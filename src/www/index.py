@@ -69,7 +69,6 @@ if options.debug:
     })
 #    from config import auth_settings
 #    settings.update(auth_settings)
-print APP_LIST
 
 def main():
     application = tornado.web.Application(APP_LIST, **settings)

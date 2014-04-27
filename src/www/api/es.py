@@ -17,6 +17,7 @@ class ESQuery():
     def query(self, q, **kwargs):
         # Check if special interval query pattern exists
         interval_query = self._parse_interval_query(q)
+        facets = self._parse_facets_option(kwargs)
         if interval_query:
             kwargs.update(interval_query)
             print kwargs
@@ -30,7 +31,17 @@ class ESQuery():
                     }
                 }
             }
+            if facets:
+                _query['facets'] = facets
             return es.search(index_name, doc_type, body=_query, **kwargs)
+
+    def _parse_facets_option(self, options):
+        facets = options.pop('facets', None)
+        if facets:
+            _facets = {}
+            for field in facets.split(','):
+                _facets[field] = {"terms": {"field": field}}
+            return _facets
 
     def _parse_interval_query(self, query):
         '''Check if the input query string matches interval search regex,
@@ -49,20 +60,20 @@ class ESQuery():
     def query_interval(self, chr,  gstart, gend, **kwargs):
         #gstart = safe_genome_pos(gstart)
         #gend = safe_genome_pos(gend)
-        #if chr.lower().startswith('chr'):
-        #    chr = chr[3:]
+        if chr.lower().startswith('chr'):
+            chr = chr[3:]
         _query = {
             "query": {
                 "bool": {
                     "must": [
                         {
-                            "term": {"dbsnp.chrom": chr.lower()}
+                            "term": {"chrom": chr.lower()}
                         },
                         {
-                            "range": {"dbsnp.chromStart": {"lte": gend}}
+                            "range": {"chromStart": {"lte": gend}}
                         },
                         {
-                            "range": {"dbsnp.chromEnd": {"gte": gstart}}
+                            "range": {"chromEnd": {"gte": gstart}}
                         }
                     ]
                 }
