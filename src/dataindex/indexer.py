@@ -44,6 +44,24 @@ def get_test_doc_li(n):
             })
     return out
 
+def docs_feeder2(infile):
+    total=0
+    t0= time.time()
+    with file(infile) as fp:
+        for line in fp:
+            doc_li = json.loads(line).values()
+            out = []
+            for doc in doc_li:
+                _doc = {}
+                _doc['dbsnp'] = doc
+                _doc['_id'] = doc['_id']
+                del _doc['dbsnp']['_id']
+                out.append(_doc)
+            print('>', len(out))
+            total += len(out)
+            yield out
+    print(total, timesofar(t0))
+
 
 def doc_feeder(doc_li, step=1000):
     total = len(doc_li)
@@ -99,6 +117,24 @@ def index_dbsnp():
             print('>', len(out))
             total += len(out)
             do_index(out, step=10000)
+    print(total, timesofar(t0))
+
+def index_cosmic():
+    total = 0
+    t0 = time.time()
+    with file('../../data/cosmicsnps_42714') as fp:
+        for line in fp:
+            doc_li = json.loads(line).values()
+            out = []
+            for doc in doc_li:
+                _doc = {}
+                _doc['cosmic'] = doc
+                _doc['_id'] = doc['_id']
+                del _doc['cosmic']['_id']
+                out.append(_doc)
+            print('>', len(out))
+            total += len(out)
+            do_index(out, step=10000, update=True)
     print(total, timesofar(t0))
 
 def index_from_file(infile, node, test=True):
