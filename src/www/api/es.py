@@ -1,3 +1,4 @@
+import re
 from elasticsearch import Elasticsearch
 
 
@@ -14,16 +15,36 @@ class ESQuery():
         return es.mget(body=vid_list, index=index_name, doc_type=doc_type, **kwargs)
 
     def query(self, q, **kwargs):
-        _query = {
-            "query": {
-                "query_string" : {
-                    #"default_field" : "content",
-                    "query" : q
+        # Check if special interval query pattern exists
+        interval_query = self._parse_interval_query(q)
+        if interval_query:
+            kwargs.update(interval_query)
+            print kwargs
+            return self.query_interval(**kwargs)
+        else:
+            _query = {
+                "query": {
+                    "query_string" : {
+                        #"default_field" : "content",
+                        "query" : q
+                    }
                 }
             }
-        }
+            return es.search(index_name, doc_type, body=_query, **kwargs)
 
-        return es.search(index_name, doc_type, body=_query, **kwargs)
+    def _parse_interval_query(self, query):
+        '''Check if the input query string matches interval search regex,
+           if yes, return a dictionary with three key-value pairs:
+              chr
+              gstart
+              gend
+            , otherwise, return None.
+        '''
+        pattern = r'chr(?P<chr>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)'
+        if query:
+            mat = re.search(pattern, query)
+            if mat:
+                return mat.groupdict()
 
     def query_interval(self, chr,  gstart, gend, **kwargs):
         #gstart = safe_genome_pos(gstart)

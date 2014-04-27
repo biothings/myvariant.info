@@ -2,8 +2,9 @@ import re
 import json
 
 from tornado.web import HTTPError
+from elasticsearch import NotFoundError
 
-from ..helper import BaseHandler
+from www.helper import BaseHandler
 from .es import ESQuery
 #from utils.common import split_ids
 
@@ -22,11 +23,12 @@ class VariantHandler(BaseHandler):
             kwargs = self.get_query_params()
             #kwargs.setdefault('scopes', 'entrezgene,ensemblgene,retired')
             #kwargs.setdefault('species', 'all')
-            variant = self.esq.get_variant(vid, **kwargs)
-            if variant:
-                self.return_json(variant)
-            else:
+            try:
+                variant = self.esq.get_variant(vid, **kwargs)
+            except NotFoundError:
                 raise HTTPError(404)
+
+            self.return_json(variant)
         else:
             raise HTTPError(404)
 
@@ -89,10 +91,6 @@ class QueryHandler(BaseHandler):
             res = {'success': False, 'error': "Missing required parameters."}
 
         self.return_json(res)
-        self.ga_track(event={'category': 'v2_api',
-                             'action': 'query_get',
-                             'label': 'qsize',
-                             'value': len(q) if q else 0})
 
     def post(self):
         '''
@@ -124,10 +122,7 @@ class QueryHandler(BaseHandler):
             res = {'success': False, 'error': "Missing required parameters."}
 
         self.return_json(res)
-        self.ga_track(event={'category': 'v2_api',
-                             'action': 'query_post',
-                             'label': 'qsize',
-                             'value': len(q) if q else 0})
+
 
 
 APP_LIST = [
