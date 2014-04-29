@@ -60,7 +60,10 @@ for article in snps.getAllMembersGen(namespaces=[0]):   # get all snp-names as l
 	#print snp_page
 	if not "23andMe" in template.name:
 		if not "OMIM SNP" in template.name:
-			print template
+			try: #REMOVE AFTER DONE DEBUGGING
+				print template
+			except UnicodeEncodeError:
+				print "error"
 			try:
 				chr = template.get("Chromosome").value.decode("iso-8859-1").rstrip()
 				pos = template.get("position").value.decode("iso-8859-1").rstrip()
