@@ -53,4 +53,4 @@ If you have/find a variant annotation resource you want to included in our syste
   * **Meta** dictionary: you can put some metadata like "maintainer", "requirements", etc. Note that "requirements" is a list of strings follows [pip requirements.txt format](https://pip.pypa.io/en/1.1/requirements.html).
   * **get_mapping** function: optional, this can be used to customize the indexing. You can just leave it empty.
 * fork this repo, and add your own data plugin (under a subfolder, like *cosmic* example), commit and send the pull request.
-
+* And the last, if you have trouble to code a data plugin, you can just produce a dump of JSON document list using whatever tools you like, and send over your dumped file to us. But that will require us to load it manually.
