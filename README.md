@@ -1,3 +1,6 @@
+Introduction
+-------------
+
 This is a project coming out of [1st NoB Hackathon](https://github.com/Network-of-BioThings/nob-hq/wiki/1st-Network-of-BioThings-Hackathon).
 
 The scope of this project is to aggregate existing annotations for genetic variants. Variant annotations have drawn huge amount of efforts from researchers, which made many variant annotation resources available, but also very scattered. Doing integration of all of them is hard.
@@ -35,7 +38,18 @@ From the discussion of the hackathon, we decided a strategy summarized as below:
   
   Also note that it's not neccesary the data-provider can write the importer, anyone who finds a useful resource can do that as well (of course, check to make sure the data release license allows that)
 
-  The guideline for writing JSON importer is coming soon.
+  See the guideline below for contributing JSON importer.
+  
+How to contribute
+------------------
 
+If you have/find a variant annotation resource you want to included in our system, you can following the guideline below to contribute a JSON importer (let's call it "**data plugin**") for it.
 
+* Code in Python (at least for now)
+* Using hg19 genome assembly for genomic cordinates (assuming we are dealing with human variants for now)
+* all data plugins is under *[src/dataload/contrib](tree/master/src/dataload/contrib)* folder.
+* check out the example *[src/dataload/contrib/cosmic](tree/master/src/dataload/contrib/cosmic)* for loading cosmic data from UCSC server. The following should be defined:
+  * **loaddata** function: the output of this function should be either a **list** or **[generator](https://docs.python.org/2/tutorial/classes.html#generators)** of JSON documents. A **generator** is ideal for large list won't fit into memeory. *cosmic* example above uses generator. See [requirements/example](#a-very-simple-rule-to-aggregate-variant-annotations) above for each JSON document.
+  * **Meta** dictionary: you can put some metadata like "maintainer", "requirements", etc. Note that "requirements" is a list of strings follows [pip requirements.txt format](https://pip.pypa.io/en/1.1/requirements.html).
+  * **get_mapping** function: optional, this can be used to customize the indexing. You can just leave it empty.
 
