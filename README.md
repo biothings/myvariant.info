@@ -3,7 +3,7 @@ Introduction
 
 This is a project coming out of [1st NoB Hackathon](https://github.com/Network-of-BioThings/nob-hq/wiki/1st-Network-of-BioThings-Hackathon).
 
-The scope of this project is to aggregate existing annotations for genetic variants. Variant annotations have drawn huge amount of efforts from researchers, which made many variant annotation resources available, but also very scattered. Doing integration of all of them is hard.
+The scope of this project is to aggregate existing annotations for genetic variants. Variant annotations have drawn huge amount of efforts from researchers, which made many variant annotation resources available, but also very scattered. Doing integration of all of them is hard, so we want to create a simple way to pool them together first, with high-performance programmatic access. That way, the further integration (e.g. deduplication, deriving higher-level annotations, etc) can be much easier.
 
 From the discussion of the hackathon, we decided a strategy summarized as below:
 
