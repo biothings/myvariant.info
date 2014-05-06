@@ -5,10 +5,18 @@ import MySQLdb
 #Draws from the cosmicRaw database directly
 #Sean D. Mooney
 
-limit = 100000
-offset = 0
+Meta = {
+    "maintainer": "Sean Mooney",
+    "requirements": [
+        "MySQL-python>=1.2.5",
+    ]
+}
+
 
 def loaddata():
+
+    limit = 100000
+    offset = 0
 
     MySQLHG19 = MySQLdb.connect('genome-mysql.cse.ucsc.edu', db='hg19', user='genomep', passwd='password')
 
@@ -61,20 +69,26 @@ def loaddata():
                 continue
 
             HGVS = "%s:g.%d%s>%s" % (chrom, chromEnd, allele1, allele2)
-            dbSNPdict[HGVS] = { "chrom":chrom, "chromStart":chromStart, "chromEnd":chromEnd, "tomour_site":tomour_site, "mut_nt":mut_nt, "mut_freq":mut_freq, "allele1":allele1, "allele2":allele2, "_id":HGVS }
-            pass
+            #dbSNPdict[HGVS] = { "chrom":chrom, "chromStart":chromStart, "chromEnd":chromEnd, "tomour_site":tomour_site, "mut_nt":mut_nt, "mut_freq":mut_freq, "allele1":allele1, "allele2":allele2, "_id":HGVS }
+            one_snp_json = { 
+                "chrom":chrom, 
+                "chromStart":chromStart, 
+                "chromEnd":chromEnd, 
+                "tomour_site":tomour_site, 
+                "mut_nt":mut_nt, 
+                "mut_freq":mut_freq, 
+                "allele1":allele1, 
+                "allele2":allele2, 
+                "_id":HGVS 
+            }
+            yield one_snp_json
+        
 
-        snp_json = json.dumps(dbSNPdict)
-        print snp_json
-        dbSNPdict = {}
+        #snp_json = json.dumps(dbSNPdict)
+        #print snp_json
+        #dbSNPdict = {}
 
-        gc.collect()
-
-        pass
+        #gc.collect()
 
 
 mapping = {}
-
-Meta = {
-    "Maintainer": "Sean Mooney"
-}
