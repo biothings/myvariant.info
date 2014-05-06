@@ -12,10 +12,7 @@ Meta = {
 }
 
 
-def loaddata():
-
-    limit = 10000
-    offset = 0
+def loaddata(limit=10000, offset=0):
 
     MySQLHG19 = MySQLdb.connect('genome-mysql.cse.ucsc.edu', db='hg19', user='genomep', passwd='password')
 
@@ -75,4 +72,6 @@ def loaddata():
             }
             yield one_snp_json
 
-mapping = {}
+
+def get_mapping():
+    pass
