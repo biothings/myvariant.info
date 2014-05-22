@@ -71,6 +71,16 @@ def doc_feeder(doc_li, step=1000):
         print('Done.')
 
 
+def verify_doc_li(doc_li):
+    from www.api import es
+    esq = es.ESQuery()
+
+    stats = {True: 0, False: 0}
+    for doc in doc_li:
+        stats[esq.exists(doc['_id'])] += 1
+    return stats
+
+
 def create_index():
     es.indices.create(index=index_name, body=mapping)
 
@@ -81,6 +91,14 @@ def do_index(doc_li, step=1000, update=False):
         _li = []
         for doc in doc_batch:
             if update:
+#                _li.append({
+#                    "update": {
+#                        "_index": index_name,
+#                        "_type": doc_type,
+#                        "_id": doc['_id']
+#                    }
+#                    })
+#                _li.append({'script': 'ctx._source.remove("cosmic")'})
                 _li.append({
                     "update": {
                         "_index": index_name,
@@ -122,7 +140,7 @@ def index_dbsnp():
 def index_cosmic():
     total = 0
     t0 = time.time()
-    with file('../../data/cosmicsnps_42714') as fp:
+    with file('../../data/cosmicsnps_42714_fix') as fp:
         for line in fp:
             doc_li = json.loads(line).values()
             out = []
@@ -140,7 +158,9 @@ def index_cosmic():
 def index_from_file(infile, node, test=True):
     t0 = time.time()
     with file(infile) as fp:
-        doc_li = json.load(fp).values()
+        doc_li = json.load(fp)
+        if isinstance(doc_li, dict):
+            doc_li = doc_li.values()
         out = []
         for doc in doc_li:
             _doc = {}
