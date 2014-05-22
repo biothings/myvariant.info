@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html class="   ">
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Network-of-BioThings/myvariant.info</title>
+    <link rel="assets" href="https://assets-cdn.github.com/">
+    <link rel="conduit-xhr" href="https://ghconduit.com:25035/">
+    <meta name="selected-link" value="repo_wiki" data-pjax-transient />
+    
+    <link href="https://assets-cdn.github.com/assets/github-0282bede6135e06ec35e92d06a80225f92812b0e.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="https://assets-cdn.github.com/assets/github2-dcf6ca6edf1a82a2dcaebf74f6b2d9eface5db5d.css" media="all" rel="stylesheet" type="text/css" />
+         
+  <meta name="description" content="myvariant.info" />
+
+  </head>
+
+
+  <body class="logged_out  env-production windows vis-public">
+    <a href="#start-of-content" tabindex="1" class="accessibility-aid js-skip-to-content">Skip to content</a>
+    <div class="wrapper">
+<div id="wiki-content" style="margin-left:200px">
+<h1>
+<a name="user-content-demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>Demo</h1>
+
+<ul class="task-list">
+<li>
+<h3>Get a variant from a ID:</h3>
+<h5>http://dev2.mygene.info:8000/api/variant/&lt;variant_id&gt;</h5>
+<p>
+<ul>
+<li><a href="http://dev2.mygene.info:8000/api/variant/1:g.35367C>T">http://dev2.mygene.info:8000/api/variant/1:g.35367C&gt;T</a></li>
+<li><a href="http://dev2.mygene.info:8000/api/variant/7:g.55241707G>T">http://dev2.mygene.info:8000/api/variant/7:g.55241707G&gtT</a></li>
+<li><a href="http://dev2.mygene.info:8000/api/variant/9:g.107620835C>T">http://dev2.mygene.info:8000/api/variant/9:g.107620835C&gt;T</a></li>
+</ul>
+</p>
+
+<li>
+<h3>Making queries (<a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax">query syntax</a>):</h3>
+<h5>http://dev2.mygene.info:8000/api/query/?q=&lt;query&gt;</h5>
+
+<ul class="task-list">
+<li>
+<p>query for anything</p>
+
+<p><a href="http://dev2.mygene.info:8000/api/query?q=rs71409357">http://dev2.mygene.info:8000/api/query?q=rs71409357</a></p>
+</li>
+<li>
+<p>query for a genomic range</p>
+
+<p><a href="http://dev2.mygene.info:8000/api/query?q=chr1:69000-70000">http://dev2.mygene.info:8000/api/query?q=chr1:69000-70000</a></p>
+</li>
+<li>
+<p>query for one or more fields</p>
+
+<p><a href="http://dev2.mygene.info:8000/api/query?q=dbsnp.snpclass:single">http://dev2.mygene.info:8000/api/query?q=dbsnp.snpclass:single</a></p>
+</li>
+<li><p>support wild char</p></li>
+<li><p>support regex</p></li>
+<li>
+<p>boolean query (AND, OR, NOT)</p>
+
+<p><a href="http://dev2.mygene.info:8000/api/query?q=(NOT func:unknown)">http://dev2.mygene.info:8000/api/query?q=(NOT func:unknown)</a></p>
+</li>
+
+<li>
+<p>faceting</p>
+
+<p><a href="http://dev2.mygene.info:8000/api/query?q=(NOT func:unknown)&amp;facets=func&amp;size=0">http://dev2.mygene.info:8000/api/query?q=(NOT func:unknown)&amp;facets=func&amp;size=0</a></p>
+</li>
+
+<li>
+<p>field exists</p>
+
+<p><a href="http://dev2.mygene.info:8000/api/query?q=_exists_:dbsnp AND _exists_:cosmic">http://dev2.mygene.info:8000/api/query?q=_exists_:dbsnp AND _exists_:cosmic</a></p>
+</li>
+
+</ul>
+</li>
+</ul>
+
+
+<h1>
+<a name="user-content-stats" class="anchor" href="#stats"><span class="octicon octicon-link"></span></a>Stats</h1>
+
+<ul class="task-list">
+<li>dbsnp (13392111)</li>
+<li>mutdb (420246)</li>
+<li>gwassnps(15030)</li>
+<li>cosmic(1024759)</li>
+<li>docm(1119)</li>
+<li>snpedia(5905)</li>
+</ul><h1>
+  </div>
+</div>
+  </div>
+</div>
+  </body>
+</html>
+
