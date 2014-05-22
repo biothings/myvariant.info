@@ -1,5 +1,5 @@
 import re
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, NotFoundError
 
 
 es = Elasticsearch()
@@ -10,6 +10,14 @@ doc_type = 'variant'
 class ESQuery():
     def get_variant(self, vid, **kwargs):
         return es.get(index=index_name, id=vid, doc_type=doc_type, **kwargs)
+
+    def exists(self, vid):
+        """return True/False if a variant id exists or not."""
+        try:
+            doc = self.get_variant(vid, fields=None)
+            return doc['found']
+        except NotFoundError, e:
+            return False
 
     def mget_variants(self, vid_list, **kwargs):
         return es.mget(body=vid_list, index=index_name, doc_type=doc_type, **kwargs)
