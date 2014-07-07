@@ -1,11 +1,11 @@
 import re
 from elasticsearch import Elasticsearch, NotFoundError
-
+import config
 
 es = Elasticsearch()
-es_host = 'localhost:9200'
-index_name = 'myvariant_all'
-doc_type = 'variant'
+es_host = config.ES_HOST
+index_name = config.ES_INDEX_NAME
+doc_type = config.ES_DOC_TYPE
 
 class ESQuery():
     def get_variant(self, vid, **kwargs):
