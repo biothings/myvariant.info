@@ -6,12 +6,12 @@ import time
 
 from elasticsearch import Elasticsearch
 from .mapping import mapping
-
+import config
 
 es = Elasticsearch()
-es_host = 'localhost:9200'
-index_name = 'myvariant_all'
-doc_type = 'variant'
+es_host = config.ES_HOST
+index_name = config.ES_INDEX_NAME
+doc_type = config.ES_DOC_TYPE
 
 
 def timesofar(t0, clock=0):
