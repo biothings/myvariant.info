@@ -74,10 +74,12 @@ def doc_feeder(doc_li, step=1000):
 def verify_doc_li(doc_li):
     from www.api import es
     esq = es.ESQuery()
-
+    logger = logging.getLogger()
+    logger.setLevel(logging.ERROR)
     stats = {True: 0, False: 0}
     for doc in doc_li:
         stats[esq.exists(doc['_id'])] += 1
+    logger.setLevel(logging.INFO)
     return stats
 
 
@@ -137,6 +139,7 @@ def index_dbsnp():
             do_index(out, step=10000)
     print(total, timesofar(t0))
 
+
 def index_cosmic():
     total = 0
     t0 = time.time()
@@ -154,6 +157,7 @@ def index_cosmic():
             total += len(out)
             do_index(out, step=10000, update=True)
     print(total, timesofar(t0))
+
 
 def index_from_file(infile, node, test=True):
     t0 = time.time()
@@ -174,3 +178,27 @@ def index_from_file(infile, node, test=True):
     print(len(out), timesofar(t0))
     if test:
         return out
+
+
+def index_dbnsfp(path, step=10000, test=True):
+    from dataload.contrib import dbnsfp
+    vdoc_generator = dbnsfp.load_data(path)
+    vdoc_batch = []
+    cnt = 0
+    t0 = time.time()
+    t1 = time.time()
+    for vdoc in vdoc_generator:
+        cnt += 1
+        vdoc_batch.append(vdoc)
+        if len(vdoc_batch) >= step:
+            if not test:
+                do_index(vdoc_batch, update=False)
+            print(cnt, timesofar(t1))
+            vdoc_batch = []
+            t1 = time.time()
+
+    if vdoc_batch:
+        if not test:
+            do_index(vdoc_batch, update=False)
+    print(cnt, timesofar(t1))
+    print("Finished! [Total time: {}]".format(timesofar(t0)))
