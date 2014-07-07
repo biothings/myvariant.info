@@ -2,8 +2,8 @@ import re
 from elasticsearch import Elasticsearch, NotFoundError
 import config
 
-es = Elasticsearch()
 es_host = config.ES_HOST
+es = Elasticsearch(es_host)
 index_name = config.ES_INDEX_NAME
 doc_type = config.ES_DOC_TYPE
 
