@@ -1,93 +1,99 @@
 # -*- coding: utf-8 -*-
-import csv, glob
+import csv
+import glob
+
 
 VALID_COLUMN_NO = 88
 
-## split ";" separated fields into comma separated lists, strip.
+
+# split ";" separated fields into comma separated lists, strip.
 def list_split(d):
-    for key, val in d.items(): 
-            try:
-                if len(val.split(";"))>1:
-                    d[key]=val.rstrip().rstrip(';').split(";")
-            except (AttributeError):
-                pass    
-            if isinstance(val, dict):
-                list_split(val)
+    for key, val in d.items():
+        try:
+            if len(val.split(";")) > 1:
+                d[key] = val.rstrip().rstrip(';').split(";")
+        except (AttributeError):
+            pass
+        if isinstance(val, dict):
+            list_split(val)
     return d
 
-## convert string numbers into integers or floats
+
+# convert string numbers into integers or floats
 def value_convert(d):
-    for key, val in d.items(): 
+    for key, val in d.items():
         try:
-            d[key]=int(val)
+            d[key] = int(val)
         except (ValueError, TypeError):
             try:
-                d[key]=float(val)
+                d[key] = float(val)
             except (ValueError, TypeError):
-                pass    
+                pass
         if isinstance(val, dict):
             value_convert(val)
     return d
 
-## remove keys whos values are "." 
-## and remove empty dictionaries
-def dict_sweep(d): 
-    for key, val in d.items(): 
-        if val==".": 
-            del d[key] 
+
+# remove keys whos values are "."
+# and remove empty dictionaries
+def dict_sweep(d):
+    for key, val in d.items():
+        if val == ".":
+            del d[key]
         elif isinstance(val, dict):
             dict_sweep(val)
-            if len(val)==0:
+            if len(val) == 0:
                 del d[key]
     return d
 
-## if dict value is a list of length 1, unlist
+
+# if dict value is a list of length 1, unlist
 def unlist(d):
     for key, val in d.items():
             if isinstance(val, list):
-                if len(val)==1:
-                    d[key]=val[0]  
+                if len(val) == 1:
+                    d[key] = val[0]
             elif isinstance(val, dict):
                 unlist(val)
     return d
-    
-## convert one snp to json
-def _map_line_to_json(fields):
-    ## specific variable treatment 
-    chrom=fields[0]
-    if fields[6]==".":
-        hg18_end="."
-    else:
-        hg18_end=int(fields[6])+1
-    chromEnd=int(fields[1]) + 1
-    allele1=fields[2]
-    allele2=fields[3]
-    HGVS="chr%s:g.%d%s>%s" % (chrom, chromEnd, allele1, allele2)
-    
-    if fields[71]==".":
-        siphy="."
-    else:
-        freq=fields[71].split(":")
-        siphy={'a':freq[0], 'c':freq[1], 'g':freq[2], 't':freq[3]}
-        
-    acc=fields[8].rstrip().rstrip(';').split(";")  
-    pos=fields[10].rstrip().rstrip(';').split(";")
-    uniprot=map(dict, map(lambda t:zip(('acc','pos'),t), zip(acc, pos)))
-    
 
-    ## load as json data  
-    one_snp_json={
-    
+
+# convert one snp to json
+def _map_line_to_json(fields):
+    # specific variable treatment
+    chrom = fields[0]
+    if fields[6] == ".":
+        hg18_end = "."
+    else:
+        hg18_end = int(fields[6])+1
+    chromEnd = int(fields[1]) + 1
+    allele1 = fields[2]
+    allele2 = fields[3]
+    HGVS = "chr%s:g.%d%s>%s" % (chrom, chromEnd, allele1, allele2)
+
+    if fields[71] == ".":
+        siphy = "."
+    else:
+        freq = fields[71].split(":")
+        siphy = {'a': freq[0], 'c': freq[1], 'g': freq[2], 't': freq[3]}
+
+    acc = fields[8].rstrip().rstrip(';').split(";")
+    pos = fields[10].rstrip().rstrip(';').split(";")
+    uniprot = map(dict, map(lambda t: zip(('acc', 'pos'), t), zip(acc, pos)))
+
+    # load as json data
+    one_snp_json = {
+
         "_id": HGVS,
-        "dbnsfp": 
+        "dbnsfp":
             {
                 "chrom": chrom,
                 "hg19":
                     {
-                        "start": fields[1], 
+                        "start": fields[1],
                         "end": chromEnd
                     },
-                "hg18": 
+                "hg18":
                     {
                         "start": fields[6],
                         "end": hg18_end
@@ -124,19 +130,19 @@ def _map_line_to_json(fields):
                     },
                 "polyphen2":
                     {
-                        "hdiv": 
+                        "hdiv":
                         {
                             "score": fields[26],
-                             "rankscore": fields[27],
-                             "pred": fields[28]
-                         },
-                         "hvar":
+                            "rankscore": fields[27],
+                            "pred": fields[28]
+                        },
+                        "hvar":
                         {
                             "score": fields[29],
                             "rankscore": fields[30],
                             "pred": fields[31]
                         }
-                    },   
+                    },
                 "lrt":
                     {
                         "score": fields[32],
@@ -191,7 +197,7 @@ def _map_line_to_json(fields):
                         "rs": fields[57],
                         "rs_rankscore": fields[58]
                     },
-                "phylop46way": 
+                "phylop46way":
                     {
                         "primate": fields[59],
                         "primate_rankscore": fields[60],
@@ -236,47 +242,25 @@ def _map_line_to_json(fields):
     }
 
     return value_convert(dict_sweep(unlist(list_split(one_snp_json))))
-    
-## open file, parse, pass to json mapper
+
+
+# open file, parse, pass to json mapper
 def data_generator(input_file):
     open_file = open(input_file)
     db_nsfp = csv.reader(open_file, delimiter="\t")
-    db_nsfp.next() #skip header
+    db_nsfp.next()  # skip header
     for row in db_nsfp:
         assert len(row) == VALID_COLUMN_NO
         one_snp_json = _map_line_to_json(row)
         yield one_snp_json
     open_file.close()
-        
-## load directory and find files, pass to data_generator
+
+
+# load path and find files, pass to data_generator
 def load_data(path):
     for input_file in glob.glob(path):
         print input_file
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
-
-def index(path, step):
-    #from dataindex.indexer import do_index
-    vdoc_generator=load_data(path)
-    vdoc_batch=[]
-    for vdoc in vdoc_generator:
-        vdoc_batch.append(vdoc)
-        if len(vdoc_batch)==step:
-            #do_index(vdoc_batch, update=False)
-            print "done indexing batch"
-            vdoc_batch=[]
-
-
-i=index("/Users/Amark/Documents/Su_Lab/dbnsfpv2/dbNSFP2.5_variant.chr7", step=10000)
-#print len(i)
-# "/Users/Amark/Documents/Su_Lab/dbnsfpv2/dbNSFP2.5_variant.chr*"
-#g=load_data("/Users/Amark/Documents/Su_Lab/dbnsfpv2/dbNSFP2.5_variant.chr*")
-#out=list(g)
-#outz=range(0, len(out), 1000)
-#for i in outz:
-#    print out[i].get("_id")
-
-
-
 
