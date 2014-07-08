@@ -17,6 +17,21 @@ def list_split(d):
         if isinstance(val, dict):
             list_split(val)
     return d
+    
+
+# remove keys whos values are "."
+# and remove empty dictionaries
+def dict_sweep(d):
+    for key, val in d.items():
+        if val == ".":
+            del d[key]
+        elif isinstance(val, list):
+            d[key] = [item for item in val if item != "."]
+        elif isinstance(val, dict):
+            dict_sweep(val)
+            if len(val) == 0:
+                del d[key]
+    return d
 
 
 # convert string numbers into integers or floats
@@ -31,19 +46,14 @@ def value_convert(d):
                 pass
         if isinstance(val, dict):
             value_convert(val)
-    return d
-
-
-# remove keys whos values are "."
-# and remove empty dictionaries
-def dict_sweep(d):
-    for key, val in d.items():
-        if val == ".":
-            del d[key]
-        elif isinstance(val, dict):
-            dict_sweep(val)
-            if len(val) == 0:
-                del d[key]
+        elif isinstance(val, list):
+            try:
+                d[key] = [int(x) for x in val]
+            except (ValueError, TypeError):
+                try:
+                    d[key] = [float(x) for x in val]
+                except (ValueError, TypeError):
+                    pass
     return d
 
 
@@ -241,7 +251,7 @@ def _map_line_to_json(fields):
             }
     }
 
-    return value_convert(dict_sweep(unlist(list_split(one_snp_json))))
+    return unlist(value_convert(dict_sweep(list_split(one_snp_json))))
 
 
 # open file, parse, pass to json mapper
@@ -263,4 +273,7 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
+
+i=load_data("/Users/Amark/documents/su_lab/dbnsfpv2/chr1.tsv")
+out=list(i)
 
