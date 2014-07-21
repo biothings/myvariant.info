@@ -26,7 +26,9 @@ def dict_sweep(d):
         if val == ".":
             del d[key]
         elif isinstance(val, list):
-            d[key] = [item for item in val if item != "."]
+            d[key] = [dict_sweep(item) for item in val if isinstance(item, dict)]
+            if len(val) == 0:
+                del d[key]
         elif isinstance(val, dict):
             dict_sweep(val)
             if len(val) == 0:
@@ -251,7 +253,7 @@ def _map_line_to_json(fields):
             }
     }
 
-    return unlist(value_convert(dict_sweep(list_split(one_snp_json))))
+    return dict_sweep(unlist(value_convert(list_split(one_snp_json))))
 
 
 # open file, parse, pass to json mapper
