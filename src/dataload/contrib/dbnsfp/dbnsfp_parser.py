@@ -276,6 +276,3 @@ def load_data(path):
         for one_snp_json in data:
             yield one_snp_json
 
-i=load_data("/Users/Amark/documents/su_lab/dbnsfpv2/chr1.tsv")
-out=list(i)
-
