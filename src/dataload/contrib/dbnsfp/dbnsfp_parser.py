@@ -254,7 +254,7 @@ def _map_line_to_json(fields):
     }
 
     one_snp_json = dict_sweep(unlist(value_convert(list_split(one_snp_json))))
-    one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json.get("dbnsfp").get("chrom"))
+    one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"]) 
     return one_snp_json
 
 
