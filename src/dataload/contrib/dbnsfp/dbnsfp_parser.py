@@ -78,10 +78,11 @@ def _map_line_to_json(fields):
         hg18_end = "."
     else:
         hg18_end = int(fields[6])+1
+    chromStart = int(fields[1])
     chromEnd = int(fields[1]) + 1
     allele1 = fields[2]
     allele2 = fields[3]
-    HGVS = "chr%s:g.%d%s>%s" % (chrom, chromEnd, allele1, allele2)
+    HGVS = "chr%s:g.%d%s>%s" % (chrom, chromStart, allele1, allele2)
 
     if fields[71] == ".":
         siphy = "."
