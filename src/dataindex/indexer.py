@@ -8,8 +8,8 @@ from elasticsearch import Elasticsearch
 from .mapping import mapping
 import config
 
-es = Elasticsearch()
 es_host = config.ES_HOST
+es = Elasticsearch(es_host)
 index_name = config.ES_INDEX_NAME
 doc_type = config.ES_DOC_TYPE
 
@@ -44,9 +44,10 @@ def get_test_doc_li(n):
             })
     return out
 
+
 def docs_feeder2(infile):
-    total=0
-    t0= time.time()
+    total = 0
+    t0 = time.time()
     with file(infile) as fp:
         for line in fp:
             doc_li = json.loads(line).values()
@@ -63,12 +64,14 @@ def docs_feeder2(infile):
     print(total, timesofar(t0))
 
 
-def doc_feeder(doc_li, step=1000):
+def doc_feeder(doc_li, step=1000, verbose=True):
     total = len(doc_li)
     for i in range(0, total, step):
-        print('\t{}-{}...'.format(i, min(i+step, total)), end='')
+        if verbose:
+            print('\t{}-{}...'.format(i, min(i+step, total)), end='')
         yield doc_li[i: i+step]
-        print('Done.')
+        if verbose:
+            print('Done.')
 
 
 def verify_doc_li(doc_li):
@@ -87,20 +90,19 @@ def create_index():
     es.indices.create(index=index_name, body=mapping)
 
 
-def do_index(doc_li, step=1000, update=False):
-    total = len(doc_li)
-    for doc_batch in doc_feeder(doc_li, step=step):
+def do_index(doc_li, index_name, doc_type, step=1000, update=False, verbose=True):
+    for doc_batch in doc_feeder(doc_li, step=step, verbose=verbose):
         _li = []
         for doc in doc_batch:
             if update:
-#                _li.append({
-#                    "update": {
-#                        "_index": index_name,
-#                        "_type": doc_type,
-#                        "_id": doc['_id']
-#                    }
-#                    })
-#                _li.append({'script': 'ctx._source.remove("cosmic")'})
+                # _li.append({
+                #     "update": {
+                #         "_index": index_name,
+                #         "_type": doc_type,
+                #         "_id": doc['_id']
+                #     }
+                #     })
+                # _li.append({'script': 'ctx._source.remove("cosmic")'})
                 _li.append({
                     "update": {
                         "_index": index_name,
@@ -192,13 +194,42 @@ def index_dbnsfp(path, step=10000, test=True):
         vdoc_batch.append(vdoc)
         if len(vdoc_batch) >= step:
             if not test:
-                do_index(vdoc_batch, update=False)
+                do_index(vdoc_batch, "myvariant_current_1", "variant", update=True, step=step, verbose=False)  # ###
             print(cnt, timesofar(t1))
             vdoc_batch = []
             t1 = time.time()
 
     if vdoc_batch:
         if not test:
-            do_index(vdoc_batch, update=False)
+            do_index(vdoc_batch, "myvariant_current_1", "variant", update=True, step=step, verbose=False)  # ###
     print(cnt, timesofar(t1))
     print("Finished! [Total time: {}]".format(timesofar(t0)))
+
+
+def clone_index(createidx=False, test=True):
+    if test:
+        return
+    from utils.es import ESIndexer
+    from utils.common import iter_n
+
+    new_idx = 'myvariant_current_1'
+    step = 10000
+    if createidx:
+        from mapping import get_mapping
+        m = get_mapping()
+        body = {'settings': {'number_of_shards': 10}}    # ###
+        es.indices.create(new_idx, body=body)
+        es.indices.put_mapping(index=new_idx, doc_type='variant', body=m)
+    # helpers.reindex(es, source_index='myvariant_all',
+    #                 target_index= new_idx, chunk_size=10000)
+    esi = ESIndexer()
+    doc_iter = esi.doc_feeder(index='myvariant_all', doc_type='variant', step=step)
+
+    def fn(doc):
+        doc = doc['_source']
+        doc['_id'] = 'chr' + doc['_id']
+        return doc
+
+    for doc_batch in iter_n(doc_iter, step):
+        doc_batch = [fn(doc) for doc in doc_batch]
+        do_index(doc_batch, index_name=new_idx, doc_type='variant', step=step, verbose=False, update=True)
