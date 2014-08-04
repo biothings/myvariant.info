@@ -72,6 +72,10 @@ class ESQuery():
             chr = chr[3:]
         _query = {
             "query": {
+
+                "bool": {
+                    "should": [
+                        {
                 "bool": {
                     "must": [
                         {
@@ -85,8 +89,25 @@ class ESQuery():
                         }
                     ]
                 }
-            }
+                },
+                {
+                "bool": {
+                    "must": [
+                        {
+                            "term": {"chrom": chr.lower()}
+                        },
+                        {
+                            "range": {"dbnsfp.hg19.start": {"lte": gend}}
+                        },
+                        {
+                            "range": {"dbnsfp.hg19.end": {"gte": gstart}}
+                        }
+                    ]
+                }
+            }]
         }
+        }
+    }
 
         return es.search(index_name, doc_type, body=_query, **kwargs)
 
