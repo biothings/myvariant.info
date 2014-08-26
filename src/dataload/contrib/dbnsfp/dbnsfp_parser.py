@@ -17,7 +17,7 @@ def list_split(d):
         if isinstance(val, dict):
             list_split(val)
     return d
-    
+
 
 # remove keys whos values are "."
 # and remove empty dictionaries
@@ -116,15 +116,19 @@ def _map_line_to_json(fields):
                 "aa":
                     {
                         "ref": fields[4],
-                        "alt": fields[5]
+                        "alt": fields[5],
+                        "pos": fields[20],
+                        "refcodon": fields[13],
+                        "codonpos": fields[15],
+                        "ensembl_transcript": fields[19],
+                        "aapos_sift": fields[21],
+                        "aapos_fathmm": fields[22]
                     },
                 "genename": fields[7],
                 "uniprot": uniprot,
                 "interpro_domain": fields[11],
                 "cds_strand": fields[12],
-                "refcodon": fields[13],
                 "slr_test_statistic": fields[14],
-                "codonpos": fields[15],
                 "fold-degenerate": fields[16],
                 "ancestral_allele": fields[17],
                 "ensembl":
@@ -132,9 +136,6 @@ def _map_line_to_json(fields):
                         "geneid": fields[18],
                         "transcriptid": fields[19]
                     },
-                "aapos": fields[20],
-                "aapos_sift": fields[21],
-                "aapos_fathmm": fields[22],
                 "sift":
                     {
                         "score": fields[23],
@@ -255,7 +256,7 @@ def _map_line_to_json(fields):
     }
 
     one_snp_json = dict_sweep(unlist(value_convert(list_split(one_snp_json))))
-    one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"]) 
+    one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"])
     return one_snp_json
 
 
@@ -264,10 +265,24 @@ def data_generator(input_file):
     open_file = open(input_file)
     db_nsfp = csv.reader(open_file, delimiter="\t")
     db_nsfp.next()  # skip header
+    previous_row = None
     for row in db_nsfp:
         assert len(row) == VALID_COLUMN_NO
-        one_snp_json = _map_line_to_json(row)
-        yield one_snp_json
+        current_row = _map_line_to_json(row)
+        if previous_row:
+            if current_row["_id"] == previous_row["_id"]:
+                aa = previous_row["dbnsfp"]["aa"]
+                if not isinstance(aa, list):
+                    aa = [aa]
+                aa.append(current_row["dbnsfp"]["aa"])
+                previous_row["dbnsfp"]["aa"] = aa
+                if len(previous_row["dbnsfp"]["aa"]) > 1:
+                    continue
+            else:
+                yield previous_row
+        previous_row = current_row
+    if previous_row:
+        yield previous_row
     open_file.close()
 
 
@@ -278,4 +293,3 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
-
