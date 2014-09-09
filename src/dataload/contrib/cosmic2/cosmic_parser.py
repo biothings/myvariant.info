@@ -4,7 +4,7 @@ import re
 import glob
 
 
-VALID_COLUMN_NO = 25
+VALID_COLUMN_NO = 29
 
 
 # remove keys whos values are "."
@@ -118,7 +118,7 @@ def data_generator(input_file):
     cosmic = csv.reader(open_file, delimiter="\t")
     cosmic.next()  # skip header
     for row in cosmic:
-        assert len(row) == 29
+        assert len(row) == VALID_COLUMN_NO
         if row[13].find('?') != -1 or \
            row[16] == "" or \
            row[17] == "":  # Mutation GRCh37 genome position, Mutation CDS
