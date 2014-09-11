@@ -113,26 +113,19 @@ def _map_line_to_json(fields):
 
 
 # open file, parse, pass to json mapper
-def data_generator(input_file):
-    open_file = open(input_file)
-    cosmic = csv.reader(open_file, delimiter="\t")
-    cosmic.next()  # skip header
-    for row in cosmic:
-        assert len(row) == VALID_COLUMN_NO
-        if row[13].find('?') != -1 or \
-           row[16] == "" or \
-           row[17] == "":  # Mutation GRCh37 genome position, Mutation CDS
-            continue  # skip variant
-        one_snp_json = _map_line_to_json(row)
-        if one_snp_json:
-            yield one_snp_json
+def load_data(input_file):
+    for file in sorted(glob.glob(input_file)):
+        print file
+        open_file = open(input_file)
+        cosmic = csv.reader(open_file, delimiter="\t")
+        cosmic.next()  # skip header
+        for row in cosmic:
+            assert len(row) == VALID_COLUMN_NO
+            if row[13].find('?') != -1 or \
+               row[16] == "" or \
+               row[17] == "":  # Mutation GRCh37 genome position, Mutation CDS
+                continue  # skip variant
+            one_snp_json = _map_line_to_json(row)
+            if one_snp_json:
+                yield one_snp_json
     open_file.close()
-
-
-# load path and find files, pass to data_generator
-def load_data(path):
-    for input_file in sorted(glob.glob(path)):
-        print input_file
-        data = data_generator(input_file)
-        for one_snp_json in data:
-            yield one_snp_json
