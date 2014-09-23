@@ -42,7 +42,12 @@ def polyphen(field):
     else:
         return field
 
-
+def count_dict(field):
+    count_list = field.split("/")
+    counts = dict(item.split("=") for item in count_list)
+    return counts
+    
+    
 # convert one snp to json
 def _map_line_to_json(fields):
     chrInfo = fields[0].split(":")  # grch37
@@ -79,9 +84,9 @@ def _map_line_to_json(fields):
                 "allele2": fields[3].split(">")[1],
                 "allele_count":
                     {
-                        "european_american": fields[4].split("/"),
-                        "african_american": fields[5].split("/"),
-                        "all": fields[6].split("/")
+                        "european_american": count_dict(fields[4]),
+                        "african_american": count_dict(fields[5]),
+                        "all": count_dict(fields[6])
                     },
                 "ma_fin_percent":
                     {
@@ -91,9 +96,9 @@ def _map_line_to_json(fields):
                     },
                 "genotype_count":
                     {
-                        "european_american": fields[8].split("/"),
-                        "african_american": fields[9].split("/"),
-                        "all_genotype": fields[10].split("/")
+                        "european_american": count_dict(fields[8]),
+                        "african_american": count_dict(fields[9]),
+                        "all_genotype": count_dict(fields[10])
                     },
                 "avg_sample_read": fields[11],
                 "gene":
