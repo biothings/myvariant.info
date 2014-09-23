@@ -46,7 +46,7 @@ def _map_line_to_json(fields):
     cds = fields[13]
     sub = re.search(r'[ATCG]+>[ATCGMN]+', cds)
     ins = re.search(r'ins[ATCGMN]+|ins[0-9]+', cds)
-    delete = re.search('del', cds)
+    delete = cds.find('del') == 0
     del_ins = re.search(r'[0-9]+>[ATCGMN]+', cds)
     comp = re.search(r'[ATCGMN]+', cds)
 
