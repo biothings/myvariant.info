@@ -75,7 +75,7 @@ def _map_line_to_json(fields):
     #print fields[1]
     #print cds
     
-    seq = re.search(r'[ATCGMNHYR]+', cds)
+    seq = re.findall(r'[ATCGMNHYR]+|[0-9]+', cds)[-1]
     replace = re.findall(r'[ATCGMNYR=]+', cds)
     sub = re.search(r'[ATCGMNHYR]+>[ATCGMNHYR]+', cds)
     ins = re.search(r'ins[ATCGMNHYR]+|ins[0-9]+', cds)
@@ -85,9 +85,10 @@ def _map_line_to_json(fields):
     inv = re.search(r'inv|inv[0-9]+|inv[ATCGMNHYR]+', cds)
     if ins:
         delete = None
-    if delete:
+        indel = None
+    elif delete:
         ins = None
-
+        indel = None
     if sub:
         HGVS = "chr%s:g.%s%s" % (chrom, chromStart, sub.group())
     elif ins:
@@ -95,9 +96,9 @@ def _map_line_to_json(fields):
     elif delete:
         HGVS = "chr%s:g.%s_%sdel" % (chrom, chromStart, chromEnd)
     elif indel:
-        HGVS = "chr%s:g.%s_%sdel%s" % (chrom, chromStart, chromEnd, ins.group())
+        HGVS = "chr%s:g.%s_%sdelins%s" % (chrom, chromStart, chromEnd, seq)
     elif dup:
-        HGVS = "chr%s:g.%s_%sdup%s" % (chrom, chromStart, chromEnd, seq.group())
+        HGVS = "chr%s:g.%s_%sdup%s" % (chrom, chromStart, chromEnd, seq)
     elif inv:
         HGVS = "chr%s:g.%s_%sinv%s" % (chrom, chromStart, chromEnd, inv.group())
     elif replace:
