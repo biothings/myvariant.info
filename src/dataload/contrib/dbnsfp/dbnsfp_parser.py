@@ -325,6 +325,3 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
-
-i = load_data("/Users/Amark/Documents/Su_Lab/myvariant.info/dbnsfpv2/dbNSFPv2.7/chr4.tsv")
-out = list(i)
