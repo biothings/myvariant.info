@@ -159,9 +159,9 @@ def load_data(input_file):
     for file in sorted(glob.glob(input_file)):
         print file
         open_file = open(input_file)
-        cosmic = csv.reader(open_file, delimiter="\t")
-        cosmic.next()  # skip header
-        for row in cosmic:
+        clinvar = csv.reader(open_file, delimiter="\t")
+        clinvar.next()  # skip header
+        for row in clinvar:
             assert len(row) == VALID_COLUMN_NO
             if row[12] == "GRCh37" or \
                row[13] == "-"  or \
