@@ -208,15 +208,14 @@ def _map_line_to_json(fields):
 def load_data(input_file):
         # All possible SNVs of GRCh37/hg19 incl. all annotations
         cadd = pysam.Tabixfile(input_file)
-        for row in cadd.fetch(1, 1000000, 1010000):
+        for row in cadd.fetch():
             row = row.split()
-            yield row
-#            assert len(row) == VALID_COLUMN_NO
-#            one_snp_json = _map_line_to_json(row)
-#            if one_snp_json:
-#                yield one_snp_json
+            assert len(row) == VALID_COLUMN_NO
+            one_snp_json = _map_line_to_json(row)
+            if one_snp_json:
+                yield one_snp_json
     
-i = load_data("http://shendure-web.gs.washington.edu/cadd/v1.0/whole_genome_SNVs_inclAnno.tsv.gz")
-out=list(i)
+#i = load_data("http://shendure-web.gs.washington.edu/cadd/v1.0/whole_genome_SNVs_inclAnno.tsv.gz")
+#out=list(i)
 
 
