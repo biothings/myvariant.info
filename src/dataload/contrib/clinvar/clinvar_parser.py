@@ -48,7 +48,7 @@ def unlist(d):
 
 def phen_id(phenotype_ids):
     try:
-        p = phenotype_ids.strip(";").replace(";",",").split(",")
+        p = phenotype_ids.strip(";").replace(";", ",").split(",")
         phen_id = {}
         for id in p:
             key, value = id.split(":")
@@ -72,9 +72,7 @@ def _map_line_to_json(fields):
     HGVS = None
     cds = fields[18].split(":")
     cds = cds[1]
-    #print fields[1]
-    #print cds
-    
+
     seq = re.findall(r'[ATCGMNHYR]+|[0-9]+', cds)[-1]
     replace = re.findall(r'[ATCGMNYR=]+', cds)
     sub = re.search(r'[ATCGMNHYR]+>[ATCGMNHYR]+', cds)
@@ -96,7 +94,10 @@ def _map_line_to_json(fields):
     elif delete:
         HGVS = "chr%s:g.%s_%sdel" % (chrom, chromStart, chromEnd)
     elif indel:
-        HGVS = "chr%s:g.%s_%sdelins%s" % (chrom, chromStart, chromEnd, seq)
+        try:
+            HGVS = "chr%s:g.%s_%sdel%s" % (chrom, chromStart, chromEnd, ins.group())
+        except AttributeError:
+            print "ERROR:", fields[1], cds
     elif dup:
         HGVS = "chr%s:g.%s_%sdup%s" % (chrom, chromStart, chromEnd, seq)
     elif inv:
@@ -121,7 +122,7 @@ def _map_line_to_json(fields):
                         "assembly": fields[12],
                         "chr": fields[13],
                         "start": fields[14],
-                        "end": fields[15]                    
+                        "end": fields[15]
                     },
                 "type": fields[1],
                 "name": fields[2],
@@ -139,7 +140,7 @@ def _map_line_to_json(fields):
                 "origin": fields[11],
                 "cytogenic": fields[16],
                 "review_status": fields[17],
-                "hgvs": 
+                "hgvs":
                     {
                         "coding": fields[18],
                         "protein": fields[19]
@@ -172,6 +173,6 @@ def load_data(input_file):
             if one_snp_json:
                 yield one_snp_json
         open_file.close()
-    
-i = load_data("/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/variant_summary.txt")
-out=list(i)
+
+#  i = load_data("/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/variant_summary.txt")
+#  out=list(i)
