@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pysam
+from itertools import groupby, imap
 
 
 VALID_COLUMN_NO = 90
@@ -46,6 +47,7 @@ def unlist(d):
 
 # convert one snp to json
 def _map_line_to_json(fields):
+    assert len(fields) == VALID_COLUMN_NO
     chrom = fields[0]
     chromStart = fields[1]
     allele1 = fields[2]
@@ -202,46 +204,32 @@ def _map_line_to_json(fields):
                   }
             }
     return dict_sweep(unlist(value_convert(one_snp_json)))
+            
+
+def merge_duplicate_rows(rows):
+    rows = list(rows)
+    first_row = rows[0]
+    other_rows = rows[1:]
+    for row in other_rows:
+        for i in first_row["cadd"]:
+            if row["cadd"][i]:
+                if row["cadd"][i] != first_row["cadd"][i]:
+                    aa = first_row["cadd"][i]
+                    if not isinstance(aa, list):
+                        aa = [aa]
+                    aa.append(row["cadd"][i])
+                    first_row["cadd"][i] = aa             
+    return first_row
 
 
 # open file, parse, pass to json mapper
 def load_data(input_file):
         # All possible SNVs of GRCh37/hg19 incl. all annotations
         cadd = pysam.Tabixfile(input_file)
-        previous_row = None
-        for row in cadd.fetch(1, 10000000, 10010000):
-            row = row.split()
-            assert len(row) == VALID_COLUMN_NO
-#            one_snp_json = _map_line_to_json(row)
-#            if one_snp_json:
-#                yield one_snp_json
-            current_row = _map_line_to_json(row)
-            if previous_row:
-                if current_row["_id"] == previous_row["_id"]: # merge duplicate _id's
-                    for i in previous_row["cadd"]:
-                        if current_row["cadd"][i] != previous_row["cadd"][i]:
-                            aa = previous_row["cadd"][i]
-                            if not isinstance(aa, list):
-                                aa = [aa]
-                            aa.append(current_row["cadd"][i])
-                            previous_row["cadd"][i] = aa
-                yield previous_row
-            previous_row = current_row
-        if previous_row:
-            yield previous_row
-    
-i = load_data("http://krishna.gs.washington.edu/download/CADD/v1.0/whole_genome_SNVs_inclAnno.tsv.gz")
-out = list(i)
-print len(out)
-id_list=[]
-for id in out:
-    id_list.append(id['_id'])
-myset = set(id_list)
-print len(myset)
-
-#dup=[]
-#for id in out:
-#    if id['_id'] == "chr1:g.901881C>G":
-#        dup.append(id)
-
+        cadd = cadd.fetch()
+        cadd = imap(lambda x: x.split(), cadd)
+        json_rows = imap(_map_line_to_json, cadd)
+        row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
+        for one_snp_json in imap(merge_duplicate_rows, row_groups):
+            yield one_snp_json
 
