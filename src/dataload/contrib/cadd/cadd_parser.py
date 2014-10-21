@@ -186,17 +186,17 @@ def _map_line_to_json(fields):
                              'exon': fields[79],
                              'intron': fields[80]
                          },
-                     'grantham': fields[83],
-                     'polyphen':
-                         {
-                             'cat': fields[84],
-                             'val': fields[85]
-                         },
-                     'sift':
-                         {
-                             'cat': fields[86],
-                             'val': fields[87]
-                         },
+#                     'grantham': fields[83],
+#                     'polyphen':
+#                         {
+#                             'cat': fields[84],
+#                             'val': fields[85]
+#                         },
+#                     'sift':
+#                         {
+#                             'cat': fields[86],
+#                             'val': fields[87]
+#                         },
                      'rawscore': fields[88],
                      'phred': fields[89]
                   }
@@ -208,14 +208,40 @@ def _map_line_to_json(fields):
 def load_data(input_file):
         # All possible SNVs of GRCh37/hg19 incl. all annotations
         cadd = pysam.Tabixfile(input_file)
-        for row in cadd.fetch():
+        previous_row = None
+        for row in cadd.fetch(1, 10000000, 10010000):
             row = row.split()
             assert len(row) == VALID_COLUMN_NO
-            one_snp_json = _map_line_to_json(row)
-            if one_snp_json:
-                yield one_snp_json
+#            one_snp_json = _map_line_to_json(row)
+#            if one_snp_json:
+#                yield one_snp_json
+            current_row = _map_line_to_json(row)
+            if previous_row:
+                if current_row["_id"] == previous_row["_id"]: # merge duplicate _id's
+                    for i in previous_row["cadd"]:
+                        if current_row["cadd"][i] != previous_row["cadd"][i]:
+                            aa = previous_row["cadd"][i]
+                            if not isinstance(aa, list):
+                                aa = [aa]
+                            aa.append(current_row["cadd"][i])
+                            previous_row["cadd"][i] = aa
+                yield previous_row
+            previous_row = current_row
+        if previous_row:
+            yield previous_row
     
-#i = load_data("http://shendure-web.gs.washington.edu/cadd/v1.0/whole_genome_SNVs_inclAnno.tsv.gz")
-#out=list(i)
+i = load_data("http://krishna.gs.washington.edu/download/CADD/v1.0/whole_genome_SNVs_inclAnno.tsv.gz")
+out = list(i)
+print len(out)
+id_list=[]
+for id in out:
+    id_list.append(id['_id'])
+myset = set(id_list)
+print len(myset)
+
+#dup=[]
+#for id in out:
+#    if id['_id'] == "chr1:g.901881C>G":
+#        dup.append(id)
 
 
