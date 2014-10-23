@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import csv
 import glob
+import pymongo
 
 
 VALID_COLUMN_NO = 98
@@ -325,3 +326,19 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
+            
+            
+# load collection into mongodb
+def load_collection(database, collection, collection_name):
+    """
+    : param database: mongodb url
+    : param collection: variant docs, path to file
+    : param collection_name: annotation source name
+    """
+    conn = pymongo.MongoClient(database)
+    db = conn.variantdoc
+    posts = db[collection_name]
+    for doc in load_data(collection):
+        posts.insert(doc, manipulate=False, check_keys=False, w=0)
+    return db
+        

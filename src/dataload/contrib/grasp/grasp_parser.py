@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import csv
 import glob
+import pymongo
 
 
 VALID_COLUMN_NO = 70
@@ -177,6 +178,20 @@ def load_data(input_file):
             if one_snp_json:
                 yield one_snp_json
         open_file.close()
+        
+        
+def load_collection(database, collection, collection_name):
+    """
+    : param database: mongodb url
+    : param collection: variant docs, path to file
+    : param collection_name: annotation source name
+    """
+    conn = pymongo.MongoClient(database)
+    db = conn.variantdoc
+    posts = db[collection_name]
+    for doc in load_data(collection):
+        posts.insert(doc, manipulate=False, check_keys=False, w=0)
+    return db
     
 i = load_data("/Users/Amark/Documents/Su_Lab/myvariant.info/grasp/graspmini.tsv")
 out=list(i)

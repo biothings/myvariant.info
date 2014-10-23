@@ -2,6 +2,8 @@
 import csv
 import re
 import glob
+import pymongo
+from itertools import islice, imap, groupby
 
 
 VALID_COLUMN_NO = 25
@@ -65,6 +67,7 @@ def phen_id(phenotype_ids):
 
 # convert one snp to json
 def _map_line_to_json(fields):
+    assert len(fields) == VALID_COLUMN_NO
     chrom = fields[13]
     chromStart = fields[14]
     chromEnd = fields[15]
@@ -155,24 +158,61 @@ def _map_line_to_json(fields):
     return dict_sweep(unlist(value_convert(one_snp_json)))
 
 
+def merge_duplicate_rows(rows):
+    rows = list(rows)
+    first_row = rows[0]
+    other_rows = rows[1:]
+    for row in other_rows:
+        for i in first_row['clinvar']:
+            if row['clinvar'][i]:
+                if row['clinvar'][i] != first_row['clinvar'][i]:
+                    aa = first_row['clinvar'][i]
+                    if not isinstance(aa, list):
+                        aa = [aa]
+                    aa.append(row['clinvar'][i])
+                    first_row['clinvar'][i] = aa             
+    return first_row
+
+
 # open file, parse, pass to json mapper
-def load_data(input_file):
-    for file in sorted(glob.glob(input_file)):
-        print file
-        open_file = open(input_file)
+def data_generator(input_file):
+    with open(input_file) as open_file:
+        print open_file
         clinvar = csv.reader(open_file, delimiter="\t")
         clinvar.next()  # skip header
-        for row in clinvar:
-            assert len(row) == VALID_COLUMN_NO
-            if row[12] == "GRCh37" or \
-               row[13] == "-"  or \
-               row[18] == "-"  or \
-               re.search(r'p.', row[18]):
-                continue  # skip variant
-            one_snp_json = _map_line_to_json(row)
-            if one_snp_json:
-                yield one_snp_json
-        open_file.close()
+        
+        clinvar = (row for row in clinvar
+                    if row[18] != '-' and
+                    not re.search(r'p.', row[18]))
+                    
+        json_rows = imap(_map_line_to_json, clinvar)
+        row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
+        for one_snp_json in imap(merge_duplicate_rows, row_groups):
+            yield one_snp_json
 
-#  i = load_data("/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/variant_summary.txt")
-#  out=list(i)
+
+def load_collection(database, collection, collection_name):
+    """
+    : param database: mongodb url
+    : param collection: variant docs, path to file
+    : param collection_name: annotation source name
+    """
+    for file in collection:
+        print file
+    conn = pymongo.MongoClient(database)
+    db = conn.variantdoc
+    posts = db[collection_name]
+    for doc in data_generator(collection):
+        posts.insert(doc, manipulate=False, check_keys=False, w=0)
+    return db
+
+
+#d = load_collection('/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/clinvarmini.tsv', 'clinvar')
+i = data_generator("/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/variant_summary.txt")
+out=list(i)
+print len(out)
+id_list=[]
+for id in out:
+    id_list.append(id['_id'])
+myset = set(id_list)
+print len(myset)

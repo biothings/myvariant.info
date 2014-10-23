@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+
 import pysam
 from itertools import groupby, imap
+import pymongo
 
 
 VALID_COLUMN_NO = 90
+DEPENDENCIES = ["pysam", "pymongo"]
 
 
 # remove keys whos values are "."
@@ -43,7 +46,7 @@ def unlist(d):
             elif isinstance(val, dict):
                 unlist(val)
     return d
-    
+
 
 # convert one snp to json
 def _map_line_to_json(fields):
@@ -112,7 +115,7 @@ def _map_line_to_json(fields):
                              'h3k4me3': fields[32],
                              'nucleo': fields[33],
                              'occ': fields[34],
-                             'p_val':  
+                             'p_val':
                                  {
                                      'comb': fields[35],
                                      'dnas': fields[36],
@@ -188,6 +191,7 @@ def _map_line_to_json(fields):
                              'exon': fields[79],
                              'intron': fields[80]
                          },
+# KeyError
 #                     'grantham': fields[83],
 #                     'polyphen':
 #                         {
@@ -199,12 +203,12 @@ def _map_line_to_json(fields):
 #                             'cat': fields[86],
 #                             'val': fields[87]
 #                         },
-                     'rawscore': fields[88],
-                     'phred': fields[89]
+#                     'rawscore': fields[88],
+#                     'phred': fields[89]
                   }
             }
     return dict_sweep(unlist(value_convert(one_snp_json)))
-            
+
 
 def merge_duplicate_rows(rows):
     rows = list(rows)
@@ -223,7 +227,7 @@ def merge_duplicate_rows(rows):
 
 
 # open file, parse, pass to json mapper
-def load_data(input_file):
+def data_generator(input_file):
         # All possible SNVs of GRCh37/hg19 incl. all annotations
         cadd = pysam.Tabixfile(input_file)
         cadd = cadd.fetch()
@@ -233,3 +237,17 @@ def load_data(input_file):
         for one_snp_json in imap(merge_duplicate_rows, row_groups):
             yield one_snp_json
 
+
+# load collection into mongodb
+def load_collection(database, collection, collection_name):
+    """
+    : param database: mongodb url
+    : param collection: variant docs, path to file
+    : param collection_name: annotation source name
+    """
+    conn = pymongo.MongoClient(database)
+    db = conn.variantdoc
+    posts = db[collection_name]
+    for doc in data_generator(collection):
+        posts.insert(doc, manipulate=False, check_keys=False, w=0)
+    return db
