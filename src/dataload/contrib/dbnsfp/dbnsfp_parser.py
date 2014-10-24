@@ -322,6 +322,7 @@ def data_generator(input_file):
 # load path and find files, pass to data_generator
 def load_data(path):
     for input_file in sorted(glob.glob(path)):
+        #if 'chr' in input_file:
         print input_file
         data = data_generator(input_file)
         for one_snp_json in data:
@@ -341,4 +342,4 @@ def load_collection(database, collection, collection_name):
     for doc in load_data(collection):
         posts.insert(doc, manipulate=False, check_keys=False, w=0)
     return db
-        
+     
