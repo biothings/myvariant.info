@@ -3,7 +3,7 @@ import csv
 import glob
 import pymongo
 import time
-from dataindex.indexer import timesofar
+
 
 VALID_COLUMN_NO = 98
 
@@ -328,7 +328,27 @@ def load_data(path):
         for one_snp_json in data:
             yield one_snp_json
             
-            
+           
+def timesofar(t0, clock=0):
+    '''return the string(eg.'3m3.42s') for the passed real time/CPU time so far
+       from given t0 (return from t0=time.time() for real time/
+       t0=time.clock() for CPU time).'''
+    if clock:
+        t = time.clock() - t0
+    else:
+        t = time.time() - t0
+    h = int(t / 3600)
+    m = int((t % 3600) / 60)
+    s = round((t % 3600) % 60, 2)
+    t_str = ''
+    if h != 0:
+        t_str += '%sh' % h
+    if m != 0:
+        t_str += '%sm' % m
+    t_str += '%ss' % s
+    return t_str
+    
+    
 # load collection into mongodb
 def load_collection(database, input_file_list, collection_name):
     """
