@@ -3,6 +3,7 @@ import csv
 import glob
 import pymongo
 import time
+from dataindex.indexer import timesofar
 
 VALID_COLUMN_NO = 98
 
