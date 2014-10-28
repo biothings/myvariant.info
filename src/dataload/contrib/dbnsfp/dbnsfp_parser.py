@@ -2,7 +2,7 @@
 import csv
 import glob
 import pymongo
-
+import time
 
 VALID_COLUMN_NO = 98
 
@@ -340,4 +340,33 @@ def load_collection(database, input_file_list, collection_name):
     posts = db[collection_name]
     for doc in load_data(input_file_list):
         posts.insert(doc, manipulate=False, check_keys=False, w=0)
-    return db
+    print "%s successfully loaded into mongodb" % collection_name
+
+
+def timesofar(t0, clock=0):
+    '''return the string(eg.'3m3.42s') for the passed real time/CPU time so far
+       from given t0 (return from t0=time.time() for real time/
+       t0=time.clock() for CPU time).'''
+    if clock:
+        t = time.clock() - t0
+    else:
+        t = time.time() - t0
+    h = int(t / 3600)
+    m = int((t % 3600) / 60)
+    s = round((t % 3600) % 60, 2)
+    t_str = ''
+    if h != 0:
+        t_str += '%sh' % h
+    if m != 0:
+        t_str += '%sm' % m
+    t_str += '%ss' % s
+    return t_str
+    
+    
+def run(database, input_file_list, collection_name):
+    t1 = time.time()
+    cnt = 0
+    for doc in load_collection(database, input_file_list, collection_name):
+        cnt += 1
+        if cnt % 100000 == 0:
+            print cnt, timesofar(t1)
