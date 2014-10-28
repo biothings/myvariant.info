@@ -239,15 +239,15 @@ def data_generator(input_file):
 
 
 # load collection into mongodb
-def load_collection(database, collection, collection_name):
+def load_collection(database, cadd_url, collection_name):
     """
     : param database: mongodb url
-    : param collection: variant docs, path to file
+    : param input_file_list: variant docs, path to file
     : param collection_name: annotation source name
     """
     conn = pymongo.MongoClient(database)
     db = conn.variantdoc
     posts = db[collection_name]
-    for doc in data_generator(collection):
+    for doc in data_generator(cadd_url):
         posts.insert(doc, manipulate=False, check_keys=False, w=0)
     return db

@@ -177,38 +177,35 @@ def merge_duplicate_rows(rows):
 # open file, parse, pass to json mapper
 def data_generator(input_file):
     with open(input_file) as open_file:
-        print open_file
         clinvar = csv.reader(open_file, delimiter="\t")
         clinvar.next()  # skip header
-        
         clinvar = (row for row in clinvar
                     if row[18] != '-' and
                     not re.search(r'p.', row[18]))
-                    
-        json_rows = imap(_map_line_to_json, clinvar)
+        json_rows = (row for row in imap(_map_line_to_json, clinvar) if row)
         row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
         for one_snp_json in imap(merge_duplicate_rows, row_groups):
             yield one_snp_json
 
 
-def load_collection(database, collection, collection_name):
+def load_collection(database, input_file_list, collection_name):
     """
     : param database: mongodb url
-    : param collection: variant docs, path to file
+    : param input_file_list: variant docs, path to file
     : param collection_name: annotation source name
     """
-    for file in collection:
+    for file in input_file_list:
         print file
     conn = pymongo.MongoClient(database)
     db = conn.variantdoc
     posts = db[collection_name]
-    for doc in data_generator(collection):
+    for doc in data_generator(input_file_list):
         posts.insert(doc, manipulate=False, check_keys=False, w=0)
     return db
 
 
-#d = load_collection('/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/clinvarmini.tsv', 'clinvar')
-i = data_generator("/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/variant_summary.txt")
+i = data_generator('/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/clinvarmini.tsv')
+#i = data_generator("/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/variant_summary.txt")
 out=list(i)
 print len(out)
 id_list=[]
@@ -216,3 +213,8 @@ for id in out:
     id_list.append(id['_id'])
 myset = set(id_list)
 print len(myset)
+
+row_count=[row for row in out if out.count(row['_id']) > 1]
+
+
+

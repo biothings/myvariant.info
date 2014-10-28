@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import csv
 import glob
+from itertools import islice, groupby, imap
 import pymongo
 
 
@@ -165,6 +166,35 @@ def _map_line_to_json(fields):
     return list_split(dict_sweep(unlist(value_convert(one_snp_json))))
 
 
+def merge_duplicate_rows(rows):
+    rows = list(rows)
+    first_row = rows[0]
+    other_rows = rows[1:]
+    for row in other_rows:
+        for i in first_row['grasp']:
+            if row['grasp'][i]:
+                if row['grasp'][i] != first_row['grasp'][i]:
+                    aa = first_row['grasp'][i]
+                    if not isinstance(aa, list):
+                        aa = [aa]
+                    aa.append(row['grasp'][i])
+                    first_row['grasp'][i] = aa             
+    return first_row
+
+
+# open file, parse, pass to json mapper
+def load_data(input_file):
+    with open(input_file) as open_file:
+        grasp = csv.reader(open_file, delimiter="\t")
+        # Skip first 8 meta lines
+        grasp = islice(grasp, 8, None)
+        grasp = (row for row in grasp if len(row) == VALID_COLUMN_NO)
+        json_rows = imap(_map_line_to_json, grasp)
+        row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
+        for one_snp_json in imap(merge_duplicate_rows, row_groups):
+            yield one_snp_json
+
+
 # open file, parse, pass to json mapper
 def load_data(input_file):
     for file in sorted(glob.glob(input_file)):
@@ -172,28 +202,39 @@ def load_data(input_file):
         open_file = open(input_file)
         grasp = csv.reader(open_file, delimiter="\t")
         grasp.next()  # skip header
+        bad_rows = []
         for row in grasp:
             #assert len(row) == VALID_COLUMN_NO
-            one_snp_json = _map_line_to_json(row)
-            if one_snp_json:
+            try:
+                one_snp_json = _map_line_to_json(row)
+            #if one_snp_json:
                 yield one_snp_json
+            except:
+                diff_rows = enumerate(row)
+                wrong = [(i, row) for (i, row) in diff_rows]
+                #print wrong[-1]
+                 
         open_file.close()
         
         
-def load_collection(database, collection, collection_name):
+def load_collection(database, input_file_list, collection_name):
     """
     : param database: mongodb url
-    : param collection: variant docs, path to file
+    : param input_file_list: variant docs, path to file
     : param collection_name: annotation source name
     """
     conn = pymongo.MongoClient(database)
     db = conn.variantdoc
     posts = db[collection_name]
-    for doc in load_data(collection):
+    for doc in load_data(input_file_list):
         posts.insert(doc, manipulate=False, check_keys=False, w=0)
     return db
     
 i = load_data("/Users/Amark/Documents/Su_Lab/myvariant.info/grasp/graspmini.tsv")
 out=list(i)
-
-
+print len(out)
+id_list=[]
+for id in out:
+    id_list.append(id['_id'])
+myset = set(id_list)
+print len(myset)

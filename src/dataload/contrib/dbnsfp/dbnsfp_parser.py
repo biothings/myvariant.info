@@ -322,7 +322,6 @@ def data_generator(input_file):
 # load path and find files, pass to data_generator
 def load_data(path):
     for input_file in sorted(glob.glob(path)):
-        #if 'chr' in input_file:
         print input_file
         data = data_generator(input_file)
         for one_snp_json in data:
@@ -330,16 +329,15 @@ def load_data(path):
             
             
 # load collection into mongodb
-def load_collection(database, collection, collection_name):
+def load_collection(database, input_file_list, collection_name):
     """
     : param database: mongodb url
-    : param collection: variant docs, path to file
+    : param input_file_list: variant docs, path to file
     : param collection_name: annotation source name
     """
     conn = pymongo.MongoClient(database)
     db = conn.variantdoc
     posts = db[collection_name]
-    for doc in load_data(collection):
+    for doc in load_data(input_file_list):
         posts.insert(doc, manipulate=False, check_keys=False, w=0)
     return db
-     
