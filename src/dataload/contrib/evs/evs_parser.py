@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import csv
 import glob
-from itertools import islice
+from itertools import islice, groupby, imap
+import pymongo
+#from dataindex.indexer import timesofar
+import time
 
 
 VALID_COLUMN_NO = 31
@@ -42,12 +45,13 @@ def polyphen(field):
     else:
         return field
 
+
 def count_dict(field):
     count_list = field.split("/")
     counts = dict(item.split("=") for item in count_list)
     return counts
-    
-    
+
+
 # convert one snp to json
 def _map_line_to_json(fields):
     chrInfo = fields[0].split(":")  # grch37
@@ -118,7 +122,7 @@ def _map_line_to_json(fields):
                         "phast_cons": fields[18],
                         "gerp": fields[19]
                     },
-                "grantham_score": fields[20],
+                #"grantham_score": fields[20],
                 "polyphen2":
                     {
                         "class": polyphen(fields[21])[0],
@@ -141,20 +145,34 @@ def _map_line_to_json(fields):
     return dict_sweep(value_convert(one_snp_json))
 
 
+def merge_duplicate_rows(rows):
+    rows = list(rows)
+    first_row = rows[0]
+    other_rows = rows[1:]
+    for row in other_rows:
+        for i in first_row["evs"]:
+            if row['evs'][i]:
+                if row["evs"][i] != first_row["evs"][i]:
+                    aa = first_row["evs"][i]
+                    if not isinstance(aa, list):
+                        aa = [aa]
+                    aa.append(row["evs"][i])
+                    first_row["evs"][i] = aa             
+    return first_row
+
+
 # open file, parse, pass to json mapper
 def data_generator(input_file):
-    open_file = open(input_file)
-    evs = csv.reader(open_file, delimiter=" ")
-    for row in islice(evs, 8, None):  # skip meta lines
-        assert len(row) == VALID_COLUMN_NO
-        if row[30] == "":
-            continue  # skip variant
-        one_snp_json = _map_line_to_json(row)
-        if one_snp_json:
+    with open(input_file) as open_file:
+        evs = csv.reader(open_file, delimiter=" ")
+        # Skip first 8 meta lines
+        evs = islice(evs, 8, None)
+        json_rows = imap(_map_line_to_json, evs)
+        row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
+        for one_snp_json in imap(merge_duplicate_rows, row_groups):
             yield one_snp_json
-    open_file.close()
-
-
+        
+            
 # load path and find files, pass to data_generator
 def load_data(path):
     for input_file in sorted(glob.glob(path)):
@@ -162,3 +180,43 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
+
+
+def timesofar(t0, clock=0):
+    '''return the string(eg.'3m3.42s') for the passed real time/CPU time so far
+       from given t0 (return from t0=time.time() for real time/
+       t0=time.clock() for CPU time).'''
+    if clock:
+        t = time.clock() - t0
+    else:
+        t = time.time() - t0
+    h = int(t / 3600)
+    m = int((t % 3600) / 60)
+    s = round((t % 3600) % 60, 2)
+    t_str = ''
+    if h != 0:
+        t_str += '%sh' % h
+    if m != 0:
+        t_str += '%sm' % m
+    t_str += '%ss' % s
+    return t_str
+    
+
+def load_collection(database, input_file_list, collection_name):
+    """
+    : param database: mongodb url
+    : param input_file_list: variant docs, path to file
+    : param collection_name: annotation source name
+    """
+    conn = pymongo.MongoClient(database)
+    db = conn.variantdoc
+    posts = db[collection_name]
+    t1 = time.time()
+    cnt = 0
+    for doc in load_data(input_file_list):
+        posts.insert(doc, manipulate=False, check_keys=False, w=0)
+        cnt += 1
+        if cnt % 100000 == 0:
+            print cnt, timesofar(t1)
+    print "successfully loaded %s into mongodb" % collection_name
+
