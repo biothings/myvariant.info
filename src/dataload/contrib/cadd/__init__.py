@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from .cadd import load_data
+from .cadd import load_collection
