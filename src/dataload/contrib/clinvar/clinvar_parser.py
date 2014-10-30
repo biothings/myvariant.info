@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 import csv
 import re
-import glob
 import pymongo
-from itertools import islice, imap, groupby
+from itertools import imap, groupby
+import os
+from subprocess import Popen, PIPE
+#import time
+#from utils.common import timesofar
 
 
 VALID_COLUMN_NO = 25
@@ -160,32 +163,41 @@ def _map_line_to_json(fields):
 
 def merge_duplicate_rows(rows):
     rows = list(rows)
-    first_row = rows[0]
-    other_rows = rows[1:]
+    first_row = rows[-1]
+    #first_row = rows[0]
+    other_rows = rows[0:-1]
+    #other_rows = rows[1:]
     for row in other_rows:
         for i in first_row['clinvar']:
-            if row['clinvar'][i]:
+            if i in row['clinvar']:
                 if row['clinvar'][i] != first_row['clinvar'][i]:
                     aa = first_row['clinvar'][i]
                     if not isinstance(aa, list):
                         aa = [aa]
                     aa.append(row['clinvar'][i])
-                    first_row['clinvar'][i] = aa             
+                    first_row['clinvar'][i] = aa
     return first_row
 
 
 # open file, parse, pass to json mapper
 def data_generator(input_file):
-    with open(input_file) as open_file:
-        clinvar = csv.reader(open_file, delimiter="\t")
-        clinvar.next()  # skip header
-        clinvar = (row for row in clinvar
-                    if row[18] != '-' and
-                    not re.search(r'p.', row[18]))
-        json_rows = (row for row in imap(_map_line_to_json, clinvar) if row)
-        row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-        for one_snp_json in imap(merge_duplicate_rows, row_groups):
-            yield one_snp_json
+    #open_file = Popen(["sort", "-t", "\t", "-k14", "-k15", "-n", input_file], stdout=PIPE).stdout
+    os.system("sort -t$'\t' -k14 -k15 -nr %s > %s_sorted.tsv" % (input_file, input_file))
+    #open_file = open(input_file)    
+    open_file = open("%s_sorted.tsv" % (input_file))
+    clinvar = csv.reader(open_file, delimiter="\t")
+    #clinvar.next()  # skip header
+    clinvar = (row for row in clinvar
+                if row[18] != '-' and
+                row[18].find('?') == -1 and
+                row[13] != "" and
+                not re.search(r'#AlleleID', row[0]) and
+                not re.search(r'p.', row[18]))
+    json_rows = (row for row in imap(_map_line_to_json, clinvar) if row)
+    row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
+    for one_snp_json in imap(merge_duplicate_rows, row_groups):
+        yield one_snp_json
+    open_file.close()
 
 
 def load_collection(database, input_file_list, collection_name):
@@ -198,14 +210,14 @@ def load_collection(database, input_file_list, collection_name):
         print file
     conn = pymongo.MongoClient(database)
     db = conn.variantdoc
-    posts = db[collection_name]
+    posts = db[collection_name] 
     for doc in data_generator(input_file_list):
         posts.insert(doc, manipulate=False, check_keys=False, w=0)
     return db
 
 
-i = data_generator('/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/clinvarmini.tsv')
-#i = data_generator("/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/variant_summary.txt")
+#i = data_generator('/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/clinvarmini.tsv')
+i = data_generator("/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/variant_summary.txt")
 out=list(i)
 print len(out)
 id_list=[]
@@ -214,7 +226,9 @@ for id in out:
 myset = set(id_list)
 print len(myset)
 
-row_count=[row for row in out if out.count(row['_id']) > 1]
-
+dup=[]
+for id in out:
+    if id['_id'] == 'chr19:g.1221319C>A':
+        dup.append(id)
 
 

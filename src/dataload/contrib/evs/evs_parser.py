@@ -3,7 +3,7 @@ import csv
 import glob
 from itertools import islice, groupby, imap
 import pymongo
-#from dataindex.indexer import timesofar
+from utils.common import timesofar
 import time
 
 
@@ -180,26 +180,6 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
-
-
-def timesofar(t0, clock=0):
-    '''return the string(eg.'3m3.42s') for the passed real time/CPU time so far
-       from given t0 (return from t0=time.time() for real time/
-       t0=time.clock() for CPU time).'''
-    if clock:
-        t = time.clock() - t0
-    else:
-        t = time.time() - t0
-    h = int(t / 3600)
-    m = int((t % 3600) / 60)
-    s = round((t % 3600) % 60, 2)
-    t_str = ''
-    if h != 0:
-        t_str += '%sh' % h
-    if m != 0:
-        t_str += '%sm' % m
-    t_str += '%ss' % s
-    return t_str
     
 
 def load_collection(database, input_file_list, collection_name):
@@ -220,3 +200,8 @@ def load_collection(database, input_file_list, collection_name):
             print cnt, timesofar(t1)
     print "successfully loaded %s into mongodb" % collection_name
 
+#load_collection('mongodb://myvariant_user:Qag1H6V%0vEG@localhost:27017/variantdoc', 
+#                    '/opt/myvariant.info/load_archive/evs/ESP6500SI-V2-SSA137.GRCh38-liftover.chr*', 'evs')
+load_collection('mongodb://myvariant_user:Qag1H6V%0vEG@su08.scripps.edu:27017/variantdoc',
+    '/Users/Amark/Documents/Su_Lab/myvariant.info/evs/evs.txt/ESP6500SI-V2-SSA137.GRCh38-liftover.chr1.*',#ESP6500SI-V2-SSA137.GRCh38-liftover.chr*',
+    'evs')

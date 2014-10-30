@@ -3,6 +3,8 @@ import csv
 import glob
 from itertools import islice, groupby, imap
 import pymongo
+import time
+from utils.common import timesofar
 
 
 VALID_COLUMN_NO = 70
@@ -172,7 +174,7 @@ def merge_duplicate_rows(rows):
     other_rows = rows[1:]
     for row in other_rows:
         for i in first_row['grasp']:
-            if row['grasp'][i]:
+            if i in row['grasp']:
                 if row['grasp'][i] != first_row['grasp'][i]:
                     aa = first_row['grasp'][i]
                     if not isinstance(aa, list):

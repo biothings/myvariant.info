@@ -216,7 +216,7 @@ def merge_duplicate_rows(rows):
     other_rows = rows[1:]
     for row in other_rows:
         for i in first_row["cadd"]:
-            if row["cadd"][i]:
+            if i in row["cadd"]:
                 if row["cadd"][i] != first_row["cadd"][i]:
                     aa = first_row["cadd"][i]
                     if not isinstance(aa, list):
