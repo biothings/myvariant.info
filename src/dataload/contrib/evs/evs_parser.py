@@ -3,7 +3,7 @@ import csv
 import glob
 from itertools import islice, groupby, imap
 import pymongo
-from utils.common import timesofar
+#from utils.common import timesofar
 import time
 
 
@@ -201,3 +201,9 @@ def load_collection(database, input_file_list, collection_name):
         if cnt % 100000 == 0:
             print cnt, timesofar(t1)
     print "successfully loaded %s into mongodb" % collection_name
+
+i = load_data( '/Users/Amark/Documents/Su_Lab/myvariant.info/evs/evs.txt/ESP6500SI-V2-SSA137.GRCh38-liftover.chr*')
+out = list(i)
+#load_collection('mongodb://myvariant_user:Qag1H6V%0vEG@su08.scripps.edu:27017/variantdoc', 
+#                    '/Users/Amark/Documents/Su_Lab/myvariant.info/evs/evs.txt/evsmini.tsv', 'evs')
+                    #ESP6500SI-V2-SSA137.GRCh38-liftover.chr*

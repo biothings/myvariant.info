@@ -3,6 +3,8 @@
 import pysam
 from itertools import groupby, imap
 import pymongo
+import time
+from utils.common import timesofar
 
 
 VALID_COLUMN_NO = 90
@@ -191,20 +193,19 @@ def _map_line_to_json(fields):
                              'exon': fields[79],
                              'intron': fields[80]
                          },
-# KeyError
-#                     'grantham': fields[83],
-#                     'polyphen':
-#                         {
-#                             'cat': fields[84],
-#                             'val': fields[85]
-#                         },
-#                     'sift':
-#                         {
-#                             'cat': fields[86],
-#                             'val': fields[87]
-#                         },
-#                     'rawscore': fields[88],
-#                     'phred': fields[89]
+                     'grantham': fields[83],
+                     'polyphen':
+                         {
+                             'cat': fields[84],
+                             'val': fields[85]
+                         },
+                     'sift':
+                         {
+                             'cat': fields[86],
+                             'val': fields[87]
+                         },
+                     'rawscore': fields[88],
+                     'phred': fields[89]
                   }
             }
     return dict_sweep(unlist(value_convert(one_snp_json)))
@@ -248,6 +249,11 @@ def load_collection(database, cadd_url, collection_name):
     conn = pymongo.MongoClient(database)
     db = conn.variantdoc
     posts = db[collection_name]
+    t1 = time.time()
+    cnt = 0
     for doc in data_generator(cadd_url):
         posts.insert(doc, manipulate=False, check_keys=False, w=0)
-    return db
+        cnt += 1
+        if cnt % 100000 == 0:
+            print cnt, timesofar(t1)
+    print "successfully loaded %s into mongodb" % collection_name 
