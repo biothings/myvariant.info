@@ -122,7 +122,7 @@ def _map_line_to_json(fields):
                         "phast_cons": fields[18],
                         "gerp": fields[19]
                     },
-                #"grantham_score": fields[20],
+                "grantham_score": fields[20],
                 "polyphen2":
                     {
                         "class": polyphen(fields[21])[0],
@@ -151,13 +151,15 @@ def merge_duplicate_rows(rows):
     other_rows = rows[1:]
     for row in other_rows:
         for i in first_row["evs"]:
-            if row['evs'][i]:
+            if i in row['evs']:
                 if row["evs"][i] != first_row["evs"][i]:
                     aa = first_row["evs"][i]
                     if not isinstance(aa, list):
                         aa = [aa]
                     aa.append(row["evs"][i])
-                    first_row["evs"][i] = aa             
+                    first_row["evs"][i] = aa
+            else:
+                continue
     return first_row
 
 
@@ -199,9 +201,3 @@ def load_collection(database, input_file_list, collection_name):
         if cnt % 100000 == 0:
             print cnt, timesofar(t1)
     print "successfully loaded %s into mongodb" % collection_name
-
-#load_collection('mongodb://myvariant_user:Qag1H6V%0vEG@localhost:27017/variantdoc', 
-#                    '/opt/myvariant.info/load_archive/evs/ESP6500SI-V2-SSA137.GRCh38-liftover.chr*', 'evs')
-load_collection('mongodb://myvariant_user:Qag1H6V%0vEG@su08.scripps.edu:27017/variantdoc',
-    '/Users/Amark/Documents/Su_Lab/myvariant.info/evs/evs.txt/ESP6500SI-V2-SSA137.GRCh38-liftover.chr1.*',#ESP6500SI-V2-SSA137.GRCh38-liftover.chr*',
-    'evs')
