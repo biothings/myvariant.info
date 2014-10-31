@@ -4,9 +4,7 @@ import re
 import pymongo
 from itertools import imap, groupby
 import os
-from subprocess import Popen, PIPE
-#import time
-#from utils.common import timesofar
+#from subprocess import Popen, PIPE
 
 
 VALID_COLUMN_NO = 25
@@ -51,21 +49,37 @@ def unlist(d):
     return d
 
 
-def phen_id(phenotype_ids):
-    try:
-        p = phenotype_ids.strip(";").replace(";", ",").split(",")
-        phen_id = {}
-        for id in p:
-            key, value = id.split(":")
-            if key in phen_id:
-                if not isinstance(phen_id[key], list):
-                    phen_id[key] = [phen_id[key]]
-                phen_id[key].append(value)
+#def phen_id(phenotype_ids):
+#    p = phenotype_ids.strip(";").replace(";", ",").split(",")
+#    phen_id = {}
+#    for id in p:
+#        key, value = id.split(":")
+#        if key in phen_id:
+#            if not isinstance(phen_id[key], list):
+#                phen_id[key] = [phen_id[key]]
+#            phen_id[key].append(value)
+#        else:
+#            phen_id[key] = value
+#    return phen_id
+
+
+# split id lists into dictionary
+def other_id(other_ids):
+    p = other_ids.strip(";").replace(";", ",").split(",")
+    other_id = {}
+    for id in p:
+        try:
+            ind = id.index(":")
+            key, value = id[:ind], id[ind+1:]
+            if key in other_id:
+                if not isinstance(other_id[key], list):
+                    other_id[key] = [other_id[key]]
+                other_id[key].append(value)
             else:
-                phen_id[key] = value
-        return phen_id
-    except:
-        return phenotype_ids
+                other_id[key] = value
+        except:
+            continue
+    return other_id
 
 
 # convert one snp to json
@@ -142,7 +156,7 @@ def _map_line_to_json(fields):
                 "nsv_dbvar": fields[7],
                 "rcv_accession": fields[8].split(";"),
                 "tested_in_gtr": fields[9],
-                "phenotype_id": phen_id(fields[10]),
+                "phenotype_id": other_id(fields[10]),
                 "origin": fields[11],
                 "cytogenic": fields[16],
                 "review_status": fields[17],
@@ -154,7 +168,7 @@ def _map_line_to_json(fields):
                 "number_submitters": fields[20],
                 "last_evaluated": fields[21],
                 "guidelines": fields[22],
-                "other_ids": fields[23],
+                "other_ids": other_id(fields[23]),
                 "variant_id": fields[24]
             }
         }
@@ -163,10 +177,8 @@ def _map_line_to_json(fields):
 
 def merge_duplicate_rows(rows):
     rows = list(rows)
-    first_row = rows[-1]
-    #first_row = rows[0]
-    other_rows = rows[0:-1]
-    #other_rows = rows[1:]
+    first_row = rows[0]
+    other_rows = rows[1:]
     for row in other_rows:
         for i in first_row['clinvar']:
             if i in row['clinvar']:
@@ -182,16 +194,16 @@ def merge_duplicate_rows(rows):
 # open file, parse, pass to json mapper
 def data_generator(input_file):
     #open_file = Popen(["sort", "-t", "\t", "-k14", "-k15", "-n", input_file], stdout=PIPE).stdout
-    os.system("sort -t$'\t' -k14 -k15 -nr %s > %s_sorted.tsv" % (input_file, input_file))
+    os.system("sort -t$'\t' -k14 -k15 -k20 -n %s > %s_sorted.tsv" % (input_file, input_file))
     #open_file = open(input_file)    
     open_file = open("%s_sorted.tsv" % (input_file))
+    print input_file
     clinvar = csv.reader(open_file, delimiter="\t")
-    #clinvar.next()  # skip header
+    clinvar.next()  # skip header
     clinvar = (row for row in clinvar
                 if row[18] != '-' and
                 row[18].find('?') == -1 and
                 row[13] != "" and
-                not re.search(r'#AlleleID', row[0]) and
                 not re.search(r'p.', row[18]))
     json_rows = (row for row in imap(_map_line_to_json, clinvar) if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
@@ -206,29 +218,8 @@ def load_collection(database, input_file_list, collection_name):
     : param input_file_list: variant docs, path to file
     : param collection_name: annotation source name
     """
-    for file in input_file_list:
-        print file
     conn = pymongo.MongoClient(database)
     db = conn.variantdoc
     posts = db[collection_name] 
     for doc in data_generator(input_file_list):
         posts.insert(doc, manipulate=False, check_keys=False, w=0)
-    return db
-
-
-#i = data_generator('/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/clinvarmini.tsv')
-i = data_generator("/Users/Amark/Documents/Su_Lab/myvariant.info/clinvar/variant_summary.txt")
-out=list(i)
-print len(out)
-id_list=[]
-for id in out:
-    id_list.append(id['_id'])
-myset = set(id_list)
-print len(myset)
-
-dup=[]
-for id in out:
-    if id['_id'] == 'chr19:g.1221319C>A':
-        dup.append(id)
-
-
