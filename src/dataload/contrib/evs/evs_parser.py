@@ -53,7 +53,7 @@ def count_dict(field):
 
 
 # convert one snp to json
-def _map_line_to_json(fields):
+def _map_line_to_json(fields):        
     chrInfo = fields[0].split(":")  # grch37
     chrom = chrInfo[0]
     chromStart = int(chrInfo[1])
@@ -169,7 +169,7 @@ def data_generator(input_file):
         evs = csv.reader(open_file, delimiter=" ")
         # Skip first 8 meta lines
         evs = islice(evs, 8, None)
-        evs = (row for row in evs if len(row) == VALID_COLUMN_NO)
+        evs = (row for row in evs if ":" in row[30])
         json_rows = imap(_map_line_to_json, evs)
         row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
         for one_snp_json in imap(merge_duplicate_rows, row_groups):
