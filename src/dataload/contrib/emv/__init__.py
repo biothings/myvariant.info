@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
-from .evs_parser import load_collection
+from .emv_parser import load_collection
 
