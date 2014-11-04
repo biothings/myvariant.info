@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #import os
+import re
 import glob
 import csv
 from itertools import imap, groupby
@@ -18,8 +19,7 @@ VALID_COLUMN_NO = 11
 # and remove empty dictionaries
 def dict_sweep(d):
     for key, val in d.items():
-        if val == " " or \
-           val is None:
+        if val == "":
             del d[key]
         elif isinstance(val, dict):
             dict_sweep(val)
@@ -50,9 +50,10 @@ def id_strip(id_list):
     return ids
         
 # convert one snp to json
-def _map_line_to_json(fields):  
-    HGVS = fields[0]
-    
+def _map_line_to_json(fields):
+    id = fields[0].split(":")
+    HGVS = "chr%s:%s" % (re.search(r'[1-9]+', id[0]).group(), id[1])
+        
     # load as json data
     if HGVS is None:
         return
@@ -75,8 +76,8 @@ def _map_line_to_json(fields):
         }
 
     return dict_sweep(value_convert(one_snp_json))
-    
-    
+
+
 def merge_duplicate_rows(rows):
     rows = list(rows)
     first_row = rows[0]
@@ -93,23 +94,24 @@ def merge_duplicate_rows(rows):
             else:
                 continue
     return first_row
-    
-    
+
+
 # open file, parse, pass to json mapper
 def data_generator(input_file):
     #with open(input_file) as open_file:
     os.system("sort -t$'\t' -k1 -n %s > %s_sorted.csv" % (input_file, input_file))
-    open_file = open("%s_sorted.csv" % (input_file))    
+    open_file = open("%s_sorted.csv" % (input_file))
     emv = csv.reader(open_file, delimiter=",")
     # Skip header
     emv.next()
+    emv = (row for row in emv if row[0])
     json_rows = imap(_map_line_to_json, emv)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     for one_snp_json in imap(merge_duplicate_rows, row_groups):
         yield one_snp_json
     open_file.close()
-        
-            
+
+
 # load path and find files, pass to data_generator
 def load_data(path):
     for input_file in sorted(glob.glob(path)):
@@ -117,7 +119,7 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
-    
+
 
 def load_collection(database, input_file_list, collection_name):
     """
@@ -131,4 +133,3 @@ def load_collection(database, input_file_list, collection_name):
     for doc in load_data(input_file_list):
         posts.insert(doc, manipulate=False, check_keys=False, w=0)
     print "successfully loaded %s into mongodb" % collection_name
-    
