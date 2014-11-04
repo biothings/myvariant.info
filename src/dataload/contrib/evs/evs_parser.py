@@ -3,7 +3,7 @@ import csv
 import glob
 from itertools import islice, groupby, imap
 import pymongo
-#from utils.common import timesofar
+from utils.common import timesofar
 import time
 
 
