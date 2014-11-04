@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-import csv
+#import csv
+from csvkit import CSVKitReader
 import glob
 from itertools import islice, groupby, imap
 import pymongo
 import time
-from utils.common import timesofar
+#from utils.common import timesofar
 
 
 VALID_COLUMN_NO = 70
@@ -185,26 +186,27 @@ def merge_duplicate_rows(rows):
 
 
 # open file, parse, pass to json mapper
-def load_data(input_file):
-    with open(input_file) as open_file:
-        grasp = csv.reader(open_file, delimiter="\t")
-        # Skip first 8 meta lines
-        grasp = islice(grasp, 8, None)
-        grasp = (row for row in grasp if len(row) == VALID_COLUMN_NO)
-        json_rows = imap(_map_line_to_json, grasp)
-        row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-        for one_snp_json in imap(merge_duplicate_rows, row_groups):
-            yield one_snp_json
+#def load_data(input_file):
+#    with open(input_file) as open_file:
+#        grasp = csv.reader(open_file, delimiter="\t")
+#        # Skip first 8 meta lines
+#        grasp = islice(grasp, 8, None)
+#        grasp = (row for row in grasp if len(row) == VALID_COLUMN_NO)
+#        json_rows = imap(_map_line_to_json, grasp)
+#        row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
+#        for one_snp_json in imap(merge_duplicate_rows, row_groups):
+#            yield one_snp_json
 
 
 # open file, parse, pass to json mapper
 def load_data(input_file):
-    for file in sorted(glob.glob(input_file)):
+    for file in glob.glob(input_file):
         print file
         open_file = open(input_file)
-        grasp = csv.reader(open_file, delimiter="\t")
+        grasp = CSVKitReader(open_file, encoding='utf-8', delimiter='\t')
+        #grasp = csv.reader(open_file, delimiter="\t")
         grasp.next()  # skip header
-        bad_rows = []
+#        bad_rows = []
         for row in grasp:
             #assert len(row) == VALID_COLUMN_NO
             try:
@@ -214,7 +216,7 @@ def load_data(input_file):
             except:
                 diff_rows = enumerate(row)
                 wrong = [(i, row) for (i, row) in diff_rows]
-                #print wrong[-1]
+                print wrong[-1]
                  
         open_file.close()
         
