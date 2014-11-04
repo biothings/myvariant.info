@@ -169,7 +169,8 @@ def data_generator(input_file):
         evs = csv.reader(open_file, delimiter=" ")
         # Skip first 8 meta lines
         evs = islice(evs, 8, None)
-        evs = (row for row in evs if ":" in row[30])
+        evs = (row for row in evs if ":" in row[30] and \
+                len(row) == VALID_COLUMN_NO)
         json_rows = imap(_map_line_to_json, evs)
         row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
         for one_snp_json in imap(merge_duplicate_rows, row_groups):
