@@ -169,6 +169,7 @@ def data_generator(input_file):
         evs = csv.reader(open_file, delimiter=" ")
         # Skip first 8 meta lines
         evs = islice(evs, 8, None)
+        evs = (row for row in evs if len(row) == VALID_COLUMN_NO)
         json_rows = imap(_map_line_to_json, evs)
         row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
         for one_snp_json in imap(merge_duplicate_rows, row_groups):
@@ -201,9 +202,3 @@ def load_collection(database, input_file_list, collection_name):
         if cnt % 100000 == 0:
             print cnt, timesofar(t1)
     print "successfully loaded %s into mongodb" % collection_name
-
-i = load_data( '/Users/Amark/Documents/Su_Lab/myvariant.info/evs/evs.txt/ESP6500SI-V2-SSA137.GRCh38-liftover.chr*')
-out = list(i)
-#load_collection('mongodb://myvariant_user:Qag1H6V%0vEG@su08.scripps.edu:27017/variantdoc', 
-#                    '/Users/Amark/Documents/Su_Lab/myvariant.info/evs/evs.txt/evsmini.tsv', 'evs')
-                    #ESP6500SI-V2-SSA137.GRCh38-liftover.chr*
