@@ -128,7 +128,7 @@ def _map_line_to_json(fields):
                 "varType": varType,
                 "rsID": rsID,
                 "QUAL": QUAL,
-                "FILTER": FILTER
+                "FILTER": FILTER,
                 "AC": AC,
                 "AF": AF,
                 "AN": AN
