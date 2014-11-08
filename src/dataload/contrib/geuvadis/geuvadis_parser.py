@@ -107,7 +107,7 @@ def _map_line_to_json(fields):
     one_snp_json = {
 
         "_id": HGVS,
-        "gonl":
+        "geuvadis":
             {
                 "chrom": chrom,
                 "hg19":
@@ -130,7 +130,7 @@ def _map_line_to_json(fields):
     }
 
     one_snp_json = list_split(dict_sweep(unlist(value_convert(one_snp_json))))
-    one_snp_json["gonl"]["chrom"] = str(one_snp_json["gonl"]["chrom"])
+    one_snp_json["geuvadis"]["chrom"] = str(one_snp_json["geuvadis"]["chrom"])
     return one_snp_json
     
 
@@ -153,7 +153,7 @@ def data_generator(input_file):
 
 # load path and find files, pass to data_generator
 def load_data(path):
-    input_file = "/gpfs/home/gerikson/GEEVS_aggregation_v2.vcf.gz"
+    input_file = "ftp://ftp.ebi.ac.uk/pub/databases/eva/PRJEB6042/ERZX00026/GEEVS_aggregation_v2.vcf.gz"
     data = data_generator(input_file)
 
     
