@@ -9,7 +9,8 @@ def get_mapping():
         }
     }
     for _m in [mapping_dbsnp, mapping_mutdb, mapping_snpedia,
-               mapping_gwassnps, mapping_cosmic, mapping_docm, mapping_dbnsfp]:
+               mapping_gwassnps, mapping_cosmic, mapping_docm,
+               mapping_dbnsfp, mapping_emv]:
         m['variant']['properties'].update(_m)
     return m
 
@@ -715,3 +716,75 @@ mapping_dbnsfp = {
     }
 }
 
+mapping_emv = {
+    "emv": {
+        "properties": {
+            "egl_classification": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "egl_protein": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "egl_variant": {
+                "type": "string",
+                "analyzer": "string_lowercase",
+                "include_in_all": True
+            },
+            "gene": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "variant_aka_list": {
+                "type": "string",
+                "analyzer": "string_lowercase",
+                "include_in_all": True
+            }
+        }
+    }
+}
+
+mapping_clinvar = {
+    "clinvar": {
+        "properties": {
+            "clinical_significance": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "genome": {
+                "properties": {
+                    "chr": {
+                        "type": "string",
+                        "analyzer": "string_lowercase"
+                    },
+                    "start": {
+                        "type": "long"
+                    },
+                    "end": {
+                        "type": "long"
+                    }
+                }
+            },
+            "gene": {
+                "properties": {
+                    "symbol": {
+                        "type": "string",
+                        "analyzer": "string_lowercase"
+                    }
+                }
+            },
+            "type": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "origin": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "variant_id": {
+                "type": "long"
+            }
+        }
+    }
+}
