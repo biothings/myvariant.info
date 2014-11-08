@@ -7,6 +7,7 @@ import time
 from elasticsearch import Elasticsearch
 from .mapping import mapping
 import config
+import utils.es
 
 es_host = config.ES_HOST
 es = Elasticsearch(es_host)
@@ -74,15 +75,22 @@ def doc_feeder(doc_li, step=1000, verbose=True):
             print('Done.')
 
 
-def verify_doc_li(doc_li):
-    from www.api import es
-    esq = es.ESQuery()
+def verify_doc_li(doc_li, return_ids=False):
+    esi = utils.es.ESIndexer()
     logger = logging.getLogger()
     logger.setLevel(logging.ERROR)
-    stats = {True: 0, False: 0}
+    if return_ids:
+        stats = {True: [], False: []}
+    else:
+        stats = {True: 0, False: 0}
     for doc in doc_li:
-        stats[esq.exists(doc['_id'])] += 1
+        if return_ids:
+            stats[esi.exists(doc['_id'])].append(doc['_id'])
+        else:
+            stats[esi.exists(doc['_id'])] += 1
     logger.setLevel(logging.INFO)
+    if return_ids:
+        print({True: len(stats[True]), False: len(stats[False])})
     return stats
 
 

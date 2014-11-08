@@ -20,7 +20,7 @@ class ESQuery():
             return False
 
     def mget_variants(self, vid_list, **kwargs):
-        return es.mget(body=vid_list, index=index_name, doc_type=doc_type, **kwargs)
+        return es.mget(body={'ids': vid_list}, index=index_name, doc_type=doc_type, **kwargs)
 
     def query(self, q, **kwargs):
         # Check if special interval query pattern exists

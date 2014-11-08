@@ -1,23 +1,26 @@
 # -*- coding: utf-8 -*-
 import csv
 import glob
+import pymongo
+import time
+from utils.common import timesofar
 
 
-VALID_COLUMN_NO = 88
+VALID_COLUMN_NO = 98
 
 
 # split ";" separated fields into comma separated lists, strip.
 def list_split(d):
     for key, val in d.items():
+        if isinstance(val, dict):
+            list_split(val)
         try:
             if len(val.split(";")) > 1:
                 d[key] = val.rstrip().rstrip(';').split(";")
         except (AttributeError):
             pass
-        if isinstance(val, dict):
-            list_split(val)
     return d
-    
+
 
 # remove keys whos values are "."
 # and remove empty dictionaries
@@ -74,24 +77,24 @@ def unlist(d):
 def _map_line_to_json(fields):
     # specific variable treatment
     chrom = fields[0]
-    if fields[6] == ".":
+    if fields[7] == ".":
         hg18_end = "."
     else:
-        hg18_end = int(fields[6])+1
+        hg18_end = int(fields[7])+1
     chromStart = int(fields[1])
     chromEnd = int(fields[1]) + 1
     allele1 = fields[2]
     allele2 = fields[3]
     HGVS = "chr%s:g.%d%s>%s" % (chrom, chromStart, allele1, allele2)
 
-    if fields[71] == ".":
+    if fields[74] == ".":
         siphy = "."
     else:
-        freq = fields[71].split(":")
+        freq = fields[74].split(":")
         siphy = {'a': freq[0], 'c': freq[1], 'g': freq[2], 't': freq[3]}
 
-    acc = fields[8].rstrip().rstrip(';').split(";")
-    pos = fields[10].rstrip().rstrip(';').split(";")
+    acc = fields[11].rstrip().rstrip(';').split(";")
+    pos = fields[13].rstrip().rstrip(';').split(";")
     uniprot = map(dict, map(lambda t: zip(('acc', 'pos'), t), zip(acc, pos)))
 
     # load as json data
@@ -108,154 +111,187 @@ def _map_line_to_json(fields):
                     },
                 "hg18":
                     {
-                        "start": fields[6],
+                        "start": fields[7],
                         "end": hg18_end
+                    },
+                "hg38":
+                    {
+                        "chrom": fields[8],
+                        "pos": fields[9]                    
                     },
                 "allele1": allele1,
                 "allele2": allele2,
                 "aa":
                     {
                         "ref": fields[4],
-                        "alt": fields[5]
+                        "alt": fields[5],
+                        "pos": fields[23],
+                        "refcodon": fields[16],
+                        "codonpos": fields[18],
+                        "aapos_sift": fields[24],
+                        "aapos_fathmm": fields[25]
                     },
-                "genename": fields[7],
+                "genename": fields[10],
                 "uniprot": uniprot,
-                "interpro_domain": fields[11],
-                "cds_strand": fields[12],
-                "refcodon": fields[13],
-                "slr_test_statistic": fields[14],
-                "codonpos": fields[15],
-                "fold-degenerate": fields[16],
-                "ancestral_allele": fields[17],
+                "interpro_domain": fields[14],
+                "cds_strand": fields[15],
+                "slr_test_statistic": fields[17],
+                "fold-degenerate": fields[19],
+                "ancestral_allele": fields[20],
                 "ensembl":
                     {
-                        "geneid": fields[18],
-                        "transcriptid": fields[19]
+                        "geneid": fields[21],
+                        "transcriptid": fields[22]
                     },
-                "aapos": fields[20],
-                "aapos_sift": fields[21],
-                "aapos_fathmm": fields[22],
                 "sift":
                     {
-                        "score": fields[23],
-                        "converted_rankscore": fields[24],
-                        "pred": fields[25]
+                        "score": fields[26],
+                        "converted_rankscore": fields[27],
+                        "pred": fields[28]
                     },
                 "polyphen2":
                     {
                         "hdiv":
                         {
-                            "score": fields[26],
-                            "rankscore": fields[27],
-                            "pred": fields[28]
-                        },
-                        "hvar":
-                        {
                             "score": fields[29],
                             "rankscore": fields[30],
                             "pred": fields[31]
+                        },
+                        "hvar":
+                        {
+                            "score": fields[32],
+                            "rankscore": fields[33],
+                            "pred": fields[34]
                         }
                     },
                 "lrt":
-                    {
-                        "score": fields[32],
-                        "converted_rankscore": fields[33],
-                        "pred": fields[34]
-                    },
-                "mutationtaster":
                     {
                         "score": fields[35],
                         "converted_rankscore": fields[36],
                         "pred": fields[37]
                     },
-                "mutationassessor":
+                "mutationtaster":
                     {
                         "score": fields[38],
-                        "rankscore": fields[39],
+                        "converted_rankscore": fields[39],
                         "pred": fields[40]
                     },
-                "fathmm":
+                "mutationassessor":
                     {
                         "score": fields[41],
                         "rankscore": fields[42],
                         "pred": fields[43]
                     },
-                "radialsvm":
+                "fathmm":
                     {
                         "score": fields[44],
                         "rankscore": fields[45],
                         "pred": fields[46]
                     },
-                "lr":
+                "radialsvm":
                     {
                         "score": fields[47],
                         "rankscore": fields[48],
                         "pred": fields[49]
                     },
-                "reliability_index": fields[50],
+                "lr":
+                    {
+                        "score": fields[50],
+                        "rankscore": fields[51],
+                        "pred": fields[52]
+                    },
+                "reliability_index": fields[53],
                 "vest3":
                     {
-                        "score": fields[51],
-                        "rankscore": fields[52]
+                        "score": fields[54],
+                        "rankscore": fields[55]
                     },
                 "cadd":
                     {
-                        "raw": fields[53],
-                        "raw_rankscore": fields[54],
-                        "phred": fields[55]
+                        "raw": fields[56],
+                        "raw_rankscore": fields[57],
+                        "phred": fields[58]
                     },
                 "gerp++":
                     {
-                        "nr": fields[56],
-                        "rs": fields[57],
-                        "rs_rankscore": fields[58]
+                        "nr": fields[59],
+                        "rs": fields[60],
+                        "rs_rankscore": fields[61]
                     },
-                "phylop46way":
+                "phylop":
                     {
-                        "primate": fields[59],
-                        "primate_rankscore": fields[60],
-                        "placental": fields[61],
-                        "placental_rankscore": fields[62],
-                        "vertebrate": fields[63],
-                        "vertebrate_rankscore": fields[64]
+                        "46way": 
+                            {
+                                "primate": fields[62],
+                                "primate_rankscore": fields[63],
+                                "placental": fields[64],
+                                "placental_rankscore": fields[65],
+                            },
+                        "100way":
+                            {
+                                "vertebrate": fields[66],
+                                "vertebrate_rankscore": fields[67]
+                            }
                     },
-                "phastcons46way":
+                "phastcons":
                     {
-                        "primate": fields[65],
-                        "primate_rankscore": fields[66],
-                        "placental": fields[67],
-                        "placental_rankscore": fields[68],
-                        "vertebrate": fields[69],
-                        "vertebrate_rankscore": fields[70]
+                        "46way": 
+                            {
+                                "primate": fields[68],
+                                "primate_rankscore": fields[69],
+                                "placental": fields[70],
+                                "placental_rankscore": fields[71],
+                            },
+                        "100way":
+                            {
+                                "vertebrate": fields[72],
+                                "vertebrate_rankscore": fields[73]
+                            }
                     },
-                "siphy_29way_pi": siphy,
-                "siphy_29way_pi_logodds": fields[72],
-                "siphy_29way_pi_logodds_rankscore": fields[73],
-                "lrt_omega": fields[74],
-                "unisnp_ids": fields[75],
+                "siphy_29way":
+                    {
+                        "pi": siphy,
+                        "logodds": fields[75],
+                        "logodds_rankscore": fields[76]
+                    },
+                "lrt_omega": fields[77],
+                "unisnp_ids": fields[78],
                 "1000gp1":
                     {
-                        "ac": fields[76],
-                        "af": fields[77],
-                        "afr_ac": fields[78],
-                        "afr_af": fields[79],
-                        "eur_ac": fields[80],
-                        "eur_af": fields[81],
-                        "amr_ac": fields[82],
-                        "amr_af": fields[83],
-                        "asn_ac": fields[84],
-                        "asn_af": fields[85]
+                        "ac": fields[79],
+                        "af": fields[80],
+                        "afr_ac": fields[81],
+                        "afr_af": fields[82],
+                        "eur_ac": fields[83],
+                        "eur_af": fields[84],
+                        "amr_ac": fields[85],
+                        "amr_af": fields[86],
+                        "asn_ac": fields[87],
+                        "asn_af": fields[88]
                     },
                 "esp6500":
                     {
-                        "aa_af": fields[86],
-                        "ea_af": fields[87]
+                        "aa_af": fields[89],
+                        "ea_af": fields[90]
+                    },
+                "aric5606":
+                    {
+                        "aa_ac": fields[91],
+                        "aa_af": fields[92],
+                        "ea_ac": fields[93],
+                        "ea_af": fields[94]
+                    },
+                "clinvar":
+                    {
+                        "rs": fields[95],
+                        "clin_sig": fields[96],
+                        "trait": fields[97]
                     }
             }
     }
 
-    one_snp_json = dict_sweep(unlist(value_convert(list_split(one_snp_json))))
-    one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"]) 
+    one_snp_json = list_split(dict_sweep(unlist(value_convert(one_snp_json))))
+    one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"])
     return one_snp_json
 
 
@@ -264,10 +300,24 @@ def data_generator(input_file):
     open_file = open(input_file)
     db_nsfp = csv.reader(open_file, delimiter="\t")
     db_nsfp.next()  # skip header
+    previous_row = None
     for row in db_nsfp:
         assert len(row) == VALID_COLUMN_NO
-        one_snp_json = _map_line_to_json(row)
-        yield one_snp_json
+        current_row = _map_line_to_json(row)
+        if previous_row:
+            if current_row["_id"] == previous_row["_id"]:
+                aa = previous_row["dbnsfp"]["aa"]
+                if not isinstance(aa, list):
+                    aa = [aa]
+                aa.append(current_row["dbnsfp"]["aa"])
+                previous_row["dbnsfp"]["aa"] = aa
+                if len(previous_row["dbnsfp"]["aa"]) > 1:
+                    continue
+            else:
+                yield previous_row
+        previous_row = current_row
+    if previous_row:
+        yield previous_row
     open_file.close()
 
 
@@ -278,4 +328,24 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
-
+    
+    
+# load collection into mongodb
+def load_collection(database, input_file_list, collection_name):
+    """
+    : param database: mongodb url
+    : param input_file_list: variant docs, path to file
+    : param collection_name: annotation source name
+    """
+    conn = pymongo.MongoClient(database)
+    db = conn.variantdoc
+    posts = db[collection_name]
+    t1 = time.time()
+    cnt = 0
+    for doc in load_data(input_file_list):
+        posts.insert(doc, manipulate=False, check_keys=False, w=0)
+        cnt += 1
+        if cnt % 100000 == 0:
+            print cnt, timesofar(t1)
+    print "successfully loaded %s into mongodb" % collection_name 
+ 

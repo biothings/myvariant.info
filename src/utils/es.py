@@ -1,11 +1,12 @@
 from __future__ import print_function
 import time
+import json
 import logging
 logging.basicConfig()
 from elasticsearch import Elasticsearch, NotFoundError
 
 import config
-from utils.common import iter_n, timesofar
+from utils.common import iter_n, timesofar, ask
 
 
 es_host = config.ES_HOST
@@ -61,6 +62,26 @@ class ESIndexer():
         self._doc_type = doc_type or config.ES_DOC_TYPE
         self.step = step
 
+    def check(self):
+        '''print out ES server info for verification.'''
+        # print "Servers:", self.conn.servers
+        print("Servers:", self._es.transport.hosts)
+        print("Default indices:", self._index)
+        print("Default doc_type:", self._doc_type)
+
+    @wrapper
+    def get_variant(self, vid, **kwargs):
+        return self._es.get(index=self._index, id=vid, doc_type=self._doc_type, **kwargs)
+
+    @wrapper
+    def exists(self, vid):
+        """return True/False if a variant id exists or not."""
+        try:
+            doc = self.get_variant(vid, fields=None)
+            return doc['found']
+        except NotFoundError, e:
+            return False
+
     @wrapper
     def count(self, q=None, raw=False):
         _res = self._es.count(self._index, self._doc_type, q)
@@ -111,3 +132,10 @@ class ESIndexer():
         cur = self.doc_feeder(step=step, _source=False, verbose=verbose)
         id_li = [doc['_id'] for doc in cur]
         return id_li
+
+    def update_mapping(self, m):
+        assert m.keys() == [self._doc_type]
+        assert m[self._doc_type].keys() == ['properties']
+        print(json.dumps(m), indent=2)
+        if ask("Continue to update above mapping?") == 'Y':
+            self._es.indices.put_mapping(index=self._index, doc_type=self._doc_type, body=m)
