@@ -204,6 +204,7 @@ def data_generator(input_file):
                 if row[18] != '-' and
                 row[18].find('?') == -1 and
                 row[13] != "" and
+                row[12] == "GRCh37" and
                 not re.search(r'p.', row[18]))
     json_rows = (row for row in imap(_map_line_to_json, clinvar) if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))

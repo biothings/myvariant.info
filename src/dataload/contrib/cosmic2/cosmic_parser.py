@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import csv
 import re
-import glob
 import time
 import pymongo
 from itertools import imap, groupby
-from utils.common import timesofar
+#from utils.common import timesofar
 
 
 VALID_COLUMN_NO = 29
@@ -41,6 +40,7 @@ def value_convert(d):
 
 # convert one snp to json
 def _map_line_to_json(fields):
+    assert len(fields) == VALID_COLUMN_NO
     chr_info = re.findall(r"[\w']+", fields[17])
     chrom = chr_info[0]  # Mutation GRCh37 genome position
     chromStart = int(chr_info[1])
@@ -122,7 +122,7 @@ def merge_duplicate_rows(rows):
     other_rows = rows[1:]
     for row in other_rows:
         for i in first_row['cosmic']:
-            if row['cosmic'][i]:
+            if i in row['cosmic']:
                 if row['cosmic'][i] != first_row['cosmic'][i]:
                     aa = first_row['cosmic'][i]
                     if not isinstance(aa, list):
@@ -139,32 +139,39 @@ def load_data(input_file):
         cosmic.next()  # skip header
         cosmic = (row for row in cosmic
                     if row[13].find('?') != -1 and
-                    row[16] == "" and
-                    row[17] == "")
-        json_rows = (row for row in imap(_map_line_to_json, cosmic) if row)
+                    row[16] != "" and
+                    row[13] != "")
+        cnt = 0
+        cds = []
+        for row in cosmic:
+            if row[17] != "" and row[13] != "":
+            #if row[13].find('?') == -1:
+                cnt = cnt +1
+                cds.append(row[17])
+        json_rows = imap(_map_line_to_json, cosmic)
         row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
         for one_snp_json in imap(merge_duplicate_rows, row_groups):
             yield one_snp_json
-
-# open file, parse, pass to json mapper
-#def load_data(input_file):
-#    for file in sorted(glob.glob(input_file)):
-#        print file
-#        open_file = open(input_file)
-#        cosmic = csv.reader(open_file, delimiter="\t")
-#        cosmic.next()  # skip header
-#        for row in cosmic:
-#            assert len(row) == VALID_COLUMN_NO
-#            if row[13].find('?') != -1 or \
-#               row[16] == "" or \
-#               row[17] == "":  # Mutation GRCh37 genome position, Mutation CDS
-#                continue  # skip variant
-#            one_snp_json = _map_line_to_json(row)
-#            if one_snp_json:
-#                yield one_snp_json
-#    open_file.close()
     
 
+def timesofar(t0, clock=0, t1=None):
+    '''return the string(eg.'3m3.42s') for the passed real time/CPU time so far
+       from given t0 (return from t0=time.time() for real time/
+       t0=time.clock() for CPU time).'''
+    t1 = t1 or time.clock() if clock else time.time()
+    t = t1 - t0
+    h = int(t / 3600)
+    m = int((t % 3600) / 60)
+    s = round((t % 3600) % 60, 2)
+    t_str = ''
+    if h != 0:
+        t_str += '%sh' % h
+    if m != 0:
+        t_str += '%sm' % m
+    t_str += '%ss' % s
+    return t_str
+    
+    
 # load collection into mongodb
 def load_collection(database, input_file_list, collection_name):
     """
@@ -184,8 +191,8 @@ def load_collection(database, input_file_list, collection_name):
             print cnt, timesofar(t1)
     print "successfully loaded %s into mongodb" % collection_name 
 
-
-i = load_data('/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/minicosmic69.tsv')
+#i=load_data('/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/cosmicmini.tsv')
+i=load_data('/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/CosmicCompleteExport_v70_100814.tsv')
 out = list(i)
 print len(out)
 id_list=[]
@@ -194,4 +201,5 @@ for id in out:
 myset = set(id_list)
 print len(myset)
 #load_collection('mongodb://myvariant_user:Qag1H6V%0vEG@su08.scripps.edu:27017/variantdoc', 
-#                    '/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/minicosmic69.tsv', 'cosmic')
+#                    '/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/CosmicCompleteExport_v70_100814.tsv',
+#                    'cosmic')
