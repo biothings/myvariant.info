@@ -71,6 +71,24 @@ def id_strip(id_list):
     for id in id_list:
         ids.append(id.rstrip().lstrip())
     return ids
-    
+
+# load collection into mongodb
+def load_collection(database, input_file_list, collection_name):
+    """
+    : param database: mongodb url
+    : param input_file_list: variant docs, path to file
+    : param collection_name: annotation source name
+    """
+    conn = pymongo.MongoClient(database)
+    db = conn.variantdoc
+    posts = db[collection_name]
+    t1 = time.time()
+    cnt = 0
+    for doc in load_data(input_file_list):
+        posts.insert(doc, manipulate=False, check_keys=False, w=0)
+        cnt += 1
+        if cnt % 100000 == 0:
+            print cnt, timesofar(t1)
+    print "successfully loaded %s into mongodb" % collection_name 
 
 
