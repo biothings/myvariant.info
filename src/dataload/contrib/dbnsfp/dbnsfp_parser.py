@@ -4,73 +4,10 @@ import glob
 import pymongo
 import time
 from utils.common import timesofar
+from utils.dataload import list_split, dict_sweep, unlist, value_convert
 
 
 VALID_COLUMN_NO = 98
-
-
-# split ";" separated fields into comma separated lists, strip.
-def list_split(d):
-    for key, val in d.items():
-        if isinstance(val, dict):
-            list_split(val)
-        try:
-            if len(val.split(";")) > 1:
-                d[key] = val.rstrip().rstrip(';').split(";")
-        except (AttributeError):
-            pass
-    return d
-
-
-# remove keys whos values are "."
-# and remove empty dictionaries
-def dict_sweep(d):
-    for key, val in d.items():
-        if val == ".":
-            del d[key]
-        elif isinstance(val, list):
-            d[key] = [dict_sweep(item) for item in val if isinstance(item, dict)]
-            if len(val) == 0:
-                del d[key]
-        elif isinstance(val, dict):
-            dict_sweep(val)
-            if len(val) == 0:
-                del d[key]
-    return d
-
-
-# convert string numbers into integers or floats
-def value_convert(d):
-    for key, val in d.items():
-        try:
-            d[key] = int(val)
-        except (ValueError, TypeError):
-            try:
-                d[key] = float(val)
-            except (ValueError, TypeError):
-                pass
-        if isinstance(val, dict):
-            value_convert(val)
-        elif isinstance(val, list):
-            try:
-                d[key] = [int(x) for x in val]
-            except (ValueError, TypeError):
-                try:
-                    d[key] = [float(x) for x in val]
-                except (ValueError, TypeError):
-                    pass
-    return d
-
-
-# if dict value is a list of length 1, unlist
-def unlist(d):
-    for key, val in d.items():
-            if isinstance(val, list):
-                if len(val) == 1:
-                    d[key] = val[0]
-            elif isinstance(val, dict):
-                unlist(val)
-    return d
 
 
 # convert one snp to json
@@ -290,7 +227,7 @@ def _map_line_to_json(fields):
             }
     }
 
-    one_snp_json = list_split(dict_sweep(unlist(value_convert(one_snp_json))))
+    one_snp_json = list_split(dict_sweep(unlist(value_convert(one_snp_json)), "."), ";")
     one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"])
     return one_snp_json
 

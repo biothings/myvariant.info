@@ -5,49 +5,11 @@ from itertools import groupby, imap
 import pymongo
 import time
 #from utils.common import timesofar
+from utils.dataload import dict_sweep, unlist, value_convert
 
 
 VALID_COLUMN_NO = 90
 DEPENDENCIES = ["pysam", "pymongo"]
-
-
-# remove keys whos values are "."
-# and remove empty dictionaries
-def dict_sweep(d):
-    for key, val in d.items():
-        if val == "NA":
-            del d[key]
-        elif isinstance(val, dict):
-            dict_sweep(val)
-            if len(val) == 0:
-                del d[key]
-    return d
-
-
-# convert string numbers into integers or floats
-def value_convert(d):
-    for key, val in d.items():
-        try:
-            d[key] = int(val)
-        except (ValueError, TypeError):
-            try:
-                d[key] = float(val)
-            except (ValueError, TypeError):
-                pass
-        if isinstance(val, dict):
-            value_convert(val)
-    return d
-
-
-# if dict value is a list of length 1, unlist
-def unlist(d):
-    for key, val in d.items():
-            if isinstance(val, list):
-                if len(val) == 1:
-                    d[key] = val[0]
-            elif isinstance(val, dict):
-                unlist(val)
-    return d
 
 
 # convert one snp to json
@@ -208,7 +170,7 @@ def _map_line_to_json(fields):
                          'phred': fields[89]
                       }
                 }
-        return dict_sweep(unlist(value_convert(one_snp_json)))
+        return dict_sweep(unlist(value_convert(one_snp_json)), "NA")
 
 
 def merge_duplicate_rows(rows):

@@ -12,12 +12,16 @@ VALID_COLUMN_NO = 25
 
 # remove keys whos values are "."
 # and remove empty dictionaries
-def dict_sweep(d):
+def dict_sweep(d, vals):
     for key, val in d.items():
-        if val == "-":
+        if val in vals:
             del d[key]
+        elif isinstance(val, list):
+            d[key] = [dict_sweep(item, vals) for item in val if isinstance(item, dict)]
+            if len(val) == 0:
+                del d[key]
         elif isinstance(val, dict):
-            dict_sweep(val)
+            dict_sweep(val, vals)
             if len(val) == 0:
                 del d[key]
     return d
@@ -172,7 +176,7 @@ def _map_line_to_json(fields):
                 "variant_id": fields[24]
             }
         }
-    return dict_sweep(unlist(value_convert(one_snp_json)))
+    return dict_sweep(unlist(value_convert(one_snp_json)), "-")
 
 
 def merge_duplicate_rows(rows):

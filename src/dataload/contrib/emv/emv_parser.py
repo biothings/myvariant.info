@@ -6,7 +6,7 @@ import csv
 from itertools import imap, groupby
 import pymongo
 import os
-
+from utils.dataload import dict_sweep, value_convert, merge_duplicate_rows
 
 ## merge EMV file with genomic ID file
 #def file_merge(emv_file, id_file):
@@ -15,32 +15,6 @@ import os
 
 VALID_COLUMN_NO = 11
 
-# remove keys whos values are ""
-# and remove empty dictionaries
-def dict_sweep(d):
-    for key, val in d.items():
-        if val == "":
-            del d[key]
-        elif isinstance(val, dict):
-            dict_sweep(val)
-            if len(val) == 0:
-                del d[key]
-    return d
-
-
-# convert string numbers into integers or floats
-def value_convert(d):
-    for key, val in d.items():
-        try:
-            d[key] = int(val)
-        except (ValueError, TypeError):
-            try:
-                d[key] = float(val)
-            except (ValueError, TypeError):
-                pass
-        if isinstance(val, dict):
-            value_convert(val)
-    return d
     
 def id_strip(id_list):
     id_list = id_list.split("|")
@@ -75,25 +49,7 @@ def _map_line_to_json(fields):
             }
         }
 
-    return dict_sweep(value_convert(one_snp_json))
-
-
-def merge_duplicate_rows(rows):
-    rows = list(rows)
-    first_row = rows[0]
-    other_rows = rows[1:]
-    for row in other_rows:
-        for i in first_row['emv']:
-            if i in row['emv']:
-                if row['emv'][i] != first_row['emv'][i]:
-                    aa = first_row['emv'][i]
-                    if not isinstance(aa, list):
-                        aa = [aa]
-                    aa.append(row['emv'][i])
-                    first_row['emv'][i] = aa
-            else:
-                continue
-    return first_row
+    return dict_sweep(value_convert(one_snp_json), "")
 
 
 # open file, parse, pass to json mapper
@@ -107,8 +63,9 @@ def data_generator(input_file):
     emv = (row for row in emv if row[0])
     json_rows = imap(_map_line_to_json, emv)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-    for one_snp_json in imap(merge_duplicate_rows, row_groups):
-        yield one_snp_json
+    return (one_snp_json for one_snp_json in merge_duplicate_rows(row_groups, db))
+#    for one_snp_json in imap(merge_duplicate_rows, row_groups):
+#        yield one_snp_json
     open_file.close()
 
 

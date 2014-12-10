@@ -74,6 +74,23 @@ def id_strip(id_list):
         ids.append(id.rstrip().lstrip())
     return ids
 
+def merge_duplicate_rows(rows, db):
+    rows = list(rows)
+    first_row = rows[0]
+    other_rows = rows[1:]
+    for row in other_rows:
+        for i in first_row[db]:
+            if i in row[db]:
+                if row[db][i] != first_row[db][i]:
+                    aa = first_row[db][i]
+                    if not isinstance(aa, list):
+                        aa = [aa]
+                    aa.append(row[db][i])
+                    first_row[db][i] = aa
+            else:
+                continue
+    return first_row
+    
 # load collection into mongodb
 def load_collection(database, input_file_list, collection_name):
     """
