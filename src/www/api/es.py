@@ -89,16 +89,18 @@ class ESQuery():
             return False
 
     def mget_variants(self, vid_list, **kwargs):
-        return es.mget(body={'ids': vid_list}, index=index_name, doc_type=doc_type, **kwargs)
+        options = self._get_cleaned_query_options(kwargs)
+        res = es.mget(body={'ids': vid_list}, index=index_name, doc_type=doc_type, **options.kwargs)
+        return res if options.raw else [self._get_variantdoc(doc) for doc in res]
 
     def query(self, q, **kwargs):
         # Check if special interval query pattern exists
         interval_query = self._parse_interval_query(q)
         facets = self._parse_facets_option(kwargs)
+        options = self._get_cleaned_query_options(kwargs)
         if interval_query:
-            kwargs.update(interval_query)
-            print kwargs
-            return self.query_interval(**kwargs)
+            options['kwargs'].update(interval_query)
+            res = self.query_interval(**options.kwargs)
         else:
             _query = {
                 "query": {
@@ -110,10 +112,26 @@ class ESQuery():
             }
             if facets:
                 _query['facets'] = facets
-            return es.search(index_name, doc_type, body=_query, **kwargs)
+            res = es.search(index_name, doc_type, body=_query, **options.kwargs)
 
-    def _parse_facets_option(self, options):
-        facets = options.pop('facets', None)
+        if not options.raw:
+            _res = res['hits']
+            _res['took'] = res['took']
+            if "facets" in res:
+                _res['facets'] = res['facets']
+            for v in _res['hits']:
+                del v['_type']
+                del v['_index']
+                for attr in ['fields', '_source']:
+                    if attr in v:
+                        v.update(v[attr])
+                        del v[attr]
+                        break
+            res = _res
+        return res
+
+    def _parse_facets_option(self, kwargs):
+        facets = kwargs.pop('facets', None)
         if facets:
             _facets = {}
             for field in facets.split(','):
