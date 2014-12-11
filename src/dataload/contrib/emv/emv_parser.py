@@ -4,7 +4,6 @@ import re
 import glob
 import csv
 from itertools import imap, groupby
-import pymongo
 import os
 from utils.dataload import dict_sweep, value_convert, merge_duplicate_rows
 
@@ -58,15 +57,13 @@ def data_generator(input_file):
     os.system("sort -t$'\t' -k1 -n %s > %s_sorted.csv" % (input_file, input_file))
     open_file = open("%s_sorted.csv" % (input_file))
     emv = csv.reader(open_file, delimiter=",")
+    open_file.close()
     # Skip header
     emv.next()
     emv = (row for row in emv if row[0])
     json_rows = imap(_map_line_to_json, emv)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-    return (one_snp_json for one_snp_json in merge_duplicate_rows(row_groups, db))
-#    for one_snp_json in imap(merge_duplicate_rows, row_groups):
-#        yield one_snp_json
-    open_file.close()
+    return (one_snp_json for one_snp_json in merge_duplicate_rows(row_groups, "emv"))
 
 
 # load path and find files, pass to data_generator
@@ -76,17 +73,3 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
-
-
-def load_collection(database, input_file_list, collection_name):
-    """
-    : param database: mongodb url
-    : param input_file_list: variant docs, path to file
-    : param collection_name: annotation source name
-    """
-    conn = pymongo.MongoClient(database)
-    db = conn.variantdoc
-    posts = db[collection_name]
-    for doc in load_data(input_file_list):
-        posts.insert(doc, manipulate=False, check_keys=False, w=0)
-    print "successfully loaded %s into mongodb" % collection_name
