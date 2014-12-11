@@ -1,6 +1,10 @@
+import sys
 import time
 from itertools import islice
 import os.path
+from shlex import shlex
+
+str_types = str if sys.version_info.major == 3 else (str, unicode)
 
 
 # ===============================================================================
@@ -32,6 +36,19 @@ def timesofar(t0, clock=0, t1=None):
         t_str += '%sm' % m
     t_str += '%ss' % s
     return t_str
+
+
+def is_str(s):
+    """return True or False if input is a string or not.
+        python3 compatible.
+    """
+    return isinstance(s, str_types)
+
+
+def is_seq(li):
+    """return True if input is either a list or a tuple.
+    """
+    return isinstance(li, (list, tuple))
 
 
 def iter_n(iterable, n):
@@ -68,3 +85,35 @@ def anyfile(infile, mode='r'):
     else:
         in_f = file(infile, mode)
     return in_f
+
+
+class dotdict(dict):
+    def __getattr__(self, attr):
+        value = self.get(attr, None)
+        if isinstance(value, dict):
+            return dotdict(value)
+        else:
+            return value
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
+
+
+def split_ids(q):
+    '''split input query string into list of ids.
+       any of " \t\n\x0b\x0c\r|,+" as the separator,
+        but perserving a phrase if quoted
+        (either single or double quoted)
+        more detailed rules see:
+        http://docs.python.org/2/library/shlex.html#parsing-rules
+
+        e.g. split_ids('CDK2 CDK3') --> ['CDK2', 'CDK3']
+             split_ids('"CDK2 CDK3"\n CDk4')  --> ['CDK2 CDK3', 'CDK4']
+
+    '''
+    lex = shlex(q.encode('utf8'), posix=True)
+    lex.whitespace = ' \t\n\x0b\x0c\r|,+'
+    lex.whitespace_split = True
+    lex.commenters = ''
+    ids = [x.decode('utf8').strip() for x in list(lex)]
+    ids = [x for x in ids if x]
+    return ids
