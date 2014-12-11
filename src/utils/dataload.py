@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from utils.commmon import timesorfar
+from utils.commmon import timesofar
 import pymongo
 import time
 """
@@ -9,7 +9,11 @@ mapping to JSON, cleaning.
         
 # remove keys whos values are ".", "-", "", "NA", "none", " "
 # and remove empty dictionaries
-def dict_sweep(d, vals):
+def dict_sweep(d, vals): 
+    """
+    @param d: a dictionary
+    @param vals: a string or list of strings to sweep
+    """
     for key, val in d.items():
         if val in vals:
             del d[key]
@@ -75,6 +79,10 @@ def id_strip(id_list):
     return ids
 
 def merge_duplicate_rows(rows, db):
+    """
+    @param rows: rows to be grouped by
+    @param db: database name, string
+    """
     rows = list(rows)
     first_row = rows[0]
     other_rows = rows[1:]

@@ -58,15 +58,13 @@ def data_generator(input_file):
     os.system("sort -t$'\t' -k1 -n %s > %s_sorted.csv" % (input_file, input_file))
     open_file = open("%s_sorted.csv" % (input_file))
     emv = csv.reader(open_file, delimiter=",")
+    open_file.close()
     # Skip header
     emv.next()
     emv = (row for row in emv if row[0])
     json_rows = imap(_map_line_to_json, emv)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-    return (one_snp_json for one_snp_json in merge_duplicate_rows(row_groups, db))
-#    for one_snp_json in imap(merge_duplicate_rows, row_groups):
-#        yield one_snp_json
-    open_file.close()
+    return (one_snp_json for one_snp_json in merge_duplicate_rows(row_groups, "emv"))
 
 
 # load path and find files, pass to data_generator
