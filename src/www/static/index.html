@@ -1,141 +1,231 @@
 <!DOCTYPE html>
-<html class="   ">
+
+<html class="">
+<head>
     <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+
     <title>Network-of-BioThings/myvariant.info</title>
-
-    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <meta name="description" content="myvariant.info" />
-
-<style>
+    <link href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css" rel=
+    "stylesheet">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="myvariant.info" name="description">
+    <style>
 @font-face {
-  font-family: 'Boost';
-  font-weight: normal;
-  font-style: normal;
-  src: url('/static/fonts/2A2715_0_0.eot');
-  src: url('/static/fonts/2A2715_0_0.eot?#iefix') format('embedded-opentype'), url('/static/fonts/2A2715_0_0.woff') format('woff'), url('/static/fonts/2A2715_0_0.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'Boost';
-  font-weight: bold;
-  font-style: normal;
-  src: url('/static/fonts/2A2715_1_0.eot');
-  src: url('/static/fonts/2A2715_1_0.eot?#iefix') format('embedded-opentype'), url('/static/fonts/2A2715_1_0.woff') format('woff'), url('/static/fonts/2A2715_1_0.ttf') format('truetype');
-}
-body {
-  font-family: Boost, Avenir, Segoe, sans-serif;
-  font-size: 100%;
-  line-height: 24px;
-  color: #59504a;
-  text-rendering: optimizelegibility;
-  background-color: #fcf9f7;
-}
+    font-family: 'Boost';
+    font-weight: normal;
+    font-style: normal;
+    src: url('/static/fonts/2A2715_0_0.eot');
+    src: url('/static/fonts/2A2715_0_0.eot?#iefix') format('embedded-opentype'), url('/static/fonts/2A2715_0_0.woff') format('woff'), url('/static/fonts/2A2715_0_0.ttf') format('truetype');
+    }
+    @font-face {
+    font-family: 'Boost';
+    font-weight: bold;
+    font-style: normal;
+    src: url('/static/fonts/2A2715_1_0.eot');
+    src: url('/static/fonts/2A2715_1_0.eot?#iefix') format('embedded-opentype'), url('/static/fonts/2A2715_1_0.woff') format('woff'), url('/static/fonts/2A2715_1_0.ttf') format('truetype');
+    }
+    html, button, input, select, textarea,
+    .pure-g [class *= "pure-u"] {
+    /* Set your content font stack here: */
+    font-family: Boost, Avenir, Segoe, sans-serif;
+    }
+    body {
+    font-family: Boost, Avenir, Segoe, sans-serif;
+    font-size: 100%;
+    line-height: 24px;
+    color: #59504a;
+    text-rendering: optimizelegibility;
+    background-color: #fcf9f7;
+    padding-left: 20px;
+    }
+    .content {
+    }
 
-</style>
+    </style>
+</head>
 
-  </head>
+<body>
+    <div class="pure-g">
+        <div class="header pure-u-1-1">
+            <h1>MyVariant.info</h1>
+        </div>
 
+        <div class="pure-u-1-1">
+            <h2><a class="anchor" href="#introduction" id=
+            "user-content-introduction"><span class=
+            "octicon octicon-link"></span></a>Introduction</h2>
 
-  <body
-    <div class="wrapper">
-<div style="margin-left:200px">
+            <p>This is a project coming out of <a href=
+            "https://github.com/Network-of-BioThings/nob-hq/wiki/1st-Network-of-BioThings-Hackathon">
+            1st NoB Hackathon</a>.</p>
 
-<h1><a name="user-content-introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h1>
+            <p>The scope of this project is to aggregate existing annotations
+            for genetic variants. Variant annotations have drawn huge amount of
+            efforts from researchers, which made many variant annotation
+            resources available, but also very scattered. Doing integration of
+            all of them is hard, so we want to create a simple way to pool them
+            together first, with high-performance programmatic access. That
+            way, the further integration (e.g. deduplication, deriving
+            higher-level annotations, etc) can be much easier.</p>
 
-<p>This is a project coming out of <a href="https://github.com/Network-of-BioThings/nob-hq/wiki/1st-Network-of-BioThings-Hackathon">1st NoB Hackathon</a>.</p>
+            <p>Code repo: <a href=
+            "https://github.com/Network-of-BioThings/myvariant.info">https://github.com/Network-of-BioThings/myvariant.info</a></p>
 
-<p>The scope of this project is to aggregate existing annotations for genetic variants. Variant annotations have drawn huge amount of efforts from researchers, which made many variant annotation resources available, but also very scattered. Doing integration of all of them is hard, so we want to create a simple way to pool them together first, with high-performance programmatic access. That way, the further integration (e.g. deduplication, deriving higher-level annotations, etc) can be much easier.</p>
-<p>Code repo: <a href="https://github.com/Network-of-BioThings/myvariant.info">https://github.com/Network-of-BioThings/myvariant.info</a></p>
-<p>Wiki: <a href="https://github.com/Network-of-BioThings/myvariant.info/wiki">https://github.com/Network-of-BioThings/myvariant.info/wiki</a></p>
+            <p>Wiki: <a href=
+            "https://github.com/Network-of-BioThings/myvariant.info/wiki">https://github.com/Network-of-BioThings/myvariant.info/wiki</a></p>
+        </div>
 
-<h1>
-<a name="user-content-demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>Demo</h1>
+        <div class="pure-u-1-1">
+            <h2><a class="anchor" href="#demo" id=
+            "user-content-demo"><span class=
+            "octicon octicon-link"></span></a>Demo</h2>
 
-<ul class="task-list">
-<li>
-<h3>Get a variant from a ID:</h3>
-<h5>http://myvariant.info/api/variant/&lt;variant_id&gt;</h5>
-<p>
-<ul>
-<li><a href="http://myvariant.info/api/variant/chr1:g.35367C>T">http://myvariant.info/api/variant/chr1:g.35367C&gt;T</a></li>
-<li><a href="http://myvariant.info/api/variant/chr7:g.55241707G>T">http://myvariant.info/api/variant/chr7:g.55241707G&gtT</a></li>
-<li><a href="http://myvariant.info/api/variant/chr9:g.107620835C>T">http://myvariant.info/api/variant/chr9:g.107620835C&gt;T</a></li>
-<li><a href="http://myvariant.info/api/variant/chr1:g.160145947G>T">http://myvariant.info/api/variant/chr1:g.160145947G&gt;T</a></li>
-<li><a href="http://myvariant.info/api/variant/chr16:g.28883241A>G">http://myvariant.info/api/variant/chr16:g.28883241A&gt;G</a></li>
-<li><a href="http://myvariant.info/api/variant/chr3:g.49721532C>T">http://myvariant.info/api/variant/chr3:g.49721532C&gt;T</a></li>
+            <ul class="task-list">
+                <li>
+                    <h3>Get a variant from a ID:</h3>
 
-</li>
-</ul>
-</p>
+                    <h4>
+                    http://myvariant.info/api/variant/&lt;variant_id&gt;</h4>
 
-<li>
-<h3>Making queries (<a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax">query syntax</a>):</h3>
-<h5>http://myvariant.info/api/query/?q=&lt;query&gt;</h5>
+                    <p></p>
 
-<ul class="task-list">
-<li>
-<p>query for any supported id (currently rsid, will include more as we go)</p>
+                    <ul>
+                        <li>
+                            <a href=
+                            "http://myvariant.info/api/variant/chr1:g.35367C%3ET">
+                            http://myvariant.info/api/variant/chr1:g.35367C&gt;T</a>
+                        </li>
 
-<p><a href="http://myvariant.info/api/query?q=rs58991260">http://myvariant.info/api/query?q=rs58991260</a></p>
-</li>
-<li>
-<p>query for a genomic range</p>
+                        <li>
+                            <a href=
+                            "http://myvariant.info/api/variant/chr7:g.55241707G%3ET">
+                            http://myvariant.info/api/variant/chr7:g.55241707G&gt;T</a>
+                        </li>
 
-<p><a href="http://myvariant.info/api/query?q=chr1:69000-70000">http://myvariant.info/api/query?q=chr1:69000-70000</a></p>
-</li>
-<li>
-<p>query for one or more fields</p>
+                        <li>
+                            <a href=
+                            "http://myvariant.info/api/variant/chr9:g.107620835C%3ET">
+                            http://myvariant.info/api/variant/chr9:g.107620835C&gt;T</a>
+                        </li>
 
-<p><a href="http://myvariant.info/api/query?q=dbsnp.snpclass:single">http://myvariant.info/api/query?q=dbsnp.snpclass:single</a></p>
-</li>
-<li><p>support wild char</p></li>
-<li><p>support regex</p></li>
-<li>
-<p>boolean query (AND, OR, NOT)</p>
+                        <li>
+                            <a href=
+                            "http://myvariant.info/api/variant/chr1:g.160145947G%3ET">
+                            http://myvariant.info/api/variant/chr1:g.160145947G&gt;T</a>
+                        </li>
 
-<p><a href="http://myvariant.info/api/query?q=(NOT func:unknown)">http://myvariant.info/api/query?q=(NOT func:unknown)</a></p>
-</li>
-<p><a href="http://myvariant.info/api/query?q=dbnsfp.polyphen2.hdiv.score:>0.99 AND chrom:1">http://myvariant.info/api/query?q=dbnsfp.polyphen2.hdiv.score:>0.99 AND chrom:1</a></p>
-</li>
+                        <li>
+                            <a href=
+                            "http://myvariant.info/api/variant/chr16:g.28883241A%3EG">
+                            http://myvariant.info/api/variant/chr16:g.28883241A&gt;G</a>
+                        </li>
 
-<li>
-<p>faceting</p>
+                        <li>
+                            <a href=
+                            "http://myvariant.info/api/variant/chr3:g.49721532C%3ET">
+                            http://myvariant.info/api/variant/chr3:g.49721532C&gt;T</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <p>
 
-<p><a href="http://myvariant.info/api/query?q=(NOT func:unknown)&amp;facets=func&amp;size=0">http://myvariant.info/api/query?q=(NOT func:unknown)&amp;facets=func&amp;size=0</a></p>
-</li>
+            <ul>
+                <li>
+                    <h3>Making queries (<a href=
+                    "http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax">query
+                    syntax</a>):</h3>
 
-<li>
-<p>field exists</p>
+                    <h4>http://myvariant.info/api/query/?q=&lt;query&gt;</h4>
 
-<p><a href="http://myvariant.info/api/query?q=_exists_:dbsnp AND _exists_:cosmic">http://myvariant.info/api/query?q=_exists_:dbsnp AND _exists_:cosmic</a></p>
-</li>
+                    <ul class="task-list">
+                        <li>
+                            <p>query for any supported id (currently rsid, will
+                            include more as we go)</p>
 
-</ul>
-</li>
-</ul>
+                            <p><a href=
+                            "http://myvariant.info/api/query?q=rs58991260">http://myvariant.info/api/query?q=rs58991260</a></p>
+                        </li>
 
+                        <li>
+                            <p>query for a genomic range</p>
 
-<h1>
-<a name="user-content-stats" class="anchor" href="#stats"><span class="octicon octicon-link"></span></a>Stats</h1>
+                            <p><a href=
+                            "http://myvariant.info/api/query?q=chr1:69000-70000">
+                            http://myvariant.info/api/query?q=chr1:69000-70000</a></p>
+                        </li>
 
-<ul class="task-list">
-<li><b>total (99,948,811)</b></li>
-<li>dbnsfp (84,580,288)</li>
-<li>dbsnp (13,392,109)</li>
-<li>clinvar (88,568)</li>
-<li>mutdb (420,246)</li>
-<li>gwassnps (15,030)</li>
-<li>cosmic (1,024,759)</li>
-<li>docm (1,119)</li>
-<li>snpedia (5,907)</li>
-<li>EMVClass (12,066)</li>
-</ul><h1>
-  </div>
-</div>
-  </div>
-</div>
-  </body>
+                        <li>
+                            <p>query for one or more fields</p>
+
+                            <p><a href=
+                            "http://myvariant.info/api/query?q=dbsnp.snpclass:single">
+                            http://myvariant.info/api/query?q=dbsnp.snpclass:single</a></p>
+                        </li>
+
+                        <li>
+                            <p>support wild char</p>
+                        </li>
+
+                        <li>
+                            <p>support regex</p>
+                        </li>
+
+                        <li>
+                            <p>boolean query (AND, OR, NOT)</p>
+
+                            <p><a href=
+                            "http://myvariant.info/api/query?q=(NOT%20func:unknown)">
+                            http://myvariant.info/api/query?q=(NOT
+                            func:unknown)</a></p>
+                        </li>
+
+                        <li style="list-style: none; display: inline">
+                            <p><a href=
+                            "http://myvariant.info/api/query?q=dbnsfp.polyphen2.hdiv.score:%3E0.99%20AND%20chrom:1">
+                            http://myvariant.info/api/query?q=dbnsfp.polyphen2.hdiv.score:&gt;0.99
+                            AND chrom:1</a></p>
+                        </li>
+
+                        <li>
+                            <p>faceting</p>
+
+                            <p><a href=
+                            "http://myvariant.info/api/query?q=(NOT%20func:unknown)&amp;facets=func&amp;size=0">
+                            http://myvariant.info/api/query?q=(NOT
+                            func:unknown)&amp;facets=func&amp;size=0</a></p>
+                        </li>
+
+                        <li>
+                            <p>field exists</p>
+
+                            <p><a href=
+                            "http://myvariant.info/api/query?q=_exists_:dbsnp%20AND%20_exists_:cosmic">
+                            http://myvariant.info/api/query?q=_exists_:dbsnp
+                            AND _exists_:cosmic</a></p>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h2><a class="anchor" href="#stats" id=
+            "user-content-stats"><span class=
+            "octicon octicon-link"></span></a>Stats</h2>
+
+            <ul class="task-list">
+                <li><b>total (99,948,811)</b></li>
+                <li>dbnsfp (84,580,288)</li>
+                <li>dbsnp (13,392,109)</li>
+                <li>clinvar (88,568)</li>
+                <li>mutdb (420,246)</li>
+                <li>gwassnps (15,030)</li>
+                <li>cosmic (1,024,759)</li>
+                <li>docm (1,119)</li>
+                <li>snpedia (5,907)</li>q
+                <li>EMVClass (12,066)</li>
+            </ul>
+        </div>
+    </div>
+</body>
 </html>
-
