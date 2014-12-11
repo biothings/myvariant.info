@@ -1,10 +1,10 @@
 '''
-A thin python layer for accessing GeneDoc ElasticSearch host.
+A thin python layer for accessing MyVariant ElasticSearch host.
 
 Currently available URLs:
 
-    /query?q=cdk2      gene query service
-    /gene/<geneid>     gene annotation service
+    /v1/query?q=rs58991260            variant query service
+    /v1/variant/<variant_id>    variant annotation service
 
 '''
 import sys
@@ -52,13 +52,12 @@ class MainHandler(tornado.web.RequestHandler):
             self.render(os.path.join(STATIC_PATH, 'index.html'))
 
 
-
-
 APP_LIST = [
     (r"/", MainHandler),
 ]
 
 APP_LIST += add_apps('api', api_app_list)
+APP_LIST += add_apps('v1', api_app_list)
 
 
 settings = {}
@@ -77,6 +76,7 @@ def main():
     loop = tornado.ioloop.IOLoop.instance()
     if options.debug:
         tornado.autoreload.start(loop)
+        tornado.autoreload.watch(os.path.join(STATIC_PATH, 'index.html'))
         logging.info('Server is running on "%s:%s"...' % (options.address, options.port))
 
 
