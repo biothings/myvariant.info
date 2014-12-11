@@ -117,7 +117,7 @@ class ESIndexer():
                 break
             else:
                 for doc in res['hits']['hits']:
-                    yield doc
+                    yield doc['_source']
                     cnt += 1
                 if verbose:
                     print('done.[%.1f%%,%s]' % (min(cnt, n)*100./n, timesofar(t1)))
@@ -135,7 +135,8 @@ class ESIndexer():
 
     def update_mapping(self, m):
         assert m.keys() == [self._doc_type]
-        assert m[self._doc_type].keys() == ['properties']
-        print(json.dumps(m), indent=2)
+        # assert m[self._doc_type].keys() == ['properties']
+        assert 'properties' in m[self._doc_type]
+        print(json.dumps(m, indent=2))
         if ask("Continue to update above mapping?") == 'Y':
-            self._es.indices.put_mapping(index=self._index, doc_type=self._doc_type, body=m)
+            print(self._es.indices.put_mapping(index=self._index, doc_type=self._doc_type, body=m))
