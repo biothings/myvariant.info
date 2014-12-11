@@ -82,6 +82,7 @@ class BaseHandler(tornado.web.RequestHandler):
            if encode is False, assumes input data is already a JSON encoded
            string.
         '''
+        indent = indent or 2   # tmp settings
         jsoncallback = self.get_argument(self.jsonp_parameter, '')  # return as JSONP
         if SUPPORT_MSGPACK:
             use_msgpack = self.get_argument('msgpack', '')
