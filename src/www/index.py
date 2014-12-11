@@ -9,8 +9,8 @@ Currently available URLs:
 '''
 import sys
 import os.path
-import subprocess
-import json
+#import subprocess
+#import json
 
 import tornado.httpserver
 import tornado.ioloop
@@ -24,7 +24,7 @@ if src_path not in sys.path:
     sys.path.append(src_path)
 #from config import INCLUDE_DOCS
 #from utils.es import ESQuery
-from helper import add_apps, BaseHandler
+from helper import add_apps   # , BaseHandler
 from api.handlers import APP_LIST as api_app_list
 
 
@@ -45,7 +45,6 @@ if options.debug:
     options.address = '0.0.0.0'
 
 
-
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         #if INCLUDE_DOCS:
@@ -62,12 +61,12 @@ APP_LIST += add_apps('v1', api_app_list)
 
 settings = {}
 if options.debug:
-#     from config import STATIC_PATH
+    # from config import STATIC_PATH
     settings.update({
         "static_path": STATIC_PATH,
     })
-#    from config import auth_settings
-#    settings.update(auth_settings)
+    # from config import auth_settings
+    # settings.update(auth_settings)
 
 def main():
     application = tornado.web.Application(APP_LIST, **settings)
@@ -78,7 +77,6 @@ def main():
         tornado.autoreload.start(loop)
         tornado.autoreload.watch(os.path.join(STATIC_PATH, 'index.html'))
         logging.info('Server is running on "%s:%s"...' % (options.address, options.port))
-
 
     loop.start()
 

@@ -6,7 +6,7 @@ from elasticsearch import NotFoundError
 
 from www.helper import BaseHandler
 from .es import ESQuery
-#from utils.common import split_ids
+from utils.common import split_ids
 
 
 class VariantHandler(BaseHandler):
@@ -122,7 +122,6 @@ class QueryHandler(BaseHandler):
             res = {'success': False, 'error': "Missing required parameters."}
 
         self.return_json(res)
-
 
 
 APP_LIST = [

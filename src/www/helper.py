@@ -114,7 +114,8 @@ class BaseHandler(tornado.web.RequestHandler):
         '''Provide server side support for CORS request.'''
         self.set_header("Access-Control-Allow-Origin", "*")
         self.set_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
-        self.set_header("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control")
+        self.set_header("Access-Control-Allow-Headers",
+                        "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control")
         self.set_header("Access-Control-Allow-Credentials", "false")
         self.set_header("Access-Control-Max-Age", "60")
 
