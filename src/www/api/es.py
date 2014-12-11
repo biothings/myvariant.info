@@ -14,6 +14,9 @@ class ESQuery():
         doc.setdefault('_id', hit['_id'])
         if '_version' in hit:
             doc.setdefault('_version', hit['_version'])
+        if hit.get('found', None) is False:
+            # if found is false, pass that to the doc
+            doc['found'] = hit['found']
         return doc
 
     def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False):
@@ -91,7 +94,7 @@ class ESQuery():
     def mget_variants(self, vid_list, **kwargs):
         options = self._get_cleaned_query_options(kwargs)
         res = es.mget(body={'ids': vid_list}, index=index_name, doc_type=doc_type, **options.kwargs)
-        return res if options.raw else [self._get_variantdoc(doc) for doc in res]
+        return res if options.raw else [self._get_variantdoc(doc) for doc in res['docs']]
 
     def query(self, q, **kwargs):
         # Check if special interval query pattern exists
