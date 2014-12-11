@@ -4,13 +4,14 @@ def get_mapping():
     m = {
         "variant": {
             "include_in_all": False,
-            "dynamic" : False,
+            "dynamic": False,
             "properties": {}
         }
     }
     for _m in [mapping_dbsnp, mapping_mutdb, mapping_snpedia,
                mapping_gwassnps, mapping_cosmic, mapping_docm,
-               mapping_dbnsfp, mapping_emv]:
+               mapping_dbnsfp, mapping_emv, mapping_clinvar,
+               mapping_evs]:
         m['variant']['properties'].update(_m)
     return m
 
@@ -18,11 +19,11 @@ def get_mapping():
 mapping = {
     'mappings': {
         "_default_": {
-#            "_all": { "enabled":  false }
+        #    "_all": { "enabled":  false }
         },
         'variant': {
             "include_in_all": False,
-            "dynamic" : False,
+            "dynamic": False,
             "dynamic_templates": [
             #     { "es": {
             #           "match":              "*_es",
@@ -32,14 +33,16 @@ mapping = {
             #               "analyzer":       "spanish"
             #           }
             #     }},
-                { "lowercase_keyword": {
-                      "match":              "*",
-                      "match_mapping_type": "string",
-                      "mapping": {
-                          "type": "string",
-                          "analyzer": "string_lowercase"
-                      }
-                }}
+                {
+                    "lowercase_keyword": {
+                        "match": "*",
+                        "match_mapping_type": "string",
+                        "mapping": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        }
+                    }
+                }
             ]
         }
     }
@@ -80,7 +83,7 @@ mapping_dbsnp = {
             },
             "strand": {
                 "type": "string",
-                "index" : "not_analyzed"
+                "index": "not_analyzed"
             }
         }
     }
@@ -125,7 +128,7 @@ mapping_mutdb = {
             },
             "strand": {
                 "type": "string",
-                "index" : "not_analyzed"
+                "index": "not_analyzed"
             }
         }
     }
@@ -257,7 +260,7 @@ mapping_docm = {
             },
             "pubmed_id": {
                 "type": "string",
-                "index" : "not_analyzed"
+                "index": "not_analyzed"
             },
             "type": {
                 "type": "string",
@@ -784,6 +787,28 @@ mapping_clinvar = {
             },
             "variant_id": {
                 "type": "long"
+            }
+        }
+    }
+}
+
+mapping_evs = {
+    "evs": {
+        "properties": {
+            "clinical_info": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "function_gvs": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "grantham_score": {
+                "type": "float"
+            },
+            "rs_id": {
+                "type": "string",
+                "analyzer": "string_lowercase"
             }
         }
     }
