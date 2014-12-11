@@ -4,7 +4,6 @@ import re
 import glob
 import csv
 from itertools import imap, groupby
-import pymongo
 import os
 from utils.dataload import dict_sweep, value_convert, merge_duplicate_rows
 
@@ -74,17 +73,3 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
-
-
-def load_collection(database, input_file_list, collection_name):
-    """
-    : param database: mongodb url
-    : param input_file_list: variant docs, path to file
-    : param collection_name: annotation source name
-    """
-    conn = pymongo.MongoClient(database)
-    db = conn.variantdoc
-    posts = db[collection_name]
-    for doc in load_data(input_file_list):
-        posts.insert(doc, manipulate=False, check_keys=False, w=0)
-    print "successfully loaded %s into mongodb" % collection_name

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from utils.commmon import timesofar
+from commmon import timesofar
 import pymongo
 import time
 """
