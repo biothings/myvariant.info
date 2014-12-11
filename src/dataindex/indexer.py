@@ -13,6 +13,8 @@ es_host = config.ES_HOST
 es = Elasticsearch(es_host)
 index_name = config.ES_INDEX_NAME
 doc_type = config.ES_DOC_TYPE
+logger = logging.getLogger()
+logger.setLevel(logging.ERROR)
 
 
 def timesofar(t0, clock=0):
@@ -42,7 +44,7 @@ def get_test_doc_li(n):
         out.append({
             '_id': 'chr1:g.{}A>C'.format(random.randint(1, 10000000)),
             'aaa': 'bbb'
-            })
+        })
     return out
 
 
@@ -94,41 +96,52 @@ def verify_doc_li(doc_li, return_ids=False):
     return stats
 
 
-def create_index():
-    es.indices.create(index=index_name, body=mapping)
+def create_index(index_name):
+    body = {'settings': {'number_of_shards': 10}}
+    body.update(mapping)
+    es.indices.create(index=index_name, body=body)
 
+
+def _index_doc_batch(doc_batch, index_name, doc_type, update=False):
+    _li = []
+    for doc in doc_batch:
+        if update:
+            # _li.append({
+            #     "update": {
+            #         "_index": index_name,
+            #         "_type": doc_type,
+            #         "_id": doc['_id']
+            #     }
+            #     })
+            # _li.append({'script': 'ctx._source.remove("cosmic")'})
+            _li.append({
+                "update": {
+                    "_index": index_name,
+                    "_type": doc_type,
+                    "_id": doc['_id']
+                }
+            })
+            _li.append({'doc': doc, 'doc_as_upsert': True})
+        else:
+            _li.append({
+                "index": {
+                    "_index": index_name,
+                    "_type": doc_type,
+                    "_id": doc['_id']
+                }
+            })
+            _li.append(doc)
+    es.bulk(body=_li)
 
 def do_index(doc_li, index_name, doc_type, step=1000, update=False, verbose=True):
     for doc_batch in doc_feeder(doc_li, step=step, verbose=verbose):
-        _li = []
-        for doc in doc_batch:
-            if update:
-                # _li.append({
-                #     "update": {
-                #         "_index": index_name,
-                #         "_type": doc_type,
-                #         "_id": doc['_id']
-                #     }
-                #     })
-                # _li.append({'script': 'ctx._source.remove("cosmic")'})
-                _li.append({
-                    "update": {
-                        "_index": index_name,
-                        "_type": doc_type,
-                        "_id": doc['_id']
-                    }
-                    })
-                _li.append({'doc': doc, 'doc_as_upsert': True})
-            else:
-                _li.append({
-                    "index": {
-                        "_index": index_name,
-                        "_type": doc_type,
-                        "_id": doc['_id']
-                    }
-                    })
-                _li.append(doc)
-        es.bulk(body=_li)
+        _index_doc_batch(doc_batch, index_name, doc_type, update=update)
+
+
+def do_index_from_collection(collection, index_name, doc_type, step=10000, update=False):
+    from utils.mongo import doc_feeder
+    for doc_batch in doc_feeder(collection, step=step, inbatch=True):
+        _index_doc_batch(doc_batch, index_name, doc_type, update=update)
 
 
 def index_dbsnp():
@@ -220,7 +233,7 @@ def clone_index(createidx=False, test=True):
     from utils.es import ESIndexer
     from utils.common import iter_n
 
-    new_idx = 'myvariant_current_1'
+    new_idx = 'myvariant_current_3'
     step = 10000
     if createidx:
         from mapping import get_mapping
@@ -231,13 +244,30 @@ def clone_index(createidx=False, test=True):
     # helpers.reindex(es, source_index='myvariant_all',
     #                 target_index= new_idx, chunk_size=10000)
     esi = ESIndexer()
-    doc_iter = esi.doc_feeder(index='myvariant_all', doc_type='variant', step=step)
-
-    def fn(doc):
-        doc = doc['_source']
-        doc['_id'] = 'chr' + doc['_id']
-        return doc
+    doc_iter = esi.doc_feeder(index='myvariant_all_1', doc_type='variant', step=step)
 
     for doc_batch in iter_n(doc_iter, step):
-        doc_batch = [fn(doc) for doc in doc_batch]
         do_index(doc_batch, index_name=new_idx, doc_type='variant', step=step, verbose=False, update=True)
+
+
+def get_es_stats():
+    cnt_li = []
+    total = es.count(index=index_name, doc_type=doc_type)['count']
+    cnt_li.append(('total', total))
+    src_li = ['dbnsfp', 'dbsnp', 'clinvar', 'mutdb', 'gwassnps',
+              'cosmic', 'docm', 'snpedia', 'emv']
+    for src in src_li:
+        body = {
+            "query": {
+                "constant_score": {
+                    "filter": {
+                        "exists": {
+                            "field": src
+                        }
+                    }
+                }
+            }
+        }
+        cnt = es.count(index=index_name, doc_type=doc_type, body=body)['count']
+        cnt_li.append((src, cnt))
+    return cnt_li
