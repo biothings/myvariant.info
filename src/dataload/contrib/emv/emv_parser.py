@@ -3,7 +3,7 @@
 import re
 import glob
 import csv
-from itertools import imap, groupby
+from itertools import imap, groupby, ifilter
 import os
 #from utils.dataload import dict_sweep, value_convert, unlist, merge_duplicate_rows
 
@@ -47,17 +47,17 @@ def _map_line_to_json(fields):
 # open file, parse, pass to json mapper
 def data_generator(input_file):
     os.system("sort -t$'\t' -k1 -n %s > %s_sorted.csv" % (input_file, input_file))
-    with open("%s_sorted.csv" % (input_file)) as open_file:
-        open_file = open("%s_sorted.csv" % (input_file))
-        emv = csv.reader(open_file, delimiter=",")
-        # Skip header
-        emv.next()
-        emv = (row for row in emv if row[0])
-        json_rows = imap(_map_line_to_json, emv)
-        row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-        snp = (merge_duplicate_rows(rg, "emv") for rg in row_groups )
-        #snp = (one_snp_json for one_snp_json in merge_duplicate_rows(row_groups, "emv"))
-        #open_file.close()
+    #with open("%s_sorted.csv" % (input_file)) as open_file:
+    open_file = open("%s_sorted.csv" % (input_file))
+    emv = csv.reader(open_file, delimiter=",")
+    # Skip header
+    emv.next()
+    emv = ifilter(lambda x: x[0], emv)
+    #emv = (row for row in emv if row[0])
+    json_rows = imap(_map_line_to_json, emv)
+    row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
+    snp = (merge_duplicate_rows(rg, "emv") for rg in row_groups )
+    #open_file.close()
     return snp
 
 

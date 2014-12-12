@@ -2,41 +2,9 @@
 import csv
 import glob
 from itertools import islice, groupby, imap
-import pymongo
-from utils.common import timesofar
-import time
-
+from utils.common import dict_sweep, value_convert
 
 VALID_COLUMN_NO = 31
-
-
-# remove keys whos values are "."
-# and remove empty dictionaries
-def dict_sweep(d):
-    for key, val in d.items():
-        if val == "NA" or \
-           val == "none":
-            del d[key]
-        elif isinstance(val, dict):
-            dict_sweep(val)
-            if len(val) == 0:
-                del d[key]
-    return d
-
-
-# convert string numbers into integers or floats
-def value_convert(d):
-    for key, val in d.items():
-        try:
-            d[key] = int(val)
-        except (ValueError, TypeError):
-            try:
-                d[key] = float(val)
-            except (ValueError, TypeError):
-                pass
-        if isinstance(val, dict):
-            value_convert(val)
-    return d
 
 
 def polyphen(field):
@@ -142,7 +110,7 @@ def _map_line_to_json(fields):
             }
         }
 
-    return dict_sweep(value_convert(one_snp_json))
+    return dict_sweep(value_convert(one_snp_json), vals=["NA", "none"])
 
 
 def merge_duplicate_rows(rows):
@@ -185,21 +153,3 @@ def load_data(path):
         for one_snp_json in data:
             yield one_snp_json
     
-
-def load_collection(database, input_file_list, collection_name):
-    """
-    : param database: mongodb url
-    : param input_file_list: variant docs, path to file
-    : param collection_name: annotation source name
-    """
-    conn = pymongo.MongoClient(database)
-    db = conn.variantdoc
-    posts = db[collection_name]
-    t1 = time.time()
-    cnt = 0
-    for doc in load_data(input_file_list):
-        posts.insert(doc, manipulate=False, check_keys=False, w=0)
-        cnt += 1
-        if cnt % 100000 == 0:
-            print cnt, timesofar(t1)
-    print "successfully loaded %s into mongodb" % collection_name
