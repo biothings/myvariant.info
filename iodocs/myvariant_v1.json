@@ -1,0 +1,172 @@
+{
+    "endpoints": [
+        {
+            "name": "MyVariant.info variant query service",
+            "methods": [
+                {
+                    "MethodName": "Variant query service",
+                    "Synopsis": "Make variant query and return matching variant list. Support JSONP and CORS as well.",
+                    "HTTPMethod": "GET",
+                    "URI": "/v1/query",
+                    "RequiresOAuth": "N",
+                    "parameters": [
+                        {
+                            "Name": "q",
+                            "Type": "string",
+                            "Required": "Y",
+                            "Description": "query string. Examples: \"CDK2\", \"NM_052827\", \"204639_at\". The detailed query syntax can be found at http://docs.mygene.info/en/latest/doc/query_service.html"
+                        },
+                        {
+                            "Name": "fields",
+                            "Type": "string",
+                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v2/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"all\"."
+                        },
+                        {
+                            "Name": "size",
+                            "Type": "integer",
+                            "Description": " the maximum number of matching gene hits to return (with a cap of 1000 at the moment). Default: 10."
+                        },
+                        {
+                            "Name": "from",
+                            "Type": "integer",
+                            "Description": " the number of matching gene hits to skip, starting from 0. Combining with \"size\" parameter, this can be useful for paging. Default: 0. "
+                        },
+                        {
+                            "Name": "sort",
+                            "Type": "string",
+                            "Description": "the comma-separated fields to sort on. Prefix with \"-\" for descending order, otherwise in ascending order. Default: sort by matching scores in decending order."
+                        },
+                        {
+                            "Name": "facets",
+                            "Type": "string",
+                            "Description": "a single field or comma-separated fields to return facets, for example, “facets=taxid”, “facets=taxid,type_of_gene”."
+                        },
+                        {
+                            "Name": "callback",
+                            "Type": "string",
+                            "Description": "you can pass a \"callback\" parameter to make a JSONP call."
+                        },
+                        {
+                            "Name": "email",
+                            "Type": "string",
+                            "Description": "If you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you."
+                        }
+                    ]
+                },
+
+                {
+                    "MethodName": "Gene query service via POST",
+                    "Synopsis": "Make gene queries in batch",
+                    "HTTPMethod": "POST",
+                    "URI": "/v2/query",
+                    "RequiresOAuth": "N",
+                    "parameters": [
+                        {
+                            "Name": "q",
+                            "Type": "string",
+                            "Required": "Y",
+                            "Description": "multiple query terms seperated by comma (also support \"+\" or white space), but no wildcard, e.g., \"q=1017,1018\" or \"q=CDK2+BTK\" "
+                        },
+                        {
+                            "Name": "scopes",
+                            "Type": "string",
+                            "Description": "specify one or more fields (separated by comma) as the search \"scopes\", e.g., \"scopes=entrezgene\", \"scopes=entrezgene,ensemblgene\". The available \"fields\" can be passed to \"scopes\" parameter are listed here: http://mygene.info/doc/query_service.html#available-fields. Default: \"scopes=entrezgene,ensemblgene,retired\" (either Entrez or Ensembl gene ids)."
+                        },
+                        {
+                            "Name": "fields",
+                            "Type": "string",
+                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v2/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
+                        },
+                        {
+                            "Name": "email",
+                            "Type": "string",
+                            "Description": "If you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you."
+                        }
+                    ]
+                }
+            ]
+        },
+
+        {
+            "name": "MyVariant.info variant annotation services",
+            "methods": [
+                {
+                    "MethodName": "Variant annotation service",
+                    "Synopsis": "Retrieve variant annotation based on HGVS name based ids, support JSONP and CORS as well.",
+                    "HTTPMethod": "GET",
+                    "URI": "/v1/variant/:variantid",
+                    "RequiresOAuth": "N",
+                    "parameters": [
+                        {
+                            "Name": "variantid",
+                            "Type": "string",
+                            "Required": "Y",
+                            "Description": "Entrez or Ensembl gene id, e,g., 1017, ENSG00000170248. A retired Entrez Gene id works too if it is replaced by a new one, e.g., 245794"
+                        },
+                        {
+                            "Name": "fields",
+                            "Type": "string",
+                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v2/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
+                        },
+                        {
+                            "Name": "callback",
+                            "Type": "string",
+                            "Description": "you can pass a \"callback\" parameter to make a JSONP call."
+                        },
+                        {
+                            "Name": "email",
+                            "Type": "string",
+                            "Description": "If you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you."
+                        }
+                    ]
+                },
+
+                {
+                    "MethodName": "Variant annotation service via POST",
+                    "Synopsis": "Make variant queries in batch for a list of HGVS name based ids",
+                    "HTTPMethod": "POST",
+                    "URI": "/v1/variant",
+                    "RequiresOAuth": "N",
+                    "parameters": [
+                        {
+                            "Name": "ids",
+                            "Type": "string",
+                            "Required": "Y",
+                            "Description": "multiple variantids seperated by comma, e.g., \"ids=1017,1018\" or \"ids=695,ENSG00000123374\". Note that currently we only take the input ids up to 1000 maximum, the rest will be omitted."
+                        },
+                        {
+                            "Name": "fields",
+                            "Type": "string",
+                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v2/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
+                        },
+                        {
+                            "Name": "email",
+                            "Type": "string",
+                            "Description": "If you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you."
+                        }
+                    ]
+                }
+
+            ]
+        },
+
+        {
+            "name": "MyVariant.info metadata service",
+            "methods": [
+                {
+                    "MethodName": "Metadata service",
+                    "Synopsis": "Get metadata about the data available from MyVariant.info.",
+                    "HTTPMethod": "GET",
+                    "URI": "/v1/metadata",
+                    "parameters": [
+                        {
+                            "Name": "callback",
+                            "Type": "string",
+                            "Description": "you can pass a \"callback\" parameter to make a JSONP call."
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
