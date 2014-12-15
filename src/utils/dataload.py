@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from utils.common import timesofar
+#from utils.common import timesofar
 import pymongo
 import time
 """
@@ -9,7 +9,7 @@ mapping to JSON, cleaning.
         
 # remove keys whos values are ".", "-", "", "NA", "none", " "
 # and remove empty dictionaries
-def dict_sweep(d, vals): 
+def dict_sweep(d, vals=[".", "-", "", "NA", "none", " "]): 
     """
     @param d: a dictionary
     @param vals: a string or list of strings to sweep
@@ -18,7 +18,11 @@ def dict_sweep(d, vals):
         if val in vals:
             del d[key]
         elif isinstance(val, list):
-            d[key] = [dict_sweep(item, vals) for item in val if isinstance(item, dict)]
+            for item in val:
+                if item in vals:
+                    del item
+                elif isinstance(item, dict):
+                    dict_sweep(item, vals)
             if len(val) == 0:
                 del d[key]
         elif isinstance(val, dict):

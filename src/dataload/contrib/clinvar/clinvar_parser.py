@@ -1,70 +1,13 @@
 # -*- coding: utf-8 -*-
 import csv
 import re
-import pymongo
 from itertools import imap, groupby
 import os
+#from utils.common import unlist, dict_sweep, value_convert
 #from subprocess import Popen, PIPE
 
 
 VALID_COLUMN_NO = 25
-
-
-# remove keys whos values are "."
-# and remove empty dictionaries
-def dict_sweep(d, vals):
-    for key, val in d.items():
-        if val in vals:
-            del d[key]
-        elif isinstance(val, list):
-            d[key] = [dict_sweep(item, vals) for item in val if isinstance(item, dict)]
-            if len(val) == 0:
-                del d[key]
-        elif isinstance(val, dict):
-            dict_sweep(val, vals)
-            if len(val) == 0:
-                del d[key]
-    return d
-
-
-# convert string numbers into integers or floats
-def value_convert(d):
-    for key, val in d.items():
-        try:
-            d[key] = int(val)
-        except (ValueError, TypeError):
-            try:
-                d[key] = float(val)
-            except (ValueError, TypeError):
-                pass
-        if isinstance(val, dict):
-            value_convert(val)
-    return d
-
-
-# if dict value is a list of length 1, unlist
-def unlist(d):
-    for key, val in d.items():
-            if isinstance(val, list):
-                if len(val) == 1:
-                    d[key] = val[0]
-            elif isinstance(val, dict):
-                unlist(val)
-    return d
-
-
-#def phen_id(phenotype_ids):
-#    p = phenotype_ids.strip(";").replace(";", ",").split(",")
-#    phen_id = {}
-#    for id in p:
-#        key, value = id.split(":")
-#        if key in phen_id:
-#            if not isinstance(phen_id[key], list):
-#                phen_id[key] = [phen_id[key]]
-#            phen_id[key].append(value)
-#        else:
-#            phen_id[key] = value
-#    return phen_id
 
 
 # split id lists into dictionary
@@ -176,30 +119,13 @@ def _map_line_to_json(fields):
                 "variant_id": fields[24]
             }
         }
-    return dict_sweep(unlist(value_convert(one_snp_json)), "-")
-
-
-def merge_duplicate_rows(rows):
-    rows = list(rows)
-    first_row = rows[0]
-    other_rows = rows[1:]
-    for row in other_rows:
-        for i in first_row['clinvar']:
-            if i in row['clinvar']:
-                if row['clinvar'][i] != first_row['clinvar'][i]:
-                    aa = first_row['clinvar'][i]
-                    if not isinstance(aa, list):
-                        aa = [aa]
-                    aa.append(row['clinvar'][i])
-                    first_row['clinvar'][i] = aa
-    return first_row
+    return dict_sweep(unlist(value_convert(one_snp_json)), vals=["-"])
 
 
 # open file, parse, pass to json mapper
 def data_generator(input_file):
     #open_file = Popen(["sort", "-t", "\t", "-k14", "-k15", "-n", input_file], stdout=PIPE).stdout
-    os.system("sort -t$'\t' -k14 -k15 -k20 -n %s > %s_sorted.tsv" % (input_file, input_file))
-    #open_file = open(input_file)    
+    os.system("sort -t$'\t' -k14 -k15 -k20 -n %s > %s_sorted.tsv" % (input_file, input_file)) 
     open_file = open("%s_sorted.tsv" % (input_file))
     print input_file
     clinvar = csv.reader(open_file, delimiter="\t")
@@ -212,19 +138,6 @@ def data_generator(input_file):
                 not re.search(r'p.', row[18]))
     json_rows = (row for row in imap(_map_line_to_json, clinvar) if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-    for one_snp_json in imap(merge_duplicate_rows, row_groups):
-        yield one_snp_json
-    open_file.close()
+    snp = (merge_duplicate_rows(rg, "clinvar") for rg in row_groups )
+    return snp
 
-
-def load_collection(database, input_file_list, collection_name):
-    """
-    : param database: mongodb url
-    : param input_file_list: variant docs, path to file
-    : param collection_name: annotation source name
-    """
-    conn = pymongo.MongoClient(database)
-    db = conn.variantdoc
-    posts = db[collection_name] 
-    for doc in data_generator(input_file_list):
-        posts.insert(doc, manipulate=False, check_keys=False, w=0)

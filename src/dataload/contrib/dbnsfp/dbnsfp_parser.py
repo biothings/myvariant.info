@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 import csv
 import glob
-import pymongo
-import time
-from utils.common import timesofar
 from utils.dataload import list_split, dict_sweep, unlist, value_convert
 
 
@@ -227,7 +224,7 @@ def _map_line_to_json(fields):
             }
     }
 
-    one_snp_json = list_split(dict_sweep(unlist(value_convert(one_snp_json)), "."), ";")
+    one_snp_json = list_split(dict_sweep(unlist(value_convert(one_snp_json)), vals=["."]), ";")
     one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"])
     return one_snp_json
 
@@ -265,24 +262,4 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
-    
-    
-# load collection into mongodb
-def load_collection(database, input_file_list, collection_name):
-    """
-    : param database: mongodb url
-    : param input_file_list: variant docs, path to file
-    : param collection_name: annotation source name
-    """
-    conn = pymongo.MongoClient(database)
-    db = conn.variantdoc
-    posts = db[collection_name]
-    t1 = time.time()
-    cnt = 0
-    for doc in load_data(input_file_list):
-        posts.insert(doc, manipulate=False, check_keys=False, w=0)
-        cnt += 1
-        if cnt % 100000 == 0:
-            print cnt, timesofar(t1)
-    print "successfully loaded %s into mongodb" % collection_name 
- 
+
