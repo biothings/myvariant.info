@@ -43,6 +43,9 @@ class BaseHandler(tornado.web.RequestHandler):
         if 'skip' in kwargs and 'from' not in kwargs:
             kwargs['from'] = kwargs['skip']
             del kwargs['skip']
+        if 'from' in kwargs:
+            kwargs['from_'] = kwargs['from']   # elasticsearch python module using from_ for from parameter
+            del kwargs['from']
         return kwargs
 
     def _check_boolean_param(self, kwargs):
