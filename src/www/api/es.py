@@ -1,4 +1,6 @@
 import re
+import logging
+logging.basicConfig()
 from utils.common import dotdict, is_str, is_seq
 from elasticsearch import Elasticsearch, NotFoundError
 import config
@@ -9,6 +11,9 @@ index_name = config.ES_INDEX_NAME
 doc_type = config.ES_DOC_TYPE
 
 class ESQuery():
+    _allowed_options = ['_source', 'start', 'from_', 'size',
+                        'sort', 'explain', 'version', 'facets']
+
     def _get_variantdoc(self, hit):
         doc = hit.get('_source', hit.get('fields', {}))
         doc.setdefault('_id', hit['_id'])
@@ -64,6 +69,23 @@ class ESQuery():
             fields = self._default_fields
         return fields
 
+    def _parse_sort_option(self, options):
+        sort = options.get('sort', None)
+        if sort:
+            _sort_array = []
+            for field in sort.split(','):
+                field = field.strip()
+                # if field == 'name' or field[1:] == 'name':
+                #     # sorting on "name" field is ignored, as it is a multi-text field.
+                #     continue
+                if field.startswith('-'):
+                    _f = "%s:desc" % field[1:]
+                else:
+                    _f = "%s:asc" % field
+                _sort_array.append(_f)
+            options["sort"] = ','.join(_sort_array)
+        return options
+
     def _get_cleaned_query_options(self, kwargs):
         """common helper for processing fields, kwargs and other options passed to ESQueryBuilder."""
         options = dotdict()
@@ -75,6 +97,9 @@ class ESQuery():
         fields = kwargs.pop('fields', None)
         if fields:
             kwargs["_source"] = self._cleaned_fields(fields)
+        kwargs = self._parse_sort_option(kwargs)
+        for key in set(kwargs) - set(self._allowed_options):
+            del kwargs[key]
         options.kwargs = kwargs
         return options
 

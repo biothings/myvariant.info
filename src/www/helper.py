@@ -3,7 +3,7 @@ import datetime
 import tornado.web
 #from utils.ga import GAMixIn
 
-SUPPORT_MSGPACK = False
+SUPPORT_MSGPACK = True
 if SUPPORT_MSGPACK:
     import msgpack
 

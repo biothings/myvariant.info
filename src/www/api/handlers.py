@@ -98,7 +98,6 @@ class QueryHandler(BaseHandler):
             q
             scopes
             fields
-            species
 
             jsoninput   if true, input "q" is a json string, must be decoded as a list.
         '''
