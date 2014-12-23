@@ -77,7 +77,7 @@ def doc_feeder(doc_li, step=1000, verbose=True):
             print('Done.')
 
 
-def verify_doc_li(doc_li, return_ids=False):
+def verify_doc_li(doc_li, return_ids=False, step=10000):
     esi = utils.es.ESIndexer()
     logger = logging.getLogger()
     logger.setLevel(logging.ERROR)
@@ -85,11 +85,16 @@ def verify_doc_li(doc_li, return_ids=False):
         stats = {True: [], False: []}
     else:
         stats = {True: 0, False: 0}
-    for doc in doc_li:
-        if return_ids:
-            stats[esi.exists(doc['_id'])].append(doc['_id'])
-        else:
-            stats[esi.exists(doc['_id'])] += 1
+    doc_cnt = len(doc_li)
+    for i in range(0, doc_cnt, step):
+        j = min(doc_cnt, i + step)
+        print(i, '...', j)
+        res = esi.mexists([doc['_id'] for doc in doc_li[i:j]])
+        for _id, exists in res:
+            if return_ids:
+                stats[exists].append(_id)
+            else:
+                stats[exists] += 1
     logger.setLevel(logging.INFO)
     if return_ids:
         print({True: len(stats[True]), False: len(stats[False])})
