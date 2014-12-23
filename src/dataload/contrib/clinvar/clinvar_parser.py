@@ -84,9 +84,8 @@ def _map_line_to_json(fields):
         "clinvar":
             {
                 "allele_id": fields[0],
-                "genome":
+                "hg19":
                     {
-                        "assembly": fields[12],
                         "chr": fields[13],
                         "start": fields[14],
                         "end": fields[15]
@@ -99,7 +98,7 @@ def _map_line_to_json(fields):
                         "symbol": fields[4]
                     },
                 "clinical_significance": fields[5].split(";"),
-                "rs_dbsnp": fields[6],
+                "rsid": 'rs' + str(fields[6]),
                 "nsv_dbvar": fields[7],
                 "rcv_accession": fields[8].split(";"),
                 "tested_in_gtr": fields[9],
@@ -116,20 +115,20 @@ def _map_line_to_json(fields):
                 "last_evaluated": fields[21],
                 "guidelines": fields[22],
                 "other_ids": other_id(fields[23]),
-                "variant_id": fields[24]
+                "clinvar_id": fields[24]
             }
         }
     return dict_sweep(unlist(value_convert(one_snp_json)), vals=["-"])
 
 
 # open file, parse, pass to json mapper
-def data_generator(input_file):
+def load_data(input_file):
     #open_file = Popen(["sort", "-t", "\t", "-k14", "-k15", "-n", input_file], stdout=PIPE).stdout
     os.system("sort -t$'\t' -k14 -k15 -k20 -n %s > %s_sorted.tsv" % (input_file, input_file)) 
     open_file = open("%s_sorted.tsv" % (input_file))
     print input_file
     clinvar = csv.reader(open_file, delimiter="\t")
-    clinvar.next()  # skip header
+    #clinvar.next()  # skip header
     clinvar = (row for row in clinvar
                 if row[18] != '-' and
                 row[18].find('?') == -1 and
@@ -138,6 +137,5 @@ def data_generator(input_file):
                 not re.search(r'p.', row[18]))
     json_rows = (row for row in imap(_map_line_to_json, clinvar) if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-    snp = (merge_duplicate_rows(rg, "clinvar") for rg in row_groups )
-    return snp
+    return (merge_duplicate_rows(rg, "clinvar") for rg in row_groups )
 
