@@ -2,7 +2,6 @@ import re
 import json
 
 from tornado.web import HTTPError
-from elasticsearch import NotFoundError
 
 from www.helper import BaseHandler
 from .es import ESQuery
@@ -13,22 +12,25 @@ class VariantHandler(BaseHandler):
     esq = ESQuery()
 
     def get(self, vid=None):
-        '''/gene/<geneid>
-           geneid can be entrezgene, ensemblgene, retired entrezgene ids.
-           /gene/1017
-           /gene/1017?fields=symbol,name
-           /gene/1017?fields=symbol,name,reporter.HG-U133_Plus_2
+        '''
+        /variant/<variantid>
+            varintid can be HGVS name.
+        /variant/chr1:g.160145907G>T
+        /variant/chr1:g.160145907G>T?fields=dbsnp
+        /variant/chr1:g.160145907G>T?fields=dbnsfp.genename,dbnsfp.cadd
+
+        parameters:
+            fields
+            callback
+            email
         '''
         if vid:
             kwargs = self.get_query_params()
-            #kwargs.setdefault('scopes', 'entrezgene,ensemblgene,retired')
-            #kwargs.setdefault('species', 'all')
-            try:
-                variant = self.esq.get_variant(vid, **kwargs)
-            except NotFoundError:
+            variant = self.esq.get_variant(vid, **kwargs)
+            if variant:
+                self.return_json(variant)
+            else:
                 raise HTTPError(404)
-
-            self.return_json(variant)
         else:
             raise HTTPError(404)
 
@@ -39,16 +41,14 @@ class VariantHandler(BaseHandler):
            parameters:
             ids
             fields
-            species
+            email
         '''
         kwargs = self.get_query_params()
         ids = kwargs.pop('ids', None)
         if ids:
             ids = re.split('[\s\r\n+|,]+', ids)
             #scopes = 'entrezgene,ensemblgene,retired'
-            #fields = kwargs.pop('fields', None)
-            #kwargs.setdefault('species', 'all')
-            res = self.esq.mget_variants(ids, **kwargs)
+            res = self.esq.mget_variants2(ids, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 
@@ -66,9 +66,12 @@ class QueryHandler(BaseHandler):
             from
             size
             sort
-            species
+            facets
+            callback
+            email
 
             explain
+            raw
         '''
         kwargs = self.get_query_params()
         q = kwargs.pop('q', None)
@@ -98,6 +101,7 @@ class QueryHandler(BaseHandler):
             q
             scopes
             fields
+            email
 
             jsoninput   if true, input "q" is a json string, must be decoded as a list.
         '''
@@ -116,7 +120,7 @@ class QueryHandler(BaseHandler):
             if ids:
                 scopes = kwargs.pop('scopes', None)
                 fields = kwargs.pop('fields', None)
-                res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
+                res = self.esq.mget_variant2(ids, fields=fields, scopes=scopes, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 
