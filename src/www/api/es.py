@@ -1,18 +1,25 @@
 import re
-import logging
-logging.basicConfig()
+import json
 from utils.common import dotdict, is_str, is_seq
-from elasticsearch import Elasticsearch, NotFoundError
+from utils.es import get_es
+from elasticsearch import NotFoundError
 import config
 
-es_host = config.ES_HOST
-es = Elasticsearch(es_host)
-index_name = config.ES_INDEX_NAME
-doc_type = config.ES_DOC_TYPE
+# a query to get variants with most of fields:
+# _exists_:dbnsfp AND _exists_:dbsnp AND _exists_:mutdb AND _exists_:cosmic AND _exists_:clinvar AND _exists_:gwassnps
+
+
+class MVQueryError(Exception):
+    pass
+
 
 class ESQuery():
-    _allowed_options = ['_source', 'start', 'from_', 'size',
-                        'sort', 'explain', 'version', 'facets']
+    def __init__(self, index=None, doc_type=None, es_host=None):
+        self._es = get_es(es_host)
+        self._index = index or config.ES_INDEX_NAME
+        self._doc_type = doc_type or config.ES_DOC_TYPE
+        self._allowed_options = ['_source', 'start', 'from_', 'size',
+                                 'sort', 'explain', 'version', 'facets']
 
     def _get_variantdoc(self, hit):
         doc = hit.get('_source', hit.get('fields', {}))
@@ -103,11 +110,6 @@ class ESQuery():
         options.kwargs = kwargs
         return options
 
-    def get_variant(self, vid, **kwargs):
-        options = self._get_cleaned_query_options(kwargs)
-        res = es.get(index=index_name, id=vid, doc_type=doc_type, **options.kwargs)
-        return res if options.raw else self._get_variantdoc(res)
-
     def exists(self, vid):
         """return True/False if a variant id exists or not."""
         try:
@@ -116,10 +118,59 @@ class ESQuery():
         except NotFoundError:
             return False
 
+    def get_variant(self, vid, **kwargs):
+        options = self._get_cleaned_query_options(kwargs)
+        res = self._es.get(index=self._index, id=vid, doc_type=self._doc_type, **options.kwargs)
+        return res if options.raw else self._get_variantdoc(res)
+
     def mget_variants(self, vid_list, **kwargs):
         options = self._get_cleaned_query_options(kwargs)
-        res = es.mget(body={'ids': vid_list}, index=index_name, doc_type=doc_type, **options.kwargs)
+        res = self._es.mget(body={'ids': vid_list}, index=self._index, doc_type=self._doc_type, **options.kwargs)
         return res if options.raw else [self._get_variantdoc(doc) for doc in res['docs']]
+
+    def get_variant2(self, vid, **kwargs):
+        options = self._get_cleaned_query_options(kwargs)
+        qbdr = ESQueryBuilder(**options.kwargs)
+        _q = qbdr.build_id_query(vid, options.scopes)
+        if options.rawquery:
+            return _q
+        res = self._es.search(body=_q, index=self._index, doc_type=self._doc_type)
+        if not options.raw:
+            res = self._cleaned_res(res, empty=None, single_hit=True)
+        return res
+
+    def mget_variants2(self, vid_list, **kwargs):
+        '''for /query post request'''
+        options = self._get_cleaned_query_options(kwargs)
+        qbdr = ESQueryBuilder(**options.kwargs)
+        try:
+            _q = qbdr.build_multiple_id_query(vid_list, options.scopes)
+        except MVQueryError as err:
+            return {'success': False,
+                    'error': err.message}
+        if options.rawquery:
+            return _q
+        res = self._es.msearch(body=_q, index=self._index, doc_type=self._doc_type)['responses']
+        if options.raw:
+            return res
+
+        assert len(res) == len(vid_list)
+        _res = []
+        for i in range(len(res)):
+            hits = res[i]
+            qterm = vid_list[i]
+            hits = self._cleaned_res(hits, empty=[], single_hit=False)
+            if len(hits) == 0:
+                _res.append({u'query': qterm,
+                             u'notfound': True})
+            elif 'error' in hits:
+                _res.append({u'query': qterm,
+                             u'error': True})
+            else:
+                for hit in hits:
+                    hit[u'query'] = qterm
+                    _res.append(hit)
+        return _res
 
     def query(self, q, **kwargs):
         # Check if special interval query pattern exists
@@ -140,7 +191,7 @@ class ESQuery():
             }
             if facets:
                 _query['facets'] = facets
-            res = es.search(index_name, doc_type, body=_query, **options.kwargs)
+            res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
 
         if not options.raw:
             _res = res['hits']
@@ -224,4 +275,43 @@ class ESQuery():
             }
         }
 
-        return es.search(index_name, doc_type, body=_query, **kwargs)
+        return self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **kwargs)
+
+
+class ESQueryBuilder:
+    def build_id_query(self, vid, scopes=None):
+        _default_scopes = [
+            '_id',
+            'rsid', "dbnsfp.unsnp_ids",   # for rsid
+            'evs.gene.id', 'clinvar.gene.symbol', 'dbnsfp.genename',  # for gene symbols
+        ]
+        scopes = scopes or _default_scopes
+        if is_str(scopes):
+            _query = {
+                "match": {
+                    scopes: {
+                        "query": "{}".format(vid),
+                        "operator": "and"
+                    }
+                }
+            }
+        elif is_seq(scopes):
+            _query = {
+                "multi_match": {
+                    "query": "{}".format(vid),
+                    "fields": scopes,
+                    "operator": "and"
+                }
+            }
+        else:
+            raise ValueError('"scopes" cannot be "%s" type'.format(type(scopes)))
+        _q = {"query": _query}
+        return _q
+
+    def build_multiple_id_query(self, vid_list, scopes=None):
+        """make a query body for msearch query."""
+        _q = []
+        for id in vid_list:
+            _q.extend(['{}', json.dumps(self.build_id_query(id, scopes))])
+        _q.append('')
+        return '\n'.join(_q)
