@@ -1,5 +1,7 @@
+from __future__ import print_function
 import time
-from mongokit import Connection
+#from mongokit import Connection
+from pymongo import MongoClient
 from config import (DATA_SRC_SERVER, DATA_SRC_PORT, DATA_SRC_DATABASE,
                     DATA_SERVER_USERNAME, DATA_SERVER_PASSWORD)
 from utils.common import timesofar
@@ -11,7 +13,8 @@ def get_src_db(conn=None):
                                             DATA_SRC_SERVER,
                                             DATA_SRC_PORT,
                                             DATA_SRC_DATABASE)
-    conn = Connection(uri)
+    #conn = Connection(uri)
+    conn = MongoClient(uri)
     return conn[DATA_SRC_DATABASE]
 
 
@@ -26,7 +29,7 @@ def doc_feeder(collection, step=1000, s=None, e=None, inbatch=False, query=None,
     n = cur.count()
     s = s or 0
     e = e or n
-    print 'Retrieving %d documents from database "%s".' % (n, collection.name)
+    print('Retrieving {} documents from database "{}".'.format(n, collection.name))
     t0 = time.time()
     if inbatch:
         doc_li = []
@@ -36,11 +39,11 @@ def doc_feeder(collection, step=1000, s=None, e=None, inbatch=False, query=None,
         if s:
             cur.skip(s)
             cnt = s
-            print "Skipping %d documents." % s
+            print("Skipping {} documents.".format(s))
         if e:
             cur.limit(e - (s or 0))
         cur.batch_size(step)
-        print "Processing %d-%d documents..." % (cnt + 1, min(cnt + step, e)),
+        print("Processing {}-{} documents...".format(cnt + 1, min(cnt + step, e)), end='')
         for doc in cur:
             if inbatch:
                 doc_li.append(doc)
@@ -51,19 +54,19 @@ def doc_feeder(collection, step=1000, s=None, e=None, inbatch=False, query=None,
                 if inbatch:
                     yield doc_li
                     doc_li = []
-                print 'Done.[%.1f%%,%s]' % (cnt * 100. / n, timesofar(t1))
+                print('Done.[%.1f%%,%s]' % (cnt * 100. / n, timesofar(t1)))
                 if batch_callback:
                     batch_callback(cnt, time.time()-t1)
                 if cnt < e:
                     t1 = time.time()
-                    print "Processing %d-%d documents..." % (cnt + 1, min(cnt + step, e)),
+                    print("Processing {}-{} documents...".format(cnt + 1, min(cnt + step, e)), end='')
         if inbatch and doc_li:
             #Important: need to yield the last batch here
             yield doc_li
 
         #print 'Done.[%s]' % timesofar(t1)
-        print 'Done.[%.1f%%,%s]' % (cnt * 100. / n, timesofar(t1))
-        print "=" * 20
-        print 'Finished.[total time: %s]' % timesofar(t0)
+        print('Done.[%.1f%%,%s]' % (cnt * 100. / n, timesofar(t1)))
+        print("=" * 20)
+        print('Finished.[total time: {}]'.format(timesofar(t0)))
     finally:
         cur.close()
