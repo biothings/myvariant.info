@@ -755,7 +755,7 @@ mapping_clinvar = {
                 "type": "string",
                 "analyzer": "string_lowercase"
             },
-            "genome": {
+            "hg19": {
                 "properties": {
                     "chr": {
                         "type": "string",
@@ -784,6 +784,9 @@ mapping_clinvar = {
             "origin": {
                 "type": "string",
                 "analyzer": "string_lowercase"
+            },
+            "rsid": {
+                "type": "string"
             },
             "variant_id": {
                 "type": "long"
