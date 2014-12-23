@@ -1,18 +1,25 @@
 from __future__ import print_function
 import time
 import json
-import logging
-logging.basicConfig()
 from elasticsearch import Elasticsearch, NotFoundError
 
 import config
 from utils.common import iter_n, timesofar, ask
 
+# setup ES logging
+import logging
+formatter = logging.Formatter("%(levelname)s:%(name)s:%(message)s")
+es_logger = logging.getLogger('elasticsearch')
+es_logger.setLevel(logging.WARNING)
+ch = logging.StreamHandler()
+ch.setFormatter(formatter)
+es_logger.addHandler(ch)
 
-es_host = config.ES_HOST
-es = Elasticsearch(es_host)
-# index_name = config.ES_INDEX_NAME
-# doc_type = config.ES_DOC_TYPE
+es_tracer = logging.getLogger('elasticsearch.trace')
+es_tracer.setLevel(logging.WARNING)
+ch = logging.StreamHandler()
+ch.setFormatter(formatter)
+es_tracer.addHandler(ch)
 
 
 def verify_ids(doc_iter, step=100000, index=None, doc_type=None):
@@ -20,6 +27,7 @@ def verify_ids(doc_iter, step=100000, index=None, doc_type=None):
 
     index = index or config.ES_INDEX_NAME
     doc_type = doc_type or config.ES_DOC_TYPE
+    es = get_es()
     q = {'query': {'ids': {"values": []}}}
     total_cnt = 0
     found_cnt = 0
@@ -79,8 +87,21 @@ class ESIndexer():
         try:
             doc = self.get_variant(vid, fields=None)
             return doc['found']
-        except NotFoundError, e:
+        except NotFoundError as e:
             return False
+
+    @wrapper
+    def mexists(self, vid_list):
+        q = {
+            "query": {
+                "ids": {
+                    "values": vid_list
+                }
+            }
+        }
+        res = self._es.search(index=self._index, doc_type=self._doc_type, body=q)
+        id_set = set([doc['_id'] for doc in res['hits']['hits']])
+        return [(vid, vid in id_set) for vid in vid_list]
 
     @wrapper
     def count(self, q=None, raw=False):
