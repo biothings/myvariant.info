@@ -53,6 +53,7 @@ def value_convert(d):
                     pass
     return d
 
+
 # if dict value is a list of length 1, unlist
 def unlist(d):
     for key, val in d.items():
@@ -67,7 +68,7 @@ def unlist(d):
 def list_split(d, sep):
     for key, val in d.items():
         if isinstance(val, dict):
-            list_split(val)
+            list_split(val, sep)
         try:
             if len(val.split(sep)) > 1:
                 d[key] = val.rstrip().rstrip(sep).split(sep)
@@ -122,4 +123,11 @@ def load_collection(database, input_file_list, collection_name):
             print cnt, timesofar(t1)
     print "successfully loaded %s into mongodb" % collection_name 
 
-
+def unique_ids(input_file):
+    i = load_data(input_file)
+    out = list(i)
+    id_list = [a['_id'] for a in out if a]
+    myset = set(id_list)
+    print len(out), "documents produced" 
+    print len(myset), "Unique IDs"
+    return out
