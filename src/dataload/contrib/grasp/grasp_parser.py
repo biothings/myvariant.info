@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import csv
-import glob
-from itertools import islice, groupby, imap, ifilter
-#from utils.common import timesofar
+from itertools import groupby, imap, ifilter
 
 
 VALID_COLUMN_NO = 70
@@ -10,14 +8,13 @@ VALID_COLUMN_NO = 70
 
 # convert one snp to json
 def _map_line_to_json(fields):
-    #assert len(fields) == VALID_COLUMN_NO
+    assert len(fields) == VALID_COLUMN_NO
     chrom = fields[5]
     chromStart = fields[6]
     alleles = fields[58].split("/")
     allele1 = alleles[0]
     allele2 = alleles[1][0]
     HGVS = "chr%s:g.%s%s>%s" % (chrom, chromStart, allele1, allele2)
-    #HGVS = "chr%s:g.%s" % (chrom, chromStart)
 
     # load as json data
     if HGVS is None:
@@ -27,7 +24,8 @@ def _map_line_to_json(fields):
 
         "_id": HGVS,
         "grasp":
-            {    'hg19':
+            {
+                'hg19':
                      {
                          'chr': fields[5],
                          'pos': fields[6]
@@ -57,7 +55,7 @@ def _map_line_to_json(fields):
                  'replication_sample_description': fields[21],
                  'platform_snps_passing_qc': fields[22],
                  'gwas_ancestry_description': fields[23],
-                 'discovery': 
+                 'discovery':
                      {
                          'total_samples': fields[25],
                          'european': fields[26],
@@ -116,7 +114,7 @@ def _map_line_to_json(fields):
     return list_split(dict_sweep(unlist(value_convert(one_snp_json)), [""]), ",")
 
 ## replace None indices with ''
-def grasp_generator(grasp_row):
+def row_generator(row_row):
     ind = range(VALID_COLUMN_NO)
     row = []
     for i in ind:
@@ -129,23 +127,13 @@ def grasp_generator(grasp_row):
     
 # open file, parse, pass to json mapper
 def load_data(input_file):
-    open_file = open(input_file)    
-    open_file = csv.reader(open_file, delimiter="\t") 
+    open_file = open(input_file)
+    open_file = csv.reader(open_file, delimiter="\t")
     open_file.next()
-    grasp = imap(grasp_generator, open_file)
-    #grasp = grasp_generator(open_file)
+    grasp = imap(row_generator, open_file)
     grasp = ifilter(lambda row: row[58] != "", grasp)
     json_rows = imap(_map_line_to_json, grasp)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "grasp") for rg in row_groups)
-        
     
-i = load_data("/Users/Amark/Documents/Su_Lab/myvariant.info/grasp/grasp.tsv")
-out=list(i)
-print len(out)
-id_list=[]
-for id in out:
-    id_list.append(id['_id'])
-myset = set(id_list)
-print len(myset)

@@ -1,20 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import pysam
-from itertools import groupby, imap
-import pymongo
-import time
-#from utils.common import timesofar
-from utils.dataload import dict_sweep, unlist, value_convert
+from itertools import groupby, imap, chain
+#from utils.dataload import dict_sweep, unlist, value_convert
 
 
-VALID_COLUMN_NO = 90
+VALID_COLUMN_NO = 116
 DEPENDENCIES = ["pysam", "pymongo"]
 
 
 # convert one snp to json
 def _map_line_to_json(fields):
-    if len(fields) == VALID_COLUMN_NO:
+    if len(fields) >= VALID_COLUMN_NO:
         chrom = fields[0]
         chromStart = fields[1]
         allele1 = fields[2]
@@ -71,160 +68,183 @@ def _map_line_to_json(fields):
                                  'rs_pval': fields[27]
                              },
                          'bstatistic': fields[28],
+                         'mutindex': fields[29],
+                         'dna':
+                             {
+                                 'helt': fields[30],
+                                 'mgw': fields[31],
+                                 'prot': fields[32],
+                                 'roll': fields[33]
+                             },
+                         'mirsvr':
+                             {
+                                'score': fields[34],
+                                'e': fields[35],
+                                'aln': fields[36]
+                             },
+                         'targetscans': fields[37],
+                         'fitcons': fields[38],
+                         'chmm':
+                             {
+                                'tssa': fields[39],
+                                'tssaflnk': fields[40],
+                                'txflnk': fields[41],
+                                'tx': fields[42],
+                                'txwk': fields[43],
+                                'enh': fields[44],
+                                #'enh': fields[45],
+                                'znfrpts': fields[46],
+                                'het': fields[47],
+                                'tssbiv': fields[48],
+                                'bivflnk': fields[49],
+                                'enhbiv': fields[50],
+                                'reprpc': fields[51],
+                                'reprpcwk': fields[52],
+                                'quies': fields[53],
+                             },
                          'encode':
                              {
-                                 'exp': fields[29],
-                                 'h3k27ac': fields[30],
-                                 'h3k4me1': fields[31],
-                                 'h3k4me3': fields[32],
-                                 'nucleo': fields[33],
-                                 'occ': fields[34],
+                                 'exp': fields[54],
+                                 'h3k27ac': fields[55],
+                                 'h3k4me1': fields[56],
+                                 'h3k4me3': fields[57],
+                                 'nucleo': fields[58],
+                                 'occ': fields[59],
                                  'p_val':
                                      {
-                                         'comb': fields[35],
-                                         'dnas': fields[36],
-                                         'faire': fields[37],
-                                         'polii': fields[38],
-                                         'ctcf': fields[39],
-                                         'mycp': fields[40]
+                                         'comb': fields[60],
+                                         'dnas': fields[61],
+                                         'faire': fields[62],
+                                         'polii': fields[63],
+                                         'ctcf': fields[64],
+                                         'mycp': fields[65]
                                      },
                                  'sig':
                                      {
-                                         'dnase': fields[41],
-                                         'faire': fields[42],
-                                         'polii': fields[43],
-                                         'ctcf': fields[44],
-                                         'myc': fields[45]
+                                         'dnase': fields[66],
+                                         'faire': fields[67],
+                                         'polii': fields[68],
+                                         'ctcf': fields[69],
+                                         'myc': fields[70]
                                      },
                              },
-                         'segway': fields[46],
+                         'segway': fields[71],
                          'motif':
                              {
-                                 'toverlap': fields[47],
-                                 'dist': fields[48],
-                                 'ecount': fields[49],
-                                 'ename': fields[50],
-                                 'ehipos': fields[51],
-                                 'escorechng': fields[52]
+                                 'toverlap': fields[72],
+                                 'dist': fields[73],
+                                 'ecount': fields[74],
+                                 'ename': fields[75],
+                                 'ehipos': fields[76],
+                                 'escorechng': fields[77]
                              },
                          'tf':
                              {
-                                 'bs': fields[53],
-                                 'bs_peaks': fields[54],
-                                 'bs_peaks_max': fields[55]
+                                 'bs': fields[78],
+                                 'bs_peaks': fields[79],
+                                 'bs_peaks_max': fields[80]
                              },
-                         'isknownvariant': fields[56],
+                         'isknownvariant': fields[81],
                          'esp':
                              {
-                                 'af': fields[57],
-                                 'afr': fields[58],
-                                 'eur': fields[59]
+                                 'af': fields[82],
+                                 'afr': fields[83],
+                                 'eur': fields[84]
                              },
                          '1000g':
                              {
-                                 'af': fields[60],
-                                 'asn': fields[61],
-                                 'amr': fields[62],
-                                 'afr': fields[63],
-                                 'eur': fields[64]
+                                 'af': fields[85],
+                                 'asn': fields[86],
+                                 'amr': fields[87],
+                                 'afr': fields[88],
+                                 'eur': fields[89]
                              },
-                         'min_dist_tss': fields[65],
-                         'min_dist_tse': fields[66],
+                         'min_dist_tss': fields[90],
+                         'min_dist_tse': fields[91],
                          'gene':
                              {
-                                 'gene_id': fields[67],
-                                 'feature_id': fields[68],
-                                 'ccds_id': fields[69],
-                                 'genename': fields[70],
+                                 'gene_id': fields[92],
+                                 'feature_id': fields[93],
+                                 'ccds_id': fields[94],
+                                 'genename': fields[95],
                                  'cds':
                                      {
-                                         'cdna_pos': fields[71],
-                                         'rel_cdna_pos': fields[72],
-                                         'cds_pos': fields[73],
-                                         'rel_cds_pos': fields[74]
+                                         'cdna_pos': fields[96],
+                                         'rel_cdna_pos': fields[97],
+                                         'cds_pos': fields[98],
+                                         'rel_cds_pos': fields[99]
                                      },
                                  'prot':
                                      {
-                                         'protpos': fields[75],
-                                         'rel_prot_pos': fields[76],
-                                         'oaa': fields[81],
-                                         'naa': fields[82]
-                                     },
-                                 'dst_2_splice': fields[77],
-                                 'dst_2_spltype': fields[78],
-                                 'exon': fields[79],
-                                 'intron': fields[80]
-                             },
-                         'grantham': fields[83],
-                             'polyphen':
+                                         'protpos': fields[100],
+                                         'rel_prot_pos': fields[101],
+                                         'domain': fields[102]
+                                     }
+                                },
+                         'dst2splice': fields[103],
+                         'dst2spltype': fields[104],
+                         'exon': fields[105],
+                         'intron': fields[106],
+                         'oaa': fields[107],
+                         'naa': fields[108],
+                            
+                         'grantham': fields[109],
+                         'polyphen':
                              {
-                                 'cat': fields[84],
-                                 'val': fields[85]
+                                 'cat': fields[110],
+                                 'val': fields[111]
                              },
                          'sift':
                              {
-                                 'cat': fields[86],
-                                 'val': fields[87]
+                                 'cat': fields[112],
+                                 'val': fields[113]
                              },
-                         'rawscore': fields[88],
-                         'phred': fields[89]
+                         'rawscore': fields[114],
+                         'phred': fields[115]
                       }
                 }
-        return dict_sweep(unlist(value_convert(one_snp_json)), "NA")
-
-
-def merge_duplicate_rows(rows):
-    rows = list(rows)
-    first_row = rows[0]
-    other_rows = rows[1:]
-    for row in other_rows:
-        for i in first_row["cadd"]:
-            if i in row["cadd"]:
-                if row["cadd"][i] != first_row["cadd"][i]:
-                    aa = first_row["cadd"][i]
-                    if not isinstance(aa, list):
-                        aa = [aa]
-                    aa.append(row["cadd"][i])
-                    first_row["cadd"][i] = aa             
-    return first_row
-
+        return dict_sweep(unlist(value_convert(one_snp_json)), ["NA"])
+        
+#def load_data(input_file):
+#        # All possible SNVs of GRCh37/hg19 incl. all annotations
+#        cadd = pysam.Tabixfile(input_file)
+#        for contig in cadd.contigs:
+#            if contig == 1:
+#                cadd = cadd.fetch(contig)
+#                cadd = imap(lambda x: x.split(), cadd)
+#                json_rows = imap(_map_line_to_json, cadd)
+#                row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
+#                return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
+        
+## replace None indices with ''
+def row_generator(db_row):
+    ind = range(VALID_COLUMN_NO)
+    row = []
+    for i in ind:
+        try:
+            row.append(db_row[i])
+        except:
+            row.append('')
+    return row
 
 # open file, parse, pass to json mapper
-def data_generator(input_file):
-        # All possible SNVs of GRCh37/hg19 incl. all annotations
-        cadd = pysam.Tabixfile(input_file)
-        for contig in cadd.contigs:
-            if contig == 1:
-                cadd = cadd.fetch(contig)
-                cadd = imap(lambda x: x.split(), cadd)
-                json_rows = imap(_map_line_to_json, cadd)
-                row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-                cnt = 0
-                for one_snp_json in imap(merge_duplicate_rows, row_groups):
-                    cnt += 1
-                    yield one_snp_json
-                    if cnt == 100:
-                        break
-                    
+def load_data(input_file):
+    # All possible SNVs of GRCh37/hg19 incl. all annotations
+    tabix = pysam.Tabixfile(input_file)
+    contigs = tabix.contigs
+    fetch = []
+    for contig in contigs:
+        if contig == 'Y':
+            fetch.extend(tabix.fetch(contig))
+    #fetch = (tabix.fetch(contig) for contig in contigs)
+    #chained_fetch = chain(fetch)
+    rows = imap(lambda x: x.split(), fetch)
+    cadd = imap(row_generator, rows)
+    json_rows = imap(_map_line_to_json, cadd)
+    json_rows = (row for row in json_rows if row)
+    row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
+    return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
 
-i = data_generator('http://krishna.gs.washington.edu/download/CADD/v1.0/whole_genome_SNVs_inclAnno.tsv.gz')
+i = load_data("http://krishna.gs.washington.edu/download/CADD/v1.1/whole_genome_SNVs_inclAnno.tsv.gz")
 out=list(i)
 
-# load collection into mongodb
-def load_collection(database, cadd_url, collection_name):
-    """
-    : param database: mongodb url
-    : param input_file_list: variant docs, path to file
-    : param collection_name: annotation source name
-    """
-    conn = pymongo.MongoClient(database)
-    db = conn.variantdoc
-    posts = db[collection_name]
-    t1 = time.time()
-    cnt = 0
-    for doc in data_generator(cadd_url):
-        posts.insert(doc, manipulate=False, check_keys=False, w=0)
-        cnt += 1
-        if cnt % 100000 == 0:
-            print cnt, timesofar(t1)
-    print "successfully loaded %s into mongodb" % collection_name 
