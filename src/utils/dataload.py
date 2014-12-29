@@ -105,7 +105,7 @@ def merge_duplicate_rows(rows, db):
     return first_row
     
 # load collection into mongodb
-def load_collection(database, input_file_list, collection_name):
+def load_collection(database, docs, collection_name):
     """
     : param database: mongodb url
     : param input_file_list: variant docs, path to file
@@ -116,12 +116,13 @@ def load_collection(database, input_file_list, collection_name):
     posts = db[collection_name]
     t1 = time.time()
     cnt = 0
-    for doc in load_data(input_file_list):
+    for doc in docs:
         posts.insert(doc, manipulate=False, check_keys=False, w=0)
         cnt += 1
         if cnt % 100000 == 0:
             print cnt, timesofar(t1)
     print "successfully loaded %s into mongodb" % collection_name 
+    
 
 def unique_ids(input_file):
     i = load_data(input_file)
