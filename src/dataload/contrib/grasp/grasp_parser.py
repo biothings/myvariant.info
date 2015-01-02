@@ -42,7 +42,7 @@ def _map_line_to_json(fields):
                          'snpid_in_paper': fields[8],
                          'location_within_paper': fields[9],
                          'p_value': fields[10],
-                         'phenotype': fields[11],
+                         'phenotype': str(fields[11]),
                          'paper_phenotype_description': fields[12],
                          'paper_phenotype_categories': fields[13],
                          'date_pub': fields[14]
@@ -115,12 +115,12 @@ def _map_line_to_json(fields):
     return list_split(dict_sweep(unlist(value_convert(one_snp_json)), [""]), ",")
 
 ## replace None indices with ''
-def row_generator(row_row):
+def row_generator(db_row):
     ind = range(VALID_COLUMN_NO)
     row = []
     for i in ind:
         try:
-            row.append(grasp_row[i])
+            row.append(db_row[i])
         except:
             row.append('')
     return row
@@ -137,4 +137,3 @@ def load_data(input_file):
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "grasp") for rg in row_groups)
-    

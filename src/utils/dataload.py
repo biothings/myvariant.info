@@ -129,6 +129,6 @@ def unique_ids(input_file):
     out = list(i)
     id_list = [a['_id'] for a in out if a]
     myset = set(id_list)
-    print len(out), "documents produced" 
+    print len(out), "Documents produced" 
     print len(myset), "Unique IDs"
     return out
