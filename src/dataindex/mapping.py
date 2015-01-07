@@ -11,7 +11,7 @@ def get_mapping():
     for _m in [mapping_dbsnp, mapping_mutdb, mapping_snpedia,
                mapping_gwassnps, mapping_cosmic, mapping_docm,
                mapping_dbnsfp, mapping_emv, mapping_clinvar,
-               mapping_evs]:
+               mapping_evs, mapping_wellderly]:
         m['variant']['properties'].update(_m)
     return m
 
@@ -810,6 +810,48 @@ mapping_evs = {
                 "type": "float"
             },
             "rs_id": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            }
+        }
+    }
+}
+
+mapping_wellderly = {
+    "wellderly": {
+        "properties": {
+            "chr": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "pos": {
+                "type": "long"
+            },
+            "ref": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "alt": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "vartype": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "gene": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "coding_impact": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "polyphen": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "sift": {
                 "type": "string",
                 "analyzer": "string_lowercase"
             }
