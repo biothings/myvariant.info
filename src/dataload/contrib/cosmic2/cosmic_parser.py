@@ -3,10 +3,11 @@ import os
 import csv
 import re
 from itertools import imap, groupby, ifilter
-#from utils.common import timesofar
+import operator
+import collections
 
 
-VALID_COLUMN_NO = 29
+VALID_COLUMN_NO = 29 + 1
 
 
 # convert one snp to json
@@ -19,9 +20,8 @@ def _map_line_to_json(fields):
 
     HGVS = None
     cds = fields[13]
-    sub = re.search(r'[ATCG]+>[ATCGMN]+', cds)
+    sub = re.search(r'[ATCGMNHKRY]+>[ATCGMNHKRY]+', cds)
     ins = re.search(r'ins[ATCGMN]+|ins[0-9]+', cds)
-    #delete = 'del' in cds
     delete = cds.find('del') != -1
     del_ins = re.search(r'[0-9]+>[ATCGMN]+', cds)
     comp = re.search(r'[ATCGMN]+', cds)
@@ -34,16 +34,18 @@ def _map_line_to_json(fields):
         HGVS = "chr%s:g.%s_%sdel" % (chrom, chromStart, chromEnd)
     elif del_ins:
         HGVS = "chr%s:g.%s_%sdelins%s" % (chrom, chromStart, chromEnd, comp.group())    
+    #elif comp:
+    #    HGVS = "chr%s:g.%s_%s%s" % (chrom, chromStart, chromEnd, comp.group())
     else:
         HGVS = fields[12]
-        print "Error2:", fields[15], fields[14], cds, fields[17]
+        print "Error2:", fields[15], cds, fields[17]
 
     # load as json data
     if HGVS is None:
         return
 
     one_snp_json = {
-
+        "sorter" : fields[17] + fields[13],
         "_id": HGVS,
         "cosmic":
             {
@@ -91,9 +93,21 @@ def _map_line_to_json(fields):
 
 # open file, parse, pass to json mapper
 def load_data(input_file):
-    os.system("sort -t$'\t' -k18 -k16 %s > %s_sorted.tsv" % (input_file, input_file))
-    open_file = open("%s_sorted.tsv" % (input_file))
-    cosmic = csv.reader(open_file, delimiter="\t")
+    #os.system("sort -t$'\t' -k18 -k14 %s > %s_sorted.tsv" % (input_file, input_file))
+    #open_file = open("%s_sorted.tsv" % (input_file))
+    open_file = open(input_file)    
+    open_file = csv.reader(open_file, delimiter="\t")
+    cosmic = []
+    for row in open_file:
+        try:
+            c = row[13].split(".")[1]
+        except:
+            c = ""
+        row.append(row[17].split("-")[0] + "." + c)
+        cosmic.append(row)
+        if row[-1] != "":
+            print row[-1]
+    cosmic = sorted(cosmic, key=operator.itemgetter(17), reverse=True)
     cosmic = ifilter(lambda row:
                 row[17] != "" and
                 row[13] != "", cosmic)          
@@ -102,17 +116,10 @@ def load_data(input_file):
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "cosmic") for rg in row_groups)
 
-#i=load_data('/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/cosmicmini.tsv')
-#i=load_data('/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/cosmicmid.tsv')
-i=load_data('/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/CosmicCompleteExport_v70_100814.tsv')
-out = list(i)
-print len(out)
-id_list=[]
-for i in out:
-    if i is not None:
-        id_list.append(i['_id'])
-myset = set(id_list)
-print len(myset)
+#z = unique_ids('/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/cosmicmini.tsv')
+z = unique_ids('/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/cosmicmid.tsv')
+#z = unique_ids('/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/CosmicCompleteExport_v70_100814.tsv')
+
 #load_collection('mongodb://myvariant_user:Qag1H6V%0vEG@su08.scripps.edu:27017/variantdoc', 
 #                    '/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/CosmicCompleteExport_v70_100814.tsv',
 #                    'cosmic')
