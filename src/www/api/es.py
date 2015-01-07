@@ -119,8 +119,12 @@ class ESQuery():
             return False
 
     def get_variant(self, vid, **kwargs):
+        '''unknown vid return None'''
         options = self._get_cleaned_query_options(kwargs)
-        res = self._es.get(index=self._index, id=vid, doc_type=self._doc_type, **options.kwargs)
+        try:
+            res = self._es.get(index=self._index, id=vid, doc_type=self._doc_type, **options.kwargs)
+        except NotFoundError:
+            return
         return res if options.raw else self._get_variantdoc(res)
 
     def mget_variants(self, vid_list, **kwargs):

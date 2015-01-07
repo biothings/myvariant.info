@@ -24,8 +24,8 @@ if src_path not in sys.path:
     sys.path.append(src_path)
 #from config import INCLUDE_DOCS
 #from utils.es import ESQuery
-from helper import add_apps   # , BaseHandler
-from api.handlers import APP_LIST as api_app_list
+from .helper import add_apps   # , BaseHandler
+from .api.handlers import APP_LIST as api_app_list
 
 
 __USE_WSGI__ = False

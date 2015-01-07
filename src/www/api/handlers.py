@@ -2,7 +2,6 @@ import re
 import json
 
 from tornado.web import HTTPError
-
 from www.helper import BaseHandler
 from .es import ESQuery
 from utils.common import split_ids
