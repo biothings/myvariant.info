@@ -1,7 +1,9 @@
 from __future__ import print_function
 import time
-#from mongokit import Connection
-from pymongo import MongoClient
+try:
+    from mongokit import Connection
+except:
+    from pymongo import MongoClient as Connection
 from config import (DATA_SRC_SERVER, DATA_SRC_PORT, DATA_SRC_DATABASE,
                     DATA_SERVER_USERNAME, DATA_SERVER_PASSWORD)
 from utils.common import timesofar
@@ -13,8 +15,7 @@ def get_src_db(conn=None):
                                             DATA_SRC_SERVER,
                                             DATA_SRC_PORT,
                                             DATA_SRC_DATABASE)
-    #conn = Connection(uri)
-    conn = MongoClient(uri)
+    conn = Connection(uri)
     return conn[DATA_SRC_DATABASE]
 
 
