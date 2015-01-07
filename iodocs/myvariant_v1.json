@@ -55,22 +55,22 @@
                 },
 
                 {
-                    "MethodName": "Gene query service via POST",
-                    "Synopsis": "Make gene queries in batch",
+                    "MethodName": "Variant query service via POST (coming soon)",
+                    "Synopsis": "Make Variant queries in batch",
                     "HTTPMethod": "POST",
-                    "URI": "/v2/query",
+                    "URI": "/v1/query",
                     "RequiresOAuth": "N",
                     "parameters": [
                         {
                             "Name": "q",
                             "Type": "string",
                             "Required": "Y",
-                            "Description": "multiple query terms seperated by comma (also support \"+\" or white space), but no wildcard, e.g., \"q=1017,1018\" or \"q=CDK2+BTK\" "
+                            "Description": "multiple query terms seperated by comma (also support \"+\" or white space), but no wildcard, e.g., \"q=rs58991260,rs2500\" "
                         },
                         {
                             "Name": "scopes",
                             "Type": "string",
-                            "Description": "specify one or more fields (separated by comma) as the search \"scopes\", e.g., \"scopes=entrezgene\", \"scopes=entrezgene,ensemblgene\". The available \"fields\" can be passed to \"scopes\" parameter are listed here: http://mygene.info/doc/query_service.html#available-fields. Default: \"scopes=entrezgene,ensemblgene,retired\" (either Entrez or Ensembl gene ids)."
+                            "Description": "specify one or more fields (separated by comma) as the search \"scopes\", e.g., \"scopes=rsid\", \"scopes=rsid,dbnsfp.gene.id\". The available \"fields\" can be passed to \"scopes\" parameter are listed here: http://myvariant.info/doc/query_service.html#available-fields. Default: \"scopes=\" ()."
                         },
                         {
                             "Name": "fields",
@@ -151,7 +151,7 @@
         },
 
         {
-            "name": "MyVariant.info metadata service",
+            "name": "MyVariant.info metadata service (coming soon)",
             "methods": [
                 {
                     "MethodName": "Metadata service",
