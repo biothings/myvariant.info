@@ -14,7 +14,7 @@ def ask(prompt, options='YN'):
     '''Prompt Yes or No,return the upper case 'Y' or 'N'.'''
     options = options.upper()
     while 1:
-        s = raw_input(prompt+'[%s]' % '|'.join(list(options))).strip().upper()
+        s = input(prompt+'[%s]' % '|'.join(list(options))).strip().upper()
         if s in options:
             break
     return s

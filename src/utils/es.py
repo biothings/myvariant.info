@@ -115,7 +115,7 @@ class ESIndexer():
         n = _q_cnt['count']
         n_shards = _q_cnt['_shards']['total']
         assert n_shards == _q_cnt['_shards']['successful']
-        _size = step / n_shards
+        _size = int(step / n_shards)
         assert _size * n_shards == step
         cnt = 0
         t0 = time.time()
@@ -155,7 +155,7 @@ class ESIndexer():
         return id_li
 
     def update_mapping(self, m):
-        assert m.keys() == [self._doc_type]
+        assert list(m) == [self._doc_type]
         # assert m[self._doc_type].keys() == ['properties']
         assert 'properties' in m[self._doc_type]
         print(json.dumps(m, indent=2))
