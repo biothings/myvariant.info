@@ -232,5 +232,5 @@ def fetch_generator(tabix, contig):
 def load_data(input_file):
     # All possible SNVs of GRCh37/hg19 incl. all annotations
     tabix = pysam.Tabixfile(input_file)
-    return (fetch_generator(tabix, contig) for contig in tabix.contigs[82:83])
+    return (fetch_generator(tabix, contig) for contig in tabix.contigs)
 
