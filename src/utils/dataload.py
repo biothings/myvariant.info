@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from utils.common import timesofar
+#from utils.common import timesofar
 import pymongo
 import time
 """
@@ -127,6 +127,7 @@ def load_collection(database, input_file_list, collection_name):
 def unique_ids(input_file):
     i = load_data(input_file)
     out = list(i)
+#    out = list(out[0])
     id_list = [a['_id'] for a in out if a]
     myset = set(id_list)
     print len(out), "Documents produced" 

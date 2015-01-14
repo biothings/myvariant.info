@@ -204,17 +204,7 @@ def _map_line_to_json(fields):
                       }
                 }
         return dict_sweep(unlist(value_convert(one_snp_json)), ["NA"])
-        
-#def load_data(input_file):
-#        # All possible SNVs of GRCh37/hg19 incl. all annotations
-#        cadd = pysam.Tabixfile(input_file)
-#        for contig in cadd.contigs:
-#            if contig == 1:
-#                cadd = cadd.fetch(contig)
-#                cadd = imap(lambda x: x.split(), cadd)
-#                json_rows = imap(_map_line_to_json, cadd)
-#                row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-#                return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
+
         
 ## replace None indices with ''
 def row_generator(db_row):
@@ -225,26 +215,22 @@ def row_generator(db_row):
             row.append(db_row[i])
         except:
             row.append('')
-    return row
+    yield row
+
+
+def fetch_generator(tabix, contig):
+    fetch = tabix.fetch(contig)
+    rows = imap(lambda x: x.split(), fetch)
+    #cadd = imap(row_generator, rows)
+    json_rows = imap(_map_line_to_json, rows)
+    json_rows = (row for row in json_rows if row)
+    row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
+    return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
+    
 
 # open file, parse, pass to json mapper
 def load_data(input_file):
     # All possible SNVs of GRCh37/hg19 incl. all annotations
     tabix = pysam.Tabixfile(input_file)
-    contigs = tabix.contigs
-    fetch = []
-    for contig in contigs:
-        if contig == 'Y':
-            fetch.extend(tabix.fetch(contig))
-    #fetch = (tabix.fetch(contig) for contig in contigs)
-    #chained_fetch = chain(fetch)
-    rows = imap(lambda x: x.split(), fetch)
-    cadd = imap(row_generator, rows)
-    json_rows = imap(_map_line_to_json, cadd)
-    json_rows = (row for row in json_rows if row)
-    row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-    return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
-
-i = load_data("http://krishna.gs.washington.edu/download/CADD/v1.1/whole_genome_SNVs_inclAnno.tsv.gz")
-out=list(i)
+    return (fetch_generator(tabix, contig) for contig in tabix.contigs[82:83])
 
