@@ -2,7 +2,7 @@
 
 import pysam
 from itertools import groupby, imap, chain
-from utils.dataload import dict_sweep, unlist, value_convert
+#from utils.dataload import dict_sweep, unlist, value_convert
 
 
 VALID_COLUMN_NO = 116
@@ -235,5 +235,10 @@ def load_data(input_file):
     '''
     # All possible SNVs of GRCh37/hg19 incl. all annotations
     tabix = pysam.Tabixfile(input_file)
-    return (fetch_generator(tabix, contig) for contig in tabix.contigs)
+    #return (fetch_generator(tabix, tabix.contig) for contig in tabix.contigs)
+    for i in tabix.contigs:
+        if i == '83':
+            for doc in fetch_generator(tabix, i):
+                yield doc
+
 
