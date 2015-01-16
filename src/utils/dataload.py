@@ -117,12 +117,11 @@ def load_collection(database, src_module, collection_name):
     t1 = time.time()
     cnt = 0
     src_data = src_module.load_data()
-    for gen in src_data:
-        for doc in gen:
-            posts.insert(doc, manipulate=False, check_keys=False, w=0)
-            cnt += 1
-            if cnt % 100000 == 0:
-                print cnt, timesofar(t1)
+    for doc in src_data:
+        posts.insert(doc, manipulate=False, check_keys=False, w=0)
+        cnt += 1
+        if cnt % 100000 == 0:
+            print cnt, timesofar(t1)
     print "Successfully loaded %s into MongoDb" % collection_name 
     
 
