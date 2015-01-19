@@ -2,7 +2,7 @@
 
 import pysam
 from itertools import groupby, imap, chain
-from utils.dataload import dict_sweep, unlist, value_convert
+from utils.dataload import dict_sweep, unlist, value_convert, merge_duplicate_rows
 
 
 VALID_COLUMN_NO = 116
