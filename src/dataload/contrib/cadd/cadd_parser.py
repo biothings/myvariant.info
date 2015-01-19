@@ -203,6 +203,7 @@ def _map_line_to_json(fields):
                          'phred': fields[115]
                       }
                 }
+
         return dict_sweep(unlist(value_convert(one_snp_json)), ["NA"])
 
         
@@ -214,14 +215,14 @@ def row_generator(db_row):
         try:
             row.append(db_row[i])
         except:
-            row.append('')
-    yield row
+            row.append('NA')
+    return row
 
 
 def fetch_generator(tabix, contig):
     fetch = tabix.fetch(contig)
     rows = imap(lambda x: x.split(), fetch)
-    #cadd = imap(row_generator, rows)
+    rows = imap(row_generator, rows)
     json_rows = imap(_map_line_to_json, rows)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
@@ -237,8 +238,7 @@ def load_data(input_file):
     tabix = pysam.Tabixfile(input_file)
     #return (fetch_generator(tabix, tabix.contig) for contig in tabix.contigs)
     for i in tabix.contigs:
-        if i == '83':
-            for doc in fetch_generator(tabix, i):
-                yield doc
-
+        if i == 'GL000225.1':
+            for one_snp_json in fetch_generator(tabix, i):
+                yield one_snp_json
 
