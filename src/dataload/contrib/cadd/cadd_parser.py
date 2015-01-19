@@ -238,7 +238,6 @@ def load_data(input_file):
     tabix = pysam.Tabixfile(input_file)
     #return (fetch_generator(tabix, tabix.contig) for contig in tabix.contigs)
     for i in tabix.contigs:
-        if i == 'GL000225.1':
-            for one_snp_json in fetch_generator(tabix, i):
-                yield one_snp_json
+        for one_snp_json in fetch_generator(tabix, i):
+            yield one_snp_json
 
