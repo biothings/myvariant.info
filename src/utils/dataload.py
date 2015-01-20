@@ -125,8 +125,8 @@ def load_collection(database, src_module, collection_name):
     print "Successfully loaded %s into MongoDb" % collection_name 
     
 
-def unique_ids(input_file):
-    i = load_data(input_file)
+def unique_ids(src_module):
+    i = src_module.load_data()
     out = list(i)
 #    out = list(out[0])
     id_list = [a['_id'] for a in out if a]
