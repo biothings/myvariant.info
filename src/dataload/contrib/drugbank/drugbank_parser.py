@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from dataload.contrib.drugbank import write_file
+from dataload.contrib.drugbank.drugbank_write_file import write_file
 from itertools import imap, groupby
 from utils.dataload import dict_sweep, merge_duplicate_rows
 import csv
