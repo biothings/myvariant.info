@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#from utils.common import timesofar
+from utils.common import timesofar
 import pymongo
 import time
 """
@@ -9,7 +9,7 @@ mapping to JSON, cleaning.
         
 # remove keys whos values are ".", "-", "", "NA", "none", " "
 # and remove empty dictionaries
-def dict_sweep(d, vals=[".", "-", "", "NA", "none", " "]): 
+def dict_sweep(d, vals=[".", "-", "", "NA", "none", " ", "Not Available"]): 
     """
     @param d: a dictionary
     @param vals: a string or list of strings to sweep
@@ -128,7 +128,6 @@ def load_collection(database, src_module, collection_name):
 def unique_ids(src_module):
     i = src_module.load_data()
     out = list(i)
-#    out = list(out[0])
     id_list = [a['_id'] for a in out if a]
     myset = set(id_list)
     print len(out), "Documents produced" 
