@@ -1,2 +1,4 @@
 *.pyc
 src/config.py
+__pycache__
+
