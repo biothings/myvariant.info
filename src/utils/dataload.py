@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
-from utils.common import timesofar
+from __future__ import print_function
+import itertools
+from utils.common import timesofar, open_anyfile
 import pymongo
 import time
 """
-Utility functions for parsing flatfiles, 
+Utility functions for parsing flatfiles,
 mapping to JSON, cleaning.
 """
-        
+
 # remove keys whos values are ".", "-", "", "NA", "none", " "
 # and remove empty dictionaries
-def dict_sweep(d, vals=[".", "-", "", "NA", "none", " "]): 
+def dict_sweep(d, vals=[".", "-", "", "NA", "none", " "]):
     """
     @param d: a dictionary
     @param vals: a string or list of strings to sweep
@@ -63,7 +65,7 @@ def unlist(d):
             elif isinstance(val, dict):
                 unlist(val)
     return d
-    
+
 # split fields by sep into comma separated lists, strip.
 def list_split(d, sep):
     for key, val in d.items():
@@ -103,7 +105,7 @@ def merge_duplicate_rows(rows, db):
             else:
                 continue
     return first_row
-    
+
 # load collection into mongodb
 def load_collection(database, input_file_list, collection_name):
     """
@@ -120,15 +122,27 @@ def load_collection(database, input_file_list, collection_name):
         posts.insert(doc, manipulate=False, check_keys=False, w=0)
         cnt += 1
         if cnt % 100000 == 0:
-            print cnt, timesofar(t1)
-    print "successfully loaded %s into mongodb" % collection_name 
-    
+            print(cnt, timesofar(t1))
+    print("successfully loaded %s into mongodb" % collection_name)
+
 
 def unique_ids(input_file):
     i = load_data(input_file)
     out = list(i)
     id_list = [a['_id'] for a in out if a]
     myset = set(id_list)
-    print len(out), "Documents produced" 
-    print len(myset), "Unique IDs"
+    print(len(out), "Documents produced")
+    print(len(myset), "Unique IDs")
     return out
+
+
+def rec_handler(infile, as_list=False, block_end='\n'):
+    '''A generator to return a record (block of text)
+       at once from the infile. The record is separated by
+       one or more empty lines by default.
+    '''
+    rec_separator = lambda line: line==block_end
+    with open_anyfile(infile) as in_f:
+        for key, group in itertools.groupby(in_f, rec_separator):
+            if not key:
+                yield (list(group) if as_list else ''.join(group))
