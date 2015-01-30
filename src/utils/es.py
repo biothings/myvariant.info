@@ -87,7 +87,7 @@ class ESIndexer():
         try:
             doc = self.get_variant(vid, fields=None)
             return doc['found']
-        except NotFoundError as e:
+        except NotFoundError:
             return False
 
     @wrapper
@@ -99,8 +99,9 @@ class ESIndexer():
                 }
             }
         }
-        res = self._es.search(index=self._index, doc_type=self._doc_type, body=q)
+        res = self._es.search(index=self._index, doc_type=self._doc_type, body=q, fields=None, size=len(vid_list))
         id_set = set([doc['_id'] for doc in res['hits']['hits']])
+        print('..', len(id_set), end='')   # print out # of matching hits
         return [(vid, vid in id_set) for vid in vid_list]
 
     @wrapper
