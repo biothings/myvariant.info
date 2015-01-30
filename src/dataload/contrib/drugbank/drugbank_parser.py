@@ -32,8 +32,11 @@ def _map_line_to_json(fields):
     return dict_sweep(one_snp_json, ['Not Available'])
 
 
-def load_data(url):
-    input_file = write_file(url)
+def load_data(input_file):    
+    """
+    write_file output and csv.reader input_file
+    '/opt/myvariant.info/load_archive/drugbank/drugbank.csv'
+    """
     open_file = open(input_file)
     drugbank = csv.reader(open_file, delimiter=',')
     drugbank.next()

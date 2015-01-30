@@ -22,8 +22,7 @@ def write_file(url):
     
     drugbank_df.set_index("rs_id", inplace=True)
     id_df.set_index("rs_id", inplace=True)
-    #return [id_df, drugbank_df]
     df = id_df.join(drugbank_df, how='right').drop_duplicates()
     df.sort(columns='hgvs_id', inplace=True)
-    df.to_csv("/opt/myvariant.info/load_archive/drugbank/drugbank.csv")
+    df.to_csv('/opt/myvariant.info/load_archive/drugbank/drugbank.csv')
     return df

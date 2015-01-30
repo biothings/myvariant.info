@@ -37,13 +37,15 @@ def _map_line_to_json(fields):
                          'chr': fields[5],
                          'pos': fields[6]
                      },
-                 'nhlbi_key': fields[0],
+#                 'nhlbi_key': fields[0],
                  'hupfield': fields[1],
                  'last_curation_date': fields[2],
                  'creation_date': fields[3],
-                 'snpid_dbsnp134': fields[4],
+                 'srsid': fields[4],
                  'publication':
                      {
+                         'journal': fields[16],
+                         'title': fields[17],
                          'pmid': fields[7],
                          'snpid_in_paper': fields[8],
                          'location_within_paper': fields[9],
@@ -53,9 +55,7 @@ def _map_line_to_json(fields):
                          'paper_phenotype_categories': fields[13],
                          'date_pub': fields[14]
                      },
-                 'in_nhgri_cat': fields[15],
-                 'journal': fields[16],
-                 'title': fields[17],
+#                 'in_nhgri_cat': fields[15],
                  'includes_male_female_only_analyses': fields[18],
                  'exclusively_male_female': fields[19],
                  'initial_sample_description': fields[20],
@@ -99,14 +99,14 @@ def _map_line_to_json(fields):
                  'in_lincrna': fields[53],
                  'in_mirna': fields[54],
                  'in_mirna_bs': fields[55],
-                 'dbsnp':
-                     {
-                         'fxn': fields[56],
-                         'maf': fields[57],
-                         'alleles_het_se': fields[58],
-                         'validation': fields[59],
-                         'clin_status': fields[60],
-                     },
+#                 'dbsnp':
+#                     {
+#                         'fxn': fields[56],
+#                         'maf': fields[57],
+#                         'alleles_het_se': fields[58],
+#                         'validation': fields[59],
+#                         'clin_status': fields[60],
+#                     },
                  'oreg_anno': fields[61],
                  'conserv_pred_tfbs': fields[62],
                  'human_enhancer': fields[63],
