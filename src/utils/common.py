@@ -84,7 +84,7 @@ def anyfile(infile, mode='r'):
         import zipfile
         in_f = zipfile.ZipFile(infile, 'r').open(rawfile, 'r')
     else:
-        in_f = file(infile, mode)
+        in_f = open(infile, mode)
     return in_f
 
 
@@ -103,12 +103,14 @@ class open_anyfile():
     def __init__(self, infile, mode='r'):
         self.infile = infile
         self.mode = mode
+
     def __enter__(self):
         if is_filehandle(self.infile):
             self.in_f = self.infile
         else:
             self.in_f = anyfile(self.infile, mode=self.mode)
         return self.in_f
+
     def __exit__(self, type, value, traceback):
         self.in_f.close()
 
