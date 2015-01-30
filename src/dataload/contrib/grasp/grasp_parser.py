@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
+import os
 import csv
 from itertools import groupby, imap, ifilter
-from utils.dataload import dict_sweep, list_split, unlist, value_convert
+#from utils.dataload import dict_sweep, list_split, unlist, value_convert
 
 
 VALID_COLUMN_NO = 70
     
 
+def safe_str(s):
+    uc = s.decode('cp1252')
+    _s = uc.encode('utf8')
+    return _s
+    
 # convert one snp to json
 def _map_line_to_json(fields):
     assert len(fields) == VALID_COLUMN_NO
@@ -20,7 +26,7 @@ def _map_line_to_json(fields):
     # load as json data
     if HGVS is None:
         return
-
+        
     one_snp_json = {
 
         "_id": HGVS,
@@ -42,7 +48,7 @@ def _map_line_to_json(fields):
                          'snpid_in_paper': fields[8],
                          'location_within_paper': fields[9],
                          'p_value': fields[10],
-                         'phenotype': str(fields[11]),
+                         'phenotype': fields[11],
                          'paper_phenotype_description': fields[12],
                          'paper_phenotype_categories': fields[13],
                          'date_pub': fields[14]
@@ -128,8 +134,9 @@ def row_generator(db_row):
     
 # open file, parse, pass to json mapper
 def load_data(input_file):
-    open_file = open(input_file)
-    open_file = csv.reader(open_file, delimiter="\t")
+    os.system('iconv -f CP1252 -t UTF8 %s > %s.tsv' % (input_file, input_file)) # utf8 encode file
+    open_file = open('%s.tsv' % input_file)
+    open_file = csv.reader(open_file, delimiter="\t")    
     open_file.next()
     grasp = imap(row_generator, open_file)
     grasp = ifilter(lambda row: row[58] != "", grasp)

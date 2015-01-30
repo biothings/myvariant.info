@@ -11,7 +11,7 @@ mapping to JSON, cleaning.
 
 # remove keys whos values are ".", "-", "", "NA", "none", " "
 # and remove empty dictionaries
-def dict_sweep(d, vals=[".", "-", "", "NA", "none", " "]):
+def dict_sweep(d, vals=[".", "-", "", "NA", "none", " ", "Not Available"]):
     """
     @param d: a dictionary
     @param vals: a string or list of strings to sweep
@@ -107,7 +107,7 @@ def merge_duplicate_rows(rows, db):
     return first_row
 
 # load collection into mongodb
-def load_collection(database, input_file_list, collection_name):
+def load_collection(database, src_module, collection_name):
     """
     : param database: mongodb url
     : param input_file_list: variant docs, path to file
@@ -118,7 +118,8 @@ def load_collection(database, input_file_list, collection_name):
     posts = db[collection_name]
     t1 = time.time()
     cnt = 0
-    for doc in load_data(input_file_list):
+    src_data = src_module.load_data()
+    for doc in src_data:
         posts.insert(doc, manipulate=False, check_keys=False, w=0)
         cnt += 1
         if cnt % 100000 == 0:
@@ -126,8 +127,8 @@ def load_collection(database, input_file_list, collection_name):
     print("successfully loaded %s into mongodb" % collection_name)
 
 
-def unique_ids(input_file):
-    i = load_data(input_file)
+def unique_ids(src_module):
+    i = src_module.load_data()
     out = list(i)
     id_list = [a['_id'] for a in out if a]
     myset = set(id_list)

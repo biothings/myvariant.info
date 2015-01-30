@@ -116,10 +116,3 @@ def load_data(input_file):
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "cosmic") for rg in row_groups)
 
-#z = unique_ids('/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/cosmicmini.tsv')
-z = unique_ids('/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/cosmicmid.tsv')
-#z = unique_ids('/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/CosmicCompleteExport_v70_100814.tsv')
-
-#load_collection('mongodb://myvariant_user:Qag1H6V%0vEG@su08.scripps.edu:27017/variantdoc', 
-#                    '/Users/Amark/Documents/Su_Lab/myvariant.info/cosmic/CosmicCompleteExport_v70_100814.tsv',
-#                    'cosmic')
