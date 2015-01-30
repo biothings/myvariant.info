@@ -8,6 +8,8 @@ from elasticsearch import Elasticsearch
 from .mapping import mapping
 import config
 import utils.es
+import utils.mongo
+
 
 es_host = config.ES_HOST
 es = Elasticsearch(es_host)
@@ -90,6 +92,27 @@ def verify_doc_li(doc_li, return_ids=False, step=10000):
         j = min(doc_cnt, i + step)
         print(i, '...', j)
         res = esi.mexists([doc['_id'] for doc in doc_li[i:j]])
+        for _id, exists in res:
+            if return_ids:
+                stats[exists].append(_id)
+            else:
+                stats[exists] += 1
+    logger.setLevel(logging.INFO)
+    if return_ids:
+        print({True: len(stats[True]), False: len(stats[False])})
+    return stats
+
+
+def verify_collection(collection, return_ids=False, step=10000):
+    esi = utils.es.ESIndexer()
+    logger = logging.getLogger()
+    logger.setLevel(logging.ERROR)
+    if return_ids:
+        stats = {True: [], False: []}
+    else:
+        stats = {True: 0, False: 0}
+    for doc_li in utils.mongo.doc_feeder(collection, step=step, fields={'_id': 1}, inbatch=True):
+        res = esi.mexists([doc['_id'] for doc in doc_li])
         for _id, exists in res:
             if return_ids:
                 stats[exists].append(_id)
