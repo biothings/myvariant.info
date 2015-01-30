@@ -78,13 +78,39 @@ def anyfile(infile, mode='r'):
     filetype = os.path.splitext(infile)[1].lower()
     if filetype == '.gz':
         import gzip
-        in_f = gzip.GzipFile(infile, 'r')
+        #in_f = gzip.GzipFile(infile, 'r')
+        in_f = gzip.open(infile, 'rt')
     elif filetype == '.zip':
         import zipfile
         in_f = zipfile.ZipFile(infile, 'r').open(rawfile, 'r')
     else:
         in_f = file(infile, mode)
     return in_f
+
+
+def is_filehandle(fh):
+    '''return True/False if fh is a file-like object'''
+    return hasattr(fh, 'read') and hasattr(fh, 'close')
+
+
+class open_anyfile():
+    '''a context manager can be used in "with" stmt.
+       accepts a filehandle or anything accepted by anyfile function.
+
+        with open_anyfile('test.txt') as in_f:
+            do_something()
+    '''
+    def __init__(self, infile, mode='r'):
+        self.infile = infile
+        self.mode = mode
+    def __enter__(self):
+        if is_filehandle(self.infile):
+            self.in_f = self.infile
+        else:
+            self.in_f = anyfile(self.infile, mode=self.mode)
+        return self.in_f
+    def __exit__(self, type, value, traceback):
+        self.in_f.close()
 
 
 class dotdict(dict):
