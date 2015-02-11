@@ -7,8 +7,11 @@ Chunlei Wu
 '''
 from collections import OrderedDict
 import copy
+import time
 
 from vcf import Reader
+
+from utils.common import timesofar
 
 # the key name for the pos in var_doc
 POS_KEY = 'hg19'
@@ -17,7 +20,7 @@ POS_KEY = 'hg19'
 def get_hgvs_name(record, as_list=False):
     """construct the valid HGVS name as the _id field"""
     _id_list = []
-    _allele2_list = []
+    _alt_list = []
     _pos_list = []
 
     chrom = record.CHROM
@@ -31,7 +34,7 @@ def get_hgvs_name(record, as_list=False):
                                            record.POS,
                                            record.REF,
                                            alt)
-            _allele2_list.append(alt)
+            _alt_list.append(alt)
             _pos_list.append(OrderedDict(start=record.POS, end=record.POS + 1))   # end is start+1 for snp
 
         elif record.is_indel:
@@ -50,7 +53,7 @@ def get_hgvs_name(record, as_list=False):
                             pos = '{}_{}'.format(record.INFO['RSPOS'], end)
                             _pos_list.append(OrderedDict(start=record.INFO['RSPOS'], end=end))
                         _id = 'chr{}:g.{}del'.format(chrom, pos)
-                        _allele2_list.append(alt)
+                        _alt_list.append(alt)
                     else:
                         # record.POS and RSPOS does not match
                         # something ambigious here
@@ -66,7 +69,7 @@ def get_hgvs_name(record, as_list=False):
                     if record.POS == record.INFO['RSPOS']:
                         pos = '{}_{}'.format(record.POS, record.POS + 1)
                         _id = 'chr{}:g.{}ins{}'.format(chrom, pos, alt[1:])
-                        _allele2_list.append(alt)
+                        _alt_list.append(alt)
                         _pos_list.append(OrderedDict(start=record.POS, end=record.POS + 1))
                     else:
                         # record.POS and RSPOS does not match
@@ -81,10 +84,10 @@ def get_hgvs_name(record, as_list=False):
 
     if not as_list and len(_id_list) == 1:
         _id_list = _id_list[0]
-        _allele2_list = _allele2_list[0]
+        _alt_list = _alt_list[0]
         _pos_list = _pos_list[0]
 
-    return _id_list, _allele2_list, _pos_list
+    return _id_list, _alt_list, _pos_list
 
 
 def parse_one_rec(record):
@@ -139,15 +142,15 @@ def parse_one_rec(record):
         # This is the GMAF reported on the RefSNP and EntrezSNP pages and
         # VariationReporter
         freq_list = [float(x) for x in info['CAF'] if x]
-        assert len(freq_list) >= 2
-        snp['gmaf'] = freq_list[1]
+        if len(freq_list) >= 2:
+            snp['gmaf'] = freq_list[1]
 
     # INFO field skipped: SSR, COMMON
 
     snp['chrom'] = record.CHROM
-    snp['allele1'] = record.REF
-    _id_list, _allele2_list, _pos_list = get_hgvs_name(record)
-    snp['allele2'] = _allele2_list
+    snp['ref'] = record.REF
+    _id_list, _alt_list, _pos_list = get_hgvs_name(record)
+    snp['alt'] = _alt_list
     snp[POS_KEY] = _pos_list
     snp['_id'] = _id_list
 
@@ -155,6 +158,7 @@ def parse_one_rec(record):
 
 
 def parse_vcf(vcf_infile, compressed=True, verbose=True, by_id=True, **tabix_params):
+    t0 = time.time()
     compressed == vcf_infile.endswith('.gz')
     vcf_r = Reader(filename=vcf_infile, compressed=compressed)
     vcf_r.fetch('1', 1)   # call a dummy fetch to initialize vcf_r._tabix
@@ -169,7 +173,7 @@ def parse_vcf(vcf_infile, compressed=True, verbose=True, by_id=True, **tabix_par
                 if isinstance(doc['_id'], list):
                     for i, _id in enumerate(doc['_id']):
                         _doc = copy.copy(doc)
-                        _doc['allele2'] = doc['allele2'][i]
+                        _doc['alt'] = doc['alt'][i]
                         _doc[POS_KEY] = doc[POS_KEY][i]
                         _doc['_id'] = _id
                         yield _doc
@@ -194,5 +198,5 @@ def parse_vcf(vcf_infile, compressed=True, verbose=True, by_id=True, **tabix_par
             else:
                 cnt_3 += 1
         cnt_1 += 1
-    print("Done.")
-    print("total rs: {}; total docs: {}; skipped rs: {}".format(cnt_1, cnt_2, cnt_3))
+    print("Done. [{}]".format(timesofar(t0)))
+    print("Total rs: {}; total docs: {}; skipped rs: {}".format(cnt_1, cnt_2, cnt_3))

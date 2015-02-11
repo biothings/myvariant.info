@@ -142,7 +142,7 @@ def rec_handler(infile, as_list=False, block_end='\n'):
        at once from the infile. The record is separated by
        one or more empty lines by default.
     '''
-    rec_separator = lambda line: line==block_end
+    rec_separator = lambda line: line == block_end
     with open_anyfile(infile) as in_f:
         for key, group in itertools.groupby(in_f, rec_separator):
             if not key:
