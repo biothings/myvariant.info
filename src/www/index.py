@@ -26,6 +26,7 @@ if src_path not in sys.path:
 #from utils.es import ESQuery
 from .helper import add_apps   # , BaseHandler
 from .api.handlers import APP_LIST as api_app_list
+from .beacon.handlers import APP_LIST as beacon_app_list
 
 
 __USE_WSGI__ = False
@@ -57,6 +58,7 @@ APP_LIST = [
 
 APP_LIST += add_apps('api', api_app_list)
 APP_LIST += add_apps('v1', api_app_list)
+APP_LIST += add_apps('beacon', beacon_app_list)
 
 
 settings = {}
