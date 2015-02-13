@@ -17,14 +17,14 @@ def _map_line_to_json(fields):
         hg18_end = int(fields[7])+1
     chromStart = int(fields[1])
     chromEnd = int(fields[1]) + 1
-    allele1 = fields[2]
-    allele2 = fields[3]
+    allele1 = fields[2].upper()
+    allele2 = fields[3].upper()
     HGVS = "chr%s:g.%d%s>%s" % (chrom, chromStart, allele1, allele2)
 
-    if fields[74] == ".":
+    if fields[77] == ".":
         siphy = "."
     else:
-        freq = fields[74].split(":")
+        freq = fields[77].split(":")
         siphy = {'a': freq[0], 'c': freq[1], 'g': freq[2], 't': freq[3]}
 
     acc = fields[11].rstrip().rstrip(';').split(";")
@@ -140,86 +140,112 @@ def _map_line_to_json(fields):
                         "score": fields[54],
                         "rankscore": fields[55]
                     },
+                "provean": 
+                    {
+                        "score": fields[56],
+                        "converted_rankscore": fields[57],
+                        "pred": fields[58]
+                    },
                 "cadd":
                     {
-                        "raw": fields[56],
-                        "raw_rankscore": fields[57],
-                        "phred": fields[58]
+                        "raw": fields[59],
+                        "raw_rankscore": fields[60],
+                        "phred": fields[61]
                     },
                 "gerp++":
                     {
-                        "nr": fields[59],
-                        "rs": fields[60],
-                        "rs_rankscore": fields[61]
+                        "nr": fields[62],
+                        "rs": fields[63],
+                        "rs_rankscore": fields[64]
                     },
                 "phylop":
                     {
                         "46way": 
                             {
-                                "primate": fields[62],
-                                "primate_rankscore": fields[63],
-                                "placental": fields[64],
-                                "placental_rankscore": fields[65],
+                                "primate": fields[65],
+                                "primate_rankscore": fields[66],
+                                "placental": fields[67],
+                                "placental_rankscore": fields[68],
                             },
                         "100way":
                             {
-                                "vertebrate": fields[66],
-                                "vertebrate_rankscore": fields[67]
+                                "vertebrate": fields[69],
+                                "vertebrate_rankscore": fields[70]
                             }
                     },
                 "phastcons":
                     {
                         "46way": 
                             {
-                                "primate": fields[68],
-                                "primate_rankscore": fields[69],
-                                "placental": fields[70],
-                                "placental_rankscore": fields[71],
+                                "primate": fields[71],
+                                "primate_rankscore": fields[72],
+                                "placental": fields[73],
+                                "placental_rankscore": fields[74],
                             },
                         "100way":
                             {
-                                "vertebrate": fields[72],
-                                "vertebrate_rankscore": fields[73]
+                                "vertebrate": fields[75],
+                                "vertebrate_rankscore": fields[76]
                             }
                     },
                 "siphy_29way":
                     {
                         "pi": siphy,
-                        "logodds": fields[75],
-                        "logodds_rankscore": fields[76]
+                        "logodds": fields[78],
+                        "logodds_rankscore": fields[79]
                     },
-                "lrt_omega": fields[77],
-                "unisnp_ids": fields[78],
+                "lrt_omega": fields[80],
+                "unisnp_ids": fields[81],
                 "1000gp1":
                     {
-                        "ac": fields[79],
-                        "af": fields[80],
-                        "afr_ac": fields[81],
-                        "afr_af": fields[82],
-                        "eur_ac": fields[83],
-                        "eur_af": fields[84],
-                        "amr_ac": fields[85],
-                        "amr_af": fields[86],
-                        "asn_ac": fields[87],
-                        "asn_af": fields[88]
+                        "ac": fields[82],
+                        "af": fields[83],
+                        "afr_ac": fields[84],
+                        "afr_af": fields[85],
+                        "eur_ac": fields[86],
+                        "eur_af": fields[87],
+                        "amr_ac": fields[88],
+                        "amr_af": fields[89],
+                        "asn_ac": fields[90],
+                        "asn_af": fields[91]
                     },
                 "esp6500":
                     {
-                        "aa_af": fields[89],
-                        "ea_af": fields[90]
+                        "aa_af": fields[92],
+                        "ea_af": fields[93]
                     },
                 "aric5606":
                     {
-                        "aa_ac": fields[91],
-                        "aa_af": fields[92],
-                        "ea_ac": fields[93],
-                        "ea_af": fields[94]
+                        "aa_ac": fields[94],
+                        "aa_af": fields[95],
+                        "ea_ac": fields[96],
+                        "ea_af": fields[97]
+                    },
+                "exac":
+                    {
+                        "ac": fields[98],
+                        "af": fields[99],
+                        "adj_ac": fields[100],
+                        "adj_af": fields[101],
+                        "afr_ac": fields[102],
+                        "afr_af": fields[103],
+                        "amr_ac": fields[104],
+                        "amr_af": fields[105],
+                        "eas_ac": fields[106],
+                        "eas_af": fields[107],
+                        "fin_ac": fields[108],
+                        "fin_af": fields[109],
+                        "nfe_ac": fields[110],
+                        "nfe_af": fields[111],
+                        "sas_ac": fields[112],
+                        "sas_af": fields[113]
+                        
                     },
                 "clinvar":
                     {
-                        "rs": fields[95],
-                        "clin_sig": fields[96],
-                        "trait": fields[97]
+                        "rs": fields[114],
+                        "clin_sig": fields[115],
+                        "trait": fields[116]
                     }
             }
     }
