@@ -2,11 +2,7 @@
 import os
 import csv
 from itertools import groupby, imap, ifilter
-<<<<<<< HEAD
 from utils.dataload import dict_sweep, list_split, unlist, value_convert, merge_duplicate_rows
-=======
-from utils.dataload import dict_sweep, list_split, unlist, value_convert
->>>>>>> 3e7f92a89ac2764c651bab94e58646ea6a98aa1f
 
 
 VALID_COLUMN_NO = 70
