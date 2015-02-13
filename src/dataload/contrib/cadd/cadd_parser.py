@@ -222,9 +222,9 @@ def row_generator(db_row):
 def fetch_generator(tabix, contig):
     fetch = tabix.fetch(contig)
     rows = imap(lambda x: x.split(), fetch)
-    rows = imap(row_generator, rows)
+    #rows = imap(row_generator, rows)
     json_rows = imap(_map_line_to_json, rows)
-    json_rows = (row for row in json_rows if row)
+    #json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
     
