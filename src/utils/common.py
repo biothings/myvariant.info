@@ -1,10 +1,18 @@
+from __future__ import print_function
 import sys
 import time
 from itertools import islice
 import os.path
 from shlex import shlex
+import gzip
+import pickle
 
-str_types = str if sys.version_info.major == 3 else (str, unicode)
+if sys.version_info.major == 3:
+    str_types = str
+    import pickle
+else:
+    str_types = (str, unicode)
+    import cPickle as pickle
 
 
 # ===============================================================================
@@ -145,3 +153,54 @@ def split_ids(q):
     ids = [x.decode('utf8').strip() for x in list(lex)]
     ids = [x for x in ids if x]
     return ids
+
+
+def dump(obj, filename, bin=-1):
+    '''Saves a compressed object to disk
+    '''
+    print('Dumping into "%s"...' % filename, end='')
+    out_f = gzip.GzipFile(filename, 'wb')
+    pickle.dump(obj, out_f, protocol=bin)
+    out_f.close()
+    print('Done. [%s]' % os.stat(filename).st_size)
+
+
+def dump2gridfs(object, filename, db, bin=-1):
+    '''Save a compressed object to MongoDB gridfs.'''
+    import gridfs
+    print('Dumping into "MongoDB:%s/%s"...' % (db.name, filename), end='')
+    fs = gridfs.GridFS(db)
+    if fs.exists(_id=filename):
+        fs.delete(filename)
+    fobj = fs.new_file(filename=filename, _id=filename)
+    try:
+        gzfobj = gzip.GzipFile(filename=filename, mode='wb', fileobj=fobj)
+        pickle.dump(object, gzfobj, protocol=bin)
+    finally:
+        gzfobj.close()
+        fobj.close()
+    print('Done. [%s]' % fs.get(filename).length)
+
+
+def loadobj(filename, mode='file'):
+    '''Loads a compressed object from disk file (or file-like handler) or
+        MongoDB gridfs file (mode='gridfs')
+           obj = loadobj('data.pyobj')
+
+           obj = loadobj(('data.pyobj', mongo_db), mode='gridfs')
+    '''
+    if mode == 'gridfs':
+        import gridfs
+        filename, db = filename   # input is a tuple of (filename, mongo_db)
+        fs = gridfs.GridFS(db)
+        fobj = fs.get(filename)
+    else:
+        if is_str(filename):
+            fobj = gzip.GzipFile(filename, 'rb')
+        else:
+            fobj = filename   # input is a file-like handler
+    try:
+        object = pickle.load(fobj)
+    finally:
+        fobj.close()
+    return object
