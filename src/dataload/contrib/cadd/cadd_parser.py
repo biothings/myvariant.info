@@ -240,4 +240,3 @@ def load_data(input_file):
     for i in tabix.contigs:
         for one_snp_json in fetch_generator(tabix, i):
             yield one_snp_json
-
