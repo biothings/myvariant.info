@@ -1,18 +1,15 @@
-
-
 from __future__ import print_function
 import re
 
 from bitarray import bitarray
 
-import utils.common
-import utils.mongo
+from utils.common import loadobj, is_str
+from utils.mongo import get_src_db, doc_feeder
 from config import HG19_DATAFILE
-
-# encode nucleotide into bit form
 
 
 def nuc_to_bit(sequence):
+    '''encode nucleotide into bit form'''
     code = {'A': bitarray('001'),
             'C': bitarray('010'),
             'G': bitarray('011'),
@@ -28,10 +25,9 @@ def nuc_to_bit(sequence):
     seq_bit.encode(code, sequence)
     return(seq_bit)
 
-# encode bit form to nucleotide
-
 
 def bit_to_nuc(sequence):
+    '''encode bit form to nucleotide'''
     if sequence == bitarray('001'):
         nuc = 'A'
     elif sequence == bitarray('010'):
@@ -40,15 +36,16 @@ def bit_to_nuc(sequence):
         nuc = 'G'
     elif sequence == bitarray('100'):
         nuc = 'T'
+    else:
+        raise ValueError("Cannot decode input bits.")
     return nuc
-
-'''parse variant name, print the variant name and
-    return chromosome number, nucleotide position
-    and nucleotide name
-    '''
 
 
 def parse(str):
+    '''parse variant name, print the variant name and
+       return chromosome number, nucleotide position
+       and nucleotide name
+    '''
     pat = 'chr(\w+):g\.(\d+)(\w)\>(\w)'
     mat = re.match(pat, str)
     if mat:
@@ -58,52 +55,79 @@ def parse(str):
 
 class VariantValidator:
     def __init__(self):
-        self.data = None
+        self._chr_data = None
 
-    # validate single hgvs variant name  document
-    def validate_hgvs(self, hgvs_id):
+    def validate_hgvs(self, hgvs_id, verbose=False):
+        '''validate single hgvs variant name, return True/False,
+           or None if input hgvs_id cannot be validated (could be
+           wrong format, or ins/del type currently we don't validate.
+        '''
         r = parse(hgvs_id)
         if r:
             # get the chromosome sequence in bit form
-            if self.data is None:
-                self.data = utils.common.loadobj(HG19_DATAFILE)
-            chr_bit = bitarray()
+            if self._chr_data is None:
+                print("\n\tLoading chromosome data...", end='')
+                self._chr_data = loadobj(HG19_DATAFILE)
+                print("Done.")
             if r[0] == 'M':
                 chr = 'MT'
             else:
                 chr = r[0]
-            chr_bit = self.data[str(chr)]
+            pos = int(r[1])
+            nuc_hgvs = r[2]
+
+            chr_bit = bitarray()
+            chr_bit = self._chr_data[str(chr)]
 
             # get the nucleotide in chromsome sequence in bit form
             nuc_chr_bit = bitarray()
-            nuc_chr_bit = chr_bit[int(r[1])*3-3:int(r[1])*3]
+            nuc_chr_bit = chr_bit[pos*3-3:pos*3]
             nuc_chr = bit_to_nuc(nuc_chr_bit)
 
             # compare HGVS id with genome
-            return r[2] == nuc_chr
+            matched = nuc_hgvs == nuc_chr
+            if verbose:
+                if matched:
+                    print('"{}":\t{}'.format(hgvs_id, matched))
+                else:
+                    print('"{}":\t{} (should be "{}")'.format(hgvs_id, matched, nuc_chr))
+            return matched
         else:
+            if verbose:
+                print('"{}":\tNone(not tested).'.format(hgvs_id))
             return None
 
-    # validate multiple hgvs variant name
-    def validate_many(self, *args):
-        for item in args:
-            print(self.validate_hgvs(item))
+    def validate_many(self, hgvs_li, verbose=False):
+        '''validate multiple hgvs variant name'''
+        out = []
+        for hgvs_id in hgvs_li:
+            out.append(self.validate_hgvs(hgvs_id, verbose=verbose))
+        return out
 
-    def validate_src(self, collection, return_False=False,
-                     return_None=False, return_True=False):
-        return_dic = {False: return_False, True: return_True,
-                      None: return_None}
+    def validate_src(self, collection, return_false=False,
+                     return_none=False, return_true=False, verbose=False):
+        '''Validate hgvs ids from a src collection.'''
+
+        return_dict = {
+            False: return_false,
+            True: return_true,
+            None: return_none
+        }
 
         # read in the collection from mongodb
-        src = utils.mongo.get_src_db()
-        cursor = utils.mongo.doc_feeder(src[collection], step=10000)
+        if is_str(collection):
+            src = get_src_db()
+            _coll = src[collection]
+        else:
+            _coll = collection
+        cursor = doc_feeder(_coll, step=10000)
 
-        print_only = not (return_False or return_None or return_True)
+        print_only = not (return_false or return_none or return_true)
         if not print_only:
             # output dictionary, three keys: 'false','true','none'
             out = {}
-            for k in return_dic:
-                if return_dic[k]:
+            for k in return_dict:
+                if return_dict[k]:
                     out[k] = []
 
         # initialize the count
@@ -111,20 +135,16 @@ class VariantValidator:
         # validate each item in the cursor
         for item in cursor:
             _id = item['_id']
-            valid = self.validate_hgvs(_id)
-            print(_id, valid)
+            valid = self.validate_hgvs(_id, verbose=verbose)
             cnt_d[valid] += 1
-            if return_dic[valid]:
+            if return_dict[valid]:
                 out[valid].append(_id)
 
         # print out counts
-        print("The number of False HGVS IDs in the collection \
-is : {0}".format(cnt_d[False]))
-        print("The number of True HGVS IDs in the collection \
-is : {0}".format(cnt_d[True]))
-        print("The number of HGVS IDs that could not be identified by \
-parser in the collection is : {0}".format(cnt_d[None]))
+        print("\n# of VALID HGVS IDs:\t{0}".format(cnt_d[True]))
+        print("# of INVALID HGVS IDs:\t{0}".format(cnt_d[False]))
+        print("# of HGVS IDs skipped:\t {0}".format(cnt_d[None]))
 
-        # print out the HGVS IDs as user defined
+        # return HGVS IDs as user defined
         if not print_only:
             return out
