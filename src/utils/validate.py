@@ -1,11 +1,11 @@
-
-
 from __future__ import print_function
 import re
+import os.path
+import time
 
 from bitarray import bitarray
 
-from utils.common import loadobj, is_str, anyfile
+from utils.common import loadobj, is_str, open_anyfile, timesofar
 from utils.mongo import get_src_db, doc_feeder
 
 def nuc_to_bit(sequence):
@@ -58,23 +58,39 @@ def parse(str):
         r = mat.groups()
         return (r[0], r[1], r[2])
 
-def chr_dict():
-    ''' read in chromosome fasta sequence, 
-        and store them in a dictionary'''
-    chr_dict = {}
-    for i in range(1, 23) + ['X','Y','MT']:
-        file_name=str(i) + '.fasta.zip'
-        seq_file = anyfile(file_name)
-        header = seq_file.readline()
-        seq_bit=bitarray()
-        for line in seq_file:
-            line = line.rstrip('\n')
-            line_bit = bitarray()
-            line_bit = nuc_to_bit(line)
-            seq_bit += line_bit
-        chr_dict.update({str(i):seq_bit})
-        
-    return chr_dict
+def get_genome_in_bit(chr_fa_folder):
+    ''' encode each chromosome fasta sequence into a bitarray,
+        and store them in a dictionary with chr numbers as keys
+        chr_fa_folder is the folder to put all gzipped fasta files:
+
+        fasta files can be downloaded from NCBI FTP site:
+
+        ftp://ftp.ncbi.nlm.nih.gov/genomes/Homo_sapiens/
+        ARCHIVE/BUILD.37.3/Assembled_chromosomes/seq/
+        hs_ref_<assembly>_chr<i>.fa.gz  (e.g. hs_ref_GRCh37.p5_chr1.fa.gz)
+
+    '''
+    chr_bit_d = {}
+    chr_range = [str(i) for i in range(1, 23)] + ['X', 'Y', 'MT']
+    t0 = time.time()
+    for i in chr_range:
+        t1 = time.time()
+        file_name = 'hs_ref_GRCh37.p5_chr{}.fa.gz'.format(i)
+        print("Loading {}...".format(file_name), end='')
+        file_name = os.path.join(chr_fa_folder, file_name)
+        with open_anyfile(file_name) as seq_f:
+            seq_f.readline()   # skip header
+            seq_bit = bitarray()
+            for line in seq_f:
+                line = line.rstrip('\n')
+                line_bit = nuc_to_bit(line)
+                seq_bit += line_bit
+            chr_bit_d.update({i: seq_bit})
+        print("done.[{}]".format(timesofar(t1)))
+    print('='*20)
+    print("Finished. [{}]".format(timesofar(t0)))
+
+    return chr_bit_d
 
 class VariantValidator:
     def __init__(self):
@@ -87,10 +103,8 @@ class VariantValidator:
         '''
         r = parse(hgvs_id)
         # set the range for r[0]
-        chr_range = set()
-        for i in range(1, 23):
-                chr_range.add(str(i))
-        chr_range.update('X','Y','M','MT')
+        chr_range = [str(i) for i in range(1, 23)] + ['X', 'Y', 'M', 'MT']
+        chr_range = set(chr_range)
 
         if r and (str(r[0]) in chr_range):
             # get the chromosome sequence in bit form
@@ -176,4 +190,3 @@ class VariantValidator:
 
         out['summary'] = cnt_d
         return out
-

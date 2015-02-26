@@ -9,9 +9,9 @@ import pickle
 
 if sys.version_info.major == 3:
     str_types = str
-    import pickle
+    import pickle       # noqa
 else:
-    str_types = (str, unicode)
+    str_types = (str, unicode)    # noqa
     import cPickle as pickle
 
 
@@ -160,6 +160,8 @@ def dump(obj, filename, bin=-1):
     '''
     print('Dumping into "%s"...' % filename, end='')
     out_f = gzip.GzipFile(filename, 'wb')
+    # out_f = bz2.BZ2File(filename, 'w')
+    # out_f = lzma.LZMAFile(filename, 'w')
     pickle.dump(obj, out_f, protocol=bin)
     out_f.close()
     print('Done. [%s]' % os.stat(filename).st_size)
