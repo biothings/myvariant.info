@@ -1,3 +1,8 @@
+
+# coding: utf-8
+
+# In[ ]:
+
 from __future__ import print_function
 import re
 
@@ -5,8 +10,6 @@ from bitarray import bitarray
 
 from utils.common import loadobj, is_str
 from utils.mongo import get_src_db, doc_feeder
-from config import HG19_DATAFILE
-
 
 def nuc_to_bit(sequence):
     '''encode nucleotide into bit form'''
@@ -36,6 +39,12 @@ def bit_to_nuc(sequence):
         nuc = 'G'
     elif sequence == bitarray('100'):
         nuc = 'T'
+    elif sequence == bitarray('110'):
+        nuc = 'M'
+    elif sequence == bitarray('101'):
+        nuc = 'N'
+    elif sequence == bitarray('111'):
+        nuc = 'R'
     else:
         raise ValueError("Cannot decode input bits.")
     return nuc
@@ -63,11 +72,17 @@ class VariantValidator:
            wrong format, or ins/del type currently we don't validate.
         '''
         r = parse(hgvs_id)
-        if r:
+        # set the range for r[0]
+        chr_range = set()
+        for i in range(1, 23):
+                chr_range.add(str(i))
+        chr_range.update('X','Y','M','MT')
+
+        if r and (str(r[0]) in chr_range):
             # get the chromosome sequence in bit form
             if self._chr_data is None:
                 print("\n\tLoading chromosome data...", end='')
-                self._chr_data = loadobj(HG19_DATAFILE)
+                self._chr_data = loadobj('hg19_dict_bit.pyobj')
                 print("Done.")
             if r[0] == 'M':
                 chr = 'MT'
@@ -122,10 +137,10 @@ class VariantValidator:
             _coll = collection
         cursor = doc_feeder(_coll, step=10000)
 
+        out = {}
         print_only = not (return_false or return_none or return_true)
         if not print_only:
             # output dictionary, three keys: 'false','true','none'
-            out = {}
             for k in return_dict:
                 if return_dict[k]:
                     out[k] = []
@@ -145,6 +160,6 @@ class VariantValidator:
         print("# of INVALID HGVS IDs:\t{0}".format(cnt_d[False]))
         print("# of HGVS IDs skipped:\t {0}".format(cnt_d[None]))
 
-        # return HGVS IDs as user defined
-        if not print_only:
-            return out
+        out['summary'] = cnt_d
+        return out
+
