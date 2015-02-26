@@ -1,9 +1,11 @@
+
+
 from __future__ import print_function
 import re
 
 from bitarray import bitarray
 
-from utils.common import loadobj, is_str
+from utils.common import loadobj, is_str, anyfile
 from utils.mongo import get_src_db, doc_feeder
 
 def nuc_to_bit(sequence):
@@ -56,6 +58,23 @@ def parse(str):
         r = mat.groups()
         return (r[0], r[1], r[2])
 
+def chr_dict():
+    ''' read in chromosome fasta sequence, 
+        and store them in a dictionary'''
+    chr_dict = {}
+    for i in range(1, 23) + ['X','Y','MT']:
+        file_name=str(i) + '.fasta.zip'
+        seq_file = anyfile(file_name)
+        header = seq_file.readline()
+        seq_bit=bitarray()
+        for line in seq_file:
+            line = line.rstrip('\n')
+            line_bit = bitarray()
+            line_bit = nuc_to_bit(line)
+            seq_bit += line_bit
+        chr_dict.update({str(i):seq_bit})
+        
+    return chr_dict
 
 class VariantValidator:
     def __init__(self):
