@@ -1,8 +1,3 @@
-
-# coding: utf-8
-
-# In[ ]:
-
 from __future__ import print_function
 import re
 
