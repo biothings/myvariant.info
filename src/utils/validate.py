@@ -65,9 +65,8 @@ def get_genome_in_bit(chr_fa_folder):
 
         fasta files can be downloaded from NCBI FTP site:
 
-        ftp://ftp.ncbi.nlm.nih.gov/genomes/Homo_sapiens/
-        ARCHIVE/BUILD.37.3/Assembled_chromosomes/seq/
-        hs_ref_<assembly>_chr<i>.fa.gz  (e.g. hs_ref_GRCh37.p5_chr1.fa.gz)
+        ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37.p13/Primary_Assembly/assembled_chromosomes/FASTA/
+        chr<i>.fa.gz  (e.g. chr1.fa.gz)
 
     '''
     chr_bit_d = {}
