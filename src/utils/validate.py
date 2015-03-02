@@ -7,6 +7,8 @@ from bitarray import bitarray
 
 from utils.common import loadobj, is_str, open_anyfile, timesofar
 from utils.mongo import get_src_db, doc_feeder
+from config import HG19_DATAFILE
+
 
 def nuc_to_bit(sequence):
     '''encode nucleotide into bit form'''
@@ -47,6 +49,20 @@ def bit_to_nuc(sequence):
     return nuc
 
 
+def bit_to_nuc2(bits):
+    '''a util function to convert a encoded bitarray back to
+       nt sequence.
+    '''
+    code = {'A': bitarray('001'),
+            'C': bitarray('010'),
+            'G': bitarray('011'),
+            'T': bitarray('100'),
+            'N': bitarray('101'),
+            'M': bitarray('110'),
+            'R': bitarray('111')}
+    return bits.decode(code)
+
+
 def parse(str):
     '''parse variant name, print the variant name and
        return chromosome number, nucleotide position
@@ -74,7 +90,8 @@ def get_genome_in_bit(chr_fa_folder):
     t0 = time.time()
     for i in chr_range:
         t1 = time.time()
-        file_name = 'hs_ref_GRCh37.p5_chr{}.fa.gz'.format(i)
+        #file_name = 'hs_ref_GRCh37.p5_chr{}.fa.gz'.format(i)
+        file_name = 'chr{}.fa.gz'.format(i)
         print("Loading {}...".format(file_name), end='')
         file_name = os.path.join(chr_fa_folder, file_name)
         with open_anyfile(file_name) as seq_f:
@@ -95,6 +112,11 @@ class VariantValidator:
     def __init__(self):
         self._chr_data = None
 
+    def load_chr_data(self):
+        print("\tLoading chromosome data...", end='')
+        self._chr_data = loadobj(HG19_DATAFILE)
+        print("Done.")
+
     def validate_hgvs(self, hgvs_id, verbose=False):
         '''validate single hgvs variant name, return True/False,
            or None if input hgvs_id cannot be validated (could be
@@ -108,9 +130,8 @@ class VariantValidator:
         if r and (str(r[0]) in chr_range):
             # get the chromosome sequence in bit form
             if self._chr_data is None:
-                print("\n\tLoading chromosome data...", end='')
-                self._chr_data = loadobj('hg19_dict_bit.pyobj')
-                print("Done.")
+                print()
+                self.load_chr_data()
             if r[0] == 'M':
                 chr = 'MT'
             else:
