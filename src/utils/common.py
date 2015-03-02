@@ -155,8 +155,9 @@ def split_ids(q):
     return ids
 
 
-def dump(obj, filename, bin=-1):
+def dump(obj, filename, bin=2):
     '''Saves a compressed object to disk
+       binary protocol 2 is compatible with py2, 3 and 4 are for py3
     '''
     print('Dumping into "%s"...' % filename, end='')
     out_f = gzip.GzipFile(filename, 'wb')
@@ -167,7 +168,7 @@ def dump(obj, filename, bin=-1):
     print('Done. [%s]' % os.stat(filename).st_size)
 
 
-def dump2gridfs(object, filename, db, bin=-1):
+def dump2gridfs(object, filename, db, bin=2):
     '''Save a compressed object to MongoDB gridfs.'''
     import gridfs
     print('Dumping into "MongoDB:%s/%s"...' % (db.name, filename), end='')
@@ -199,6 +200,8 @@ def loadobj(filename, mode='file'):
     else:
         if is_str(filename):
             fobj = gzip.GzipFile(filename, 'rb')
+            # fobj = bz2.BZ2File(filename, 'r')
+            # fobj = lzma.LZMAFile(filename, 'r')
         else:
             fobj = filename   # input is a file-like handler
     try:
