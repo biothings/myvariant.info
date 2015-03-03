@@ -1,17 +1,22 @@
 # -*- coding: utf-8 -*-
-
+from __future__ import print_function
+import time
+import sys
 import pysam
 from itertools import groupby, imap, chain
 from utils.dataload import dict_sweep, unlist, value_convert, merge_duplicate_rows
+from utils.common import timesofar
+from utils.mongo import get_src_db
 
 
+CADD_INPUT = '/opt/myvariant.info/load_archive/cadd/whole_genome_SNVs_inclAnno.tsv.gz'
 VALID_COLUMN_NO = 116
 DEPENDENCIES = ["pysam", "pymongo"]
 
 
 # convert one snp to json
 def _map_line_to_json(fields):
-    #if len(fields) >= VALID_COLUMN_NO:
+    assert len(fields) == VALID_COLUMN_NO
     chrom = fields[0]
     chromStart = fields[1]
     allele1 = fields[2]
@@ -20,8 +25,7 @@ def _map_line_to_json(fields):
 
     # load as json data
     if HGVS is None:
-        return
-
+	return
     one_snp_json = {
 
             "_id": HGVS,
@@ -206,37 +210,34 @@ def _map_line_to_json(fields):
 
     return dict_sweep(unlist(value_convert(one_snp_json)), ["NA"])
 
-        
-## replace None indices with ''
-def row_generator(db_row):
-    ind = range(VALID_COLUMN_NO)
-    row = []
-    for i in ind:
-        try:
-            row.append(db_row[i])
-        except:
-            row.append('NA')
-    return row
-
 
 def fetch_generator(tabix, contig):
     fetch = tabix.fetch(contig)
-    rows = imap(lambda x: x.split(), fetch)
-    #rows = imap(row_generator, rows)
+    rows = imap(lambda x: x.split('\t'), fetch)
     json_rows = imap(_map_line_to_json, rows)
-    #json_rows = (row for row in json_rows if row)
+    json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-    return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
-    
+    return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)    
 
-# open file, parse, pass to json mapper
-def load_data(input_file):
+
+def load_contig(contig):
+    '''save cadd contig into mongodb collection.
+       should be an iterable.
     '''
-    @param: input_file - cadd url
-    '''
-    # All possible SNVs of GRCh37/hg19 incl. all annotations
-    tabix = pysam.Tabixfile(input_file)
-    #return (fetch_generator(tabix, tabix.contig) for contig in tabix.contigs)
-    for i in tabix.contigs:
-        for one_snp_json in fetch_generator(tabix, i):
-            yield one_snp_json
+    tabix = pysam.Tabixfile(CADD_INPUT)
+    src_db = get_src_db()
+    target_coll = src_db["cadd"]
+    t0 = time.time()
+    cnt = 0
+    docs = (doc for doc in fetch_generator(tabix, contig))
+    doc_list = []
+    for doc in docs:
+        doc_list.append(doc)
+        cnt += 1
+        if len(doc_list) == 100:
+            target_coll.insert(doc_list, manipulate=False, check_keys=False, w=0) 
+            doc_list = []
+        if cnt % 100000 == 0:
+            print(cnt, timesofar(t0))
+    print("successfully loaded %s into mongodb" % collection_name)
+    print("total docs: {}; total time: {}".format(cnt, timesofar(t0)))

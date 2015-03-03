@@ -4,7 +4,7 @@ import glob
 from utils.dataload import list_split, dict_sweep, unlist, value_convert
 
 
-VALID_COLUMN_NO = 98
+VALID_COLUMN_NO = 119
 
 
 # convert one snp to json

@@ -17,9 +17,13 @@ def load_source(collection_name, src_module=None, src_data=None):
     if src_module:
         src_data = src_module.load_data()
     if src_data:
+	doc_list = []
         for doc in src_data:
-            target_coll.insert(doc, manipulate=False, check_keys=False, w=0)
-            cnt += 1
+	    doc_list.append(doc)
+	    cnt += 1
+	    if len(doc_list) == 100:
+                target_coll.insert(doc_list, manipulate=False, check_keys=False, w=0)
+	        doc_list = []
             if cnt % 100000 == 0:
                 print(cnt, timesofar(t0))
         print("successfully loaded %s into mongodb" % collection_name)
