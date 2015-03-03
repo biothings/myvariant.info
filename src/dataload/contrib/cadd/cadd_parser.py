@@ -239,5 +239,5 @@ def load_contig(contig):
             doc_list = []
         if cnt % 100000 == 0:
             print(cnt, timesofar(t0))
-    print("successfully loaded %s into mongodb" % collection_name)
+    print("successfully loaded cadd chromosome %s into mongodb" % contig)
     print("total docs: {}; total time: {}".format(cnt, timesofar(t0)))
