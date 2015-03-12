@@ -9,7 +9,7 @@ from utils.common import timesofar
 from utils.mongo import get_src_db
 
 
-CADD_INPUT = '/opt/myvariant.info/load_archive/cadd/whole_genome_SNVs_inclAnno.tsv.gz'
+CADD_INPUT = 'http://krishna.gs.washington.edu/download/CADD/v1.2/whole_genome_SNVs_inclAnno.tsv.gz'
 VALID_COLUMN_NO = 116
 DEPENDENCIES = ["pysam", "pymongo"]
 
@@ -214,7 +214,8 @@ def _map_line_to_json(fields):
 def fetch_generator(tabix, contig):
     fetch = tabix.fetch(contig)
     rows = imap(lambda x: x.split('\t'), fetch)
-    json_rows = imap(_map_line_to_json, rows)
+    annos = (row for row in rows if row[9] != "Intergenic")
+    json_rows = imap(_map_line_to_json, annos)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)    
