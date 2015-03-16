@@ -1,0 +1,17 @@
+def get_mapping():
+    m = {
+        "variant": {
+            "include_in_all": False,
+            "dynamic": False,
+            "properties": {}
+        }
+    }
+
+	__sources__ = ['cadd', 'clinvar', 'cosmic', 'cosmic2', 'dbnsfp', 'dbsnp', 'drugbank', 'emv', 'evs', 'grasp']
+
+	for src in __sources__:
+		src_m = importlib.import_module('dataload.contrib' + src + '__init__')
+		_m = getattr(src_m, 'get_mapping')
+		m['variant']['properties'].update(_m)
+
+	return m

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import print_function
 from .dbsnp_vcf_parser import parse_vcf
 
@@ -14,3 +16,63 @@ def load_data():
             _doc['_id'] = doc['_id']
             del doc['_id']
             yield _doc
+
+def get_mapping():
+	mapping = {
+		"dbsnp": {
+			"properties": {
+				"allele_origin": {
+					"type": "string",
+					"analyzer": "string_lowercase"
+				},
+				"alt": {
+					"type": "string",
+					"analyzer": "string_lowercase"
+				},
+				"chrom":{
+					"type" : "string",
+					"analyzer": "string_lowercase"
+				},
+				"class":{
+					"type" : "string",
+					"analyzer": "string_lowercase"
+				},
+				"flags":{
+					"type" : "string",
+					"analyzer": "string_lowercase"
+				},
+				"gmaf":{
+					"type" : "float"
+				},
+				"hg19": {
+					"properties": {
+						"end": {
+							"type": "long"
+						},
+						"start": {
+							"type": "long"
+						}
+					}
+				},
+				"ref": {
+					"type": "string",
+					"analyzer": "string_lowercase"
+				},
+				"rsid": {
+					"type": "string",
+					"include_in_all": True,
+					"analyzer": "string_lowercase"
+				},
+				"var_subtype": {
+					"type": "string",
+					"analyzer": "string_lowercase"
+				},
+				"vartype": {
+					"type": "string",
+					"analyzer": "string_lowercase"
+				}
+			}
+		}
+	}
+	return mapping
+

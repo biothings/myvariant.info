@@ -2,7 +2,7 @@
 import csv
 import glob
 from itertools import islice, groupby, imap
-from utils.common import dict_sweep, value_convert
+from utils.dataload import dict_sweep, value_convert
 
 VALID_COLUMN_NO = 31
 
