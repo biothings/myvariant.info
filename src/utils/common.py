@@ -209,3 +209,12 @@ def loadobj(filename, mode='file'):
     finally:
         fobj.close()
     return object
+
+
+def dict_sweep():
+    pass
+
+def value_convert():
+    pass
+
+
