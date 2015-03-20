@@ -8,9 +8,21 @@ from utils.dataload import dict_sweep, unlist, value_convert, merge_duplicate_ro
 from utils.common import timesofar
 from utils.mongo import get_src_db
 
+## tabix file links from CADD http://cadd.gs.washington.edu/download
+## whole genome SNVs including annotations
+whole_genome = 'http://krishna.gs.washington.edu/download/CADD/v1.2/whole_genome_SNVs_inclAnno.tsv.gz'
+## SNV variants on Illumina Exome BeadChip
+exome = '/opt/myvariant.info/load_archive/cadd/HumanExome-12v1-1_A_inclAnno.tsv.gz'
+## 1000 Genomes variants SNVs and InDels including all annotations
+thousandgp = '/opt/myvariant.info/load_archive/cadd/1000G_inclAnno.tsv.gz'
+## Exome Aggreation Consortium variants including all annotations
+exac = 'opt/myvariant.info/load_archive/cadd/ExAC.r0.2_inclAnno.tsv.gz'
+## ESP6500 variants SNVs and InDels including all annotations
+esp = 'opt/myvariant.info/load_archive/cadd/ESP6500SI_inclAnno.tsv.gz'
 
-CADD_INPUT = 'http://krishna.gs.washington.edu/download/CADD/v1.2/whole_genome_SNVs_inclAnno.tsv.gz'
+## number of fields/annotations
 VALID_COLUMN_NO = 116
+
 DEPENDENCIES = ["pysam", "pymongo"]
 
 
@@ -214,7 +226,7 @@ def _map_line_to_json(fields):
 def fetch_generator(tabix, contig):
     fetch = tabix.fetch(contig)
     rows = imap(lambda x: x.split('\t'), fetch)
-    annos = (row for row in rows if row[9] != "Intergenic")
+    annos = (row for row in rows if row[10] in ["NON_SYNONYMOUS", "SPLICE_SITE", "CANONICAL_SPLICE"])
     json_rows = imap(_map_line_to_json, annos)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
@@ -225,7 +237,9 @@ def load_contig(contig):
     '''save cadd contig into mongodb collection.
        should be an iterable.
     '''
-    tabix = pysam.Tabixfile(CADD_INPUT)
+    #if CADD_INPUT == "exome":
+	#CADD_INPUT = exome
+    tabix = pysam.Tabixfile(whole_genome)
     src_db = get_src_db()
     target_coll = src_db["cadd"]
     t0 = time.time()
