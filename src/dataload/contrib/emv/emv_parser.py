@@ -5,7 +5,7 @@ import glob
 import csv
 from itertools import imap, groupby, ifilter
 import os
-#from utils.dataload import dict_sweep, value_convert, unlist, merge_duplicate_rows
+from utils.dataload import dict_sweep, value_convert, unlist, merge_duplicate_rows
 
 ## merge EMV file with genomic ID file
 #def file_merge(emv_file, id_file):
@@ -17,8 +17,13 @@ VALID_COLUMN_NO = 11
         
 # convert one snp to json
 def _map_line_to_json(fields):
-    id = fields[0].split(":")
-    HGVS = "chr%s:%s" % (re.search(r'[1-9]+', id[0]).group(), id[1])
+    vid = fields[0].split(":")
+    chrom = re.search(r'[1-9]+', vid[0]).group()
+    
+    if chrom == '23':
+        chrom = chrom.replace('23', 'X')
+        
+    HGVS = "chr%s:%s" % (chrom, vid[1])
         
     # load as json data
     if HGVS is None:
@@ -52,6 +57,7 @@ def data_generator(input_file):
     # Skip header
     emv.next()
     emv = ifilter(lambda x: x[0], emv)
+    emv = (row for row in emv if len(row[3].split(";")) == 1)
     json_rows = imap(_map_line_to_json, emv)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "emv") for rg in row_groups )

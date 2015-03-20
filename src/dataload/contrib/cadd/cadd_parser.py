@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import time
-import sys
 import pysam
-from itertools import groupby, imap, chain
+from itertools import groupby, imap
 from utils.dataload import dict_sweep, unlist, value_convert, merge_duplicate_rows
 from utils.common import timesofar
 from utils.mongo import get_src_db
@@ -25,13 +24,13 @@ def _map_line_to_json(fields):
 
     # load as json data
     if HGVS is None:
-	return
+        return
     one_snp_json = {
 
             "_id": HGVS,
             "cadd":
                 {
-                     'chrom': fields[0],
+                    'chrom': fields[0],
                      'pos': fields[1],
                      'ref': fields[2],
                      'anc': fields[3],
@@ -96,7 +95,7 @@ def _map_line_to_json(fields):
                             'tx': fields[42],
                             'txwk': fields[43],
                             'enh': fields[44],
-                            #'enh': fields[45],
+                          #  'enh': fields[45],
                             'znfrpts': fields[46],
                             'het': fields[47],
                             'tssbiv': fields[48],
@@ -191,7 +190,6 @@ def _map_line_to_json(fields):
                      'intron': fields[106],
                      'oaa': fields[107],
                      'naa': fields[108],
-                        
                      'grantham': fields[109],
                      'polyphen':
                          {
@@ -218,7 +216,7 @@ def fetch_generator(tabix, contig):
     json_rows = imap(_map_line_to_json, annos)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-    return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)    
+    return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
 
 
 def load_contig(contig):
@@ -236,7 +234,7 @@ def load_contig(contig):
         doc_list.append(doc)
         cnt += 1
         if len(doc_list) == 100:
-            target_coll.insert(doc_list, manipulate=False, check_keys=False, w=0) 
+            target_coll.insert(doc_list, manipulate=False, check_keys=False, w=0)
             doc_list = []
         if cnt % 100000 == 0:
             print(cnt, timesofar(t0))

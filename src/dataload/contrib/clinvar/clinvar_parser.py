@@ -3,8 +3,8 @@ import csv
 import re
 from itertools import imap, groupby
 import os
-#from utils.common import unlist, dict_sweep, value_convert
-#from subprocess import Popen, PIPE
+from utils.dataload import unlist, dict_sweep, value_convert
+
 
 
 VALID_COLUMN_NO = 25
@@ -123,12 +123,10 @@ def _map_line_to_json(fields):
 
 # open file, parse, pass to json mapper
 def load_data(input_file):
-    #open_file = Popen(["sort", "-t", "\t", "-k14", "-k15", "-n", input_file], stdout=PIPE).stdout
-    os.system("sort -t$'\t' -k14 -k15 -k20 -n %s > %s_sorted.tsv" % (input_file, input_file)) 
+    os.system("sort -t$'\t' -k14 -k15 -k20 -n %s > %s_sorted.tsv" % (input_file, input_file))
     open_file = open("%s_sorted.tsv" % (input_file))
     print input_file
     clinvar = csv.reader(open_file, delimiter="\t")
-    #clinvar.next()  # skip header
     clinvar = (row for row in clinvar
                 if row[18] != '-' and
                 row[18].find('?') == -1 and
@@ -137,5 +135,4 @@ def load_data(input_file):
                 not re.search(r'p.', row[18]))
     json_rows = (row for row in imap(_map_line_to_json, clinvar) if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-    return (merge_duplicate_rows(rg, "clinvar") for rg in row_groups )
-
+    return (merge_duplicate_rows(rg, "clinvar") for rg in row_groups)

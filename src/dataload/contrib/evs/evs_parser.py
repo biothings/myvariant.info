@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import csv
 import glob
+import re
 from itertools import islice, groupby, imap
-from utils.common import dict_sweep, value_convert
+from utils.dataload import dict_sweep, value_convert
 
 VALID_COLUMN_NO = 31
 
@@ -20,6 +21,14 @@ def count_dict(field):
     return counts
 
 
+def get_ref(fields, mutation):
+    if len(ref) < len(alt):
+
+        allele = "ins%s" % alt[1:]
+    
+
+
+
 # convert one snp to json
 def _map_line_to_json(fields):        
     chrInfo = fields[0].split(":")  # grch37
@@ -27,10 +36,20 @@ def _map_line_to_json(fields):
     chromStart = int(chrInfo[1])
 
     ma_fin_percent = fields[7].split("/")
-
+    
     if fields[3]:
-        HGVS = "chr%s:g.%d%s" % (chrom, chromStart, fields[3])
-
+        mutation = fields[3].split(">")
+        ref = mutation[0]
+        alt = mutation[1]
+        if len(ref) > len(alt):
+            chromEnd = chromStart + (len(ref) - len(alt))
+            HGVS = "chr%s:g.%d_%ddel" % (chrom, chromStart, chromEnd)
+            
+        if len(ref) < len(alt):
+            chromEnd = chromStart + (len(alt) - len(ref))
+            HGVS = "chr%s:g.%d_%dins%s" % (chrom, chromStart, chromEnd, alt[1:])
+            
+            
     # load as json data
     if HGVS is None:
         return
@@ -119,7 +138,7 @@ def merge_duplicate_rows(rows):
     other_rows = rows[1:]
     for row in other_rows:
         for i in first_row["evs"]:
-            if i in row['evs']:
+            if i in row["evs"]:
                 if row["evs"][i] != first_row["evs"][i]:
                     aa = first_row["evs"][i]
                     if not isinstance(aa, list):
@@ -133,17 +152,20 @@ def merge_duplicate_rows(rows):
 
 # open file, parse, pass to json mapper
 def data_generator(input_file):
-    open_file = open(input_file) 
+    open_file = open(input_file)
     evs = csv.reader(open_file, delimiter=" ")
     # Skip first 8 meta lines
     evs = islice(evs, 8, None)
     evs = (row for row in evs if ":" in row[30] and \
             len(row) == VALID_COLUMN_NO)
+    #for row in evs:
+    #    docs = [doc for doc in doc[3].split(";")]
+    #    json_row = _map_line_to_json() for doc
     json_rows = imap(_map_line_to_json, evs)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-    return (merge_duplicate_rows(rg, "evs") for rg in row_groups )
-        
-            
+    return (merge_duplicate_rows(rg, "evs") for rg in row_groups)
+
+
 # load path and find files, pass to data_generator
 def load_data(path):
     for input_file in sorted(glob.glob(path)):
@@ -151,4 +173,3 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
-    
