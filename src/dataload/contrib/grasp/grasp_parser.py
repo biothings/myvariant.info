@@ -12,24 +12,20 @@ def safe_str(s):
     uc = s.decode('cp1252')
     _s = uc.encode('utf8')
     return _s
+
     
 # convert one snp to json
 def _map_line_to_json(fields):
     assert len(fields) == VALID_COLUMN_NO
-    chrom = fields[5]
-    chromStart = fields[6]
-    alleles = fields[58].split("/")
-    allele1 = alleles[0]
-    allele2 = alleles[1][0]
-    HGVS = "chr%s:g.%s%s>%s" % (chrom, chromStart, allele1, allele2)
-
+    rsid = fields[8]
+    
     # load as json data
-    if HGVS is None:
+    if rsid is None:
         return
         
     one_snp_json = {
 
-        "_id": HGVS,
+        "_id": rsid,
         "grasp":
             {
                 'hg19':
@@ -47,7 +43,7 @@ def _map_line_to_json(fields):
                          'journal': fields[16],
                          'title': fields[17],
                          'pmid': fields[7],
-                         'snpid_in_paper': fields[8],
+                         'snpid': fields[8],
                          'location_within_paper': fields[9],
                          'p_value': fields[10],
                          'phenotype': fields[11],
