@@ -283,6 +283,9 @@ class ESQuery():
 
 
 class ESQueryBuilder:
+    def __init__(self, **query_options):
+        self._query_options = query_options
+
     def build_id_query(self, vid, scopes=None):
         _default_scopes = [
             '_id',
@@ -310,6 +313,8 @@ class ESQueryBuilder:
         else:
             raise ValueError('"scopes" cannot be "%s" type'.format(type(scopes)))
         _q = {"query": _query}
+        self._query_options.pop("query", None)    # avoid "query" be overwritten by self.query_options
+        _q.update(self._query_options)
         return _q
 
     def build_multiple_id_query(self, vid_list, scopes=None):
