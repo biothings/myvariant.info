@@ -103,7 +103,9 @@ class ESQuery():
             options.scopes = self._cleaned_scopes(scopes)
         fields = kwargs.pop('fields', None)
         if fields:
-            kwargs["_source"] = self._cleaned_fields(fields)
+            fields = self._cleaned_fields(fields)
+            if fields:
+                kwargs["_source"] = fields
         kwargs = self._parse_sort_option(kwargs)
         for key in set(kwargs) - set(self._allowed_options):
             del kwargs[key]
