@@ -19,15 +19,7 @@ def count_dict(field):
     count_list = field.split("/")
     counts = dict(item.split("=") for item in count_list)
     return counts
-
-
-def get_ref(fields, mutation):
-    if len(ref) < len(alt):
-
-        allele = "ins%s" % alt[1:]
-    
-
-
+ 
 
 # convert one snp to json
 def _map_line_to_json(fields):        
@@ -45,10 +37,11 @@ def _map_line_to_json(fields):
             chromEnd = chromStart + (len(ref) - len(alt))
             HGVS = "chr%s:g.%d_%ddel" % (chrom, chromStart, chromEnd)
             
-        if len(ref) < len(alt):
+        elif len(ref) < len(alt):
             chromEnd = chromStart + (len(alt) - len(ref))
             HGVS = "chr%s:g.%d_%dins%s" % (chrom, chromStart, chromEnd, alt[1:])
-            
+        elif len(ref) == len(alt) == 1:
+	    HGVS = "chr%s:g.%d%s" % (chrom, chromStart, fields[3])  
             
     # load as json data
     if HGVS is None:
