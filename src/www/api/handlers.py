@@ -46,7 +46,6 @@ class VariantHandler(BaseHandler):
         ids = kwargs.pop('ids', None)
         if ids:
             ids = re.split('[\s\r\n+|,]+', ids)
-            #scopes = 'entrezgene,ensemblgene,retired'
             res = self.esq.mget_variants2(ids, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
@@ -119,7 +118,7 @@ class QueryHandler(BaseHandler):
             if ids:
                 scopes = kwargs.pop('scopes', None)
                 fields = kwargs.pop('fields', None)
-                res = self.esq.mget_variant2(ids, fields=fields, scopes=scopes, **kwargs)
+                res = self.esq.mget_variants2(ids, fields=fields, scopes=scopes, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 

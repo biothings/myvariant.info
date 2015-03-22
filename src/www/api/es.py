@@ -103,7 +103,9 @@ class ESQuery():
             options.scopes = self._cleaned_scopes(scopes)
         fields = kwargs.pop('fields', None)
         if fields:
-            kwargs["_source"] = self._cleaned_fields(fields)
+            fields = self._cleaned_fields(fields)
+            if fields:
+                kwargs["_source"] = fields
         kwargs = self._parse_sort_option(kwargs)
         for key in set(kwargs) - set(self._allowed_options):
             del kwargs[key]
@@ -283,6 +285,9 @@ class ESQuery():
 
 
 class ESQueryBuilder:
+    def __init__(self, **query_options):
+        self._query_options = query_options
+
     def build_id_query(self, vid, scopes=None):
         _default_scopes = [
             '_id',
@@ -310,6 +315,8 @@ class ESQueryBuilder:
         else:
             raise ValueError('"scopes" cannot be "%s" type'.format(type(scopes)))
         _q = {"query": _query}
+        self._query_options.pop("query", None)    # avoid "query" be overwritten by self.query_options
+        _q.update(self._query_options)
         return _q
 
     def build_multiple_id_query(self, vid_list, scopes=None):

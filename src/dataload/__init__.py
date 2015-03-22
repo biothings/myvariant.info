@@ -12,18 +12,22 @@ def load_source(collection_name, src_module=None, src_data=None):
     '''
     src_db = get_src_db()
     target_coll = src_db[collection_name]
+    if target_coll.count() > 0:
+        print("Error: target collection {} exists.".format(collection_name))
+        return
+
     t0 = time.time()
     cnt = 0
     if src_module:
         src_data = src_module.load_data()
     if src_data:
-	doc_list = []
+        doc_list = []
         for doc in src_data:
-	    doc_list.append(doc)
-	    cnt += 1
-	    if len(doc_list) == 100:
+            doc_list.append(doc)
+            cnt += 1
+            if len(doc_list) == 100:
                 target_coll.insert(doc_list, manipulate=False, check_keys=False, w=0)
-	        doc_list = []
+            doc_list = []
             if cnt % 100000 == 0:
                 print(cnt, timesofar(t0))
         print("successfully loaded %s into mongodb" % collection_name)
