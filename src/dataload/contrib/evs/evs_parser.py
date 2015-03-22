@@ -3,7 +3,7 @@ import csv
 import glob
 import re
 from itertools import islice, groupby, imap
-from utils.dataload import dict_sweep, value_convert
+from utils.dataload import dict_sweep, value_convert, merge_duplicate_rows
 
 VALID_COLUMN_NO = 31
 
@@ -123,24 +123,6 @@ def _map_line_to_json(fields):
         }
 
     return dict_sweep(value_convert(one_snp_json), vals=["NA", "none"])
-
-
-def merge_duplicate_rows(rows):
-    rows = list(rows)
-    first_row = rows[0]
-    other_rows = rows[1:]
-    for row in other_rows:
-        for i in first_row["evs"]:
-            if i in row["evs"]:
-                if row["evs"][i] != first_row["evs"][i]:
-                    aa = first_row["evs"][i]
-                    if not isinstance(aa, list):
-                        aa = [aa]
-                    aa.append(row["evs"][i])
-                    first_row["evs"][i] = aa
-            else:
-                continue
-    return first_row
 
 
 # open file, parse, pass to json mapper
