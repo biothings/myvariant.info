@@ -2,7 +2,7 @@
 
 from .evs_parser import load_data as _load_data
 
-EVS_INPUT_FILE = ''
+EVS_INPUT_FILE = '/opt/myvariant.info/load_archive/evs/ESP6500SI-V2-SSA137.GRCh38-liftover.chr*'
 
 def load_data():
     evs_data = _load_data(EVS_INPUT_FILE)
