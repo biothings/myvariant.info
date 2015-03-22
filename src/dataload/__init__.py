@@ -27,7 +27,7 @@ def load_source(collection_name, src_module=None, src_data=None):
             cnt += 1
             if len(doc_list) == 100:
                 target_coll.insert(doc_list, manipulate=False, check_keys=False, w=0)
-            doc_list = []
+                doc_list = []
             if cnt % 100000 == 0:
                 print(cnt, timesofar(t0))
         print("successfully loaded %s into mongodb" % collection_name)
