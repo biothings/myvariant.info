@@ -39,6 +39,8 @@ def loaddata(limit=10000, offset=0):
 
             cosmicid = snp[1]
             chrom = snp[7]
+            if chrom == '23':
+                chrom = 'X'
             chromStart = int(snp[8])
             chromEnd = int(snp[9])
             tumor_site = snp[12]
@@ -57,7 +59,7 @@ def loaddata(limit=10000, offset=0):
             if len(allele1) > 1 or len(allele2) > 1:
                 continue
 
-            HGVS = "%s:g.%d%s>%s" % (chrom, chromEnd, allele1, allele2)
+            HGVS = "chr%s:g.%d%s>%s" % (chrom, chromEnd, allele1, allele2)
             one_snp_json = {
                 "chrom": chrom,
                 "chromStart": chromStart,
