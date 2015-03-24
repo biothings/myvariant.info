@@ -224,7 +224,7 @@ def _map_line_to_json(fields):
 def fetch_generator(tabix, contig):
     fetch = tabix.fetch(contig)
     rows = imap(lambda x: x.split('\t'), fetch)
-    annos = (row for row in rows if row[10] in ["NON_SYNONYMOUS", "SPLICE_SITE", "CANONICAL_SPLICE"])
+    annos = (row for row in rows if "CodingTranscript" in row[9])
     json_rows = imap(_map_line_to_json, annos)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))

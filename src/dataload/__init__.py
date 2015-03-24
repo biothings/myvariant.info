@@ -12,9 +12,9 @@ def load_source(collection_name, src_module=None, src_data=None):
     '''
     src_db = get_src_db()
     target_coll = src_db[collection_name]
-    if target_coll.count() > 0:
-        print("Error: target collection {} exists.".format(collection_name))
-        return
+    #if target_coll.count() > 0:
+    #    print("Error: target collection {} exists.".format(collection_name))
+    #    return
 
     t0 = time.time()
     cnt = 0
