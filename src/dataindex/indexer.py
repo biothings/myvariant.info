@@ -5,7 +5,7 @@ import json
 import time
 
 from elasticsearch import Elasticsearch
-from .mapping import mapping
+from .mapping import get_mapping
 import config
 import utils.es
 import utils.mongo
@@ -126,6 +126,7 @@ def verify_collection(collection, return_ids=False, step=10000):
 
 def create_index(index_name):
     body = {'settings': {'number_of_shards': 10}}
+    mapping = get_mapping()
     body.update(mapping)
     es.indices.create(index=index_name, body=body)
 
