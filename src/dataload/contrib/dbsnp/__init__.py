@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import print_function
 from .dbsnp_vcf_parser import parse_vcf
 
 
 infile = "/opt/myvariant.info/load_archive/dbsnp/00-All.vcf.gz"
+
 
 def load_data():
     chrom_list = [str(i) for i in range(1, 23)] + ['X', 'Y', 'MT']
@@ -17,62 +16,77 @@ def load_data():
             del doc['_id']
             yield _doc
 
-def get_mapping():
-	mapping = {
-		"dbsnp": {
-			"properties": {
-				"allele_origin": {
-					"type": "string",
-					"analyzer": "string_lowercase"
-				},
-				"alt": {
-					"type": "string",
-					"analyzer": "string_lowercase"
-				},
-				"chrom":{
-					"type" : "string",
-					"analyzer": "string_lowercase"
-				},
-				"class":{
-					"type" : "string",
-					"analyzer": "string_lowercase"
-				},
-				"flags":{
-					"type" : "string",
-					"analyzer": "string_lowercase"
-				},
-				"gmaf":{
-					"type" : "float"
-				},
-				"hg19": {
-					"properties": {
-						"end": {
-							"type": "long"
-						},
-						"start": {
-							"type": "long"
-						}
-					}
-				},
-				"ref": {
-					"type": "string",
-					"analyzer": "string_lowercase"
-				},
-				"rsid": {
-					"type": "string",
-					"include_in_all": True,
-					"analyzer": "string_lowercase"
-				},
-				"var_subtype": {
-					"type": "string",
-					"analyzer": "string_lowercase"
-				},
-				"vartype": {
-					"type": "string",
-					"analyzer": "string_lowercase"
-				}
-			}
-		}
-	}
-	return mapping
 
+def get_mapping():
+    mapping = {
+        "dbsnp": {
+            "properties": {
+                "allele_origin": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "alt": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "chrom": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "class": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "flags": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "gmaf": {
+                    "type": "float"
+                },
+                "hg19": {
+                    "properties": {
+                        "end": {
+                            "type": "long"
+                        },
+                        "start": {
+                            "type": "long"
+                        }
+                    }
+                },
+                "ref": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "rsid": {
+                    "type": "string",
+                    "include_in_all": True,
+                    "analyzer": "string_lowercase"
+                },
+                "var_subtype": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "vartype": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "validated": {
+                    "type": "boolean"
+                },
+                "gene": {
+                    "properties": {
+                        "symbol": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "geneid": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return mapping

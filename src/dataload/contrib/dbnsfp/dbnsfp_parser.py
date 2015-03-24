@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import csv
 import glob
 from utils.dataload import list_split, dict_sweep, unlist, value_convert
@@ -51,7 +50,7 @@ def _map_line_to_json(fields):
                 "hg38":
                     {
                         "chrom": fields[8],
-                        "pos": fields[9]                    
+                        "pos": fields[9]
                     },
                 "allele1": allele1,
                 "allele2": allele2,
@@ -140,7 +139,7 @@ def _map_line_to_json(fields):
                         "score": fields[54],
                         "rankscore": fields[55]
                     },
-                "provean": 
+                "provean":
                     {
                         "score": fields[56],
                         "converted_rankscore": fields[57],
@@ -160,7 +159,7 @@ def _map_line_to_json(fields):
                     },
                 "phylop":
                     {
-                        "46way": 
+                        "46way":
                             {
                                 "primate": fields[65],
                                 "primate_rankscore": fields[66],
@@ -175,7 +174,7 @@ def _map_line_to_json(fields):
                     },
                 "phastcons":
                     {
-                        "46way": 
+                        "46way":
                             {
                                 "primate": fields[71],
                                 "primate_rankscore": fields[72],
@@ -239,7 +238,7 @@ def _map_line_to_json(fields):
                         "nfe_af": fields[111],
                         "sas_ac": fields[112],
                         "sas_af": fields[113]
-                        
+
                     },
                 "clinvar":
                     {
@@ -288,4 +287,3 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
-
