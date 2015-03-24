@@ -4,6 +4,7 @@ import glob
 import re
 from itertools import islice, groupby, imap
 from utils.dataload import dict_sweep, value_convert, merge_duplicate_rows
+from utils.hgvs import get_hgvs_from_vcf
 
 VALID_COLUMN_NO = 31
 
@@ -33,15 +34,16 @@ def _map_line_to_json(fields):
         mutation = fields[3].split(">")
         ref = mutation[0]
         alt = mutation[1]
-        if len(ref) > len(alt):
-            chromEnd = chromStart + (len(ref) - len(alt))
-            HGVS = "chr%s:g.%d_%ddel" % (chrom, chromStart, chromEnd)
+        HGVS = get_hgvs_from_vcf(chrom, chromStart, ref, alt)
+	#if len(ref) > len(alt):
+        #    chromEnd = chromStart + (len(ref) - len(alt))
+        #    HGVS = "chr%s:g.%d_%ddel" % (chrom, chromStart, chromEnd)
             
-        elif len(ref) < len(alt):
-            chromEnd = chromStart + (len(alt) - len(ref))
-            HGVS = "chr%s:g.%d_%dins%s" % (chrom, chromStart, chromEnd, alt[1:])
-        elif len(ref) == len(alt) == 1:
-	    HGVS = "chr%s:g.%d%s" % (chrom, chromStart, fields[3])  
+        #elif len(ref) < len(alt):
+        #    chromEnd = chromStart + (len(alt) - len(ref))
+        #    HGVS = "chr%s:g.%d_%dins%s" % (chrom, chromStart, chromEnd, alt[1:])
+        #elif len(ref) == len(alt) == 1:
+	#    HGVS = "chr%s:g.%d%s" % (chrom, chromStart, fields[3])  
             
     # load as json data
     if HGVS is None:
