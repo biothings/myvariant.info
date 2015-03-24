@@ -50,7 +50,7 @@ def get_hgvs_from_vcf(chr, pos, ref, alt):
     '''get a valid hgvs name from VCF-style "chr, pos, ref, alt" data.'''
     if len(ref) == len(alt) == 1:
         # this is a SNP
-        hgvs = 'chr{0}:g.{1}{3}>{4}'.format(chr, pos, ref, alt)
+        hgvs = 'chr{0}:g.{1}{2}>{3}'.format(chr, pos, ref, alt)
     elif len(ref) > 1 and len(alt) == 1:
         # this is a deletion:
         assert ref[0] == alt
