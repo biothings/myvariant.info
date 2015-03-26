@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import range
 import MySQLdb
 
 # This script produces simple JSON from UCSC variant data
@@ -12,103 +14,128 @@ Meta = {
 }
 
 
-def loaddata(limit=10000, offset=0):
+def load_data(step=1000, offset=0):
 
     MySQLHG19 = MySQLdb.connect('genome-mysql.cse.ucsc.edu', db='hg19', user='genomep', passwd='password')
 
-    Cursor = MySQLHG19.cursor()
+    cursor = MySQLHG19.cursor()
 
-    while 1:
-        Cursor = MySQLHG19.cursor()
-        SQLLine = "SELECT * FROM cosmicRaw LIMIT %d OFFSET %d" % (limit, offset)
-        Cursor.execute(SQLLine)
+    # while 1:
+    #     Cursor = MySQLHG19.cursor()
+    #     SQLLine = "SELECT * FROM cosmicRaw LIMIT %d OFFSET %d" % (limit, offset)
+    #     Cursor.execute(SQLLine)
 
-        offset += limit
+    #     offset += limit
 
-        if Cursor.rowcount == 0:
-            print "DONE"
-            break
+    #     if Cursor.rowcount == 0:
+    #         print "DONE"
+    #         break
 
-        print "%d" % offset
+    #     print "%d" % offset
 
-        while 1:
-            snp = Cursor.fetchone()
+    #     while 1:
+    #         snp = Cursor.fetchone()
 
-            if not snp:
-                break
+    #         if not snp:
+    #             break
 
-            cosmicid = snp[1]
-            chrom = snp[7]
-            if chrom == '23':
-                chrom = 'X'
-            chromStart = int(snp[8])
-            chromEnd = int(snp[9])
-            tumor_site = snp[12]
-            mut_nt = snp[10]
-            mut_freq = snp[-1]
+    sql = "SELECT COUNT(*) FROM cosmicRaw"
+    cursor.execute(sql)
+    numrows = cursor.fetchone()[0]
+    print(numrows)
 
-            mut_nt = mut_nt.upper()
-            alleles = mut_nt.split('>')
+    sql = "SELECT * FROM cosmicRaw"
+    cursor.execute(sql)
 
-            if len(alleles) < 2:
-                continue
+    for i in range(numrows):
+        snp = cursor.fetchone()
+        if i and i % step == 0:
+            print(i)
 
-            allele1 = alleles[0]
-            allele2 = alleles[1]
+        cosmicid = snp[1]
+        chrom = snp[7]
+        if chrom == '23':
+            chrom = 'X'
+        elif chrom == '24':
+            chrom = 'Y'
+        elif chrom == '25':
+            chrom = 'MT'
 
-            if len(allele1) > 1 or len(allele2) > 1:
-                continue
+        chromStart = int(snp[8])
+        chromEnd = int(snp[9])
+        tumor_site = snp[12]
+        mut_nt = snp[10]
+        mut_freq = float(snp[-1])
 
-            HGVS = "chr%s:g.%d%s>%s" % (chrom, chromEnd, allele1, allele2)
-            one_snp_json = {
-                "chrom": chrom,
-                "chromStart": chromStart,
-                "chromEnd": chromEnd,
-                "tumor_site": tumor_site,
-                "cosmic_id": cosmicid,
-                "mut_nt": mut_nt,
-                "mut_freq": mut_freq,
-                "allele1": allele1,
-                "allele2": allele2,
-                "_id": HGVS
-            }
-            yield one_snp_json
+        mut_nt = mut_nt.upper()
+        alleles = mut_nt.split('>')
+
+        if len(alleles) < 2:
+            continue
+
+        allele1 = alleles[0]
+        allele2 = alleles[1]
+
+        if len(allele1) > 1 or len(allele2) > 1:
+            continue
+
+        HGVS = "chr%s:g.%d%s>%s" % (chrom, chromEnd, allele1, allele2)
+        one_snp_json = {
+            "chrom": chrom,
+            "hg19": {
+                "start": chromStart,
+                "end": chromEnd
+            },
+            "tumor_site": tumor_site,
+            "cosmic_id": cosmicid,
+            "mut_nt": mut_nt,
+            "mut_freq": mut_freq,
+            "ref": allele1,
+            "alt": allele2,
+            "_id": HGVS
+        }
+        yield one_snp_json
 
 
 def get_mapping():
     mapping = {
         "cosmic": {
             "properties": {
+                "chrom": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "hg19": {
+                    "properties": {
+                        "start": {
+                            "type": "long"
+                        },
+                        "end": {
+                            "type": "long"
+                        }
+                    }
+                },
                 "tumor_site": {
                     "type": "string"
                 },
-                # "tomour_site": {
-                #     "type": "string"
-                # }
-                "mut_freq": {
-                    "type": "double"    # actual values are string type
+                "cosmic_id": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
                 },
                 "mut_nt": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "allele1": {
+                "mut_freq": {
+                    "type": "float"
+                },
+                "ref": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "allele2": {
+                "alt": {
                     "type": "string",
                     "analyzer": "string_lowercase"
-                },
-                "chrom": {
-                    "type": "string",
-                    "analyzer": "string_lowercase"
-                },
-                "chromStart": {
-                    "type": "long"
-                },
-                "chromEnd": {
-                    "type": "long"
                 }
             }
         }
