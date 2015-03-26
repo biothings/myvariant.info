@@ -126,7 +126,7 @@ def verify_collection(collection, return_ids=False, step=10000):
 
 def create_index(index_name):
     body = {'settings': {'number_of_shards': 10}}
-    mapping = get_mapping()
+    mapping = {"mappings": get_mapping()}
     body.update(mapping)
     es.indices.create(index=index_name, body=body)
 
@@ -161,6 +161,7 @@ def _index_doc_batch(doc_batch, index_name, doc_type, update=False):
             })
             _li.append(doc)
     es.bulk(body=_li)
+
 
 def do_index(doc_li, index_name, doc_type, step=1000, update=False, verbose=True):
     for doc_batch in doc_feeder(doc_li, step=step, verbose=verbose):
