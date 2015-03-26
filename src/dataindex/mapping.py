@@ -1,14 +1,22 @@
 #ES mapping
 import importlib
 
-def get_mapping():
-    #sources = ['cadd', 'clinvar', 'cosmic2', 'dbnsfp', 'dbsnp', 'drugbank', 'emv', 'evs', 'grasp']
-    sources = ['dbsnp', 'dbnsfp']
+
+def get_mapping(sources=None):
+    if sources is None:
+        #sources = ['cadd', 'clinvar', 'cosmic2', 'dbnsfp', 'dbsnp', 'drugbank', 'emv', 'evs', 'grasp']
+        sources = sources or ['dbsnp', 'dbnsfp', 'cosmic']
+        extra_mapping_li = [mapping_snpedia, mapping_wellderly]
+    else:
+        extra_mapping_li = []
+
+    if isinstance(sources, str):
+        sources = [sources]
     m = {
         "variant": {
             "include_in_all": False,
-                "dynamic": False,
-                    "properties": {}
+            "dynamic": False,
+            "properties": {}
         }
     }
 
@@ -17,7 +25,7 @@ def get_mapping():
         _m = src_m.get_mapping()
         m['variant']['properties'].update(_m)
 
-    for extra_mapping in [mapping_snpedia, mapping_wellderly]:
+    for extra_mapping in extra_mapping_li:
         m['variant']['properties'].update(extra_mapping)
 
     return m
