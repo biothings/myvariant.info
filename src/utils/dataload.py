@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import itertools
+import csv
 from utils.common import timesofar, open_anyfile
 import pymongo
 import time
@@ -8,6 +9,7 @@ import time
 Utility functions for parsing flatfiles,
 mapping to JSON, cleaning.
 """
+
 
 # remove keys whos values are ".", "-", "", "NA", "none", " "
 # and remove empty dictionaries
@@ -32,6 +34,7 @@ def dict_sweep(d, vals=[".", "-", "", "NA", "none", " ", "Not Available"]):
             if len(val) == 0:
                 del d[key]
     return d
+
 
 # convert string numbers into integers or floats
 def value_convert(d):
@@ -66,6 +69,7 @@ def unlist(d):
                 unlist(val)
     return d
 
+
 # split fields by sep into comma separated lists, strip.
 def list_split(d, sep):
     for key, val in d.items():
@@ -78,12 +82,14 @@ def list_split(d, sep):
             pass
     return d
 
+
 def id_strip(id_list):
     id_list = id_list.split("|")
     ids = []
     for id in id_list:
         ids.append(id.rstrip().lstrip())
     return ids
+
 
 def merge_duplicate_rows(rows, db):
     """
@@ -105,6 +111,7 @@ def merge_duplicate_rows(rows, db):
             else:
                 continue
     return first_row
+
 
 # load collection into mongodb
 def load_collection(database, src_module, collection_name):
@@ -147,3 +154,34 @@ def rec_handler(infile, as_list=False, block_end='\n'):
         for key, group in itertools.groupby(in_f, rec_separator):
             if not key:
                 yield (list(group) if as_list else ''.join(group))
+
+
+def tabfile_feeder(datafile, header=1, sep='\t',
+                   includefn=None,
+                   coerce_unicode=True,
+                   assert_column_no=None):
+    '''a generator for each row in the file.'''
+
+    with open_anyfile(datafile) as in_f:
+        reader = csv.reader(in_f, delimiter=sep)
+        lineno = 0
+        try:
+            for i in range(header):
+                reader.next()
+                lineno += 1
+
+            for ld in reader:
+                if assert_column_no:
+                    if len(ld) != assert_column_no:
+                        err = "Unexpected column number:" \
+                              " got {}, should be {}".format(len(ld), assert_column_no)
+                        raise ValueError(err)
+                if not includefn or includefn(ld):
+                    lineno += 1
+                    if coerce_unicode:
+                        yield [unicode(x, encoding='utf-8', errors='replace') for x in ld]
+                    else:
+                        yield ld
+        except ValueError:
+            print("Error at line number:", lineno)
+            raise
