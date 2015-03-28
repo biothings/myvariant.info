@@ -4,7 +4,6 @@ import time
 from itertools import islice
 import os.path
 from shlex import shlex
-import gzip
 import pickle
 
 if sys.version_info.major == 3:
@@ -155,22 +154,63 @@ def split_ids(q):
     return ids
 
 
-def dump(obj, filename, bin=2):
+def get_compressed_outfile(filename, compress='gzip'):
+    '''Get a output file handler with given compress method.
+       currently support gzip/bz2/lzma, lzma only available in py3
+    '''
+    if compress == "gzip":
+        import gzip
+        out_f = gzip.GzipFile(filename, 'wb')
+    elif compress == 'bz2':
+        import bz2
+        out_f = bz2.BZ2File(filename, 'w')
+    elif compress == 'lzma':
+        import lzma
+        out_f = lzma.LZMAFile(filename, 'w')
+    else:
+        raise ValueError("Invalid compress parameter.")
+    return out_f
+
+
+def open_compressed_file(filename):
+    '''Get a read-only file-handler for compressed file,
+       currently support gzip/bz2/lzma, lzma only available in py3
+    '''
+    in_f = open(filename, 'rb')
+    sig = in_f.read(5)
+    in_f.close()
+    if sig[:3] == b'\x1f\x8b\x08':
+        # this is a gzip file
+        import gzip
+        fobj = gzip.GzipFile(filename, 'rb')
+    elif sig[:3] == b'BZh':
+        # this is a bz2 file
+        import bz2
+        fobj = bz2.BZ2File(filename, 'r')
+    elif sig[:5] == b'\xfd7zXZ':
+        # this is a lzma file
+        import lzma
+        fobj = lzma.LZMAFile(filename, 'r')
+    else:
+        raise IOError('Unrecognized file type: "{}"'.format(sig))
+    return fobj
+
+
+def dump(obj, filename, bin=2, compress='gzip'):
     '''Saves a compressed object to disk
        binary protocol 2 is compatible with py2, 3 and 4 are for py3
     '''
     print('Dumping into "%s"...' % filename, end='')
-    out_f = gzip.GzipFile(filename, 'wb')
-    # out_f = bz2.BZ2File(filename, 'w')
-    # out_f = lzma.LZMAFile(filename, 'w')
+    out_f = get_compressed_outfile(filename, compress=compress)
     pickle.dump(obj, out_f, protocol=bin)
     out_f.close()
     print('Done. [%s]' % os.stat(filename).st_size)
 
 
 def dump2gridfs(object, filename, db, bin=2):
-    '''Save a compressed object to MongoDB gridfs.'''
+    '''Save a compressed (support gzip only) object to MongoDB gridfs.'''
     import gridfs
+    import gzip
     print('Dumping into "MongoDB:%s/%s"...' % (db.name, filename), end='')
     fs = gridfs.GridFS(db)
     if fs.exists(_id=filename):
@@ -199,7 +239,8 @@ def loadobj(filename, mode='file'):
         fobj = fs.get(filename)
     else:
         if is_str(filename):
-            fobj = gzip.GzipFile(filename, 'rb')
+            fobj = open_compressed_file(filename)
+            # fobj = gzip.GzipFile(filename, 'rb')
             # fobj = bz2.BZ2File(filename, 'r')
             # fobj = lzma.LZMAFile(filename, 'r')
         else:
@@ -209,12 +250,3 @@ def loadobj(filename, mode='file'):
     finally:
         fobj.close()
     return object
-
-
-def dict_sweep():
-    pass
-
-def value_convert():
-    pass
-
-
