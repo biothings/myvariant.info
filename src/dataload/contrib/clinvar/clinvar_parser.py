@@ -3,11 +3,19 @@ import csv
 import re
 from itertools import imap, groupby
 import os
-from utils.dataload import unlist, dict_sweep, value_convert
 
+import vcf
 
+from utils.dataload import unlist, dict_sweep, \
+    value_convert, merge_duplicate_rows
+
+''' vcf file for clinvar downloaded from
+ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/
+and tab_delimited file for clinvar downloaded from
+ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/tab_delimited/'''
 
 VALID_COLUMN_NO = 25
+vcf_reader = vcf.Reader(filename='clinvar_20150305.vcf.gz')
 
 
 # split id lists into dictionary
@@ -42,7 +50,7 @@ def _map_line_to_json(fields):
 
     seq = re.findall(r'[ATCGMNHYR]+|[0-9]+', cds)[-1]
     replace = re.findall(r'[ATCGMNYR=]+', cds)
-    sub = re.search(r'[ATCGMNHYR]+>[ATCGMNHYR]+', cds)
+    sub = re.search(r'\d([ATCGMNHKRY]>[ATCGMNHKRY])', cds)
     ins = re.search(r'ins[ATCGMNHYR]+|ins[0-9]+', cds)
     delete = fields[1] == 'deletion'
     indel = fields[1] == 'indel'
@@ -54,29 +62,47 @@ def _map_line_to_json(fields):
     elif delete:
         ins = None
         indel = None
-    if sub:
-        HGVS = "chr%s:g.%s%s" % (chrom, chromStart, sub.group())
+    # parse from vcf file. Input chrom number
+    # and chromStart, and return REF, ALT
+    if chromStart:
+        record = vcf_reader.fetch(chrom, int(chromStart))
+    else:
+        record = None
+    if record:
+        REF = record.REF
+        ALT = record.ALT
+        ALT = ALT[0]
+        if record.is_snp and len(ALT) < 2:
+            mod = [REF, ALT]
+        else:
+            mod = ALT
+    else:
+        return
+
+    if sub and record.is_snp:
+            HGVS = "chr%s:g.%s%s>%s" % (chrom, chromStart, mod[0], mod[1])
     elif ins:
-        HGVS = "chr%s:g.%s_%s%s" % (chrom, chromStart, chromEnd, ins.group())
+        HGVS = "chr%s:g.%s_%sins%s" % (chrom, chromStart, chromEnd, mod)
     elif delete:
         HGVS = "chr%s:g.%s_%sdel" % (chrom, chromStart, chromEnd)
     elif indel:
         try:
-            HGVS = "chr%s:g.%s_%sdel%s" % (chrom, chromStart, chromEnd, ins.group())
+            HGVS = "chr%s:g.%s_%sdelins%s" % (chrom, chromStart, chromEnd, mod)
         except AttributeError:
             print "ERROR:", fields[1], cds
     elif dup:
-        HGVS = "chr%s:g.%s_%sdup%s" % (chrom, chromStart, chromEnd, seq)
+        HGVS = "chr%s:g.%s_%sdup%s" % (chrom, chromStart, chromEnd, mod)
     elif inv:
-        HGVS = "chr%s:g.%s_%sinv%s" % (chrom, chromStart, chromEnd, inv.group())
+        HGVS = "chr%s:g.%s_%sinv%s" % (chrom, chromStart, chromEnd, mod)
     elif replace:
-        HGVS = "chr%s:g.%s_%s%s" % (chrom, chromStart, chromEnd, replace)
+        HGVS = "chr%s:g.%s_%s%s" % (chrom, chromStart, chromEnd, mod)
     else:
         print 'ERROR:', fields[1], cds
 
     # load as json data
     if HGVS is None:
-        return
+        print 'None:', fields[1], cds
+        return None
 
     one_snp_json = {
 
@@ -123,16 +149,18 @@ def _map_line_to_json(fields):
 
 # open file, parse, pass to json mapper
 def load_data(input_file):
-    os.system("sort -t$'\t' -k14 -k15 -k20 -n %s > %s_sorted.tsv" % (input_file, input_file))
+    os.system("sort -t$'\t' -k14 -k15 -k20 -n %s > %s_sorted.tsv" \
+              % (input_file, input_file))
     open_file = open("%s_sorted.tsv" % (input_file))
     print input_file
     clinvar = csv.reader(open_file, delimiter="\t")
     clinvar = (row for row in clinvar
-                if row[18] != '-' and
-                row[18].find('?') == -1 and
-                row[13] != "" and
-                row[12] == "GRCh37" and
-                not re.search(r'p.', row[18]))
+               if row[18] != '-' and
+               row[18].find('?') == -1 and
+               row[13] != "" and
+               row[12] == "GRCh37" and
+               not re.search(r'p.', row[18]))
     json_rows = (row for row in imap(_map_line_to_json, clinvar) if row)
-    row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
+    row_groups = (it for (key, it) in groupby(json_rows, lambda row:
+                  row["_id"]))
     return (merge_duplicate_rows(rg, "clinvar") for rg in row_groups)
