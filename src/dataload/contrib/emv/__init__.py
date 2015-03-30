@@ -1,13 +1,14 @@
-# -*- coding: utf-8 -*-
 from .emv_parser import load_data as _load_data
 
 ## must convert column 3, the coding HGVS nomenclature, to genomic.
 ## paste new column to file before loading data
 EMV_INPUT_FILE = '/opt/myvariant.info/load_archive/emv.csv*'
 
+
 def load_data():
     emv_data = _load_data(EMV_INPUT_FILE)
     return emv_data
+
 
 def get_mapping():
     mapping = {
@@ -39,5 +40,3 @@ def get_mapping():
         }
     }
     return mapping
-
-
