@@ -22,9 +22,7 @@ def _map_line_to_json(fields):
     
     if chrom == '23':
         chrom = chrom.replace('23', 'X')
-        
     HGVS = "chr%s:%s" % (chrom, vid[1])
-        
     # load as json data
     if HGVS is None:
         return
@@ -51,13 +49,13 @@ def _map_line_to_json(fields):
 
 # open file, parse, pass to json mapper
 def data_generator(input_file):
-    os.system("sort -t$'\t' -k1 -n %s > %s_sorted.csv" % (input_file, input_file))
-    open_file = open("%s_sorted.csv" % (input_file))
+    sorted = input_file.split(".")[0] 
+    os.system("sort -t$'\t' -k1 -n %s > %s_sorted.csv" % (input_file, sorted))
+    open_file = open("%s_sorted.csv" % (sorted))
     emv = csv.reader(open_file, delimiter=",")
     # Skip header
     emv.next()
     emv = ifilter(lambda x: x[0], emv)
-    emv = (row for row in emv if len(row[3].split(";")) == 1)
     json_rows = imap(_map_line_to_json, emv)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "emv") for rg in row_groups )
@@ -66,7 +64,7 @@ def data_generator(input_file):
 # load path and find files, pass to data_generator
 def load_data(path):
     for input_file in sorted(glob.glob(path)):
-        print input_file
+        print(input_file)
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json

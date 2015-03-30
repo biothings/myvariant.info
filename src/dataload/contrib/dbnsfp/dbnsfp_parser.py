@@ -13,12 +13,12 @@ def _map_line_to_json(fields):
     if fields[7] == ".":
         hg18_end = "."
     else:
-        hg18_end = int(fields[7])+1
+        hg18_end = int(fields[7])
     chromStart = int(fields[1])
-    chromEnd = int(fields[1]) + 1
-    allele1 = fields[2].upper()
-    allele2 = fields[3].upper()
-    HGVS = "chr%s:g.%d%s>%s" % (chrom, chromStart, allele1, allele2)
+    chromEnd = int(fields[1])
+    ref = fields[2].upper()
+    alt = fields[3].upper()
+    HGVS = "chr%s:g.%d%s>%s" % (chrom, chromStart, ref, alt)
 
     if fields[77] == ".":
         siphy = "."
@@ -36,6 +36,7 @@ def _map_line_to_json(fields):
         "_id": HGVS,
         "dbnsfp":
             {
+		"risd" : fields[6],
                 "chrom": chrom,
                 "hg19":
                     {
@@ -50,10 +51,11 @@ def _map_line_to_json(fields):
                 "hg38":
                     {
                         "chrom": fields[8],
-                        "pos": fields[9]
+                        "start": fields[9],
+			"end" : fields[9]
                     },
-                "allele1": allele1,
-                "allele2": allele2,
+                "ref": ref,
+                "alt": alt,
                 "aa":
                     {
                         "ref": fields[4],
@@ -243,7 +245,7 @@ def _map_line_to_json(fields):
                 "clinvar":
                     {
                         "rs": fields[114],
-                        "clin_sig": fields[115],
+                        "clinsig": fields[115],
                         "trait": fields[116]
                     }
             }
