@@ -54,20 +54,20 @@ def _map_line_to_json(fields):
         "_id": HGVS,
         "evs":
             {
-                "grch37":
+                "hg19":
                     {
                         "chr": fields[0].split(":")[0],
                         "pos": fields[0].split(":")[1]
                     },
-                "grch38":
+                "hg38":
                     {
                         "chr": fields[30].split(":")[0],
                         "pos": fields[30].split(":")[1]
                     },
-                "rs_id": fields[1],
-                "db_snp_version": fields[2],
-                "allele1": fields[3].split(">")[0],
-                "allele2": fields[3].split(">")[1],
+                "rsid": fields[1],
+                "dbsnp_version": fields[2],
+                "ref": fields[3].split(">")[0],
+                "alt": fields[3].split(">")[1],
                 "allele_count":
                     {
                         "european_american": count_dict(fields[4]),
@@ -135,9 +135,8 @@ def data_generator(input_file):
     evs = islice(evs, 8, None)
     evs = (row for row in evs if ":" in row[30] and \
             len(row) == VALID_COLUMN_NO)
-    #for row in evs:
-    #    docs = [doc for doc in doc[3].split(";")]
-    #    json_row = _map_line_to_json() for doc
+    # skip rows with multiple mutations 
+    evs = (row for row in evs if len(row[3].split(";")) == 1)
     json_rows = imap(_map_line_to_json, evs)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "evs") for rg in row_groups)
