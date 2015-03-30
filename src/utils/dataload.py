@@ -24,7 +24,7 @@ def dict_sweep(d, vals=[".", "-", "", "NA", "none", " ", "Not Available"]):
         elif isinstance(val, list):
             for item in val:
                 if item in vals:
-                    del item
+                    val.remove(item)
                 elif isinstance(item, dict):
                     dict_sweep(item, vals)
             if len(val) == 0:

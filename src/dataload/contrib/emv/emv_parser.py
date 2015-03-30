@@ -46,10 +46,9 @@ def _map_line_to_json(fields):
 
 # open file, parse, pass to json mapper
 def data_generator(input_file):
-    sorted = input_file.split(".")[0]
     # sort by the first column (hgvs id returned from Mutalyzer)
-    os.system("sort -t$'\t' -k1 -n %s > %s_sorted.csv" % (input_file, sorted))
-    open_file = open("%s_sorted.csv" % (sorted))
+    os.system("sort -t$'\t' -k1 -n %s > %s.sorted" % (input_file, input_file))
+    open_file = open("%s.sorted" % (input_file))
     emv = csv.reader(open_file, delimiter=",")
     # Skip header
     emv.next()
@@ -61,8 +60,8 @@ def data_generator(input_file):
 
 # load path and find files, pass to data_generator
 def load_data(path):
-    for input_file in sorted(glob.glob(path)):
-        print(input_file)
-        data = data_generator(input_file)
-        for one_snp_json in data:
-            yield one_snp_json
+    #input_file = glob.glob(path)
+    #print(input_file)
+    #data = data_generator(input_file)
+    for one_snp_json in data_generator(path):
+        yield one_snp_json
