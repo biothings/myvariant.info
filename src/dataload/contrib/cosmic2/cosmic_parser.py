@@ -33,7 +33,7 @@ def _map_line_to_json(fields):
     elif delete:
         HGVS = "chr%s:g.%s_%sdel" % (chrom, chromStart, chromEnd)
     elif del_ins:
-        HGVS = "chr%s:g.%s_%sdelins%s" % (chrom, chromStart, chromEnd, comp.group())    
+        HGVS = "chr%s:g.%s_%sdelins%s" % (chrom, chromStart, chromEnd, comp.group())
     #elif comp:
     #    HGVS = "chr%s:g.%s_%s%s" % (chrom, chromStart, chromEnd, comp.group())
     else:
@@ -89,13 +89,13 @@ def _map_line_to_json(fields):
             }
         }
     return dict_sweep(value_convert(one_snp_json), vals=[""])
-    
+
 
 # open file, parse, pass to json mapper
 def load_data(input_file):
     #os.system("sort -t$'\t' -k18 -k14 %s > %s_sorted.tsv" % (input_file, input_file))
     #open_file = open("%s_sorted.tsv" % (input_file))
-    open_file = open(input_file)    
+    open_file = open(input_file)
     open_file = csv.reader(open_file, delimiter="\t")
     cosmic = []
     for row in open_file:
@@ -110,9 +110,8 @@ def load_data(input_file):
     cosmic = sorted(cosmic, key=operator.itemgetter(17), reverse=True)
     cosmic = ifilter(lambda row:
                 row[17] != "" and
-                row[13] != "", cosmic)          
+                row[13] != "", cosmic)
     json_rows = imap(_map_line_to_json, cosmic)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "cosmic") for rg in row_groups)
-

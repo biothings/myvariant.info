@@ -1,17 +1,72 @@
-# -*- coding: utf-8 -*-
-
 from .evs_parser import load_data as _load_data
 
 EVS_INPUT_FILE = '/opt/myvariant.info/load_archive/evs/ESP6500SI-V2-SSA137.GRCh38-liftover.chr*'
+
 
 def load_data():
     evs_data = _load_data(EVS_INPUT_FILE)
     return evs_data
 
+
 def get_mapping():
     mapping = {
         "evs": {
             "properties": {
+                "chrom": {
+                    "type": "string"
+                },
+                "hg19": {
+                    "properties": {
+                        "start": {
+                            "type": "long"
+                        },
+                        "end": {
+                            "type": "long"
+                        }
+                    }
+                },
+                "hg38": {
+                    "properties": {
+                        "start": {
+                            "type": "long"
+                        },
+                        "end": {
+                            "type": "long"
+                        }
+                    }
+                },
+                "ref": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "alt": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "gene": {
+                    "properties": {
+                        "symbol": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "accession": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        }
+                    }
+                },
+                "hgvs": {
+                    "properties": {
+                        "coding": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "protein": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        }
+                    }
+                },
                 "clinical_info": {
                     "type": "string",
                     "analyzer": "string_lowercase"
@@ -23,7 +78,7 @@ def get_mapping():
                 "grantham_score": {
                     "type": "float"
                 },
-                "rs_id": {
+                "rsid": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 }
@@ -31,4 +86,3 @@ def get_mapping():
         }
     }
     return mapping
-

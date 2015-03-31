@@ -1,9 +1,12 @@
-
-import re
-import glob
-import csv
-from itertools import imap, groupby, ifilter
 import os
+import re
+import csv
+from itertools import groupby, ifilter
+try:
+    import itertools.imap as map
+except ImportError:
+    pass
+
 from utils.dataload import dict_sweep, value_convert, unlist, merge_duplicate_rows
 
 ## merge EMV file with genomic ID file
@@ -53,7 +56,7 @@ def data_generator(input_file):
     # Skip header
     emv.next()
     emv = ifilter(lambda x: x[0], emv)
-    json_rows = imap(_map_line_to_json, emv)
+    json_rows = map(_map_line_to_json, emv)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "emv") for rg in row_groups)
 
