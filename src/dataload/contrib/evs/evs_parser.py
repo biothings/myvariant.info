@@ -1,7 +1,10 @@
-# -*- coding: utf-8 -*-
 import csv
 import glob
-from itertools import islice, groupby, imap
+from itertools import islice, groupby
+try:
+    import itertools.imap as map
+except ImportError:
+    pass
 from utils.dataload import dict_sweep, value_convert, merge_duplicate_rows
 from utils.hgvs import get_hgvs_from_vcf
 from utils.hgvs import get_pos_start_end
@@ -138,7 +141,7 @@ def data_generator(input_file):
            len(row) == VALID_COLUMN_NO)
     # skip rows with multiple mutations
     evs = (row for row in evs if len(row[3].split(";")) == 1)
-    json_rows = imap(_map_line_to_json, evs)
+    json_rows = map(_map_line_to_json, evs)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "evs") for rg in row_groups)
 

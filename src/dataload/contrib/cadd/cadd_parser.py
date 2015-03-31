@@ -1,7 +1,11 @@
 from __future__ import print_function
 import time
 import pysam
-from itertools import groupby, imap
+from itertools import groupby
+try:
+    import itertools.imap as map
+except ImportError:
+    pass
 from utils.dataload import dict_sweep, unlist, value_convert, merge_duplicate_rows
 from utils.common import timesofar
 from utils.mongo import get_src_db
@@ -203,9 +207,9 @@ def _map_line_to_json(fields):
 
 def fetch_generator(tabix, contig):
     fetch = tabix.fetch(contig)
-    rows = imap(lambda x: x.split('\t'), fetch)
+    rows = map(lambda x: x.split('\t'), fetch)
     annos = (row for row in rows if "CodingTranscript" in row[9])
-    json_rows = imap(_map_line_to_json, annos)
+    json_rows = map(_map_line_to_json, annos)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
