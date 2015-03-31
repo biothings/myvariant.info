@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+from __future__ import unicode_literals
 import itertools
 import csv
-from utils.common import timesofar, open_anyfile
-import pymongo
-import time
+from utils.common import open_anyfile
 """
 Utility functions for parsing flatfiles,
 mapping to JSON, cleaning.
@@ -113,27 +112,6 @@ def merge_duplicate_rows(rows, db):
     return first_row
 
 
-# load collection into mongodb
-def load_collection(database, src_module, collection_name):
-    """
-    : param database: mongodb url
-    : param input_file_list: variant docs, path to file
-    : param collection_name: annotation source name
-    """
-    conn = pymongo.MongoClient(database)
-    db = conn.variantdoc
-    posts = db[collection_name]
-    t1 = time.time()
-    cnt = 0
-    src_data = src_module.load_data()
-    for doc in src_data:
-        posts.insert(doc, manipulate=False, check_keys=False, w=0)
-        cnt += 1
-        if cnt % 100000 == 0:
-            print(cnt, timesofar(t1))
-    print("successfully loaded %s into mongodb" % collection_name)
-
-
 def unique_ids(src_module):
     i = src_module.load_data()
     out = list(i)
@@ -158,7 +136,7 @@ def rec_handler(infile, as_list=False, block_end='\n'):
 
 def tabfile_feeder(datafile, header=1, sep='\t',
                    includefn=None,
-                   coerce_unicode=True,
+                   # coerce_unicode=True,   # no need here because importing unicode_literals at the top
                    assert_column_no=None):
     '''a generator for each row in the file.'''
 
@@ -178,10 +156,11 @@ def tabfile_feeder(datafile, header=1, sep='\t',
                         raise ValueError(err)
                 if not includefn or includefn(ld):
                     lineno += 1
-                    if coerce_unicode:
-                        yield [unicode(x, encoding='utf-8', errors='replace') for x in ld]
-                    else:
-                        yield ld
+                    # if coerce_unicode:
+                    #     yield [unicode(x, encoding='utf-8', errors='replace') for x in ld]
+                    # else:
+                    #     yield ld
+                    yield ld
         except ValueError:
             print("Error at line number:", lineno)
             raise
