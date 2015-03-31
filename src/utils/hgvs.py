@@ -66,3 +66,23 @@ def get_hgvs_from_vcf(chr, pos, ref, alt):
     else:
         raise ValueError("Cannot convert {} into HGVS id.".format((chr, pos, ref, alt)))
     return hgvs
+
+
+def get_pos_start_end(chr, pos, ref, alt):
+    '''get start,end tuple from VCF-style "chr, pos, ref, alt" data.'''
+    if len(ref) == len(alt) == 1:
+        # this is a SNP
+        start = end = pos
+    elif len(ref) > 1 and len(alt) == 1:
+        # this is a deletion:
+        assert ref[0] == alt
+        start = pos + 1
+        end = pos + len(ref) - 1
+    elif len(ref) == 1 and len(alt) > 1:
+        # this is a insertion
+        assert alt[0] == ref
+        start = pos
+        end = pos + 1
+    else:
+        raise ValueError("Cannot decide start/end from {}.".format((chr, pos, ref, alt)))
+    return start, end
