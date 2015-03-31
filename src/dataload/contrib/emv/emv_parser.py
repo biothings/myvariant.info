@@ -47,7 +47,7 @@ def _map_line_to_json(fields):
 # open file, parse, pass to json mapper
 def data_generator(input_file):
     # sort by the first column (hgvs id returned from Mutalyzer)
-    os.system("sort -t$'\t' -k1 -n %s > %s.sorted" % (input_file, input_file))
+    os.system("sort -k1 -n %s > %s.sorted" % (input_file, input_file))
     open_file = open("%s.sorted" % (input_file))
     emv = csv.reader(open_file, delimiter=",")
     # Skip header

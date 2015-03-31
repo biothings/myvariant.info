@@ -5,6 +5,7 @@ import re
 from itertools import islice, groupby, imap
 from utils.dataload import dict_sweep, value_convert, merge_duplicate_rows
 from utils.hgvs import get_hgvs_from_vcf
+from utils.hgvs import get_pos_start_end
 
 VALID_COLUMN_NO = 31
 
@@ -22,12 +23,18 @@ def count_dict(field):
     return counts
  
 
+def get_dbsnp(field):
+    try:
+        return field.split("_")[1]
+    except:
+        return "none"
+
 # convert one snp to json
 def _map_line_to_json(fields):        
     chrInfo = fields[0].split(":")  # grch37
     chrom = chrInfo[0]
     chromStart = int(chrInfo[1])
-
+    
     ma_fin_percent = fields[7].split("/")
     
     if fields[3]:
@@ -35,16 +42,9 @@ def _map_line_to_json(fields):
         ref = mutation[0]
         alt = mutation[1]
         HGVS = get_hgvs_from_vcf(chrom, chromStart, ref, alt)
-	#if len(ref) > len(alt):
-        #    chromEnd = chromStart + (len(ref) - len(alt))
-        #    HGVS = "chr%s:g.%d_%ddel" % (chrom, chromStart, chromEnd)
-            
-        #elif len(ref) < len(alt):
-        #    chromEnd = chromStart + (len(alt) - len(ref))
-        #    HGVS = "chr%s:g.%d_%dins%s" % (chrom, chromStart, chromEnd, alt[1:])
-        #elif len(ref) == len(alt) == 1:
-	#    HGVS = "chr%s:g.%d%s" % (chrom, chromStart, fields[3])  
-            
+	hg19 = get_pos_start_end(chrom, chromStart, ref, alt)
+	hg38 = get_pos_start_end(chrom, int(fields[30].split(":")[1]), ref, alt)	
+
     # load as json data
     if HGVS is None:
         return
@@ -54,20 +54,21 @@ def _map_line_to_json(fields):
         "_id": HGVS,
         "evs":
             {
-                "hg19":
+                "chrom": chrom,
+		"hg19":
                     {
-                        "chr": fields[0].split(":")[0],
-                        "pos": fields[0].split(":")[1]
+                        "start": hg19[0],
+                        "end": hg19[1]
                     },
                 "hg38":
                     {
-                        "chr": fields[30].split(":")[0],
-                        "pos": fields[30].split(":")[1]
+                        "start": hg38[0],
+                        "end": hg38[1]
                     },
                 "rsid": fields[1],
-                "dbsnp_version": fields[2],
-                "ref": fields[3].split(">")[0],
-                "alt": fields[3].split(">")[1],
+                "dbsnp_version": get_dbsnp(fields[2]),
+                "ref": ref,
+                "alt": alt,
                 "allele_count":
                     {
                         "european_american": count_dict(fields[4]),
@@ -89,7 +90,7 @@ def _map_line_to_json(fields):
                 "avg_sample_read": fields[11],
                 "gene":
                     {
-                        "id": fields[12],
+                        "symbol": fields[12],
                         "accession": fields[13]
                     },
                 "function_gvs": fields[14],
