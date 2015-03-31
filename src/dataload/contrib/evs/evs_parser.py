@@ -146,7 +146,7 @@ def data_generator(input_file):
 # load path and find files, pass to data_generator
 def load_data(path):
     for input_file in sorted(glob.glob(path)):
-        print input_file
+        print(input_file)
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
