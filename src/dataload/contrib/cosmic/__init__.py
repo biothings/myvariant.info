@@ -1,6 +1,8 @@
 from __future__ import print_function
-from builtins import range
-import MySQLdb
+try:
+    import MySQLdb
+except:
+    pass
 
 # This script produces simple JSON from UCSC variant data
 # Draws from the cosmicRaw database directly
