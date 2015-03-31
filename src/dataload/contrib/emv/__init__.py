@@ -2,7 +2,7 @@ from .emv_parser import load_data as _load_data
 
 ## must convert column 3, the coding HGVS nomenclature, to genomic.
 ## paste new column to file before loading data
-EMV_INPUT_FILE = '/opt/myvariant.info/load_archive/emv.csv*'
+EMV_INPUT_FILE = '/opt/myvariant.info/load_archive/emv/emv.csv'
 
 
 def load_data():

@@ -36,7 +36,7 @@ def _map_line_to_json(fields):
         "_id": HGVS,
         "dbnsfp":
             {
-		"risd" : fields[6],
+                "risd": fields[6],
                 "chrom": chrom,
                 "hg19":
                     {
@@ -52,7 +52,7 @@ def _map_line_to_json(fields):
                     {
                         "chrom": fields[8],
                         "start": fields[9],
-			"end" : fields[9]
+                        "end": fields[9]
                     },
                 "ref": ref,
                 "alt": alt,

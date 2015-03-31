@@ -5,7 +5,7 @@ from itertools import groupby, imap
 from utils.dataload import dict_sweep, unlist, value_convert, merge_duplicate_rows
 from utils.common import timesofar
 from utils.mongo import get_src_db
-
+from utils.hgvs import get_hgvs_from_vcf
 ## tabix file links from CADD http://cadd.gs.washington.edu/download
 ## whole genome SNVs including annotations
 whole_genome = 'http://krishna.gs.washington.edu/download/CADD/v1.2/whole_genome_SNVs_inclAnno.tsv.gz'
@@ -17,6 +17,8 @@ thousandgp = '/opt/myvariant.info/load_archive/cadd/1000G_inclAnno.tsv.gz'
 exac = 'opt/myvariant.info/load_archive/cadd/ExAC.r0.2_inclAnno.tsv.gz'
 ## ESP6500 variants SNVs and InDels including all annotations
 esp = 'opt/myvariant.info/load_archive/cadd/ESP6500SI_inclAnno.tsv.gz'
+## All Indels including annotations
+indels = 'http://krishna.gs.washington.edu/download/CADD/v1.2/InDels_inclAnno.tsv.gz'
 
 ## number of fields/annotations
 VALID_COLUMN_NO = 116
@@ -29,9 +31,9 @@ def _map_line_to_json(fields):
     assert len(fields) == VALID_COLUMN_NO
     chrom = fields[0]
     chromStart = fields[1]
-    allele1 = fields[2]
-    allele2 = fields[4]
-    HGVS = "chr%s:g.%s%s>%s" % (chrom, chromStart, allele1, allele2)
+    ref = fields[2]
+    alt = fields[4]
+    HGVS = get_hgvs_from_vcf(chrom, chromStart, ref, alt)
 
     # load as json data
     if HGVS is None:
@@ -215,7 +217,7 @@ def load_contig(contig):
     '''
     #if CADD_INPUT == "exome":
     #CADD_INPUT = exome
-    tabix = pysam.Tabixfile(whole_genome)
+    tabix = pysam.Tabixfile(indels)
     src_db = get_src_db()
     target_coll = src_db["cadd"]
     t0 = time.time()
