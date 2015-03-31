@@ -124,9 +124,10 @@ def verify_collection(collection, return_ids=False, step=10000):
     return stats
 
 
-def create_index(index_name):
+def create_index(index_name, mapping=None):
     body = {'settings': {'number_of_shards': 10}}
-    mapping = {"mappings": get_mapping()}
+    mapping = mapping or get_mapping()
+    mapping = {"mappings": mapping}
     body.update(mapping)
     es.indices.create(index=index_name, body=body)
 
