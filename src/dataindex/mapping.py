@@ -117,3 +117,42 @@ mapping_wellderly = {
         }
     }
 }
+
+
+# this is a minimal mapping for myvariant_merged index
+# each data source field just need to index one common field
+# (that is, this field need to exist in every documents)
+minimal_field_d = {
+    "dbsnp": "chrom",
+    "dbnsfp": "chrom",
+    "cadd": "chrom",
+    "clinvar": "type",
+    "mutdb": "chrom",
+    "gwassnps": "chrom",
+    "cosmic": "chrom",
+    "docm": "chrom",     # TODO: change chromosome_name to chrom
+    "snpedia": "text",
+    #"emv":
+    "wellderly": "chrom"  # TODO: change chr to chrom
+}
+
+mapping_merged = {}
+
+for _src in minimal_field_d:
+    _field = minimal_field_d[_src]
+    _type = 'string'
+    mapping_merged[_src] = {
+        "properties": {
+            _field: {
+                "type": _type
+            }
+        }
+    }
+
+mapping_merged = {
+    "variant": {
+        "include_in_all": False,
+        "dynamic": False,
+        "properties": mapping_merged
+    }
+}
