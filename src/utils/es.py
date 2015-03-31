@@ -147,7 +147,7 @@ class ESIndexer():
         if verbose:
             print("Finished! [{}]".format(timesofar(t0)))
 
-        assert cnt == n, "Error: scroll query terminated early, please retry.\nLast response:\n"+str(res)
+        assert cnt == n, "Error: scroll query terminated early [{}, {}], please retry.\nLast response:\n{}".format(cnt, n, res)
 
     @wrapper
     def get_id_list(self, step=100000, verbose=True):
@@ -162,3 +162,62 @@ class ESIndexer():
         print(json.dumps(m, indent=2))
         if ask("Continue to update above mapping?") == 'Y':
             print(self._es.indices.put_mapping(index=self._index, doc_type=self._doc_type, body=m))
+
+    def clean_field(self, field, dryrun=True, step=5000):
+        '''remove a top-level field from ES index, if the field is the only field of the doc,
+           remove the doc as well.
+           step is the size of bulk update on ES
+           try first with dryrun turned on, and then perform the actual updates with dryrun off.
+        '''
+        q = {
+            "query": {
+                "constant_score": {
+                    "filter": {
+                        "exists": {
+                            "field": field
+                        }
+                    }
+                }
+            }
+        }
+        cnt_orphan_doc = 0
+        cnt = 0
+        _li = []
+        for doc in self.doc_feeder(query=q):
+            if set(doc) == set(['_id', field]):
+                cnt_orphan_doc += 1
+                # delete orphan doc
+                _li.append({
+                    "delete": {
+                        "_index": self._index,
+                        "_type": self._doc_type,
+                        "_id": doc['_id']
+                    }
+                })
+            else:
+                # otherwise, just remove the field from the doc
+                _li.append({
+                    "update": {
+                        "_index": self._index,
+                        "_type": self._doc_type,
+                        "_id": doc['_id']
+                    }
+                })
+                # this script update requires "script.disable_dynamic: false" setting
+                # in elasticsearch.yml
+                _li.append({"script": 'ctx._source.remove("{}")'.format(field)})
+
+            cnt += 1
+            if len(_li) == step:
+                if not dryrun:
+                    self._es.bulk(body=_li)
+                _li = []
+        if _li:
+            if not dryrun:
+                self._es.bulk(body=_li)
+
+        print("Total {} documents found:".format(cnt))
+        print("\t{} documents are updated.".format(cnt - cnt_orphan_doc))
+        print("\t{} documents are deleted.".format(cnt_orphan_doc))
+        if dryrun:
+            print("This is a dryrun, so no actual document operations.")
