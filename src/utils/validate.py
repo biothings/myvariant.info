@@ -74,6 +74,7 @@ def parse(str):
         r = mat.groups()
         return (r[0], r[1], r[2])
 
+
 def get_genome_in_bit(chr_fa_folder):
     ''' encode each chromosome fasta sequence into a bitarray,
         and store them in a dictionary with chr numbers as keys
@@ -107,6 +108,7 @@ def get_genome_in_bit(chr_fa_folder):
     print("Finished. [{}]".format(timesofar(t0)))
 
     return chr_bit_d
+
 
 class VariantValidator:
     def __init__(self):

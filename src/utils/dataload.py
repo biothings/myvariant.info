@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 from __future__ import print_function
-from __future__ import unicode_literals
+#from __future__ import unicode_literals
 import itertools
 import csv
 from utils.common import open_anyfile
@@ -122,16 +121,24 @@ def unique_ids(src_module):
     return out
 
 
-def rec_handler(infile, as_list=False, block_end='\n'):
+def rec_handler(infile, block_end='\n', skip=0, include_block_end=False, as_list=False):
     '''A generator to return a record (block of text)
        at once from the infile. The record is separated by
        one or more empty lines by default.
+       skip can be used to skip top n-th lines
+       if include_block_end is True, the line matching block_end will also be returned.
+       if as_list is True, return a list of lines in one record.
     '''
     rec_separator = lambda line: line == block_end
     with open_anyfile(infile) as in_f:
+        if skip:
+            for i in range(skip):
+                in_f.readline()
         for key, group in itertools.groupby(in_f, rec_separator):
             if not key:
-                yield (list(group) if as_list else ''.join(group))
+                if include_block_end:
+                    _g = itertools.chain(group, (block_end,))
+                yield (list(_g) if as_list else ''.join(_g))
 
 
 def tabfile_feeder(datafile, header=1, sep='\t',
