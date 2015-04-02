@@ -13,8 +13,13 @@ def get_mapping():
     mapping = {
         "dbnsfp": {
             "properties": {
+                "rsid": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
                 "chrom": {
-                    "type": "string"
+                    "type": "string",
+                    "analyzer": "string_lowercase"
                 },
                 "hg18": {
                     "properties": {
@@ -46,10 +51,10 @@ def get_mapping():
                         }
                     }
                 },
-                "allele1": {
+                "ref": {
                     "type": "string"
                 },
-                "allele2": {
+                "alt": {
                     "type": "string"
                 },
                 "aa": {
@@ -500,7 +505,7 @@ def get_mapping():
                         "rs": {
                             "type": "string"
                         },
-                        # "clin_sig": {
+                        # "clinsig": {
                         #     "type": "integer"     # can contain |, like 5|5, FIXME
                         # },
                         "trait": {
