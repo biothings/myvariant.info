@@ -14,11 +14,7 @@ def get_mapping():
     mapping = {
         "emv": {
             "properties": {
-                "egl_classification": {
-                    "type": "string",
-                    "analyzer": "string_lowercase"
-                },
-                "egl_protein": {
+                "gene": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
@@ -27,7 +23,11 @@ def get_mapping():
                     "analyzer": "string_lowercase",
                     "include_in_all": True
                 },
-                "gene": {
+                "egl_protein": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "egl_classification": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
@@ -35,6 +35,10 @@ def get_mapping():
                     "type": "string",
                     "analyzer": "string_lowercase",
                     "include_in_all": True
+                },
+                "clinvar_rcv": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
                 }
             }
         }
