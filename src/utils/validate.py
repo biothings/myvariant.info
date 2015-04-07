@@ -162,11 +162,17 @@ class VariantValidator:
                 print('"{}":\tNone(not tested).'.format(hgvs_id))
             return None
 
-    def validate_many(self, hgvs_li, verbose=False):
+    def validate_many(self, hgvs_li, verbose=False, summary=True):
         '''validate multiple hgvs variant name'''
         out = []
         for hgvs_id in hgvs_li:
             out.append(self.validate_hgvs(hgvs_id, verbose=verbose))
+
+        if summary:
+            # print out counts
+            print("# of VALID HGVS IDs:\t{0}".format(len([x for x in out if x is True])))
+            print("# of INVALID HGVS IDs:\t{0}".format(len([x for x in out if x is False])))
+            print("# of HGVS IDs skipped:\t {0}".format(len([x for x in out if x is None])))
         return out
 
     def validate_src(self, collection, return_false=False,
