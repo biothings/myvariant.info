@@ -7,16 +7,16 @@ def get_mapping():
     mapping = {
         "mutdb": {
             "properties": {
-                "dbsnp_id": {
+                "rsid": {
                     "type": "string",
                     "include_in_all": True,
                     "analyzer": "string_lowercase",
                 },
-                "allele1": {
+                "ref": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "allele2": {
+                "alt": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
@@ -35,11 +35,15 @@ def get_mapping():
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "chromStart": {
-                    "type": "long"
-                },
-                "chromEnd": {
-                    "type": "long"
+                "hg19": {
+                    "properties": {
+                        "start": {
+                            "type": "long"
+                        },
+                        "end": {
+                            "type": "long"
+                        }
+                    }
                 },
                 "strand": {
                     "type": "string",
