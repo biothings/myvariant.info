@@ -1,5 +1,14 @@
 from .evs_parser import load_data as _load_data
 
+
+__METADATA__ = {
+    "src_name": 'EVS',
+    "src_url": 'http://evs.gs.washington.edu/EVS/',
+    "version": "2",
+    "field": "evs"
+}
+
+
 EVS_INPUT_FILE = '/opt/myvariant.info/load_archive/evs/ESP6500SI-V2-SSA137.GRCh38-liftover.chr*'
 
 

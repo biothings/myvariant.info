@@ -1,3 +1,11 @@
+__METADATA__ = {
+    "src_name": 'MutDB',
+    "src_url": 'http://www.mutdb.org/',
+    "version": None,
+    "field": "mutdb"
+}
+
+
 def load_data():
     '''mutdb data are preloaded in our db.'''
     raise NotImplementedError

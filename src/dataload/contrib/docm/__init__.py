@@ -1,3 +1,11 @@
+__METADATA__ = {
+    "src_name": 'DOCM',
+    "src_url": 'http://docm.genome.wustl.edu/',
+    "version": None,
+    "field": "docm"
+}
+
+
 def load_data():
     '''docm data are pre-loaded in our db.'''
     raise NotImplementedError

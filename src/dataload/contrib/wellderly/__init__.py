@@ -1,3 +1,12 @@
+
+__METADATA__ = {
+    "src_name": 'Wellderly',
+    "src_url": 'http://www.stsiweb.org/wellderly/',
+    "version": None,
+    "field": "wellderly"
+}
+
+
 def load_data():
     '''wellderly data are pre-loaded in our db.'''
     raise NotImplementedError

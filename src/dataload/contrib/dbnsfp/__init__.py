@@ -1,6 +1,14 @@
 from .dbnsfp_parser import load_data as _load_data
 
 
+__METADATA__ = {
+    "src_name": 'dbNSFP',
+    "src_url": 'https://sites.google.com/site/jpopgen/dbNSFP',
+    "version": '2.9',
+    "field": 'dbnsfp'
+}
+
+
 DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP2.9_variant*'
 
 
