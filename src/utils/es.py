@@ -110,6 +110,24 @@ class ESIndexer():
         return _res if raw else _res['count']
 
     @wrapper
+    def count_src(self, src):
+        if isinstance(src, str):
+            src = [src]
+        cnt_d = {}
+        for _src in src:
+            q = {
+                "query": {
+                    "constant_score": {
+                        "filter": {
+                            "exists": {"field": _src}
+                        }
+                    }
+                }
+            }
+            cnt_d[_src] = self.count(q)
+        return cnt_d
+
+    @wrapper
     def doc_feeder(self, step=10000, verbose=True, query=None, scroll='10m', **kwargs):
         q = query if query else {'query': {'match_all': {}}}
         _q_cnt = self.count(q=q, raw=True)
