@@ -37,22 +37,23 @@ def load_data(step=1000, offset=0):
         trait = snp[9]
         riskAllele = snp[14]
         pValue = snp[16]
-        # parse from myvariant.info to get hgvs_id, ref, alt information
-        http = 'http://localhost:8000/v1/query?q=dbsnp.rsid:'\
+        # parse from myvariant.info to get hgvs_id, ref, alt information based on rsid
+        url = 'http://localhost:8000/v1/query?q=dbsnp.rsid:'\
                + rsid + '&fields=_id,dbsnp.ref,dbsnp.alt,dbsnp.chrom,dbsnp.hg19'
-        r = requests.get(http)
-        if len(r.json()['hits']) == 1:
-            HGVS = r.json()['hits'][0]['_id']
-        else:
-            HGVS = []
-            for i in range(len(r.json()['hits'])):
-                HGVS.append(r.json()['hits'][i]['_id'])
-        one_snp_json = {
-            "_id": HGVS,
-            "rsid": rsid,
-            "pubMedID": pubMedID,
-            "trait": trait,
-            "riskAllele": riskAllele,
-            "pValue": pValue,
-        }
-        yield one_snp_json
+        r = requests.get(url)
+        for hits in r.json()['hits']:
+            HGVS = hits['_id']
+            
+            one_snp_json = {
+            # plus 'gwas'
+                "_id": HGVS,
+                "gwassnp":
+                    {
+                        "rsid": rsid,
+                        "pubmed": pubMedID,
+                        "trait": trait,
+                        "risk_allele": riskAllele,
+                        "pvalue": pValue,
+                    }
+            }
+            yield one_snp_json
