@@ -24,10 +24,10 @@ if src_path not in sys.path:
     sys.path.append(src_path)
 #from config import INCLUDE_DOCS
 #from utils.es import ESQuery
-from .helper import add_apps   # , BaseHandler
-from .api.handlers import APP_LIST as api_app_list
-from .beacon.handlers import APP_LIST as beacon_app_list
 
+from helper import add_apps, BaseHandler
+from api.handlers import APP_LIST as api_app_list
+from beacon.handlers import APP_LIST as beacon_app_list
 
 __USE_WSGI__ = False
 #DOCS_STATIC_PATH = os.path.join(src_path, 'docs/_build/html')
@@ -51,9 +51,31 @@ class MainHandler(tornado.web.RequestHandler):
         #if INCLUDE_DOCS:
             self.render(os.path.join(STATIC_PATH, 'index.html'))
 
+class MetaDataHandler(BaseHandler):
+    disable_caching = True
+
+    def get(self):
+        # For now, just return a hardcoded object, later we'll actually query the ES db for this information
+        self.return_json({
+            "stats": {
+                "total": 115979300,
+                "dbnsfp": 84580288,
+                "dbsnp": 13392109,
+                "clinvar": 88568,
+                "mutdb": 420246,
+                "gwassnps": 15030,
+                "cosmic": 1024759,
+                "docm": 1119,
+                "snpedia": 5907,
+                "EMVClass": 12066,
+                "Wellderly": 19785313
+            }
+        })
+
 
 APP_LIST = [
     (r"/", MainHandler),
+    (r"/metadata", MetaDataHandler),
 ]
 
 APP_LIST += add_apps('api', api_app_list)
