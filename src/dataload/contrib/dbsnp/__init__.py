@@ -2,6 +2,14 @@ from __future__ import print_function
 from .dbsnp_vcf_parser import parse_vcf
 
 
+__METADATA__ = {
+    "src_name": 'dbSNP',
+    "src_url": 'http://www.ncbi.nlm.nih.gov/SNP/',
+    "version": '142',
+    "field": "dbsnp"
+}
+
+
 infile = "/opt/myvariant.info/load_archive/dbsnp/00-All.vcf.gz"
 
 

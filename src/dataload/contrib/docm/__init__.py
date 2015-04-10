@@ -1,3 +1,11 @@
+__METADATA__ = {
+    "src_name": 'DOCM',
+    "src_url": 'http://docm.genome.wustl.edu/',
+    "version": None,
+    "field": "docm"
+}
+
+
 def load_data():
     '''docm data are pre-loaded in our db.'''
     raise NotImplementedError
@@ -13,11 +21,11 @@ def get_mapping():
                 "all_domains": {
                     "type": "string"
                 },
-                "reference": {
+                "ref": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "variant": {
+                "alt": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
@@ -61,11 +69,15 @@ def get_mapping():
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "start": {
-                    "type": "long"
-                },
-                "stop": {
-                    "type": "long"
+                "hg19": {
+                    "properties": {
+                        "start": {
+                            "type": "long"
+                        },
+                        "end": {
+                            "type": "long"
+                        }
+                    }
                 },
                 "strand": {
                     "type": "byte",
@@ -75,7 +87,7 @@ def get_mapping():
                     "type": "string",
                     "index": "no"
                 },
-                "gene_name_source": {
+                "genename_source": {
                     "type": "string",
                     "index": "no"
                 },
@@ -83,7 +95,7 @@ def get_mapping():
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "amino_acid_change": {
+                "aa_change": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
@@ -107,7 +119,7 @@ def get_mapping():
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "chromosome_name": {
+                "chrom": {
                     "type": "string",                 # actual value is integer
                     "analyzer": "string_lowercase"
                 },
@@ -115,7 +127,7 @@ def get_mapping():
                     "type": "string",
                     "index": "no"
                 },
-                "gene_name": {
+                "genename": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },

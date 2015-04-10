@@ -86,3 +86,30 @@ def get_pos_start_end(chr, pos, ref, alt):
     else:
         raise ValueError("Cannot decide start/end from {}.".format((chr, pos, ref, alt)))
     return start, end
+
+
+def fix_hgvs_indel(hgvs_id):
+    """Fix hgvs id like these:
+         'chr19:g.58863869C>-',
+         'chr10:g.52596077->T',
+         'chr10:g.52596077->T',
+         'chr12:g.8998751T>-',
+         'chr12:g.9004916C>-',
+    """
+    _hgvs_id = None
+    pat_snp = '(chr\w+:g\.(\d+))([\w-])\>([\w-])'
+    if re.match(pat_snp, hgvs_id):
+        g = re.match(pat_snp, hgvs_id).groups()
+        pos, ref, alt = g[1:]
+        if ref == '-':
+            # should be insertion
+            _hgvs_id = '{}ins{}'.format(g[0], alt)
+        elif alt == '-':
+            # should be deletion
+            end = int(pos) + len(ref) - 1
+            _hgvs_id = '{0}_{1}del'.format(g[0], end)
+        else:
+            print("Error: either cannot fix or no need to fix: ", hgvs_id)
+    else:
+        print("Error: hgvs id not in a fixable format: ", hgvs_id)
+    return _hgvs_id

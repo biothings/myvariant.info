@@ -1,9 +1,13 @@
 import os
 import re
 import csv
-from itertools import groupby, ifilter
+from itertools import groupby
 try:
     import itertools.imap as map
+except ImportError:
+    pass
+try:
+    import itertools.ifilter as filter
 except ImportError:
     pass
 
@@ -55,7 +59,7 @@ def data_generator(input_file):
     emv = csv.reader(open_file, delimiter=",")
     # Skip header
     emv.next()
-    emv = ifilter(lambda x: x[0], emv)
+    emv = filter(lambda x: x[0], emv)
     json_rows = map(_map_line_to_json, emv)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "emv") for rg in row_groups)

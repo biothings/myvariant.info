@@ -1,3 +1,11 @@
+__METADATA__ = {
+    "src_name": 'gwassnps',
+    "src_url": None,
+    "version": None,
+    "field": "gwassnps"
+}
+
+
 def load_data():
     '''gwassnps data are preloaded in our db.'''
     raise NotImplementedError
