@@ -242,45 +242,69 @@ class ESQuery():
         #gend = safe_genome_pos(gend)
         if chr.lower().startswith('chr'):
             chr = chr[3:]
+        # _query = {
+        #     "query": {
+        #         "bool": {
+        #             "should": [
+        #                 {
+        #                     "bool": {
+        #                         "must": [
+        #                             {
+        #                                 "term": {"chrom": chr.lower()}
+        #                             },
+        #                             {
+        #                                 "range": {"chromStart": {"lte": gend}}
+        #                             },
+        #                             {
+        #                                 "range": {"chromEnd": {"gte": gstart}}
+        #                             }
+        #                         ]
+        #                     }
+        #                 },
+        #                 {
+        #                     "bool": {
+        #                         "must": [
+        #                             {
+        #                                 "term": {"chrom": chr.lower()}
+        #                             },
+        #                             {
+        #                                 "range": {"dbnsfp.hg19.start": {"lte": gend}}
+        #                             },
+        #                             {
+        #                                 "range": {"dbnsfp.hg19.end": {"gte": gstart}}
+        #                             }
+        #                         ]
+        #                     }
+        #                 }
+        #             ]
+        #         }
+        #     }
+        # }
         _query = {
             "query": {
                 "bool": {
-                    "should": [
+                    "should": []
+                }
+            }
+        }
+        hg19_interval_fields = ['dbnsfp.hg19', 'dbsnp.hg19', 'evs.hg19', 'mutdb.hg19', 'docm.hg19']
+        for field in hg19_interval_fields:
+            _q = {
+                "bool": {
+                    "must": [
                         {
-                            "bool": {
-                                "must": [
-                                    {
-                                        "term": {"chrom": chr.lower()}
-                                    },
-                                    {
-                                        "range": {"chromStart": {"lte": gend}}
-                                    },
-                                    {
-                                        "range": {"chromEnd": {"gte": gstart}}
-                                    }
-                                ]
-                            }
+                            "term": {"chrom": chr.lower()}
                         },
                         {
-                            "bool": {
-                                "must": [
-                                    {
-                                        "term": {"chrom": chr.lower()}
-                                    },
-                                    {
-                                        "range": {"dbnsfp.hg19.start": {"lte": gend}}
-                                    },
-                                    {
-                                        "range": {"dbnsfp.hg19.end": {"gte": gstart}}
-                                    }
-                                ]
-                            }
+                            "range": {field + ".start": {"lte": gend}}
+                        },
+                        {
+                            "range": {field + ".end": {"gte": gstart}}
                         }
                     ]
                 }
             }
-        }
-
+            _query["query"]["bool"]["should"].append(_q)
         return self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **kwargs)
 
 
@@ -291,8 +315,9 @@ class ESQueryBuilder:
     def build_id_query(self, vid, scopes=None):
         _default_scopes = [
             '_id',
-            'rsid', "dbnsfp.unsnp_ids",   # for rsid
-            'evs.gene.id', 'clinvar.gene.symbol', 'dbnsfp.genename',  # for gene symbols
+            'rsid', "dbnsfp.rsid", "dbsnp.rsid", "evs.rsid", "mutdb.rsid"  # for rsid
+            "dbsnp.gene.symbol", 'evs.gene.symbol', 'clinvar.gene.symbol',
+            'dbnsfp.genename', "cadd.gene.genename", "docm.genename",      # for gene symbols
         ]
         scopes = scopes or _default_scopes
         if is_str(scopes):
