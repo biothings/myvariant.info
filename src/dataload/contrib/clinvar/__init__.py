@@ -28,7 +28,7 @@ def get_mapping():
                         "symbol": {
                             "type": "string",
                             "analyzer": "string_lowercase"
-                        }
+                        },
                         "id": {
                             "type": "long"
                         }
@@ -96,7 +96,7 @@ def get_mapping():
                     "index": "no"
                 },
                 "clinvar_id": {
-                    "type": "string"
+                    "type": "string",
                     "analyzer": "string_lowercase"
                 },
                 "coding_hgvs_only": {
