@@ -1,20 +1,4 @@
-from .clinvar_parser import load_data as _load_data
-
-
-__METADATA__ = {
-    "src_name": 'ClinVar',
-    "src_url": 'http://www.ncbi.nlm.nih.gov/clinvar/',
-    "version": '20150323',
-    "field": "clinvar"
-}
-
-
-CLINVAR_INPUT_FILE = '/opt/myvariant.info/load_archive/clinvar/variant_summary.txt'
-
-
-def load_data():
-    clinvar_data = _load_data(CLINVAR_INPUT_FILE)
-    return clinvar_data
+# -*- coding: utf-8 -*-
 
 
 def get_mapping():
@@ -27,10 +11,6 @@ def get_mapping():
                 },
                 "hg19": {
                     "properties": {
-                        "chr": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
                         "start": {
                             "type": "long"
                         },
@@ -39,15 +19,26 @@ def get_mapping():
                         }
                     }
                 },
+                "chrom": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
                 "gene": {
                     "properties": {
                         "symbol": {
                             "type": "string",
                             "analyzer": "string_lowercase"
                         }
+                        "id": {
+                            "type": "long"
+                        }
                     }
                 },
                 "type": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "name": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
@@ -56,10 +47,68 @@ def get_mapping():
                     "analyzer": "string_lowercase"
                 },
                 "rsid": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "rcv_accession": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "cytogenic": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "review_status": {
                     "type": "string"
                 },
-                "variant_id": {
-                    "type": "long"
+                "hgvs": {
+                    "properties": {
+                        "genomic": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "coding": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "non-coding": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "protein": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        }
+                    }
+                },
+                "number_submitters": {
+                    "type": "byte"
+                },
+                "last_evaluated": {
+                    "type": "string",
+                    "index": "no"
+                },
+                "other_ids": {
+                    "type": "string"
+                },
+                "allele_id": {
+                    "type": "string",
+                    "index": "no"
+                },
+                "clinvar_id": {
+                    "type": "string"
+                    "analyzer": "string_lowercase"
+                },
+                "coding_hgvs_only": {
+                    "type": "boolean"
+                },
+                "ref": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "alt": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
                 }
             }
         }
