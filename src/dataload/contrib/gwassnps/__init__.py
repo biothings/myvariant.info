@@ -27,28 +27,28 @@ def get_mapping():
                     "include_in_all": True,
                     "analyzer": "string_lowercase"
                 },
-                "title":{
+                "title": {
                     "type": "string"
                 },
-                "region":{
+                "region": {
                     "type": "string",
                     "analyzer": string_lowercase
                 },
-                "genename":{
+                "genename": {
                     "type": "string",
                     "analyzer": string_lowercase
                 },
-                "risk_allele":{
+                "risk_allele": {
                     "type": "string"
                 },
-                "risk_allele_freq":{
+                "risk_allele_freq": {
                     "type": "float"
                 },
-                "pvalue":{
+                "pvalue": {
                     "type": "float",
                     "index": "no"
                 },
-                "pvalue_desc":{
+                "pvalue_desc": {
                     "type": "string",
                     "index": "no"
                 }
