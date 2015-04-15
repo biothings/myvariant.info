@@ -32,11 +32,11 @@ def get_mapping():
                 },
                 "region": {
                     "type": "string",
-                    "analyzer": string_lowercase
+                    "analyzer": "string_lowercase"
                 },
                 "genename": {
                     "type": "string",
-                    "analyzer": string_lowercase
+                    "analyzer": "string_lowercase"
                 },
                 "risk_allele": {
                     "type": "string"
