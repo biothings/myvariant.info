@@ -2,6 +2,7 @@ import json
 import datetime
 import tornado.web
 #from utils.ga import GAMixIn
+from collections import OrderedDict
 
 SUPPORT_MSGPACK = True
 if SUPPORT_MSGPACK:
@@ -85,6 +86,23 @@ class BaseHandler(tornado.web.RequestHandler):
            if encode is False, assumes input data is already a JSON encoded
            string.
         '''
+        # sort this dictionary.  max_depth is how many levels deep we should sort
+        # dictionary keys.  depth is the current depth, pretty basic recursion
+        max_depth = 6
+        depth = 0
+        def sort_nested_dict(d, depth):
+            depth+=1
+            sorted_data = []
+            for (k,v) in sorted(d.items(), key=lambda x: x[0]):
+                if (depth<=max_depth) and (type(v) is dict):
+                    sorted_data.append( (k, sort_nested_dict(v, depth)) )
+                elif (depth<=max_depth) and (type(v) is list) and (type(v[0]) is dict):
+                    sorted_data.append( (k, [sort_nested_dict(vs, depth) for vs in v]) )
+                else:
+                    sorted_data.append( (k,v) )
+            return OrderedDict(sorted_data)
+        # actually call the recursive function above to sort the data
+        data = sort_nested_dict(data,depth)
         indent = indent or 2   # tmp settings
         jsoncallback = self.get_argument(self.jsonp_parameter, '')  # return as JSONP
         if SUPPORT_MSGPACK:

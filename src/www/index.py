@@ -58,17 +58,19 @@ class MetaDataHandler(BaseHandler):
         # For now, just return a hardcoded object, later we'll actually query the ES db for this information
         self.return_json({
             "stats": {
-                "total": 115979300,
-                "dbnsfp": 84580288,
-                "dbsnp": 13392109,
-                "clinvar": 88568,
-                "mutdb": 420246,
-                "gwassnps": 15030,
-                "cosmic": 1024759,
-                "docm": 1119,
-                "snpedia": 5907,
-                "EMVClass": 12066,
-                "Wellderly": 19785313
+                'total': 286219908,
+                'evs': 1977300,
+                'cadd': 163690986,
+                'wellderly': 21240519,
+                'dbnsfp': 78045379,
+                'snpedia': 5907,
+                'clinvar': 85789,
+                'docm': 1119,
+                'mutdb': 420221,
+                'cosmic': 1024498,
+                'dbsnp': 110234210,
+                'emv': 12066,
+                'gwassnps': 15243
             }
         })
 
@@ -76,6 +78,7 @@ class MetaDataHandler(BaseHandler):
 APP_LIST = [
     (r"/", MainHandler),
     (r"/metadata", MetaDataHandler),
+    (r"/v1/metadata", MetaDataHandler),
 ]
 
 APP_LIST += add_apps('api', api_app_list)
