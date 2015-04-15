@@ -1,4 +1,5 @@
 import re
+import copy
 import requests
 
 
@@ -125,8 +126,8 @@ def get_hgvs_from_rsid(doc_li, rsid_fn, api_host='http://localhost:8000'):
     for doc in doc_li:
         rsid = rsid_fn(doc)
         # parse from myvariant.info to get hgvs_id, ref, alt information based on rsid
-        url = api_host + '/v1/query?q=dbsnp.rsid:'\
-               + rsid + '&fields=_id,dbsnp.ref,dbsnp.alt,dbsnp.chrom,dbsnp.hg19'
+        url = api_host + '/v1/query?q=dbsnp.rsid:' + rsid +\
+            '&fields=_id,dbsnp.ref,dbsnp.alt,dbsnp.chrom,dbsnp.hg19'
         r = requests.get(url)
         for hits in r.json()['hits']:
             hgvs_id = hits['_id']

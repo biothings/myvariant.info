@@ -6,7 +6,7 @@ except:
     from pymongo import MongoClient as Connection
 from config import (DATA_SRC_SERVER, DATA_SRC_PORT, DATA_SRC_DATABASE,
                     DATA_SERVER_USERNAME, DATA_SERVER_PASSWORD)
-from utils.common import timesofar
+from utils.common import timesofar, ask
 
 
 def get_src_db(conn=None):
@@ -71,3 +71,14 @@ def doc_feeder(collection, step=1000, s=None, e=None, inbatch=False, query=None,
         print('Finished.[total time: {}]'.format(timesofar(t0)))
     finally:
         cur.close()
+
+
+def merge(src, target, step=10000, confirm=True):
+    """Merging docs from src collection into target collection."""
+    cnt = src.count()
+    if not (confirm and ask('Continue to update {} docs from "{}" into "{}"?'.format(cnt, src.name, target.name)) == 'Y'):
+        return
+
+    for doc in doc_feeder(src, step=step):
+        _id = doc['_id']
+        target.update_one({"_id": _id}, {'$set': doc}, upsert=True)
