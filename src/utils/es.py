@@ -46,7 +46,7 @@ def verify_ids(doc_iter, step=100000, index=None, doc_type=None):
 
 def get_es(es_host=None):
     es_host = es_host or config.ES_HOST
-    es = Elasticsearch(es_host)
+    es = Elasticsearch(es_host, timeout=120)
     return es
 
 
