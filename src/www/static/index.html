@@ -188,9 +188,8 @@
                             <p>boolean query (AND, OR, NOT)</p>
 
                             <p><a href=
-                            "/v1/query?q=(NOT%20func:unknown)">
-                            http://myvariant.info/v1/query?q=(NOT
-                            func:unknown)</a></p>
+                            "/v1/query?q=_exists_:dbsnp%20AND%20NOT%20dbsnp.vartype:indel">
+                            http://myvariant.info/v1/query?q=_exists_:dbsnp&nbsp; AND&nbsp;NOT&nbsp;dbsnp.vartype:indel</a></p>
                         </li>
 
                         <li style="list-style: none; display: inline">
@@ -204,9 +203,8 @@
                             <p>faceting</p>
 
                             <p><a href=
-                            "/v1/query?q=(NOT%20func:unknown)&amp;facets=func&amp;size=0">
-                            http://myvariant.info/v1/query?q=(NOT
-                            func:unknown)&amp;facets=func&amp;size=0</a></p>
+                            "/v1/query?q=cadd.gene.gene_id:ENSG00000113368&amp;facets=cadd.polyphen.cat&amp;size=0">
+                            http://myvariant.info/v1/query?q=cadd.gene.gene_id:ENSG00000113368&amp;facets=cadd.polyphen.cat&amp;size=0</a></p>
                         </li>
 
                         <li>
