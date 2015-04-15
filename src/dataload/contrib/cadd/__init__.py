@@ -69,7 +69,7 @@ def get_mapping():
                             "type": "string",
                             "analyzer": "string_lowercase"
                         },
-                        "gene_name": {
+                        "genename": {
                             "type": "string",
                             "analyzer": "string_lowercase"
                         }
