@@ -25,9 +25,9 @@ if src_path not in sys.path:
 #from config import INCLUDE_DOCS
 #from utils.es import ESQuery
 
-from helper import add_apps, BaseHandler
-from api.handlers import APP_LIST as api_app_list
-from beacon.handlers import APP_LIST as beacon_app_list
+from www.helper import add_apps, BaseHandler
+from www.api.handlers import APP_LIST as api_app_list
+from www.beacon.handlers import APP_LIST as beacon_app_list
 
 __USE_WSGI__ = False
 #DOCS_STATIC_PATH = os.path.join(src_path, 'docs/_build/html')
