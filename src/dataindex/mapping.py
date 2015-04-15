@@ -5,8 +5,11 @@ import importlib
 def get_mapping(sources=None):
     if sources is None:
         #sources = ['cadd', 'clinvar', 'cosmic2', 'dbnsfp', 'dbsnp', 'drugbank', 'emv', 'evs', 'grasp']
-        sources = sources or ['dbsnp', 'dbnsfp', 'cosmic']
-        extra_mapping_li = [mapping_snpedia, mapping_wellderly]
+        sources = sources or ['dbsnp', "cadd", "evs", "snpedia", "wellderly",
+                              'dbnsfp', 'emv', 'mutdb', 'docm', 'cosmic',
+                              'clinvar', 'gwassnps']
+        # extra_mapping_li = [mapping_snpedia, mapping_wellderly]
+        extra_mapping_li = []
     else:
         extra_mapping_li = []
 
@@ -132,7 +135,8 @@ minimal_field_d = {
     "cosmic": "chrom",
     "docm": "chrom",     # TODO: change chromosome_name to chrom
     "snpedia": "text",
-    #"emv":
+    "evs": "chrom",
+    "emv": "egl_classification",
     "wellderly": "chrom"  # TODO: change chr to chrom
 }
 
