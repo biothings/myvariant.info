@@ -1,6 +1,9 @@
 from __future__ import print_function
 
-import MySQLdb
+try:
+    import MySQLdb
+except:
+    pass
 import requests
 
 from utils.common import loadobj, is_float
