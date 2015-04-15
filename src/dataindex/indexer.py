@@ -132,7 +132,7 @@ def create_index(index_name, mapping=None):
     es.indices.create(index=index_name, body=body)
 
 
-def _index_doc_batch(doc_batch, index_name, doc_type, update=False):
+def _index_doc_batch(doc_batch, index_name, doc_type, update=True):
     _li = []
     for doc in doc_batch:
         if update:
@@ -164,12 +164,12 @@ def _index_doc_batch(doc_batch, index_name, doc_type, update=False):
     es.bulk(body=_li)
 
 
-def do_index(doc_li, index_name, doc_type, step=1000, update=False, verbose=True):
+def do_index(doc_li, index_name, doc_type, step=1000, update=True, verbose=True):
     for doc_batch in doc_feeder(doc_li, step=step, verbose=verbose):
         _index_doc_batch(doc_batch, index_name, doc_type, update=update)
 
 
-def do_index_from_collection(collection, index_name, doc_type, step=10000, update=False):
+def do_index_from_collection(collection, index_name, doc_type, step=10000, update=True):
     from utils.mongo import doc_feeder
     for doc_batch in doc_feeder(collection, step=step, inbatch=True):
         _index_doc_batch(doc_batch, index_name, doc_type, update=update)
