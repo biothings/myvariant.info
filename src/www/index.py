@@ -51,6 +51,7 @@ class MainHandler(tornado.web.RequestHandler):
         #if INCLUDE_DOCS:
             self.render(os.path.join(STATIC_PATH, 'index.html'))
 
+
 class MetaDataHandler(BaseHandler):
     disable_caching = True
 
@@ -94,6 +95,7 @@ if options.debug:
     })
     # from config import auth_settings
     # settings.update(auth_settings)
+
 
 def main():
     application = tornado.web.Application(APP_LIST, **settings)
