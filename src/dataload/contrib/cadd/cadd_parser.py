@@ -223,7 +223,7 @@ def load_contig(contig):
     #CADD_INPUT = exome
     tabix = pysam.Tabixfile(indels)
     src_db = get_src_db()
-    target_coll = src_db["cadd"]
+    target_coll = src_db["cadd_indels"]
     t0 = time.time()
     cnt = 0
     docs = (doc for doc in fetch_generator(tabix, contig))

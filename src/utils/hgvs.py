@@ -53,16 +53,24 @@ def get_hgvs_from_vcf(chr, pos, ref, alt):
         hgvs = 'chr{0}:g.{1}{2}>{3}'.format(chr, pos, ref, alt)
     elif len(ref) > 1 and len(alt) == 1:
         # this is a deletion:
-        assert ref[0] == alt
-        start = pos + 1
-        end = pos + len(ref) - 1
-        hgvs = 'chr{0}:g.{1}_{2}del'.format(chr, start, end)
+        if ref[0] == alt:
+            start = int(pos) + 1
+            end = int(pos) + len(ref) - 1
+            hgvs = 'chr{0}:g.{1}_{2}del'.format(chr, start, end)
+	else:
+	    end = int(pos) + len(ref) - 1
+            hgvs = 'chr{0}:g.{1}_{2}delins{3}'.format(chr, pos, end, alt)
     elif len(ref) == 1 and len(alt) > 1:
         # this is a insertion
-        assert alt[0] == ref
-        hgvs = 'chr{0}:g.{1}_{2}ins'.format(chr, pos, pos + 1)
-        ins_seq = alt[1:]
-        hgvs += ins_seq
+        if alt[0] == ref:
+            hgvs = 'chr{0}:g.{1}_{2}ins'.format(chr, pos, int(pos) + 1)
+            ins_seq = alt[1:]
+            hgvs += ins_seq
+	else:
+	    hgvs = 'chr{0}:g.{1}delins{2}'.format(chr, pos, alt)
+    elif len(ref) > 1 and len(alt) > 1:
+        end = int(pos) + len(alt) - 1
+        hgvs = 'chr{0}:g.{1}_{2}delins{3}'.format(chr, pos, end, alt)
     else:
         raise ValueError("Cannot convert {} into HGVS id.".format((chr, pos, ref, alt)))
     return hgvs

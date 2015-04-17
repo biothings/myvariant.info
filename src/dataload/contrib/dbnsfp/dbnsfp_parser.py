@@ -34,7 +34,7 @@ def _map_line_to_json(fields):
     one_snp_json = {
         "_id": HGVS,
         "dbnsfp": {
-            "risd": fields[6],
+            "rsid": fields[6],
             "chrom": chrom,
             "hg19": {
                 "start": fields[1],

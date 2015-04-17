@@ -12,7 +12,7 @@ mapping to JSON, cleaning.
 
 # remove keys whos values are ".", "-", "", "NA", "none", " "
 # and remove empty dictionaries
-def dict_sweep(d, vals=[".", "-", "", "NA", "none", " ", "Not Available"]):
+def dict_sweep(d, vals=[".", "-", "", "NA", "none", " ", "Not Available", "unknown"]):
     """
     @param d: a dictionary
     @param vals: a string or list of strings to sweep
