@@ -87,23 +87,21 @@ class BaseHandler(tornado.web.RequestHandler):
            string.
         '''
         # sort this dictionary.  max_depth is how many levels deep we should sort
-        # dictionary keys.  depth is the current depth, pretty basic recursion
+        # dictionary keys.  lists are included as a level.  depth is the current depth, pretty basic recursion
         max_depth = 6
         depth = 0
 
-        def sort_nested_dict(d, depth):
+        def sort_response_object(d, depth):
             depth += 1
-            sorted_data = []
-            for (k, v) in sorted(d.items(), key=lambda x: x[0]):
-                if (depth <= max_depth) and (type(v) is dict):
-                    sorted_data.append((k, sort_nested_dict(v, depth)))
-                elif (depth <= max_depth) and (type(v) is list) and (type(v[0]) is dict):
-                    sorted_data.append((k, [sort_nested_dict(vs, depth) for vs in v]))
-                else:
-                    sorted_data.append((k, v))
-            return OrderedDict(sorted_data)
+            if (depth <= max_depth) and (type(d) is list):
+                return [sort_response_object(ds, depth) for ds in d]
+            elif (depth <= max_depth) and (type(d) is dict):
+                return OrderedDict([(k, sort_response_object(v, depth)) for (k, v) in sorted(d.items(), key=lambda x: x[0])])
+            else:
+                return d
+
         # actually call the recursive function above to sort the data
-        data = sort_nested_dict(data, depth)
+        data = sort_response_object(data, depth)
         indent = indent or 2   # tmp settings
         jsoncallback = self.get_argument(self.jsonp_parameter, '')  # return as JSONP
         if SUPPORT_MSGPACK:
