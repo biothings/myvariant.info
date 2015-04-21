@@ -18,7 +18,7 @@ Introduction
 
   `MyVariant.info <http://myvariant.info>`_ provides simple-to-use REST web services to query/retrieve variant annotation data. It's designed with an emphasis on **simplicity** and **performance**. 
 
-.. include :: doc/quick_start.rst
+.. include:: doc/quick_start.rst
 
 
 Documentation
@@ -27,14 +27,14 @@ Documentation
 .. toctree::
     :maxdepth: 3
 
-    Try it live on interactive API page <http://myvariant.info/v1/api/>
+    Try it live on interactive API page <http://myvariant.info/v1/api>
     doc/data    
     doc/variant_query_service
     doc/variant_annotation_service
 
 Related links
 -------------
-* 'github repository<https://github.com/Network-of-BioThings/myvariant.info/>'_
+* `github repository <https://github.com/Network-of-BioThings/myvariant.info/>`_
 
 
 .. raw :: html

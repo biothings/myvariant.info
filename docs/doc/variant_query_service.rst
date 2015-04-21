@@ -29,7 +29,7 @@ q
 
 fields
 """"""
-    Optional, a comma-separated string to limit the fields returned from the matching variant hits. The supported field names can be found from any variant object (e.g. http://myvariant.info/v1/variant/chr16:g.28883241A>G). Note that it supports dot notation, and wildcards as well, e.g., you can pass "dbnsfp", "dbnsfp.genename", or "dbnsfp.aa.*". If "fields=all", all available fields will be returned. Default: "all".
+    Optional, a comma-separated string to limit the fields returned from the matching variant hits. The supported field names can be found from any variant object (e.g. `here <http://myvariant.info/v1/variant/chr16:g.28883241A%3EG>`_). Note that it supports dot notation, and wildcards as well, e.g., you can pass "dbnsfp", "dbnsfp.genename", or "dbnsfp.aa.*". If "fields=all", all available fields will be returned. Default: "all".
 
 size
 """"
@@ -48,7 +48,7 @@ from
 
 sort
 """"
-    Optional, the comma-separated fields to sort on. Prefix with "-" for descending order, otherwise in ascending order. Default: sort by matching scores in decending order.
+    Optional, the comma-separated fields to sort on. Prefix with "-" for descending order, otherwise in ascending order. Default: sort by matching scores in descending order.
 
 facets
 """"""
@@ -103,7 +103,7 @@ Available fields
 ========================    =============================================    =================================================================================
 Field                        Description                                     Examples
 ========================    =============================================    =================================================================================
-
+Field1  
 ========================    =============================================    =================================================================================
 
 Wildcard queries
@@ -134,59 +134,59 @@ should return hits as:
 
 .. code-block:: json
 
-{
-  "hits": [
-    {
-      "_id": "chr1:g.69511A>G",
-      "_score": 7.2999496,
-      "cadd": {
-        "gene": {
-          "ccds_id": "CCDS30547.1",
-          "cds": {
-            "cdna_pos": 421,
-            "cds_pos": 421,
-            "rel_cdna_pos": 0.46,
-            "rel_cds_pos": 0.46
-          },
-          "feature_id": "ENST00000335137",
-          "gene_id": "ENSG00000186092",
-          "genename": "OR4F5",
-          "prot": {
-            "domain": "tmhmm",
-            "protpos": 141,
-            "rel_prot_pos": 0.46
-          }
+        {
+          "hits": [
+            {
+              "_id": "chr1:g.69511A>G",
+              "_score": 7.2999496,
+              "cadd": {
+                "gene": {
+                  "ccds_id": "CCDS30547.1",
+                  "cds": {
+                    "cdna_pos": 421,
+                    "cds_pos": 421,
+                    "rel_cdna_pos": 0.46,
+                    "rel_cds_pos": 0.46
+                  },
+                  "feature_id": "ENST00000335137",
+                  "gene_id": "ENSG00000186092",
+                  "genename": "OR4F5",
+                  "prot": {
+                    "domain": "tmhmm",
+                    "protpos": 141,
+                    "rel_prot_pos": 0.46
+                  }
+                }
+              }
+            },
+            {
+              "_id": "chr1:g.69538G>A",
+              "_score": 0.78757036,
+              "cadd": {
+                "gene": {
+                  "ccds_id": "CCDS30547.1",
+                  "cds": {
+                    "cdna_pos": 448,
+                    "cds_pos": 448,
+                    "rel_cdna_pos": 0.49,
+                    "rel_cds_pos": 0.49
+                  },
+                  "feature_id": "ENST00000335137",
+                  "gene_id": "ENSG00000186092",
+                  "genename": "OR4F5",
+                  "prot": {
+                    "domain": "ndomain",
+                    "protpos": 150,
+                    "rel_prot_pos": 0.49
+                  }
+                }
+              }
+            }
+          ],
+          "max_score": 7.2999496,
+          "took": 2325,
+          "total": 2
         }
-      }
-    },
-    {
-      "_id": "chr1:g.69538G>A",
-      "_score": 0.78757036,
-      "cadd": {
-        "gene": {
-          "ccds_id": "CCDS30547.1",
-          "cds": {
-            "cdna_pos": 448,
-            "cds_pos": 448,
-            "rel_cdna_pos": 0.49,
-            "rel_cds_pos": 0.49
-          },
-          "feature_id": "ENST00000335137",
-          "gene_id": "ENSG00000186092",
-          "genename": "OR4F5",
-          "prot": {
-            "domain": "ndomain",
-            "protpos": 150,
-            "rel_prot_pos": 0.49
-          }
-        }
-      }
-    }
-  ],
-  "max_score": 7.2999496,
-  "took": 2325,
-  "total": 2
-}
 
 
 Faceted queries
@@ -200,34 +200,35 @@ A GET request like this::
 should return hits as:
 
 .. code-block:: json
-{
-  "facets": {
-    "cadd.polyphen.cat": {
-      "_type": "terms",
-      "missing": 797,
-      "other": 0,
-      "terms": [
+        
         {
-          "count": 1902,
-          "term": "benign"
-        },
-        {
-          "count": 998,
-          "term": "probably_damaging"
-        },
-        {
-          "count": 762,
-          "term": "possibly_damaging"
+          "facets": {
+            "cadd.polyphen.cat": {
+              "_type": "terms",
+              "missing": 797,
+              "other": 0,
+              "terms": [
+                {
+                  "count": 1902,
+                  "term": "benign"
+                },
+                {
+                  "count": 998,
+                  "term": "probably_damaging"
+                },
+                {
+                  "count": 762,
+                  "term": "possibly_damaging"
+                }
+              ],
+              "total": 3662
+            }
+          },
+          "hits": [],
+          "max_score": 0.0,
+          "took": 29,
+          "total": 4459
         }
-      ],
-      "total": 3662
-    }
-  },
-  "hits": [],
-  "max_score": 0.0,
-  "took": 29,
-  "total": 4459
-}
 
 
 
@@ -284,19 +285,15 @@ Returned result (the value of "con" variable above) from above example code shou
 
 .. code-block:: json
 
-{
+    {
 
-}
+    }
 
 .. Tip:: "query" field in returned object indicates the matching query term.
 
 If a query term has no match, it will return with "**notfound**" field as "**true**"::
-
-
-
-
-
-
+    params = 
+    res, con = 
 
 
 .. raw:: html

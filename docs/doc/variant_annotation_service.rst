@@ -2,7 +2,7 @@ Variant annotation service
 *************************************
 
 This page describes the reference for the MyVariant.info variant annotation web 
-service.  It's also recommended to try it live on our 'interactive API page <http://myvariant.info/v1/api>'_.
+service.  It's also recommended to try it live on our `interactive API page <http://myvariant.info/v1/api>`_.
 
 
 Service endpoint
@@ -41,7 +41,7 @@ fields
 
 callback
 """""""""
-    Optional, you can pass a "**callback**" parameter to make a `JSONP <http://ajaxian.com/archives/jsonp-json-with-padding>` call.
+    Optional, you can pass a "**callback**" parameter to make a `JSONP <http://ajaxian.com/archives/jsonp-json-with-padding>`_ call.
 
 filter
 """""""
@@ -62,7 +62,7 @@ A GET request like this::
 
 should return a variant object below:
 
-.. container:: variant-object-container
+.. container :: variant-object-container
 
     .. include :: variant_object.json
 
@@ -114,27 +114,52 @@ Returned object
 Returned result (the value of "con" variable above) from above example code should look like this:
 
 
-.. code-block:: json
+.. code-block :: json
 
-[{'_id': 'chr16:g.28883241A>G',
-  'cadd': {'gene': {'ccds_id': 'CCDS53996.1',
-                    'cds': {'cdna_pos': 1889,
-                            'cds_pos': 1450,
-                            'rel_cdna_pos': 0.61,
-                            'rel_cds_pos': 0.64},
-                    'feature_id': 'ENST00000322610',
-                    'gene_id': 'ENSG00000178188',
-                    'genename': 'SH2B1',
-                    'prot': {'protpos': 484, 'rel_prot_pos': 0.64}}},
-  'dbnsfp': {'genename': 'SH2B1'},
-  'query': 'chr16:g.28883241A>G'},
- {'_id': 'chr1:g.35367G>A',
-  'cadd': {'gene': {'cds': {'cdna_pos': 476, 'rel_cdna_pos': 0.4},
-                    'feature_id': 'ENST00000417324',
-                    'gene_id': 'ENSG00000237613',
-                    'genename': 'FAM138A'}},
-  'dbnsfp': {'genename': 'FAM138A'},
-  'query': 'chr1:g.35367G>A'}]
+    [
+      {
+        "_id": "chr16:g.28883241A>G",
+        "cadd": {
+          "gene": {
+            "ccds_id": "CCDS53996.1",
+            "cds": {
+              "cdna_pos": 1889,
+              "cds_pos": 1450,
+              "rel_cdna_pos": 0.61,
+              "rel_cds_pos": 0.64
+            },
+            "feature_id": "ENST00000322610",
+            "gene_id": "ENSG00000178188",
+            "genename": "SH2B1",
+            "prot": {
+              "protpos": 484, "rel_prot_pos": 0.64
+            }
+          }
+        },
+        "dbnsfp": {
+          "genename": "SH2B1"
+        },
+        "query": "chr16:g.28883241A>G"
+      },
+      {
+        "_id": "chr1:g.35367G>A",
+        "cadd": {
+          "gene": {
+            "cds": {
+              "cdna_pos": 476, 
+              "rel_cdna_pos": 0.4
+            },
+            "feature_id": "ENST00000417324",
+            "gene_id": "ENSG00000237613",
+            "genename": "FAM138A"
+          }
+        },
+        "dbnsfp": {
+          "genename": "FAM138A"
+        },
+        "query": "chr1:g.35367G>A"
+      }
+    ]
 
 .. raw:: html
 

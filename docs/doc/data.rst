@@ -40,7 +40,7 @@ keep them up-to-date, so that you don't have to do it:
 | GWAS SNP            | on new release           | gwassnp                |
 +---------------------+--------------------------+------------------------+
 
-The most updated information can be accessed 'here <http://myvariant.info/v1/metadata>'_.
+The most updated information can be accessed `here <http://myvariant.info/v1/metadata>`_.
 
 .. _variant_object:
 
@@ -51,51 +51,51 @@ Variant annotation data are both stored and returned as a variant object, which
 is essentially a collection of fields (attributes) and their values:
 
 .. code-block :: json
-
-{
-  "_id": "chr1:g.35367G>A",
-  "_version": 2,
-  "cadd": {
-    "alt": "A",
-    "annotype": "NonCodingTranscript",
-    "chrom": 1,
-    "gene": {
-      "cds": {
-        "cdna_pos": 476,
-        "rel_cdna_pos": 0.4
-      },
-      "feature_id": "ENST00000417324",
-      "gene_id": "ENSG00000237613",
-    },
-    "ref": "G",
-    "type": "SNV"  
-  },
-  "dbnsfp": {
-    "aa": {
-      "aapos_sift": "ENSP00000409362:P44L",
-      "alt": "L",
-      "codonpos": 2,
-      "pos": 44,
-      "ref": "P",
-      "refcodon": "CCG"
-    },
-    "alt": "A",
-    "ancestral_allele": "G",
-    "chrom": "1",
-    "ensembl": {
-      "geneid": "ENSG00000237613",
-      "transcriptid": "ENST00000417324"
-    },
-    "genename": "FAM138A",
-    "hg19": {
-      "end": 35367,
-      "start": 35367
-    }
-  }
-}
+        
+        {
+          "_id": "chr1:g.35367G>A",
+          "_version": 2,
+          "cadd": {
+            "alt": "A",
+            "annotype": "NonCodingTranscript",
+            "chrom": 1,
+            "gene": {
+              "cds": {
+                "cdna_pos": 476,
+                "rel_cdna_pos": 0.4
+              },
+              "feature_id": "ENST00000417324",
+              "gene_id": "ENSG00000237613",
+            },
+            "ref": "G",
+            "type": "SNV"  
+          },
+          "dbnsfp": {
+            "aa": {
+              "aapos_sift": "ENSP00000409362:P44L",
+              "alt": "L",
+              "codonpos": 2,
+              "pos": 44,
+              "ref": "P",
+              "refcodon": "CCG"
+            },
+            "alt": "A",
+            "ancestral_allele": "G",
+            "chrom": "1",
+            "ensembl": {
+              "geneid": "ENSG00000237613",
+              "transcriptid": "ENST00000417324"
+            },
+            "genename": "FAM138A",
+            "hg19": {
+              "end": 35367,
+              "start": 35367
+            }
+          }
+        }
 
 The example above omits many of the available fields.  For a full example, 
-check out 'this example variant <http://myvariant.info/v1/variant/chr1:g.35367G%3EA>'_, or try the 'interactive API page <http://myvariant.info/v1/api>'_.
+check out `this example variant <http://myvariant.info/v1/variant/chr1:g.35367G%3EA>`_, or try the `interactive API page <http://myvariant.info/v1/api>`_.
 
 .. raw:: html
 
