@@ -171,7 +171,7 @@ def test_query_post():
 
 
 def test_query_interval():
-    res = json_ok(get_ok(api + '/query?q=chr1:1000-100000'))
+    res = json_ok(get_ok(api + '/query?q=chr1:10000-100000'))
     ok_(len(res['hits']) > 1)
     ok_('_id' in res['hits'][0])
 
@@ -183,7 +183,20 @@ def test_query_size():
 
 def test_variant():
     # TODO
-    pass
+    res = json_ok(get_ok(api + '/variant/chr16:g.28883241A>G'))
+    eq_(res['_id'], "chr16:g.28883241A>G")
+
+    # testing non-ascii character
+    get_404(api + '/variant/' + '54097\xef\xbf\xbd\xef\xbf\xbdmouse')
+
+    # testing filtering parameters
+    res = json_ok(get_ok(api + '/variant/chr16:g.28883241A>G?fields=dbsnp,dbnsfp,cadd'))
+    eq_(set(res), set(['_id', '_version', 'dbnsfp', 'cadd', 'dbsnp']))
+    res = json_ok(get_ok(api + '/variant/chr16:g.28883241A>G?filter=wellderly'))
+    eq_(set(res), set(['_id', '_version', 'wellderly']))
+
+    get_404(api + '/variant')
+    get_404(api + '/variant/')
 
 
 def test_variant_post():
@@ -196,15 +209,16 @@ def test_variant_post():
     eq_(res[0]['_id'], 'chr16:g.28883241A>G')
     eq_(res[1]['_id'], 'chr11:g.66397320A>G')
 
-    res = json_ok(post_ok(api + '/gene', {'ids': 'chr16:g.28883241A>G,1018', 'fields': 'symbol,name,entrezgene'}))
+    res = json_ok(post_ok(api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'fields': 'dbsnp'}))
     eq_(len(res), 2)
     for _g in res:
-        eq_(set(_g), set(['_id', 'query', 'symbol', 'name', 'entrezgene']))
+        eq_(set(_g), set(['_id', 'query', 'dbsnp']))
 
-    res = json_ok(post_ok(api + '/gene', {'ids': '1017,chr11:g.66397320A>G', 'filter': 'symbol,go.MF'}))
+    # TODO redo this test, doesn't test much really....
+    res = json_ok(post_ok(api + '/variant', {'ids': 'chr16:g.28883241A>G,chr11:g.66397320A>G', 'filter': 'dbsnp.chrom'}))
     eq_(len(res), 2)
     for _g in res:
-        eq_(set(_g), set(['_id', 'query', 'symbol', 'go.MF']))
+        eq_(set(_g), set(['_id', 'query', 'dbsnp']))
 
 
 def test_metadata():
@@ -245,8 +259,8 @@ def test_msgpack():
     res2 = msgpack_ok(get_ok(api + '/variant/chr11:g.66397320A>G?msgpack=true'))
     ok_(res, res2)
 
-    res = json_ok(get_ok(api + '/variant/?q=rs2500'))
-    res2 = msgpack_ok(get_ok(api + '/variant/?q=rs2500&msgpack=true'))
+    res = json_ok(get_ok(api + '/query?q=rs2500'))
+    res2 = msgpack_ok(get_ok(api + '/query?q=rs2500&msgpack=true'))
     ok_(res, res2)
 
     res = json_ok(get_ok(api + '/metadata'))
