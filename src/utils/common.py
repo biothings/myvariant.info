@@ -149,11 +149,20 @@ def split_ids(q):
              split_ids('"CDK2 CDK3"\n CDk4')  --> ['CDK2 CDK3', 'CDK4']
 
     '''
-    lex = shlex(q.encode('utf8'), posix=True)
+    # Python3 strings are already unicode, .encode
+    # now returns a bytearray, which cannot be searched with
+    # shlex.  For now, do this terrible thing until we discuss
+    if sys.version_info.major == 3:
+        lex = shlex(q, posix=True)
+    else:
+        lex = shlex(q.encode('utf8'), posix=True)       
     lex.whitespace = ' \t\n\x0b\x0c\r|,+'
     lex.whitespace_split = True
     lex.commenters = ''
-    ids = [x.decode('utf8').strip() for x in list(lex)]
+    if sys.version_info.major == 3:
+        ids = [x.strip() for x in list(lex)]
+    else:
+        ids = [x.decode('utf8').strip() for x in list(lex)]
     ids = [x for x in ids if x]
     return ids
 

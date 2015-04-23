@@ -254,7 +254,7 @@ q
 
 scopes
 """"""
-    Optional, specify one or more fields (separated by comma) as the search "scopes", e.g., "scopes=rsid", "scopes=rsid,dbnsfp.genename".  The available "fields" can be passed to "**scopes**" parameter are
+    Optional, specify one or more fields (separated by comma) as the search "scopes", e.g., "scopes=dbsnp.rsid", "scopes=dbsnp.rsid,dbnsfp.genename".  The available "fields" can be passed to "**scopes**" parameter are
     :ref:`listed above <available_fields>`. Default: 
 
 fields
@@ -274,7 +274,7 @@ piece of code. Here is a sample python snippet::
     import httplib2
     h = httplib2.Http()
     headers = {'content-type': 'application/x-www-form-urlencoded'}
-    params = 'q=q=rs58991260,rs2500&scopes=rsid,dbnsfp.genename'
+    params = 'q=rs58991260,rs2500&scopes=dbsnp.rsid'
     res, con = h.request('http://myvariant.info/v1/query', 'POST', params, headers=headers)
 
 
@@ -285,9 +285,51 @@ Returned result (the value of "con" variable above) from above example code shou
 
 .. code-block:: json
 
-    {
-
-    }
+        [
+        {'_id': 'chr1:g.218631822G>A',
+          'dbsnp': {'allele_origin': 'unspecified',
+           'alleles': [{'allele': 'G', 'freq': 0.9784},
+            {'allele': 'A', 'freq': 0.02157}],
+           'alt': 'A',
+           'chrom': '1',
+           'class': 'SNV',
+           'dbsnp_build': 129,
+           'flags': ['ASP', 'G5', 'G5A', 'GNO', 'KGPhase1', 'KGPhase3', 'SLO'],
+           'gmaf': 0.02157,
+           'hg19': {'end': 218631823, 'start': 218631822},
+           'ref': 'G',
+           'rsid': 'rs58991260',
+           'validated': True,
+           'var_subtype': 'ts',
+           'vartype': 'snp'},
+          'query': 'rs58991260',
+          'wellderly': {'alleles': [{'allele': 'A', 'freq': 0.0025},
+            {'allele': 'G', 'freq': 0.9975}],
+           'alt': 'A',
+           'chrom': '1',
+           'gene': 'TGFB2',
+           'genotypes': [{'count': 1, 'freq': 0.005, 'genotype': 'G/A'},
+            {'count': 199, 'freq': 0.995, 'genotype': 'G/G'}],
+           'hg19': {'end': 218631822, 'start': 218631822},
+           'pos': 218631822,
+           'ref': 'G',
+           'vartype': 'snp'}},
+         {'_id': 'chr11:g.66397320A>G',
+          'dbsnp': {'allele_origin': 'unspecified',
+           'alleles': [{'allele': 'A'}, {'allele': 'G'}],
+           'alt': 'G',
+           'chrom': '11',
+           'class': 'SNV',
+           'dbsnp_build': 36,
+           'flags': ['ASP', 'INT', 'RV', 'U3'],
+           'hg19': {'end': 66397321, 'start': 66397320},
+           'ref': 'A',
+           'rsid': 'rs2500',
+           'validated': False,
+           'var_subtype': 'ts',
+           'vartype': 'snp'},
+          'query': 'rs2500'}
+        ]
 
 .. Tip:: "query" field in returned object indicates the matching query term.
 
