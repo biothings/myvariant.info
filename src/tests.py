@@ -161,7 +161,7 @@ def test_query_post():
     assert len(res) == 1, (res, len(res))
     res = json_ok(post_ok(api + '/query', {}), checkerror=False)
     assert 'error' in res, res
-    
+
     # TODO fix this test query
     #res = json_ok(post_ok(api + '/query', {'q': '[rs58991260, "chr11:66397000-66398000"]',
     #                                       'scopes': 'dbsnp.rsid'}))
