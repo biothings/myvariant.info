@@ -71,7 +71,7 @@
                             "Name": "scopes",
                             "Type": "string",
                             "Required": "Y",
-                            "Description": "specify one or more fields (separated by comma) as the search \"scopes\", e.g., \"scopes=rsid\", \"scopes=rsid,dbnsfp.genename\". The available \"fields\" can be passed to \"scopes\" parameter are listed here: <docs_url_here> (coming soon)."
+                            "Description": "specify one or more fields (separated by comma) as the search \"scopes\", e.g., \"scopes=dbsnp.rsid\", \"scopes=dbsnp.rsid,dbnsfp.genename\". The available \"fields\" can be passed to \"scopes\" parameter are listed here: <docs_url_here> (coming soon)."
                         },
                         {
                             "Name": "fields",

@@ -1,192 +1,194 @@
-{
-  "_id": "chr1:g.35367G>A",
-  "_version": 2,
-  "cadd": {
-    "alt": "A",
-    "annotype": "NonCodingTranscript",
-    "bstatistic": 994,
-    "chmm": {
-      "bivflnk": 0.0,
-      "enh": 0.0,
-      "enhbiv": 0.0,
-      "het": 0.0,
-      "quies": 1.0,
-      "reprpc": 0.0,
-      "reprpcwk": 0.0,
-      "tssa": 0.0,
-      "tssaflnk": 0.0,
-      "tssbiv": 0.0,
-      "tx": 0.0,
-      "txflnk": 0.0,
-      "txwk": 0.0,
-      "znfrpts": 0.0
-    },
-    "chrom": 1,
-    "consdetail": "non_coding_exon,nc",
-    "consequence": "NONCODING_CHANGE",
-    "consscore": 5,
-    "cpg": 0.03,
-    "dna": {
-      "helt": -2.04,
-      "mgw": 0.01,
-      "prot": 1.54,
-      "roll": -0.63
-    },
-    "encode": {
-      "exp": 31.46,
-      "h3k27ac": 23.44,
-      "h3k4me1": 23.8,
-      "h3k4me3": 8.6
-    },
-    "exon": "2/3",
-    "fitcons": 0.577621,
-    "gc": 0.48,
-    "gene": {
-      "cds": {
-        "cdna_pos": 476,
-        "rel_cdna_pos": 0.4
-      },
-      "feature_id": "ENST00000417324",
-      "gene_id": "ENSG00000237613",
-      "genename": "FAM138A"
-    },
-    "gerp": {
-      "n": 1.29,
-      "s": -0.558
-    },
-    "isknownvariant": "FALSE",
-    "istv": "FALSE",
-    "length": 0,
-    "mapability": {
-      "20bp": 0,
-      "35bp": 0
-    },
-    "min_dist_tse": 122,
-    "min_dist_tss": 707,
-    "mutindex": 70,
-    "phast_cons": {
-      "mammalian": 0.003,
-      "primate": 0.013,
-      "vertebrate": 0.003
-    },
-    "phred": 1.493,
-    "phylop": {
-      "mammalian": -0.155,
-      "primate": 0.151,
-      "vertebrate": -0.128
-    },
-    "pos": 35367,
-    "rawscore": -0.160079,
-    "ref": "G",
-    "scoresegdup": 0.99,
-    "segway": "D",
-    "type": "SNV"
-  },
-  "dbnsfp": {
-    "aa": {
-      "aapos_sift": "ENSP00000409362:P44L",
-      "alt": "L",
-      "codonpos": 2,
-      "pos": 44,
-      "ref": "P",
-      "refcodon": "CCG"
-    },
-    "alt": "A",
-    "ancestral_allele": "G",
-    "cadd": {
-      "phred": 1.493,
-      "raw": -0.160079,
-      "raw_rankscore": 0.05963
-    },
-    "cds_strand": "-",
-    "chrom": "1",
-    "ensembl": {
-      "geneid": "ENSG00000237613",
-      "transcriptid": "ENST00000417324"
-    },
-    "fold-degenerate": 0,
-    "genename": "FAM138A",
-    "gerp++": {
-      "nr": 1.29,
-      "rs": -0.558,
-      "rs_rankscore": 0.11796
-    },
-    "hg18": {
-      "end": 25230,
-      "start": 25230
-    },
-    "hg19": {
-      "end": 35367,
-      "start": 35367
-    },
-    "hg38": {
-      "end": 35367,
-      "start": 35367
-    },
-    "lr": {
-      "pred": "T",
-      "rankscore": 0.32941,
-      "score": 0.0846
-    },
-    "mutationtaster": {
-      "converted_rankscore": 0.10124,
-      "pred": "N",
-      "score": 1.0
-    },
-    "phastcons": {
-      "100way": {
-        "vertebrate": 0.001,
-        "vertebrate_rankscore": 0.1272
-      },
-      "46way": {
-        "placental": 0.003,
-        "placental_rankscore": 0.11579,
-        "primate": 0.336,
-        "primate_rankscore": 0.28762
-      }
-    },
-    "phylop": {
-      "100way": {
-        "vertebrate": 0.055,
-        "vertebrate_rankscore": 0.14229
-      },
-      "46way": {
-        "placental": -0.143,
-        "placental_rankscore": 0.11334,
-        "primate": 0.175,
-        "primate_rankscore": 0.17021
-      }
-    },
-    "provean": {
-      "converted_rankscore": 0.92415,
-      "pred": "D",
-      "score": -6.73
-    },
-    "radialsvm": {
-      "pred": "T",
-      "rankscore": 0.32188,
-      "score": -0.9916
-    },
-    "ref": "G",
-    "reliability_index": 5,
-    "sift": {
-      "converted_rankscore": 0.2575,
-      "pred": "T",
-      "score": 0.13
-    },
-    "siphy_29way": {
-      "logodds": 3.5364,
-      "logodds_rankscore": 0.07795,
-      "pi": {
-        "a": 0.5429,
-        "c": 0.0,
-        "g": 0.4571,
-        "t": 0.0
-      }
-    },
-    "vest3": {
-      "rankscore": 0.16309,
-      "score": 0.137
-    }
-  }
-}
+.. code-block :: json
+
+        {
+          "_id": "chr1:g.35367G>A",
+          "_version": 2,
+          "cadd": {
+            "alt": "A",
+            "annotype": "NonCodingTranscript",
+            "bstatistic": 994,
+            "chmm": {
+              "bivflnk": 0.0,
+              "enh": 0.0,
+              "enhbiv": 0.0,
+              "het": 0.0,
+              "quies": 1.0,
+              "reprpc": 0.0,
+              "reprpcwk": 0.0,
+              "tssa": 0.0,
+              "tssaflnk": 0.0,
+              "tssbiv": 0.0,
+              "tx": 0.0,
+              "txflnk": 0.0,
+              "txwk": 0.0,
+              "znfrpts": 0.0
+            },
+            "chrom": 1,
+            "consdetail": "non_coding_exon,nc",
+            "consequence": "NONCODING_CHANGE",
+            "consscore": 5,
+            "cpg": 0.03,
+            "dna": {
+              "helt": -2.04,
+              "mgw": 0.01,
+              "prot": 1.54,
+              "roll": -0.63
+            },
+            "encode": {
+              "exp": 31.46,
+              "h3k27ac": 23.44,
+              "h3k4me1": 23.8,
+              "h3k4me3": 8.6
+            },
+            "exon": "2/3",
+            "fitcons": 0.577621,
+            "gc": 0.48,
+            "gene": {
+              "cds": {
+                "cdna_pos": 476,
+                "rel_cdna_pos": 0.4
+              },
+              "feature_id": "ENST00000417324",
+              "gene_id": "ENSG00000237613",
+              "genename": "FAM138A"
+            },
+            "gerp": {
+              "n": 1.29,
+              "s": -0.558
+            },
+            "isknownvariant": "FALSE",
+            "istv": "FALSE",
+            "length": 0,
+            "mapability": {
+              "20bp": 0,
+              "35bp": 0
+            },
+            "min_dist_tse": 122,
+            "min_dist_tss": 707,
+            "mutindex": 70,
+            "phast_cons": {
+              "mammalian": 0.003,
+              "primate": 0.013,
+              "vertebrate": 0.003
+            },
+            "phred": 1.493,
+            "phylop": {
+              "mammalian": -0.155,
+              "primate": 0.151,
+              "vertebrate": -0.128
+            },
+            "pos": 35367,
+            "rawscore": -0.160079,
+            "ref": "G",
+            "scoresegdup": 0.99,
+            "segway": "D",
+            "type": "SNV"
+          },
+          "dbnsfp": {
+            "aa": {
+              "aapos_sift": "ENSP00000409362:P44L",
+              "alt": "L",
+              "codonpos": 2,
+              "pos": 44,
+              "ref": "P",
+              "refcodon": "CCG"
+            },
+            "alt": "A",
+            "ancestral_allele": "G",
+            "cadd": {
+              "phred": 1.493,
+              "raw": -0.160079,
+              "raw_rankscore": 0.05963
+            },
+            "cds_strand": "-",
+            "chrom": "1",
+            "ensembl": {
+              "geneid": "ENSG00000237613",
+              "transcriptid": "ENST00000417324"
+            },
+            "fold-degenerate": 0,
+            "genename": "FAM138A",
+            "gerp++": {
+              "nr": 1.29,
+              "rs": -0.558,
+              "rs_rankscore": 0.11796
+            },
+            "hg18": {
+              "end": 25230,
+              "start": 25230
+            },
+            "hg19": {
+              "end": 35367,
+              "start": 35367
+            },
+            "hg38": {
+              "end": 35367,
+              "start": 35367
+            },
+            "lr": {
+              "pred": "T",
+              "rankscore": 0.32941,
+              "score": 0.0846
+            },
+            "mutationtaster": {
+              "converted_rankscore": 0.10124,
+              "pred": "N",
+              "score": 1.0
+            },
+            "phastcons": {
+              "100way": {
+                "vertebrate": 0.001,
+                "vertebrate_rankscore": 0.1272
+              },
+              "46way": {
+                "placental": 0.003,
+                "placental_rankscore": 0.11579,
+                "primate": 0.336,
+                "primate_rankscore": 0.28762
+              }
+            },
+            "phylop": {
+              "100way": {
+                "vertebrate": 0.055,
+                "vertebrate_rankscore": 0.14229
+              },
+              "46way": {
+                "placental": -0.143,
+                "placental_rankscore": 0.11334,
+                "primate": 0.175,
+                "primate_rankscore": 0.17021
+              }
+            },
+            "provean": {
+              "converted_rankscore": 0.92415,
+              "pred": "D",
+              "score": -6.73
+            },
+            "radialsvm": {
+              "pred": "T",
+              "rankscore": 0.32188,
+              "score": -0.9916
+            },
+            "ref": "G",
+            "reliability_index": 5,
+            "sift": {
+              "converted_rankscore": 0.2575,
+              "pred": "T",
+              "score": 0.13
+            },
+            "siphy_29way": {
+              "logodds": 3.5364,
+              "logodds_rankscore": 0.07795,
+              "pi": {
+                "a": 0.5429,
+                "c": 0.0,
+                "g": 0.4571,
+                "t": 0.0
+              }
+            },
+            "vest3": {
+              "rankscore": 0.16309,
+              "score": 0.137
+            }
+          }
+        }

@@ -43,7 +43,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'myvariant.info'
+project = u'MyVariant.info'
 copyright = u'2015, Su Lab'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -196,7 +196,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'myvariantinfo.tex', u'myvariant.info Documentation',
+  ('index', 'myvariantinfo.tex', u'MyVariant.info Documentation',
    u'Su Lab', 'manual'),
 ]
 
@@ -226,7 +226,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'myvariantinfo', u'myvariant.info Documentation',
+    ('index', 'myvariantinfo', u'MyVariant.info Documentation',
      [u'Su Lab'], 1)
 ]
 
@@ -240,7 +240,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'myvariantinfo', u'myvariant.info Documentation',
+  ('index', 'myvariantinfo', u'MyVariant.info Documentation',
    u'Su Lab', 'myvariantinfo', 'One line description of project.',
    'Miscellaneous'),
 ]

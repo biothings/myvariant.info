@@ -4,7 +4,7 @@ Quick start
 `MyVariant.info <http://myvariant.info>`_ provides two simple web services: one for variant queries and the other for variant annotation retrieval. Both return results in `JSON <http://json.org>`_ format.
 
 Variant query service
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 
 URL
@@ -40,7 +40,7 @@ To learn more
 
 
 Variant annotation service
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 URL
 """""
