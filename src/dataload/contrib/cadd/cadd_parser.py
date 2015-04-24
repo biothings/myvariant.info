@@ -21,8 +21,6 @@ thousandgp = '/opt/myvariant.info/load_archive/cadd/1000G_inclAnno.tsv.gz'
 exac = 'opt/myvariant.info/load_archive/cadd/ExAC.r0.2_inclAnno.tsv.gz'
 ## ESP6500 variants SNVs and InDels including all annotations
 esp = 'opt/myvariant.info/load_archive/cadd/ESP6500SI_inclAnno.tsv.gz'
-## All Indels including annotations
-indels = 'http://krishna.gs.washington.edu/download/CADD/v1.2/InDels_inclAnno.tsv.gz'
 
 ## number of fields/annotations
 VALID_COLUMN_NO = 116
@@ -221,9 +219,9 @@ def load_contig(contig):
     '''
     #if CADD_INPUT == "exome":
     #CADD_INPUT = exome
-    tabix = pysam.Tabixfile(indels)
+    tabix = pysam.Tabixfile(whole_genome)
     src_db = get_src_db()
-    target_coll = src_db["cadd_indels"]
+    target_coll = src_db["cadd"]
     t0 = time.time()
     cnt = 0
     docs = (doc for doc in fetch_generator(tabix, contig))
@@ -236,5 +234,7 @@ def load_contig(contig):
             doc_list = []
         if cnt % 100000 == 0:
             print(cnt, timesofar(t0))
+    if doc_list:
+	target_coll.insert(doc_list, manipulate=False, check_keys=False, w=0)
     print("successfully loaded cadd chromosome %s into mongodb" % contig)
     print("total docs: {}; total time: {}".format(cnt, timesofar(t0)))

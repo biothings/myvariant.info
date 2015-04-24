@@ -1,6 +1,14 @@
 from .cadd_parser import load_contig
 
 
+__METADATA__ = {
+    "src_name": 'CADD',
+    "src_url": 'http://cadd.gs.washington.edu/',
+    "version": '1.2',
+    "field": "cadd"
+}
+
+
 def get_mapping():
     mapping = {
         "cadd": {
@@ -61,7 +69,7 @@ def get_mapping():
                             "type": "string",
                             "analyzer": "string_lowercase"
                         },
-                        "gene_name": {
+                        "genename": {
                             "type": "string",
                             "analyzer": "string_lowercase"
                         }

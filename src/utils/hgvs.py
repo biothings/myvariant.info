@@ -1,4 +1,6 @@
 import re
+import copy
+import requests
 
 
 def is_snp(hgvs_id):
@@ -94,3 +96,49 @@ def get_pos_start_end(chr, pos, ref, alt):
     else:
         raise ValueError("Cannot decide start/end from {}.".format((chr, pos, ref, alt)))
     return start, end
+
+
+def fix_hgvs_indel(hgvs_id):
+    """Fix hgvs id like these:
+         'chr19:g.58863869C>-',
+         'chr10:g.52596077->T',
+         'chr10:g.52596077->T',
+         'chr12:g.8998751T>-',
+         'chr12:g.9004916C>-',
+    """
+    _hgvs_id = None
+    pat_snp = '(chr\w+:g\.(\d+))([\w-])\>([\w-])'
+    if re.match(pat_snp, hgvs_id):
+        g = re.match(pat_snp, hgvs_id).groups()
+        pos, ref, alt = g[1:]
+        if ref == '-':
+            # should be insertion
+            _hgvs_id = '{}ins{}'.format(g[0], alt)
+        elif alt == '-':
+            # should be deletion
+            end = int(pos) + len(ref) - 1
+            _hgvs_id = '{0}_{1}del'.format(g[0], end)
+        else:
+            print("Error: either cannot fix or no need to fix: ", hgvs_id)
+    else:
+        print("Error: hgvs id not in a fixable format: ", hgvs_id)
+    return _hgvs_id
+
+
+def get_hgvs_from_rsid(doc_li, rsid_fn, api_host='http://localhost:8000'):
+    """input doc_li is a list doc with rsid, rsid_fn is a function to return rsid from
+       each doc.
+       It will return a generator with the _id as the matching hgvs_id for a given rsid.
+       if a rsid matches multiple hgvs ids, it will produce duplicated docs with each hgvs id.
+    """
+    for doc in doc_li:
+        rsid = rsid_fn(doc)
+        # parse from myvariant.info to get hgvs_id, ref, alt information based on rsid
+        url = api_host + '/v1/query?q=dbsnp.rsid:' + rsid +\
+            '&fields=_id,dbsnp.ref,dbsnp.alt,dbsnp.chrom,dbsnp.hg19'
+        r = requests.get(url)
+        for hits in r.json()['hits']:
+            hgvs_id = hits['_id']
+            _doc = copy.copy(doc)
+            _doc['_id'] = hgvs_id
+            yield _doc

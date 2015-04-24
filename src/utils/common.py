@@ -57,6 +57,10 @@ def is_seq(li):
     """
     return isinstance(li, (list, tuple))
 
+def is_float(f):
+    """return True if input is a float.
+    """
+    return isinstance(f,float)
 
 def iter_n(iterable, n):
     '''
@@ -250,3 +254,39 @@ def loadobj(filename, mode='file'):
     finally:
         fobj.close()
     return object
+
+
+def list2dict(a_list, keyitem, alwayslist=False):
+    '''Return a dictionary with specified keyitem as key, others as values.
+       keyitem can be an index or a sequence of indexes.
+       For example: li=[['A','a',1],
+                        ['B','a',2],
+                        ['A','b',3]]
+                    list2dict(li,0)---> {'A':[('a',1),('b',3)],
+                                         'B':('a',2)}
+       if alwayslist is True, values are always a list even there is only one item in it.
+                    list2dict(li,0,True)---> {'A':[('a',1),('b',3)],
+                                              'B':[('a',2),]}
+    '''
+    _dict = {}
+    for x in a_list:
+        if isinstance(keyitem, int):      # single item as key
+            key = x[keyitem]
+            value = tuple(x[:keyitem] + x[keyitem + 1:])
+        else:
+            key = tuple([x[i] for i in keyitem])
+            value = tuple([x[i] for i in range(len(a_list)) if i not in keyitem])
+        if len(value) == 1:      # single value
+            value = value[0]
+        if key not in _dict:
+            if alwayslist:
+                _dict[key] = [value, ]
+            else:
+                _dict[key] = value
+        else:
+            current_value = _dict[key]
+            if not isinstance(current_value, list):
+                current_value = [current_value, ]
+            current_value.append(value)
+            _dict[key] = current_value
+    return _dict

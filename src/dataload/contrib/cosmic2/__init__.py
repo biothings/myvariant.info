@@ -1,12 +1,21 @@
-# -*- coding: utf-8 -*-
-
 from .cosmic_parser import load_data as _load_data
 
+
+__METADATA__ = {
+    "src_name": 'COSMIC',
+    "src_url": 'http://cancer.sanger.ac.uk/cosmic',
+    "version": '72',
+    "field": "cosmic"
+}
+
+
 COSMIC_INPUT_FILE = ''
+
 
 def load_data():
     cosmic_data = _load_data(COSMIC_INPUT_FILE)
     return cosmic_data
+
 
 def get_mapping():
     mapping = {

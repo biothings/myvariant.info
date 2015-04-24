@@ -1,7 +1,19 @@
 from .dbnsfp_parser import load_data as _load_data
 
 
+<<<<<<< HEAD
 DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP3.0b2c_variant.chr*'
+=======
+__METADATA__ = {
+    "src_name": 'dbNSFP',
+    "src_url": 'https://sites.google.com/site/jpopgen/dbNSFP',
+    "version": '2.9',
+    "field": 'dbnsfp'
+}
+
+
+DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP2.9_variant*'
+>>>>>>> 4cdff9ae14fa4c74acd237520a17ae1927f8aafd
 
 
 def load_data():
@@ -13,8 +25,13 @@ def get_mapping():
     mapping = {
         "dbnsfp": {
             "properties": {
+                "rsid": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
                 "chrom": {
-                    "type": "string"
+                    "type": "string",
+                    "analyzer": "string_lowercase"
                 },
                 "hg18": {
                     "properties": {
@@ -46,10 +63,10 @@ def get_mapping():
                         }
                     }
                 },
-                "allele1": {
+                "ref": {
                     "type": "string"
                 },
-                "allele2": {
+                "alt": {
                     "type": "string"
                 },
                 "aa": {
@@ -500,7 +517,7 @@ def get_mapping():
                         "rs": {
                             "type": "string"
                         },
-                        # "clin_sig": {
+                        # "clinsig": {
                         #     "type": "integer"     # can contain |, like 5|5, FIXME
                         # },
                         "trait": {

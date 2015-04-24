@@ -1,3 +1,11 @@
+__METADATA__ = {
+    "src_name": 'gwassnps',
+    "src_url": None,
+    "version": None,
+    "field": "gwassnps"
+}
+
+
 def load_data():
     '''gwassnps data are preloaded in our db.'''
     raise NotImplementedError
@@ -10,31 +18,39 @@ def get_mapping():
                 "trait": {
                     "type": "string"
                 },
-                "pubmedID": {
-                    "type": "long"
+                "pubmed": {
+                    "type": "string",
+                    "index": "not_analyzed"
                 },
                 "rsid": {
                     "type": "string",
                     "include_in_all": True,
                     "analyzer": "string_lowercase"
                 },
-                "allele1": {
+                "title": {
+                    "type": "string"
+                },
+                "region": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "allele2": {
+                "genename": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "chrom": {
+                "risk_allele": {
+                    "type": "string"
+                },
+                "risk_allele_freq": {
+                    "type": "float"
+                },
+                "pvalue": {
+                    "type": "float",
+                    "index": "no"
+                },
+                "pvalue_desc": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
-                },
-                "chromStart": {
-                    "type": "long"
-                },
-                "chromEnd": {
-                    "type": "long"
+                    "index": "no"
                 }
             }
         }

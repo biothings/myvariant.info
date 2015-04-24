@@ -4,4 +4,8 @@ whole_genome_SNVs.tsv.gz.tbi
 src/config.py
 __pycache__
 .DS_Store
-
+logs
+pyenv
+docs/_build
+docs/doc_html
+src/www/static/docs

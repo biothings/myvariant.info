@@ -4,15 +4,16 @@ try:
 except:
     pass
 
-# This script produces simple JSON from UCSC variant data
-# Draws from the cosmicRaw database directly
-# Sean D. Mooney
 
-Meta = {
-    "maintainer": "Sean Mooney",
+__METADATA__ = {
     "requirements": [
         "MySQL-python>=1.2.5",
-    ]
+    ],
+    "src_name": 'COSMIC',
+    "src_url": 'http://cancer.sanger.ac.uk/cosmic',
+    "version": '68',
+    "field": "cosmic"
+
 }
 
 
@@ -83,18 +84,20 @@ def load_data(step=1000, offset=0):
 
         HGVS = "chr%s:g.%d%s>%s" % (chrom, chromEnd, allele1, allele2)
         one_snp_json = {
-            "chrom": chrom,
-            "hg19": {
-                "start": chromStart,
-                "end": chromEnd
-            },
-            "tumor_site": tumor_site,
-            "cosmic_id": cosmicid,
-            "mut_nt": mut_nt,
-            "mut_freq": mut_freq,
-            "ref": allele1,
-            "alt": allele2,
-            "_id": HGVS
+            "_id": HGVS,
+            "cosmic": {
+                "chrom": chrom,
+                "hg19": {
+                    "start": chromStart,
+                    "end": chromEnd
+                },
+                "tumor_site": tumor_site,
+                "cosmic_id": cosmicid,
+                "mut_nt": mut_nt,
+                "mut_freq": mut_freq,
+                "ref": allele1,
+                "alt": allele2
+            }
         }
         yield one_snp_json
 
