@@ -23,8 +23,8 @@ src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 if src_path not in sys.path:
     sys.path.append(src_path)
 #from config import INCLUDE_DOCS
-#from utils.es import ESQuery
 
+from www.api.es import ESQuery
 from www.helper import add_apps, BaseHandler
 from www.api.handlers import APP_LIST as api_app_list
 from www.beacon.handlers import APP_LIST as beacon_app_list
@@ -44,6 +44,17 @@ if options.debug:
     import logging
     logging.getLogger().setLevel(logging.DEBUG)
     options.address = '0.0.0.0'
+
+
+class StatusCheckHandler(tornado.web.RequestHandler):
+    ''' Handles requests to check the status of the server. '''
+    def head(self):
+        esq = ESQuery()
+        esq = esq.get_variant('chr1:g.218631822G>A')
+
+    def get(self):
+        self.head()
+        self.write('OK')
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -80,6 +91,7 @@ APP_LIST = [
     (r"/", MainHandler),
     (r"/metadata", MetaDataHandler),
     (r"/v1/metadata", MetaDataHandler),
+    (r"/status", StatusCheckHandler),
 ]
 
 APP_LIST += add_apps('api', api_app_list)
