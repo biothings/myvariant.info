@@ -10,7 +10,7 @@ Currently available URLs:
 import sys
 import os.path
 #import subprocess
-#import json
+import json
 
 import tornado.httpserver
 import tornado.ioloop
@@ -44,6 +44,15 @@ if options.debug:
     import logging
     logging.getLogger().setLevel(logging.DEBUG)
     options.address = '0.0.0.0'
+
+
+class IndexedFieldsHandler(BaseHandler):
+    def get(self):
+        try:
+            with open('context/myvariant_indexed_fields.json', 'r') as json_file:
+                self.return_json(json.load(json_file))
+        except FileNotFoundError:
+            self.return_json({})
 
 
 class StatusCheckHandler(tornado.web.RequestHandler):
@@ -93,6 +102,7 @@ APP_LIST = [
     (r"/v1/metadata", MetaDataHandler),
     (r"/status", StatusCheckHandler),
     (r"/context/(.*)", tornado.web.StaticFileHandler, {"path":"context"}),
+    (r"/indexed_fields", IndexedFieldsHandler),
 ]
 
 APP_LIST += add_apps('api', api_app_list)
