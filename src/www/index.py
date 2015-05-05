@@ -92,6 +92,7 @@ APP_LIST = [
     (r"/metadata", MetaDataHandler),
     (r"/v1/metadata", MetaDataHandler),
     (r"/status", StatusCheckHandler),
+    (r"/context/(.*)", tornado.web.StaticFileHandler, {"path":"context"}),
 ]
 
 APP_LIST += add_apps('api', api_app_list)
