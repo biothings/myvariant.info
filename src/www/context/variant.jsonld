@@ -6,7 +6,7 @@
         "clinvar": "http://identifiers.org/clinvar/",
         "evs": "http://identifiers.org/evs/",
         "gwassnps": "http://identifiers.org/gwassnps/",
-        "mutdb": "http://identifiers.org/gwassnps/"
+        "mutdb": "http://identifiers.org/gwassnps/",
         "rcv_accession": {
             "@id": "http://identifiers.org/clinvar.record/",
             "@type": "@id"
