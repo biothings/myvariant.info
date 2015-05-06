@@ -285,7 +285,8 @@ except ImportError:
 
 def setup(app):
     print 'Entered Setup'
-    #app.add_javascript('myvariant_doc.js')
-    #app.add_javascript('jquery.dataTables.min.js')
-    #app.add_stylesheet('myvariant_doc.css')
-    #app.add_stylesheet('jquery.dataTables.min.css')
+    app.add_javascript('myvariant_doc.js')
+    app.add_javascript('jquery.dataTables.min.js')
+    app.add_stylesheet('myvariant_doc.css')
+    app.add_stylesheet('jquery.dataTables.min.css')
+    print 'Exited Setup'
