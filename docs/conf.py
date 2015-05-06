@@ -282,3 +282,9 @@ try:
 except ImportError:
     print 'Warning: "sphinx_rtd_theme" is not installed, fall back to default theme.'
     pass
+
+def setup(app):
+    app.add_javascript('myvariant_doc.js')
+    app.add_javascript('jquery.dataTables.min.js')
+    app.add_stylesheet('myvariant_doc.css')
+    app.add_stylesheet('jquery.dataTables.min.css')
