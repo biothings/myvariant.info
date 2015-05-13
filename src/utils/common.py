@@ -155,7 +155,7 @@ def split_ids(q):
     if sys.version_info.major == 3:
         lex = shlex(q, posix=True)
     else:
-        lex = shlex(q.encode('utf8'), posix=True)       
+        lex = shlex(q.encode('utf8'), posix=True)
     lex.whitespace = ' \t\n\x0b\x0c\r|,+'
     lex.whitespace_split = True
     lex.commenters = ''
