@@ -149,8 +149,9 @@ class ESQuery():
         '''for /query post request'''
         options = self._get_cleaned_query_options(kwargs)
         qbdr = ESQueryBuilder(**options.kwargs)
+        scopes = '_id'
         try:
-            _q = qbdr.build_multiple_id_query(vid_list, options.scopes)
+            _q = qbdr.build_multiple_id_query(vid_list, scopes=scopes)
         except MVQueryError as err:
             return {'success': False,
                     'error': err.message}
