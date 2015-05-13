@@ -49,8 +49,9 @@ class VariantHandler(BaseHandler):
             res = self.esq.mget_variants2(ids, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
-
-        self.return_json(res)
+        encode = not isinstance(res, str)    # when res is a string, e.g. when rawquery is true,
+                                             # do not encode it as json
+        self.return_json(res, encode=encode)
 
 
 class QueryHandler(BaseHandler):
@@ -122,7 +123,9 @@ class QueryHandler(BaseHandler):
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 
-        self.return_json(res)
+        encode = not isinstance(res, str)    # when res is a string, e.g. when rawquery is true,
+                                             # do not encode it as json
+        self.return_json(res, encode=encode)
 
 
 APP_LIST = [
