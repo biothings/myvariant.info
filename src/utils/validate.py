@@ -119,7 +119,7 @@ class VariantValidator:
         self._chr_data = loadobj(HG19_DATAFILE)
         print("Done.")
 
-    def validate_hgvs(self, hgvs_id, verbose=False, flag_invalid=False, collection=False):
+    def validate_hgvs(self, hgvs_id, verbose=False):
         '''validate single hgvs variant name, return True/False,
            or None if input hgvs_id cannot be validated (could be
            wrong format, or ins/del type currently we don't validate.
@@ -156,8 +156,6 @@ class VariantValidator:
                     print('"{}":\t{}'.format(hgvs_id, matched))
                 else:
                     print('"{}":\t{} (should be "{}")'.format(hgvs_id, matched, nuc_chr))
-                    if flag_invalid:
-                        collection.update({"_id": hgvs_id}, {'$set':{"unmatched_ref": "True"}})
             return matched
         else:
             if verbose:
@@ -208,7 +206,9 @@ class VariantValidator:
         # validate each item in the cursor
         for item in cursor:
             _id = item['_id']
-            valid = self.validate_hgvs(_id, verbose=verbose, collection=collection, flag_invalid=flag_invalid)
+            valid = self.validate_hgvs(_id, verbose=verbose)
+            if valid == False and flag_invalid:
+                collection.update({"_id": _id}, {'$set':{"unmatched_ref": "True"}})
             cnt_d[valid] += 1
             if return_dict[valid]:
                 out[valid].append(_id)
