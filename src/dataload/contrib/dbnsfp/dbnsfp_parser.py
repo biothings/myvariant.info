@@ -11,6 +11,8 @@ https://sites.google.com/site/jpopgen/dbNSFP'''
 def _map_line_to_json(fields, version = 'hg19'):
     # specific variable treatment
     chrom = fields[0]
+    if chrom = 'M':
+        chrom = 'MT'
     # fields[7] in version 2, represent hg18_pos
     if fields[10] == ".":
         hg18_end = "."
