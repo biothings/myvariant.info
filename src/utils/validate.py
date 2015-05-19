@@ -176,7 +176,7 @@ class VariantValidator:
         return out
 
     def validate_src(self, collection, return_false=False,
-                     return_none=False, return_true=False, verbose=False):
+                     return_none=False, return_true=False, verbose=False, flag_invalid=False):
         '''Validate hgvs ids from a src collection.'''
 
         return_dict = {
@@ -207,6 +207,8 @@ class VariantValidator:
         for item in cursor:
             _id = item['_id']
             valid = self.validate_hgvs(_id, verbose=verbose)
+            if valid == False and flag_invalid:
+                collection.update({"_id": _id}, {'$set':{"unmatched_ref": "True"}})
             cnt_d[valid] += 1
             if return_dict[valid]:
                 out[valid].append(_id)
