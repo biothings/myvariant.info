@@ -5,14 +5,15 @@ from utils.common import timesofar
 from utils.mongo import get_src_db
 
 
-def load_source(collection_name, src_module=None, src_data=None, inbatch=True):
+def load_source(collection_name, src_module=None, src_data=None, inbatch=True, new_collection=True):
     '''save src data into mongodb collection.
        if src_module is provided, src_data = src_module.load_data()
+       if new_collection is True, it requires the target collection is empty.
        else, use src_data directly, should be a iterable.
     '''
     src_db = get_src_db()
     target_coll = src_db[collection_name]
-    if target_coll.count() > 0:
+    if new_collection and target_coll.count() > 0:
         print("Error: target collection {} exists.".format(collection_name))
         return
 
