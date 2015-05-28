@@ -2,7 +2,7 @@ from __future__ import print_function
 #from __future__ import unicode_literals
 import itertools
 import csv
-from utils.common import open_anyfile
+from utils.common import open_anyfile, is_str
 """
 Utility functions for parsing flatfiles,
 mapping to JSON, cleaning.
@@ -34,26 +34,30 @@ def dict_sweep(d, vals=[".", "-", "", "NA", "none", " ", "Not Available", "unkno
     return d
 
 
-# convert string numbers into integers or floats
-def value_convert(d):
-    for key, val in d.items():
+def to_number(val):
+    """convert an input string to int/float."""
+    if is_str(val):
         try:
-            d[key] = int(val)
-        except (ValueError, TypeError):
+            return int(val)
+        except ValueError:
             try:
-                d[key] = float(val)
-            except (ValueError, TypeError):
+                return float(val)
+            except ValueError:
                 pass
+    return val
+
+
+def value_convert(d):
+    """convert string numbers into integers or floats"""
+    for key, val in d.items():
         if isinstance(val, dict):
             value_convert(val)
         elif isinstance(val, list):
-            try:
-                d[key] = [int(x) for x in val]
-            except (ValueError, TypeError):
-                try:
-                    d[key] = [float(x) for x in val]
-                except (ValueError, TypeError):
-                    pass
+            d[key] = [to_number(x) for x in val]
+        elif isinstance(val, tuple):
+            d[key] = tuple([to_number(x) for x in val])
+        else:
+            d[key] = to_number(val)
     return d
 
 

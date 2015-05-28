@@ -57,10 +57,12 @@ def is_seq(li):
     """
     return isinstance(li, (list, tuple))
 
+
 def is_float(f):
     """return True if input is a float.
     """
-    return isinstance(f,float)
+    return isinstance(f, float)
+
 
 def iter_n(iterable, n):
     '''
