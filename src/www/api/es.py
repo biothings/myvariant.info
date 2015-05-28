@@ -149,9 +149,8 @@ class ESQuery():
         '''for /query post request'''
         options = self._get_cleaned_query_options(kwargs)
         qbdr = ESQueryBuilder(**options.kwargs)
-        scopes = '_id'
         try:
-            _q = qbdr.build_multiple_id_query(vid_list, scopes=scopes)
+            _q = qbdr.build_multiple_id_query(vid_list, scopes=options.scopes)
         except MVQueryError as err:
             return {'success': False,
                     'error': err.message}
@@ -314,12 +313,13 @@ class ESQueryBuilder:
         self._query_options = query_options
 
     def build_id_query(self, vid, scopes=None):
-        _default_scopes = [
-            '_id',
-            'rsid', "dbnsfp.rsid", "dbsnp.rsid", "evs.rsid", "mutdb.rsid"  # for rsid
-            "dbsnp.gene.symbol", 'evs.gene.symbol', 'clinvar.gene.symbol',
-            'dbnsfp.genename', "cadd.gene.genename", "docm.genename",      # for gene symbols
-        ]
+        # _default_scopes = [
+        #     '_id',
+        #     'rsid', "dbnsfp.rsid", "dbsnp.rsid", "evs.rsid", "mutdb.rsid"  # for rsid
+        #     "dbsnp.gene.symbol", 'evs.gene.symbol', 'clinvar.gene.symbol',
+        #     'dbnsfp.genename', "cadd.gene.genename", "docm.genename",      # for gene symbols
+        # ]
+        _default_scopes = '_id'
         scopes = scopes or _default_scopes
         if is_str(scopes):
             _query = {
