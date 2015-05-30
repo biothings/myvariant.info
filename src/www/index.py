@@ -92,7 +92,8 @@ class MetaDataHandler(BaseHandler):
                 'dbsnp': 110234210,
                 'emv': 12066,
                 'gwassnps': 15243
-            }
+            },
+            "timestamp": "2015-04-15T11:39:48.309000"
         })
 
 
@@ -101,7 +102,7 @@ APP_LIST = [
     (r"/metadata", MetaDataHandler),
     (r"/v1/metadata", MetaDataHandler),
     (r"/status", StatusCheckHandler),
-    (r"/context/(.*)", tornado.web.StaticFileHandler, {"path":"context"}),
+    (r"/context/(.*)", tornado.web.StaticFileHandler, {"path": "context"}),
     (r"/indexed_fields", IndexedFieldsHandler),
 ]
 
