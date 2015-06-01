@@ -201,7 +201,7 @@ class ESQuery():
                 res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
             except RequestError:
                 return {"error": "invalid query term.", "success": False}
-                
+
         if not options.raw:
             _res = res['hits']
             _res['took'] = res['took']
