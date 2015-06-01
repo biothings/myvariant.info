@@ -1,7 +1,7 @@
 jQuery(document).ready(function() {
     if( jQuery(' .indexed-field-table ').length ) {
         jQuery.ajax({
-            url: "http://myvariant.info/indexed_fields",
+            url: "http://myvariant.info/v1/indexed_fields",
             dataType: "JSONP",
             jsonpCallback: "callback",
             type: "GET",
