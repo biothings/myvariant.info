@@ -2,7 +2,7 @@ import re
 import json
 from utils.common import dotdict, is_str, is_seq
 from utils.es import get_es
-from elasticsearch import NotFoundError
+from elasticsearch import NotFoundError, RequestError
 import config
 
 # a query to get variants with most of fields:
@@ -197,8 +197,11 @@ class ESQuery():
             }
             if facets:
                 _query['facets'] = facets
-            res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
-
+            try:
+                res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
+            except RequestError:
+                return {"error": "invalid query term.", "success": False}
+                
         if not options.raw:
             _res = res['hits']
             _res['took'] = res['took']
