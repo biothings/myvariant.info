@@ -87,12 +87,6 @@ def get_mapping():
                         },
                         "codonpos": {
                             "type": "integer"
-                        },
-                        "aapos_sift": {
-                            "type": "string"
-                        },
-                        "aapos_fathmm": {
-                            "type": "string"
                         }
                     }
                 },
@@ -101,26 +95,14 @@ def get_mapping():
                     "analyzer": "string_lowercase"
                 },
                 "uniprot": {
-                    "properties": {
-                        "acc": {
-                            "type": "string"
-                        },
-                        "pos": {
-                            "type": "string"
-                        }
-                    }
+                    "type": "string",
+                    "analyzer": "string_lowercase"
                 },
                 "interpro_domain": {
                     "type": "string"
                 },
                 "cds_strand": {
                     "type": "string"
-                },
-                "slr_test_statistic": {
-                    "type": "float"
-                },
-                "fold-degenerate": {
-                    "type": "integer"
                 },
                 "ancestral_allele": {
                     "type": "string"
@@ -188,6 +170,9 @@ def get_mapping():
                         },
                         "score": {
                             "type": "float"
+                        },
+                        "omega": {
+                            "type": "float"
                         }
                     }
                 },
@@ -201,6 +186,12 @@ def get_mapping():
                         },
                         "score": {
                             "type": "float"
+                        },
+                        "model": {
+                            "type": "string"
+                        },
+                        "AAE": {
+                            "type": "string"
                         }
                     }
                 },
@@ -230,16 +221,29 @@ def get_mapping():
                         }
                     }
                 },
-                "radialsvm": {
+                "provean": {
                     "properties": {
-                        "pred": {
-                            "type": "string"
-                        },
                         "score": {
                             "type": "float"
                         },
                         "rankscore": {
                             "type": "float"
+                        },
+                        "pred": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "metasvm": {
+                    "properties": {
+                        "score": {
+                            "type": "float"
+                        },
+                        "rankscore": {
+                            "type": "float"
+                        },
+                        "pred": {
+                            "type": "string"
                         }
                     }
                 },
@@ -259,42 +263,6 @@ def get_mapping():
                 "reliability_index": {
                     "type": "integer"
                 },
-                "vest3": {
-                    "properties": {
-                        "score": {
-                            "type": "float"
-                        },
-                        "rankscore": {
-                            "type": "float"
-                        }
-                    }
-                },
-                "provean": {
-                    "properties": {
-                        "score": {
-                            "type": "float"
-                        },
-                        "converted_rankscore": {
-                            "type": "float"
-                        },
-                        "pred": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "cadd": {
-                    "properties": {
-                        "phred": {
-                            "type": "float"
-                        },
-                        "raw": {
-                            "type": "float"
-                        },
-                        "raw_rankscore": {
-                            "type": "float"
-                        }
-                    }
-                },
                 "gerp++": {
                     "properties": {
                         "rs_rankscore": {
@@ -308,83 +276,30 @@ def get_mapping():
                         }
                     }
                 },
-                "phylop": {
+                "phylop_7way": {
                     "properties": {
-                        "46way": {
-                            "properties": {
-                                "primate_rankscore": {
-                                    "type": "float"
-                                },
-                                "primate": {
-                                    "type": "float"
-                                },
-                                "placental_rankscore": {
-                                    "type": "float"
-                                },
-                                "placental": {
-                                    "type": "float"
-                                }
-                            }
+                        "vertebrate": {
+                            "type": "float"
                         },
-                        "100way": {
-                            "properties": {
-                                "vertebrate": {
-                                    "type": "float"
-                                },
-                                "vertebrate_rankscore": {
-                                    "type": "float"
-                                }
-                            }
+                        "vertebrate_rankscore": {
+                            "type": "float"
                         }
                     }
                 },
-                "phastcons": {
+                "phastcons_7way": {
                     "properties": {
-                        "46way": {
-                            "properties": {
-                                "primate_rankscore": {
-                                    "type": "float"
-                                },
-                                "primate": {
-                                    "type": "float"
-                                },
-                                "placental_rankscore": {
-                                    "type": "float"
-                                },
-                                "placental": {
-                                    "type": "float"
-                                }
-                            }
+                        "vertebrate": {
+                            "type": "float"
                         },
-                        "100way": {
-                            "properties": {
-                                "vertebrate": {
-                                    "type": "float"
-                                },
-                                "vertebrate_rankscore": {
-                                    "type": "float"
-                                }
-                            }
+                        "vertebrate_rankscore": {
+                            "type": "float"
                         }
                     }
                 },
                 "siphy_29way": {
                     "properties": {
                         "pi": {
-                            "properties": {
-                                "a": {
-                                    "type": "float"
-                                },
-                                "c": {
-                                    "type": "float"
-                                },
-                                "t": {
-                                    "type": "float"
-                                },
-                                "g": {
-                                    "type": "float"
-                                }
-                            }
+                            "type": "float"
                         },
                         "logodds": {
                             "type": "float"
@@ -393,12 +308,6 @@ def get_mapping():
                             "type": "float"
                         }
                     }
-                },
-                "lrt_omega": {
-                    "type": "float"
-                },
-                "unisnp_ids": {
-                    "type": "string"
                 },
                 "1000gp1": {
                     "properties": {
@@ -426,11 +335,37 @@ def get_mapping():
                         "amr_af": {
                             "type": "float"
                         },
-                        "asn_af": {
+                        "eas_af": {
                             "type": "float"
                         },
-                        "asn_ac": {
+                        "eas_ac": {
                             "type": "integer"
+                        },
+                        "sas_af": {
+                            "type": "float"
+                        },
+                        "sas_ac": {
+                            "type": "integer"
+                        },
+                    }
+                },
+                "twinsuk": {
+                    "properties": {
+                        "ac": {
+                            "type": "integer"
+                        },
+                        "af": {
+                            "type": "float"
+                        }
+                    }
+                },
+                "alspac": {
+                    "properties": {
+                        "ac": {
+                            "type": "integer"
+                        },
+                        "af": {
+                            "type": "float"
                         }
                     }
                 },
@@ -441,22 +376,12 @@ def get_mapping():
                         },
                         "aa_af": {
                             "type": "float"
-                        }
-                    }
-                },
-                "aric5606": {
-                    "properties": {
-                        "aa_ac": {
-                            "type": "float"
-                        },
-                        "aa_af": {
-                            "type": "float"
                         },
                         "ea_ac": {
-                            "type": "float"
+                            "type": "integer"
                         },
-                        "ea_af": {
-                            "type": "float"
+                        "aa_ac": {
+                            "type": "integer"
                         }
                     }
                 },
