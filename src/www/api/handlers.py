@@ -28,6 +28,8 @@ class VariantHandler(BaseHandler):
             variant = self.esq.get_variant(vid, **kwargs)
             if variant:
                 self.return_json(variant)
+                self.ga_track(event={'category': 'v1_api',
+                                     'action': 'variant_get'})
             else:
                 raise HTTPError(404)
         else:

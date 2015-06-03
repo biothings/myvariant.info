@@ -1,7 +1,7 @@
 import json
 import datetime
 import tornado.web
-#from utils.ga import GAMixIn
+from ga import GAMixIn
 from collections import OrderedDict
 
 SUPPORT_MSGPACK = True
@@ -22,7 +22,7 @@ class DateTimeJSONEncoder(json.JSONEncoder):
             return super(DateTimeJSONEncoder, self).default(obj)
 
 
-class BaseHandler(tornado.web.RequestHandler):
+class BaseHandler(tornado.web.RequestHandler, GAMixIn):
     jsonp_parameter = 'callback'
     cache_max_age = 604800  # 7days
     disable_caching = False
