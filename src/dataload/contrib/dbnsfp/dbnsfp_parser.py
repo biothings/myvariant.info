@@ -140,7 +140,7 @@ def _map_line_to_json(fields, version = 'hg19'):
                 "vertebrate": fields[65],
                 "vertebrate_rankscore": fields[66]
             },
-            "phastCons_7way": {
+            "phastcons_7way": {
                 "vertebrate": fields[67],
                 "vertebrate_rankscore": fields[68]
             },
