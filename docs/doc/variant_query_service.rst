@@ -107,8 +107,9 @@ Available fields
         <thead>
             <tr>
                 <th>Field</th>
-                <th>Description</th>
-                <th>Examples</th>
+                <th>Indexed</th>
+                <th>Type</th>
+                <th>Example</th>
             </tr>
         </thead>
         <tbody>

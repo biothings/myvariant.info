@@ -6,6 +6,19 @@ import sys
 from elasticsearch import Elasticsearch
 import json
 
+EXAMPLES = {'evs': "chr5:g.126147533G>A",
+            'cadd': "chr5:g.126141367T>A",
+            'wellderly': "chr2:g.208133534G>C",
+            'dbnsfp': "chr5:g.126141367T>A",
+            'snpedia': "chr7:g.117199646->CTT",
+            'clinvar': "chr19:g.36332612C>T",
+            'docm': "chr10:g.89692991A>T",
+            'mutdb': "chr13:g.88329134G>T",
+            'cosmic': "chr13:g.24167556C>T",
+            'dbsnp': "chr5:g.126147533G>A",
+            'emv': "chr2:g.179634392A>T",
+            'gwassnps': "chr1:g.117038287T>C"}
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -21,10 +34,18 @@ def main():
         r = {}
         for (k, v) in d.items():
             if type(v) is dict:
-                if 'type' in v and ('index' not in v or ('index' in v and v['index'] != 'no')):
-                    r[prefix + '.' + k] = v['type']
+                if 'type' in v:
+                    r[prefix + '.' + k] = {}
+                    r[prefix + '.' + k]['type'] = v['type']
+                    if ('index' not in v) or ('index' in v and v['index'] != 'no'):
+                        r[prefix + '.' + k]['indexed'] = True
+                        r[prefix + '.' + k]['example'] = 'q=_exists_:' + prefix.lstrip('.') + '.' + k + '&fields=' + prefix.lstrip('.') + '.' + k
+                    else:
+                        r[prefix + '.' + k]['indexed'] = False
+                        db_type = prefix.lstrip('.').split('.')[0]
+                        r[prefix + '.' + k]['example'] = 'q=' + EXAMPLES[db_type] + '&fields=' + prefix.lstrip('.') + '.' + k
                 elif 'properties' in v:
-                    r.update(get_indexed_properties_in_dict(v['properties'], prefix + '.' + k))
+                        r.update(get_indexed_properties_in_dict(v['properties'], prefix + '.' + k))
         return r
 
     # get the dictionary, strip the leading . from the key names, and write the output

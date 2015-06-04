@@ -6,8 +6,13 @@ jQuery(document).ready(function() {
             jsonpCallback: "callback",
             type: "GET",
             success: function(data) {
-                jQuery.each(data, function(field, type) {
-                    jQuery('.indexed-field-table > tbody:last').append('<tr><td>' + field + '</td><td><span class="italic">' + type + '</span></td><td>&nbsp;</td>');
+                jQuery.each(data, function(field, d) {
+                    if(d.indexed) {
+                        jQuery('.indexed-field-table > tbody:last').append('<tr><td>' + field + '</td><td>&#x2714</td><td><span class="italic">' + d.type + '</span></td><td>' + d.example + '</td>');
+                    }
+                    else {
+                        jQuery('.indexed-field-table > tbody:last').append('<tr><td>' + field + '</td><td>&nbsp</td><td><span class="italic">' + d.type + '</span></td><td>' + d.example + '</td>');
+                    }    
                 });
                 jQuery('.indexed-field-table').DataTable({
                     "iDisplayLength": 50,
