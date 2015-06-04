@@ -20,6 +20,7 @@ jQuery(document).ready(function() {
                     "columns": [
                         {"width":"290px"},
                         null,
+                        null,
                         null
                     ],
                     "autoWidth": false,
