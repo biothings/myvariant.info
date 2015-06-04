@@ -6,18 +6,18 @@ import sys
 from elasticsearch import Elasticsearch
 import json
 
-EXAMPLES = {'evs': "chr5:g.126147533G>A",
-            'cadd': "chr5:g.126141367T>A",
-            'wellderly': "chr2:g.208133534G>C",
-            'dbnsfp': "chr5:g.126141367T>A",
-            'snpedia': "chr7:g.117199646->CTT",
-            'clinvar': "chr19:g.36332612C>T",
-            'docm': "chr10:g.89692991A>T",
-            'mutdb': "chr13:g.88329134G>T",
-            'cosmic': "chr13:g.24167556C>T",
-            'dbsnp': "chr5:g.126147533G>A",
-            'emv': "chr2:g.179634392A>T",
-            'gwassnps': "chr1:g.117038287T>C"}
+EXAMPLES = {'evs': '"chr5:g.126147533G>A"',
+            'cadd': '"chr5:g.126141367T>A"',
+            'wellderly': '"chr2:g.208133534G>C"',
+            'dbnsfp': '"chr5:g.126141367T>A"',
+            'snpedia': '"chr7:g.117199646->CTT"',
+            'clinvar': '"chr19:g.36332612C>T"',
+            'docm': '"chr10:g.89692991A>T"',
+            'mutdb': '"chr13:g.88329134G>T"',
+            'cosmic': '"chr13:g.24167556C>T"',
+            'dbsnp': '"chr5:g.126147533G>A"',
+            'emv': '"chr2:g.179634392A>T"',
+            'gwassnps': '"chr1:g.117038287T>C"'}
 
 
 def main():
@@ -43,7 +43,7 @@ def main():
                     else:
                         r[prefix + '.' + k]['indexed'] = False
                         db_type = prefix.lstrip('.').split('.')[0]
-                        r[prefix + '.' + k]['example'] = 'q=' + EXAMPLES[db_type] + '&fields=' + prefix.lstrip('.') + '.' + k
+                        r[prefix + '.' + k]['example'] = 'q=_id:' + EXAMPLES[db_type] + '&fields=' + prefix.lstrip('.') + '.' + k
                 elif 'properties' in v:
                         r.update(get_indexed_properties_in_dict(v['properties'], prefix + '.' + k))
         return r
