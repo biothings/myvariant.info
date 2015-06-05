@@ -51,9 +51,12 @@ class VariantHandler(BaseHandler):
             res = self.esq.mget_variants2(ids, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
-        encode = not isinstance(res, str)    # when res is a string, e.g. when rawquery is true,
-                                             # do not encode it as json
+        encode = not isinstance(res, str)    # when res is a string, e.g. when rawquery is true, do not encode it as json
         self.return_json(res, encode=encode)
+        self.ga_track(event={'category': 'v1_api',
+                             'action': 'variant_post',
+                             'label': 'qsize',
+                             'value': len(ids) if ids else 0})
 
 
 class QueryHandler(BaseHandler):
@@ -95,6 +98,10 @@ class QueryHandler(BaseHandler):
             res = {'success': False, 'error': "Missing required parameters."}
 
         self.return_json(res)
+        self.ga_track(event={'category': 'v1_api',
+                             'action': 'query_get',
+                             'label': 'qsize',
+                             'value': len(q) if q else 0})
 
     def post(self):
         '''
@@ -125,9 +132,12 @@ class QueryHandler(BaseHandler):
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 
-        encode = not isinstance(res, str)    # when res is a string, e.g. when rawquery is true,
-                                             # do not encode it as json
+        encode = not isinstance(res, str)    # when res is a string, e.g. when rawquery is true, do not encode it as json
         self.return_json(res, encode=encode)
+        self.ga_track(event={'category': 'v1_api',
+                             'action': 'query_post',
+                             'label': 'qsize',
+                             'value': len(q) if q else 0})
 
 
 APP_LIST = [
