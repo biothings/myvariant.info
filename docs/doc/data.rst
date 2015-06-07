@@ -27,7 +27,7 @@ keep them up-to-date, so that you don't have to do it:
 Total variants loaded: **286,219,908**
 
 +-------------------------------+---------------+---------------------------+----------------------------+
-| Source                        | version       | # of variants loaded      | key name in variant objects|
+| Source                        | version       | # of variants             | key name*                  |
 +===============================+===============+===========================+============================+
 | `dbNSFP`_                     |v2.9           | 78,045,379                | dbnsfp                     |
 +-------------------------------+---------------+---------------------------+----------------------------+
@@ -54,6 +54,7 @@ Total variants loaded: **286,219,908**
 | `Scripps Wellderly`_          | \-            |21,240,519                 | wellderly                  |
 +-------------------------------+---------------+---------------------------+----------------------------+
 
+\* key name: this is the key for the specific annotation data in a variant object. 
 
 The most updated information can be accessed `here <http://myvariant.info/v1/metadata>`_.
 
