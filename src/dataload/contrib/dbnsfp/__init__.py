@@ -95,9 +95,15 @@ def get_mapping():
                     "analyzer": "string_lowercase"
                 },
                 "uniprot": {
-                    "type": "string",
-                    "analyzer": "string_lowercase"
-                },
+                    "properties": {
+                        "acc": {
+                            "type": "string"
+                        },
+                        "pos": {
+                            "type": "string"
+                        }
+                    }
+                 },
                 "interpro_domain": {
                     "type": "string"
                 },
@@ -188,7 +194,8 @@ def get_mapping():
                             "type": "float"
                         },
                         "model": {
-                            "type": "string"
+                            "type": "string",
+                            "analyzer": "string_lowercase"
                         },
                         "AAE": {
                             "type": "string"
@@ -299,7 +306,20 @@ def get_mapping():
                 "siphy_29way": {
                     "properties": {
                         "pi": {
-                            "type": "float"
+                            "properties": {
+                                "a": {
+                                    "type": "float",
+                                },
+                                "c": {
+                                    "type": "float",
+                                },
+                                "t": {
+                                    "type": "float",
+                                },
+                                "g": {
+                                    "type": "float",
+                                },
+                            }
                         },
                         "logodds": {
                             "type": "float"
