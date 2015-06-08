@@ -173,7 +173,7 @@ def get_mapping():
                             "type": "float"
                         },
                         "mq0": {
-                            "type": "float"
+                            "type": "integer"
                         },
                         "mqranksum": {
                             "type": "float"
