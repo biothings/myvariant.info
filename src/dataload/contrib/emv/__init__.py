@@ -40,7 +40,7 @@ def get_mapping():
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "variant_aka_list": {
+                "hgvs": {
                     "type": "string",
                     "analyzer": "string_lowercase",
                     "include_in_all": True
