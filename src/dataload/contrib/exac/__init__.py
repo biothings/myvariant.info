@@ -68,31 +68,31 @@ def get_mapping():
                 "an": {
                     "properties": {
                         "an": {
-                            "type": "long"
+                            "type": "integer"
                         },
                         "an_afr": {
-                            "type": "long"
+                            "type": "integer"
                         },
                         "an_amr": {
-                            "type": "long"
+                            "type": "integer"
                         },
                         "an_adj": {
-                            "type": "long"
+                            "type": "integer"
                         },
                         "an_eas": {
-                            "type": "long"
+                            "type": "integer"
                         },
                         "an_fin": {
-                            "type": "long"
+                            "type": "integer"
                         },
                         "an_nfe": {
-                            "type": "long"
+                            "type": "integer"
                         },
                         "an_oth": {
-                            "type": "long"
+                            "type": "integer"
                         },
                         "an_sas": {
-                            "type": "long"
+                            "type": "integer"
                         }
                     }
                 },
