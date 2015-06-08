@@ -43,7 +43,7 @@ def _map_line_to_json(fields):
             "egl_protein": fields[6],
             "egl_classification": fields[7],
             "egl_classification_date": fields[8],
-            "variant_aka_list": fields[9].split(" | "),
+            "hgvs": fields[9].split(" | "),
             "clinvar_rcv": fields[10],
         }
     }
