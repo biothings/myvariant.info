@@ -24,13 +24,8 @@ def get_mapping():
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "ref": {
-                    "type": "string",
-                    "analyzer": "string_lowercase"
-                },
                 "qual": {
-                    "type": "string",
-                    "analyzer": "string_lowercase"
+                    "type": "float"
                 },
                 "filter": {
                     "type": "string",
@@ -68,50 +63,50 @@ def get_mapping():
                     }
                 },
                 "af": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "an": {
                     "properties": {
                         "an": {
-                            "type": "integer"
+                            "type": "long"
                         },
                         "an_afr": {
-                            "type": "integer"
+                            "type": "long"
                         },
                         "an_amr": {
-                            "type": "integer"
+                            "type": "long"
                         },
                         "an_adj": {
-                            "type": "integer"
+                            "type": "long"
                         },
                         "an_eas": {
-                            "type": "integer"
+                            "type": "long"
                         },
                         "an_fin": {
-                            "type": "integer"
+                            "type": "long"
                         },
                         "an_nfe": {
-                            "type": "integer"
+                            "type": "long"
                         },
                         "an_oth": {
-                            "type": "integer"
+                            "type": "long"
                         },
                         "an_sas": {
-                            "type": "integer"
+                            "type": "long"
                         }
                     }
                 },
                 "baseqranksum": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "clippingranksum": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "fs": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "dp": {
-                    "type": "integer"
+                    "type": "long"
                 },
                 "het": {
                     "properties": {
@@ -170,18 +165,18 @@ def get_mapping():
                     }
                 },
                 "inbreedingcoeff": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "mq": {
                     "properties": {
                         "mq": {
-                            "type": "integer"
+                            "type": "float"
                         },
                         "mq0": {
-                            "type": "integer"
+                            "type": "float"
                         },
                         "mqranksum": {
-                            "type": "integer"
+                            "type": "float"
                         }
                     }
                 },
@@ -189,13 +184,13 @@ def get_mapping():
                     "type": "long"
                 },
                 "qd": {
-                    "type": "long"
+                    "type": "float"
                 },
                 "readposranksum": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "vqslod": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "culprit": {
                     "type": "string",
