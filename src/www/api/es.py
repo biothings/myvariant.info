@@ -310,6 +310,11 @@ class ESQuery():
             _query["query"]["bool"]["should"].append(_q)
         return self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **kwargs)
 
+    def query_fields(self, **kwargs):
+        # query the metadata to get the available fields for a variant object
+        r = self._es.indices.get(index=self._index)
+        return r[list(r.keys())[0]]['mappings']['variant']['properties']
+
 
 class ESQueryBuilder:
     def __init__(self, **query_options):

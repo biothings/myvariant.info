@@ -48,6 +48,8 @@ URL
 
     http://myvariant.info/v1/variant/<variant_id>
 
+"*\<variant_id\>*" is an HGVS name based variant id using genomic location based on hg19 human genome assembly..
+
 Examples
 """"""""
 ::
@@ -58,8 +60,6 @@ Examples
     http://myvariant.info/v1/variant/chr1:g.160145907G>T
     http://myvariant.info/v1/variant/chr16:g.28883241A>G
     http://myvariant.info/v1/variant/chr3:g.49721532G>A    
-
-"*\<variant_id\>*" is an HGVS name based variant id using genomic location based on hg19 human genome assembly..
 
 
 To learn more

@@ -5,6 +5,7 @@ from tornado.web import HTTPError
 from www.helper import BaseHandler
 from .es import ESQuery
 from utils.common import split_ids
+import config
 
 
 class VariantHandler(BaseHandler):
@@ -140,8 +141,66 @@ class QueryHandler(BaseHandler):
                              'value': len(q) if q else 0})
 
 
+class MetaDataHandler(BaseHandler):
+    disable_caching = True
+
+    def get(self):
+        # For now, just return a hardcoded object, later we'll actually query the ES db for this information
+        self.return_json({
+            "stats": {
+                'total': 286219908,
+                'evs': 1977300,
+                'cadd': 163690986,
+                'wellderly': 21240519,
+                'dbnsfp': 78045379,
+                'snpedia': 5907,
+                'clinvar': 85789,
+                'docm': 1119,
+                'mutdb': 420221,
+                'cosmic': 1024498,
+                'dbsnp': 110234210,
+                'emv': 12066,
+                'gwassnps': 15243
+            },
+            "timestamp": "2015-04-15T11:39:48.309000"
+        })
+
+
+class FieldsHandler(BaseHandler):
+    esq = ESQuery()
+
+    def get(self):
+        notes = json.load(open(config.FIELD_NOTES_PATH, 'r'))
+        es_mapping = self.esq.query_fields()
+
+        def get_indexed_properties_in_dict(d, prefix):
+            r = {}
+            for (k, v) in d.items():
+                r[prefix + '.' + k] = {}
+                r[prefix + '.' + k]['indexed'] = False
+                if 'type' in v:
+                    r[prefix + '.' + k]['type'] = v['type']
+                    if ('index' not in v) or ('index' in v and v['index'] != 'no'):
+                        # indexed field
+                        r[prefix + '.' + k]['indexed'] = True
+                else:
+                    r[prefix + '.' + k]['type'] = 'object'
+                    r.update(get_indexed_properties_in_dict(v['properties'], prefix + '.' + k))
+            return r
+
+        r = {}
+        for (k, v) in get_indexed_properties_in_dict(es_mapping, '').items():
+            k1 = k.lstrip('.')
+            r[k1] = v
+            if k1 in notes:
+                r[k1]['notes'] = notes[k1]
+        self.return_json(r)
+
+
 APP_LIST = [
-    (r"/variant/(.+)/?", VariantHandler),   # for gene get request
-    (r"/variant/?$", VariantHandler),              # for gene post request
+    (r"/variant/(.+)/?", VariantHandler),   # for variant get request
+    (r"/variant/?$", VariantHandler),              # for variant post request
     (r"/query/?", QueryHandler),
+    (r"/metadata", MetaDataHandler),    # for metadata requests
+    (r"/fields", FieldsHandler),        # for available field information
 ]

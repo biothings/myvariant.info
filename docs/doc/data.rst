@@ -113,6 +113,45 @@ is essentially a collection of fields (attributes) and their values:
 The example above omits many of the available fields.  For a full example, 
 check out `this example variant <http://myvariant.info/v1/variant/chr1:g.35367G%3EA>`_, or try the `interactive API page <http://myvariant.info/v1/api>`_.
 
+.. _available_fields:
+
+Available fields
+----------------
+
+The table below lists all of the possible fields that could be in a variant object, as well as all of their parents (for nested fields).  If the field is indexed, it may also be directly queried, e.g.
+
+::
+
+    q=dbnsfp.polyphen2.hdiv.score:>0.99
+
+
+All fields can be used with _exists_ or _missing_ filters, e.g.
+
+::
+
+    q=_exists_:dbsnp AND _exists_:cosmic
+    q=_missing_:wellderly
+
+or as inputs to the fields parameter, e.g.
+
+::
+
+    q=_exists_:dbsnp&fields=dbsnp.rsid,dbsnp.vartype
+
+
 .. raw:: html
+
+    <table class='indexed-field-table stripe'>
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Indexed</th>
+                <th>Type</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 
     <div id="spacer" style="height:300px"></div> 
