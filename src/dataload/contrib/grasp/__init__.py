@@ -32,12 +32,6 @@ def get_mapping():
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "last_curation_date": {
-                    "type": "date"
-                },
-                "creation_date": {
-                    "type": "date"
-                },
                 "publication": {
                     "properties": {
                         "journal": {
