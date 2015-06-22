@@ -12,7 +12,7 @@ import utils.mongo
 
 
 es_host = config.ES_HOST
-es = Elasticsearch(es_host)
+es = utils.get_es(es_host)
 index_name = config.ES_INDEX_NAME
 doc_type = config.ES_DOC_TYPE
 logger = logging.getLogger()
@@ -169,9 +169,9 @@ def do_index(doc_li, index_name, doc_type, step=1000, update=True, verbose=True)
         _index_doc_batch(doc_batch, index_name, doc_type, update=update)
 
 
-def do_index_from_collection(collection, index_name, doc_type, step=10000, update=True):
+def do_index_from_collection(collection, index_name, doc_type, skip, step=10000, update=True):
     from utils.mongo import doc_feeder
-    for doc_batch in doc_feeder(collection, step=step, inbatch=True):
+    for doc_batch in doc_feeder(collection, step=step, s=skip, inbatch=True):
         _index_doc_batch(doc_batch, index_name, doc_type, update=update)
 
 
