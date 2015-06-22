@@ -12,7 +12,7 @@ import utils.mongo
 
 
 es_host = config.ES_HOST
-es = utils.get_es(es_host)
+es = utils.es.get_es(es_host)
 index_name = config.ES_INDEX_NAME
 doc_type = config.ES_DOC_TYPE
 logger = logging.getLogger()
