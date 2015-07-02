@@ -33,9 +33,9 @@ Examples
 To learn more
 """""""""""""
 
-* You can read `the full description of our query syntax here <doc/variant_query_service.html>`_.
+* You can read `the full description of our query syntax here <variant_query_service.html>`_.
 * Try it live on `interactive API page <http://myvariant.info/v1/api>`_.
-* Batch queries? Yes, you can. do it with `a POST request <doc/variant_query_service.html#batch-queries-via-post>`_.
+* Batch queries? Yes, you can. do it with `a POST request <variant_query_service.html#batch-queries-via-post>`_.
 
 
 
@@ -65,6 +65,6 @@ Examples
 To learn more
 """""""""""""
 
-* You can read `the full description of our query syntax here <doc/variant_annotation_service.html>`_.
+* You can read `the full description of our query syntax here <variant_annotation_service.html>`_.
 * Try it live on `interactive API page <http://myvariant.info/v1/api>`_.
-* Yes, batch queries via `POST request <doc/variant_annotation_service.html#batch-queries-via-post>`_ as well.
+* Yes, batch queries via `POST request <variant_annotation_service.html#batch-queries-via-post>`_ as well.
