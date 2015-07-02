@@ -7,7 +7,7 @@ def get_mapping(sources=None):
         #sources = ['cadd', 'clinvar', 'cosmic2', 'dbnsfp', 'dbsnp', 'drugbank', 'emv', 'evs', 'grasp']
         sources = sources or ['dbsnp', "cadd", "evs", "snpedia", "wellderly",
                               'dbnsfp', 'emv', 'mutdb', 'docm', 'cosmic',
-                              'clinvar', 'gwassnps','exac','grasp']
+                              'clinvar', 'gwassnps','exac','grasp','snpeff']
         # extra_mapping_li = [mapping_snpedia, mapping_wellderly]
         extra_mapping_li = []
     else:
