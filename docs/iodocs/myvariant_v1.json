@@ -14,7 +14,7 @@
                             "Name": "q",
                             "Type": "string",
                             "Required": "Y",
-                            "Description": "query string. Examples: \"rs58991260\", \"chr1:69000-70000\", \"dbsnp.vartype:snp\". The detailed query syntax can be found at <docs url here> (coming soon)"
+                            "Description": "query string. Examples: \"rs58991260\", \"chr1:69000-70000\", \"dbsnp.vartype:snp\". The detailed query syntax can be found at http://docs.myvariant.info/en/latest/doc/variant_query_service.html#query-syntax"
                         },
                         {
                             "Name": "fields",

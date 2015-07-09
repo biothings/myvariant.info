@@ -58,18 +58,6 @@ callback
 """"""""
     Optional, you can pass a "**callback**" parameter to make a `JSONP <http://ajaxian.com/archives/jsonp-json-with-padding>`_ call.
 
-filter
-""""""
-    Alias for "fields" parameter.
-
-limit
-"""""
-    Alias for "size" parameter.
-
-skip
-""""
-    Alias for "from" parameter.
-
 email
 """"""
     Optional, if you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you.

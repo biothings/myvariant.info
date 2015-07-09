@@ -58,6 +58,9 @@ Total variants loaded: **286,219,908**
 
 The most updated information can be accessed `here <http://myvariant.info/v1/metadata>`_.
 
+.. note:: Each data source may have its own usage restrictions (e.g. `CADD`_ data are free for non-commercial use only). Please refer to the data source pages above for their specific restrictions.
+
+
 .. _variant_object:
 
 Variant object
