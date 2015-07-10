@@ -18,7 +18,7 @@
 tornado>=4.0.2
 elasticsearch>=1.2.0
 #Optional
-#msgpack-python>=0.4.2
+msgpack-python>=0.4.2
 
 # for python 3 pyga
 -e git+https://github.com/cyrus0824/py-ga-mob.git#egg=pyga
