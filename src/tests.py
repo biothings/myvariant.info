@@ -11,6 +11,7 @@ import urllib.error
 import json
 import sys
 from nose.tools import ok_, eq_
+import variant_list
 
 try:
     import msgpack
@@ -20,7 +21,8 @@ except ImportError:
 
 #host = 'http://localhost:8000'
 #host = 'http://dev.myvariant.info:8000'
-host = 'http://myvariant.info'
+#host = 'http://myvariant.info'
+host = 'http://52.27.154.156'
 api = host + '/v1'
 sys.stderr.write('URL base: {}\n'.format(api))
 
@@ -219,10 +221,14 @@ def test_variant_post():
     eq_(len(res), 2)
     for _g in res:
         eq_(set(_g), set(['_id', 'query', 'dbsnp']))
+    
+    # Test a large variant post
+    res = json_ok(post_ok(api + '/variant', {'ids': variant_list.VARIANT_POST_LIST}))
+    eq_(len(res), 999)
 
 
 def test_metadata():
-    get_ok(host + '/metadata')
+    #get_ok(host + '/metadata')
     get_ok(api + '/metadata')
 
 
