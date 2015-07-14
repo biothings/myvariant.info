@@ -21,8 +21,8 @@ except ImportError:
 
 #host = 'http://localhost:8000'
 #host = 'http://dev.myvariant.info:8000'
-#host = 'http://myvariant.info'
-host = 'http://52.27.154.156'
+host = 'http://myvariant.info'
+#host = 'http://52.27.154.156'
 api = host + '/v1'
 sys.stderr.write('URL base: {}\n'.format(api))
 
