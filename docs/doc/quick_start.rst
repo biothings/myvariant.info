@@ -33,9 +33,9 @@ Examples
 To learn more
 """""""""""""
 
-* You can read `the full description of our query syntax here <doc/variant_query_service.html>`_.
+* You can read `the full description of our query syntax here <variant_query_service.html>`_.
 * Try it live on `interactive API page <http://myvariant.info/v1/api>`_.
-* Batch queries? Yes, you can. do it with `a POST request <doc/variant_query_service.html#batch-queries-via-post>`_.
+* Batch queries? Yes, you can. do it with `a POST request <variant_query_service.html#batch-queries-via-post>`_.
 
 
 
@@ -48,6 +48,8 @@ URL
 
     http://myvariant.info/v1/variant/<variant_id>
 
+"*\<variant_id\>*" is an HGVS name based variant id using genomic location based on hg19 human genome assembly..
+
 Examples
 """"""""
 ::
@@ -59,12 +61,10 @@ Examples
     http://myvariant.info/v1/variant/chr16:g.28883241A>G
     http://myvariant.info/v1/variant/chr3:g.49721532G>A    
 
-"*\<variant_id\>*" is an HGVS name based variant id using genomic location based on hg19 human genome assembly..
-
 
 To learn more
 """""""""""""
 
-* You can read `the full description of our query syntax here <doc/variant_annotation_service.html>`_.
+* You can read `the full description of our query syntax here <variant_annotation_service.html>`_.
 * Try it live on `interactive API page <http://myvariant.info/v1/api>`_.
-* Yes, batch queries via `POST request <doc/variant_annotation_service.html#batch-queries-via-post>`_ as well.
+* Yes, batch queries via `POST request <variant_annotation_service.html#batch-queries-via-post>`_ as well.

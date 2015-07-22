@@ -85,12 +85,12 @@ Query parameters
 
 ids
 """""
-    Required. Accept multiple geneids (either Entrez or Ensembl gene ids) seperated by comma, e.g., 'ids=1017,1018' or 'ids=695,ENSG00000123374'. Note that currently we only take the input ids up to **1000** maximum, the rest will be omitted.
+    Required. Accept multiple HGVS variant ids separated by comma, e.g., "ids=chr1:g.35367C>T,chr7:g.55241707G>T,chr16:g.28883241A>G". Note that currently we only take the input ids up to **1000** maximum, the rest will be omitted.
 
 fields
 """""""
-    Optional, can be a comma-separated fields to limit the fields returned from the matching hits.
-    If “fields=all”, all available fields will be returned. Note that it supports dot notation as well, e.g., you can pass "refseq.rna". Default: “symbol,name,taxid,entrezgene”.
+    Optional, can be a comma-separated fields to limit the fields returned from the matching hits. 
+    If “fields=all”, all available fields will be returned. Note that it supports dot notation as well, e.g., you can pass "dbnsfp", "dbnsfp.genename", or "dbnsfp.aa.*". Default: "all".
 
 email
 """"""

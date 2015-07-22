@@ -11,36 +11,55 @@ Data sources
 We currently obtain variant annotation data from several data resources and 
 keep them up-to-date, so that you don't have to do it:
 
-+---------------------+--------------------------+------------------------+ 
-| Source              | Update Frequency         | Notes                  | 
-+=====================+==========================+========================+ 
-| EVS                 | on new release           | evs                    | 
-+---------------------+--------------------------+------------------------+ 
-| CADD                | on new release           | cadd                   |
-+---------------------+--------------------------+------------------------+ 
-| Scripps Wellderly   | on new release           | wellderly              |
-| Genome Resource     |                          |                        |
-+---------------------+--------------------------+------------------------+
-| dbNSFP              | on new release           | dbnsfp                 |
-+---------------------+--------------------------+------------------------+
-| SNPedia             | on new release           | snpedia                |
-+---------------------+--------------------------+------------------------+
-| ClinVar             | on new release           | clinvar                |
-+---------------------+--------------------------+------------------------+
-| DoCM                | on new release           | docm                   |
-+---------------------+--------------------------+------------------------+
-| MutDB               | on new release           | mutdb                  |
-+---------------------+--------------------------+------------------------+
-| COSMIC              | on new release           | cosmic                 |
-+---------------------+--------------------------+------------------------+
-| dbSNP               | on new release           | dbsnp                  |
-+---------------------+--------------------------+------------------------+
-| EmVClass            | on new release           | emv                    |
-+---------------------+--------------------------+------------------------+
-| GWAS SNP            | on new release           | gwassnp                |
-+---------------------+--------------------------+------------------------+
+.. _dbNSFP: https://sites.google.com/site/jpopgen/dbNSFP
+.. _dbSNP: http://www.ncbi.nlm.nih.gov/snp/
+.. _ClinVar: http://www.ncbi.nlm.nih.gov/clinvar
+.. _EVS : http://evs.gs.washington.edu/EVS/
+.. _CADD: http://cadd.gs.washington.edu/
+.. _MutDB: http://www.mutdb.org/
+.. _GWAS Catalog: http://www.ebi.ac.uk/gwas/
+.. _COSMIC: http://cancer.sanger.ac.uk/cancergenome/projects/cosmic/
+.. _DOCM: http://docm.genome.wustl.edu/
+.. _SNPedia: http://www.snpedia.com
+.. _EMVClass: http://geneticslab.emory.edu/emvclass/emvclass.php 
+.. _Scripps Wellderly: http://www.stsiweb.org/wellderly/
+
+Total variants loaded: **286,219,908**
+
++-------------------------------+---------------+---------------------------+----------------------------+
+| Source                        | version       | # of variants             | key name*                  |
++===============================+===============+===========================+============================+
+| `dbNSFP`_                     |v2.9           | 78,045,379                | dbnsfp                     |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `dbSNP`_                      |v142           | 110,234,210               |dbsnp                       |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `ClinVar`_                    |20150323       |85,789                     |clinvar                     |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `EVS`_                        | v2            | 1,977,300                 | evs                        |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `CADD`_                       | v1.2          | 163,690,986               | cadd                       |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `MutDB`_                      | \-            | 420,221                   |mutdb                       |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `GWAS Catalog`_               |from UCSC      |15,243                     |gwassnps                    |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `COSMIC`_                     |v68 from UCSC  |1,024,498                  |cosmic                      |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `DOCM`_                       | \-            | 1,119                     | docm                       |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `SNPedia`_                    | \-            | 5,907                     | snpedia                    |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `EMVClass`_                   | \-            | 12,066                    |emv                         |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `Scripps Wellderly`_          | \-            |21,240,519                 | wellderly                  |
++-------------------------------+---------------+---------------------------+----------------------------+
+
+\* key name: this is the key for the specific annotation data in a variant object. 
 
 The most updated information can be accessed `here <http://myvariant.info/v1/metadata>`_.
+
+.. note:: Each data source may have its own usage restrictions (e.g. `CADD`_ data are free for non-commercial use only). Please refer to the data source pages above for their specific restrictions.
+
 
 .. _variant_object:
 
@@ -97,6 +116,45 @@ is essentially a collection of fields (attributes) and their values:
 The example above omits many of the available fields.  For a full example, 
 check out `this example variant <http://myvariant.info/v1/variant/chr1:g.35367G%3EA>`_, or try the `interactive API page <http://myvariant.info/v1/api>`_.
 
+.. _available_fields:
+
+Available fields
+----------------
+
+The table below lists all of the possible fields that could be in a variant object, as well as all of their parents (for nested fields).  If the field is indexed, it may also be directly queried, e.g.
+
+::
+
+    q=dbnsfp.polyphen2.hdiv.score:>0.99
+
+
+All fields can be used with _exists_ or _missing_ filters, e.g.
+
+::
+
+    q=_exists_:dbsnp AND _exists_:cosmic
+    q=_missing_:wellderly
+
+or as inputs to the fields parameter, e.g.
+
+::
+
+    q=_exists_:dbsnp&fields=dbsnp.rsid,dbsnp.vartype
+
+
 .. raw:: html
+
+    <table class='indexed-field-table stripe'>
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Indexed</th>
+                <th>Type</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 
     <div id="spacer" style="height:300px"></div> 

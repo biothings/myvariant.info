@@ -10,7 +10,7 @@ Currently available URLs:
 import sys
 import os.path
 #import subprocess
-import json
+#import json
 
 import tornado.httpserver
 import tornado.ioloop
@@ -25,7 +25,7 @@ if src_path not in sys.path:
 #from config import INCLUDE_DOCS
 
 from www.api.es import ESQuery
-from www.helper import add_apps, BaseHandler
+from www.helper import add_apps
 from www.api.handlers import APP_LIST as api_app_list
 from www.beacon.handlers import APP_LIST as beacon_app_list
 
@@ -46,15 +46,6 @@ if options.debug:
     options.address = '0.0.0.0'
 
 
-class IndexedFieldsHandler(BaseHandler):
-    def get(self):
-        try:
-            with open('context/myvariant_indexed_fields.json', 'r') as json_file:
-                self.return_json(json.load(json_file))
-        except FileNotFoundError:
-            self.return_json({})
-
-
 class StatusCheckHandler(tornado.web.RequestHandler):
     ''' Handles requests to check the status of the server. '''
     def head(self):
@@ -72,37 +63,9 @@ class MainHandler(tornado.web.RequestHandler):
             self.render(os.path.join(STATIC_PATH, 'index.html'))
 
 
-class MetaDataHandler(BaseHandler):
-    disable_caching = True
-
-    def get(self):
-        # For now, just return a hardcoded object, later we'll actually query the ES db for this information
-        self.return_json({
-            "stats": {
-                'total': 286219908,
-                'evs': 1977300,
-                'cadd': 163690986,
-                'wellderly': 21240519,
-                'dbnsfp': 78045379,
-                'snpedia': 5907,
-                'clinvar': 85789,
-                'docm': 1119,
-                'mutdb': 420221,
-                'cosmic': 1024498,
-                'dbsnp': 110234210,
-                'emv': 12066,
-                'gwassnps': 15243
-            },
-            "timestamp": "2015-04-15T11:39:48.309000"
-        })
-
-
 APP_LIST = [
     (r"/", MainHandler),
-    (r"/metadata", MetaDataHandler),
-    (r"/v1/metadata", MetaDataHandler),
     (r"/status", StatusCheckHandler),
-    (r"/v1/indexed_fields", IndexedFieldsHandler),
 ]
 
 APP_LIST += add_apps('api', api_app_list)

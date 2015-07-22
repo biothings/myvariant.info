@@ -3,7 +3,8 @@ def get_mapping():
         "exac": {
             "properties": {
                 "chrom": {
-                    "type": "integer"
+                    "type": "string",
+                    "analyzer": "string_lowercase
                 },
                 "pos": {
                     "type": "long"
@@ -24,13 +25,8 @@ def get_mapping():
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "ref": {
-                    "type": "string",
-                    "analyzer": "string_lowercase"
-                },
                 "qual": {
-                    "type": "string",
-                    "analyzer": "string_lowercase"
+                    "type": "float"
                 },
                 "filter": {
                     "type": "string",
@@ -68,7 +64,7 @@ def get_mapping():
                     }
                 },
                 "af": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "an": {
                     "properties": {
@@ -102,16 +98,16 @@ def get_mapping():
                     }
                 },
                 "baseqranksum": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "clippingranksum": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "fs": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "dp": {
-                    "type": "integer"
+                    "type": "long"
                 },
                 "het": {
                     "properties": {
@@ -170,18 +166,18 @@ def get_mapping():
                     }
                 },
                 "inbreedingcoeff": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "mq": {
                     "properties": {
                         "mq": {
-                            "type": "integer"
+                            "type": "float"
                         },
                         "mq0": {
                             "type": "integer"
                         },
                         "mqranksum": {
-                            "type": "integer"
+                            "type": "float"
                         }
                     }
                 },
@@ -189,13 +185,13 @@ def get_mapping():
                     "type": "long"
                 },
                 "qd": {
-                    "type": "long"
+                    "type": "float"
                 },
                 "readposranksum": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "vqslod": {
-                    "type": "integer"
+                    "type": "float"
                 },
                 "culprit": {
                     "type": "string",

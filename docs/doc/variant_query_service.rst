@@ -58,18 +58,6 @@ callback
 """"""""
     Optional, you can pass a "**callback**" parameter to make a `JSONP <http://ajaxian.com/archives/jsonp-json-with-padding>`_ call.
 
-filter
-""""""
-    Alias for "fields" parameter.
-
-limit
-"""""
-    Alias for "size" parameter.
-
-skip
-""""
-    Alias for "from" parameter.
-
 email
 """"""
     Optional, if you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you.
@@ -96,30 +84,17 @@ Fielded queries
     q=dbsnp.vartype:snp
 
 
-.. _available_fields:
-
 Available fields
 ^^^^^^^^^^^^^^^^
 
-.. raw:: html
-
-    <table class='indexed-field-table stripe'>
-        <thead>
-            <tr>
-                <th>Field</th>
-                <th>Description</th>
-                <th>Examples</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+For a list of available fields, see :ref:`here <available_fields>`. 
 
 
 Wildcard queries
 """"""""""""""""
 Wildcard character "*" or "?" is supported in either simple queries or fielded queries::
-
+    
+    q=
 
 .. note:: Wildcard character can not be the first character. It will be ignored.
 
@@ -265,7 +240,7 @@ q
 scopes
 """"""
     Optional, specify one or more fields (separated by comma) as the search "scopes", e.g., "scopes=dbsnp.rsid", "scopes=dbsnp.rsid,dbnsfp.genename".  The available "fields" can be passed to "**scopes**" parameter are
-    :ref:`listed above <available_fields>`. Default: 
+    :ref:`listed here <available_fields>`. Default: 
 
 fields
 """"""
