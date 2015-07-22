@@ -239,3 +239,23 @@ class ESIndexer():
         print("\t{} documents are deleted.".format(cnt_orphan_doc))
         if dryrun:
             print("This is a dryrun, so no actual document operations.")
+
+    def find_biggest_doc(self, fields_li, min=5, return_doc=False):
+        """return the doc with the max number of fields from fields_li."""
+        import itertools
+        for n in range(len(fields_li), min - 1, -1):
+            print('>>>>', n)
+            for field_set in itertools.combinations(fields_li, n):
+                q = ' AND '.join(["_exists_:" + field for field in field_set])
+                q = {'query': {"query_string": {"query": q}}}
+                cnt = self.count(q)
+                if cnt > 0:
+                    print("\nFound {} docs with {} fields".format(cnt, len(field_set)))
+                    if return_doc:
+                        res = self._es.search(index=self._index, doc_type=self._doc_type, body=q, size=cnt)
+                        return res
+                    else:
+                        return (cnt, q)
+                else:
+                    print('.', end='')
+            print()
