@@ -23,7 +23,6 @@ except ImportError:
 #host = 'http://localhost:8000'
 #host = 'http://dev.myvariant.info:8000'
 host = 'http://myvariant.info'
-#host = 'http://52.27.154.156'
 api = host + '/v1'
 sys.stderr.write('URL base: {}\n'.format(api))
 
@@ -131,6 +130,9 @@ def test_query():
     has_hits('rs58991260')
     has_hits('chr1:69000-70000')
     has_hits('dbsnp.vartype:snp')
+    has_hits('_exists_:dbnsfp')
+    has_hits('dbnsfp.genename:BTK')
+    has_hits('_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen')
 
     con = get_ok(api + '/query?q=rs58991260&callback=mycallback')
     ok_(con.startswith('mycallback('.encode('utf-8')))
@@ -189,14 +191,24 @@ def test_variant():
     res = json_ok(get_ok(api + '/variant/chr16:g.28883241A>G'))
     eq_(res['_id'], "chr16:g.28883241A>G")
 
+    res = json_ok(get_ok(api + '/variant/chr1:g.35367G>A'))
+    eq_(res['_id'], "chr1:g.35367G>A")
+
+    res = json_ok(get_ok(api + '/variant/chr7:g.55241707G>T'))
+    eq_(res['_id'], "chr7:g.55241707G>T")
+
     # testing non-ascii character
-    get_404(api + '/variant/' + '54097\xef\xbf\xbd\xef\xbf\xbdmouse')
+    get_404(api + '/variant/' + 'chr7:g.55241707G>T\xef\xbf\xbd\xef\xbf\xbdmouse')
 
     # testing filtering parameters
     res = json_ok(get_ok(api + '/variant/chr16:g.28883241A>G?fields=dbsnp,dbnsfp,cadd'))
     eq_(set(res), set(['_id', '_version', 'dbnsfp', 'cadd', 'dbsnp']))
-    res = json_ok(get_ok(api + '/variant/chr16:g.28883241A>G?filter=wellderly'))
+    res = json_ok(get_ok(api + '/variant/chr16:g.28883241A>G?fields=wellderly'))
     eq_(set(res), set(['_id', '_version', 'wellderly']))
+    res = json_ok(get_ok(api + '/variant/chr9:g.107620835G>A?fields=dbsnp'))
+    eq_(set(res), set(['_id', '_version', 'dbsnp']))
+    res = json_ok(get_ok(api + '/variant/chr1:g.31349647C>T?fields=dbnsfp.clinvar,dbsnp.gmaf,clinvar.hgvs.coding'))
+    eq_(set(res), set(['_id', '_version', 'dbsnp', 'dbnsfp', 'clinvar']))
 
     get_404(api + '/variant')
     get_404(api + '/variant/')
@@ -222,7 +234,7 @@ def test_variant_post():
     eq_(len(res), 2)
     for _g in res:
         eq_(set(_g), set(['_id', 'query', 'dbsnp']))
-    
+
     # Test a large variant post
     res = json_ok(post_ok(api + '/variant', {'ids': variant_list.VARIANT_POST_LIST}))
     eq_(len(res), 999)
