@@ -5,9 +5,10 @@ run as "nosetests tests"
     or "nosetests tests:test_main"
 '''
 import httplib2
-import urllib.request
-import urllib.parse
-import urllib.error
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
 import json
 import sys
 from nose.tools import ok_, eq_
@@ -86,7 +87,7 @@ def head_ok(url):
 
 def post_ok(url, params):
     headers = {'Content-type': 'application/x-www-form-urlencoded'}
-    res, con = h.request(url, 'POST', urllib.parse.urlencode(encode_dict(params)), headers=headers)
+    res, con = h.request(url, 'POST', urlencode(encode_dict(params)), headers=headers)
     eq_(res.status, 200)
     return con
 
