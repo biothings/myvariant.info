@@ -8,7 +8,7 @@ Variant annotation data
 Data sources
 ------------
 
-We currently obtain variant annotation data from several data resources and 
+We currently obtain variant annotation data from several data resources and
 keep them up-to-date, so that you don't have to do it:
 
 .. _dbNSFP: https://sites.google.com/site/jpopgen/dbNSFP
@@ -21,29 +21,31 @@ keep them up-to-date, so that you don't have to do it:
 .. _COSMIC: http://cancer.sanger.ac.uk/cancergenome/projects/cosmic/
 .. _DOCM: http://docm.genome.wustl.edu/
 .. _SNPedia: http://www.snpedia.com
-.. _EMVClass: http://geneticslab.emory.edu/emvclass/emvclass.php 
+.. _EMVClass: http://geneticslab.emory.edu/emvclass/emvclass.php
 .. _Scripps Wellderly: http://www.stsiweb.org/wellderly/
+.. _EXAC: http://exac.broadinstitute.org/
+.. _GRASP: http://iapps.nhlbi.nih.gov/GRASP
 
-Total variants loaded: **286,219,908**
+Total variants loaded: **288,654,586**
 
 +-------------------------------+---------------+---------------------------+----------------------------+
 | Source                        | version       | # of variants             | key name*                  |
 +===============================+===============+===========================+============================+
-| `dbNSFP`_                     |v2.9           | 78,045,379                | dbnsfp                     |
+| `dbNSFP`_                     |v3.0b2         | 82,027,652                | dbnsfp                     |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `dbSNP`_                      |v142           | 110,234,210               |dbsnp                       |
+| `dbSNP`_                      |v142           | 110,234,202               |dbsnp                       |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `ClinVar`_                    |20150323       |85,789                     |clinvar                     |
+| `ClinVar`_                    |20150323       |85,775                     |clinvar                     |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `EVS`_                        | v2            | 1,977,300                 | evs                        |
+| `EVS`_                        | v2            | 1,977,296                 | evs                        |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `CADD`_                       | v1.2          | 163,690,986               | cadd                       |
+| `CADD`_                       | v1.2          | 163,690,938               | cadd                       |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `MutDB`_                      | \-            | 420,221                   |mutdb                       |
+| `MutDB`_                      | \-            | 420,220                   |mutdb                       |
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `GWAS Catalog`_               |from UCSC      |15,243                     |gwassnps                    |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `COSMIC`_                     |v68 from UCSC  |1,024,498                  |cosmic                      |
+| `COSMIC`_                     |v68 from UCSC  |1,024,496                  |cosmic                      |
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `DOCM`_                       | \-            | 1,119                     | docm                       |
 +-------------------------------+---------------+---------------------------+----------------------------+
@@ -51,10 +53,14 @@ Total variants loaded: **286,219,908**
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `EMVClass`_                   | \-            | 12,066                    |emv                         |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `Scripps Wellderly`_          | \-            |21,240,519                 | wellderly                  |
+| `Scripps Wellderly`_          | \-            |21,240,518                 | wellderly                  |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `EXAC`_                       | v0.3          |10,195,861                 | exac                       |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `GRASP`_                      | v2.0.0.0      |2,212,148                  | grasp                      |
 +-------------------------------+---------------+---------------------------+----------------------------+
 
-\* key name: this is the key for the specific annotation data in a variant object. 
+\* key name: this is the key for the specific annotation data in a variant object.
 
 The most updated information can be accessed `here <http://myvariant.info/v1/metadata>`_.
 
@@ -66,11 +72,11 @@ The most updated information can be accessed `here <http://myvariant.info/v1/met
 Variant object
 ---------------
 
-Variant annotation data are both stored and returned as a variant object, which 
+Variant annotation data are both stored and returned as a variant object, which
 is essentially a collection of fields (attributes) and their values:
 
 .. code-block :: json
-        
+
         {
           "_id": "chr1:g.35367G>A",
           "_version": 2,
@@ -87,7 +93,7 @@ is essentially a collection of fields (attributes) and their values:
               "gene_id": "ENSG00000237613",
             },
             "ref": "G",
-            "type": "SNV"  
+            "type": "SNV"
           },
           "dbnsfp": {
             "aa": {
@@ -113,7 +119,7 @@ is essentially a collection of fields (attributes) and their values:
           }
         }
 
-The example above omits many of the available fields.  For a full example, 
+The example above omits many of the available fields.  For a full example,
 check out `this example variant <http://myvariant.info/v1/variant/chr1:g.35367G%3EA>`_, or try the `interactive API page <http://myvariant.info/v1/api>`_.
 
 .. _available_fields:
@@ -157,4 +163,4 @@ or as inputs to the fields parameter, e.g.
         </tbody>
     </table>
 
-    <div id="spacer" style="height:300px"></div> 
+    <div id="spacer" style="height:300px"></div>
