@@ -148,21 +148,24 @@ class MetaDataHandler(BaseHandler):
         # For now, just return a hardcoded object, later we'll actually query the ES db for this information
         self.return_json({
             "stats": {
-                'total': 286219908,
-                'evs': 1977300,
-                'cadd': 163690986,
-                'wellderly': 21240519,
-                'dbnsfp': 78045379,
-                'snpedia': 5907,
-                'clinvar': 85789,
-                'docm': 1119,
-                'mutdb': 420221,
-                'cosmic': 1024498,
-                'dbsnp': 110234210,
-                'emv': 12066,
-                'gwassnps': 15243
+                "total": 288654586,
+                "cadd": 163690938,
+                "clinvar": 85775,
+                "cosmic": 1024496,
+                "dbnsfp": 82027652,
+                "dbsnp": 110234202,
+                "docm": 1119,
+                "emv": 12066,
+                "evs": 1977296,
+                "exac": 10195861,
+                "grasp": 2212148,
+                "gwassnps": 15243,
+                "mutdb": 420220,
+                "snpedia": 5907,
+                "snpeff": 288330625,
+                "wellderly": 21240518
             },
-            "timestamp": "2015-04-15T11:39:48.309000"
+            "timestamp": "2015-07-10T07:02:18.178506"
         })
 
 
