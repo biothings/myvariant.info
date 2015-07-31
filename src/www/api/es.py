@@ -123,7 +123,7 @@ class ESQuery():
     def get_variant(self, vid, **kwargs):
         '''unknown vid return None'''
         options = self._get_cleaned_query_options(kwargs)
-        kwargs = {"fields": options.kwargs["fields"]} if "fields" in options.kwargs else {}
+        kwargs = {"_source": options.kwargs["_source"]} if "_source" in options.kwargs else {}
         try:
             res = self._es.get(index=self._index, id=vid, doc_type=self._doc_type, **kwargs)
         except NotFoundError:
@@ -132,7 +132,7 @@ class ESQuery():
 
     def mget_variants(self, vid_list, **kwargs):
         options = self._get_cleaned_query_options(kwargs)
-        kwargs = {"fields": options.kwargs["fields"]} if "fields" in options.kwargs else {}
+        kwargs = {"_source": options.kwargs["_source"]} if "_source" in options.kwargs else {}
         res = self._es.mget(body={'ids': vid_list}, index=self._index, doc_type=self._doc_type, **kwargs)
         return res if options.raw else [self._get_variantdoc(doc) for doc in res['docs']]
 
