@@ -47,8 +47,6 @@ def _map_line_to_json(fields):
     HGVS = None
     cds = fields[18].split(":")
     cds = cds[1]
-
-    seq = re.findall(r'[ATCGMNHYR]+|[0-9]+', cds)[-1]
     replace = re.findall(r'[ATCGMNYR=]+', cds)
     sub = re.search(r'\d([ATCGMNHKRY]>[ATCGMNHKRY])', cds)
     ins = re.search(r'ins[ATCGMNHYR]+|ins[0-9]+', cds)

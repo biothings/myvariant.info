@@ -21,6 +21,9 @@ class ESQuery():
         self._allowed_options = ['_source', 'start', 'from_', 'size',
                                  'sort', 'explain', 'version', 'facets']
 
+    def _use_hg38(self):
+        self._index = config.ES_INDEX_NAME_HG38
+
     def _get_variantdoc(self, hit):
         doc = hit.get('_source', hit.get('fields', {}))
         doc.setdefault('_id', hit['_id'])

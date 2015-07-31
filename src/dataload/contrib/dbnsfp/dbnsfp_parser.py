@@ -7,11 +7,13 @@ VALID_COLUMN_NO = 112
 
 '''this parser is for dbNSFP v3.0 beta2 downloaded from
 https://sites.google.com/site/jpopgen/dbNSFP'''
+
+
 # convert one snp to json
-def _map_line_to_json(fields, version = 'hg19'):
+def _map_line_to_json(fields, version='hg19'):
     # specific variable treatment
     chrom = fields[0]
-    if chrom = 'M':
+    if chrom == 'M':
         chrom = 'MT'
     # fields[7] in version 2, represent hg18_pos
     if fields[10] == ".":
@@ -209,14 +211,14 @@ def _map_line_to_json(fields, version = 'hg19'):
 
 
 # open file, parse, pass to json mapper
-def data_generator(input_file, version = 'hg19'):
+def data_generator(input_file, version='hg19'):
     open_file = open(input_file)
     db_nsfp = csv.reader(open_file, delimiter="\t")
     db_nsfp.next()  # skip header
     previous_row = None
     for row in db_nsfp:
         assert len(row) == VALID_COLUMN_NO
-        current_row = _map_line_to_json(row, version = 'hg19')
+        current_row = _map_line_to_json(row, version='hg19')
         if previous_row:
             if current_row["_id"] == previous_row["_id"]:
                 aa = previous_row["dbnsfp"]["aa"]

@@ -11,6 +11,7 @@ from config import HG19_DATAFILE
 
 SNPEFF_CMD = 'java -Xmx4g -jar /home/kevinxin/snpEff/snpEff.jar hg19'.split()
 
+
 class VCFConstruct:
     def __init__(self):
         self._chr_data = None
@@ -150,10 +151,7 @@ class VCFConstruct:
         proc = subprocess.Popen(SNPEFF_CMD, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = proc.communicate(vcf_stdin)
         assert stderr == '', stderr
-
-        snpeff_json_list = []
         vcf_stdout_raw = stdout.split('\n')
-        i = 0
         for vcf_line in vcf_stdout_raw:
             if vcf_line.startswith('#'):
                 continue
@@ -165,7 +163,7 @@ class VCFConstruct:
                 ann = []
                 # Multiple annotations per VCF line
                 for item in ann_info.split(','):
-                    if len(item.split('|'))>1:
+                    if len(item.split('|')) > 1:
                         (effect, putative_impact, gene_name, gene_id, feature_type, feature_id) = item.split('|')[1:7]
                         (transcript_biotype, exon, hgvs_coding, hgvs_protein, cdna, cds, protein, distance_to_feature) = item.split('|')[7:15]
                         print(effect)

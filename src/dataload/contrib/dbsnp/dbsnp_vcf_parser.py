@@ -59,7 +59,7 @@ def get_hgvs_name(record, as_list=False):
                         # something ambigious here
                         pass
                 else:
-                    #other cases of deletion currently been ignored
+                    # other cases of deletion currently been ignored
                     # e.g. rs369371434, rs386822484
                     pass
             else:

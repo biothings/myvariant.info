@@ -32,16 +32,10 @@ def _map_line_to_json(item):
     try:
         inbreedingcoeff = info['InbreedingCoeff']
     except:
-        inbreedingcoeff = None 
+        inbreedingcoeff = None
     for i in range(0, len(item.ALT)):
-        item.ALT[i] = str(item.ALT[i])       
+        item.ALT[i] = str(item.ALT[i])
     for alt in item.ALT:
-#        if len(item.ALT) == 1:
-#            alleles = item.ALT[0]
-#            alleles = str(alleles)
-#            print alleles
-#        else:
-#            alleles = item.ALT
         alt = str(alt)
         (HGVS, var_type) = get_hgvs_from_vcf(chrom, chromStart, ref, alt, mutant_type=True)
         if HGVS is None:
@@ -82,16 +76,8 @@ def _map_line_to_json(item):
 
                 },
                 "baseqranksum": baseqranksum,
-#               "CSQ": info['CSQ'][i],
                 "clippingranksum": clippingranksum,
-#               "dp_hist": info['DP_HIST'],
                 "fs": info['FS'],
-#               "dp": info['DP'],
-#               "gq": {
-#                   "gq_hist": info['GQ_HIST'],
-#                   "gq_mean": info['GQ_MEAN'],
-#                   "gq_stddev": info['GQ_STDDEV']
-#               },
                 "het": {
                     "het_afr": info['Het_AFR'],
                     "het_amr": info['Het_AMR'],
@@ -125,6 +111,7 @@ def _map_line_to_json(item):
         }
         obj = (dict_sweep(unlist(value_convert(one_snp_json)), [None]))
         yield obj
+
 
 def load_data(input_file):
     vcf_reader = vcf.Reader(open(input_file, 'r'))
