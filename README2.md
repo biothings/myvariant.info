@@ -74,7 +74,7 @@ In order to make sure all variant IDs loaded into MyVariant.info strictly follow
 
 
 
-#### step 5: Run validate_generator function on your generator
+### step 5: Run validate_generator function on your generator
 
 
     t.validate_generator(db_generator)
