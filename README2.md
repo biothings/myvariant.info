@@ -50,23 +50,23 @@ A typical example of JSON object in MyVariant.info could be found at src/dataloa
 ## 3. Variant_ID validation
 In order to make sure all variant IDs loaded into MyVariant.info strictly follows hgvs guidelines, we have developed a variant validation function to validate all variant IDs to be loads. The validation steps are as follows:
 
-### 1) Clone this repo:
+### step 1: Clone this repo in your local environment:
 
 
     git clone https://github.com/Network-of-BioThings/myvariant.info repo_name
 
 
-### 2) Put parser under src/dataload/contrib folder
+### step 2: Put parser under src/dataload/contrib folder
 
 
-### 3) Call load_data function and get generator of JSON documents
+### step 3: Call load_data function and get generator of JSON documents
 
 
-    from dataload.contrib.dbsnp.dbsnp_parser import load_data
+    from dataload.contrib.db.db_parser import load_data
     db_generator = load_data()
 
 
-### 4) Call VariantValidator class under src/utils folder
+### step 4: Call VariantValidator class under src/utils folder
 
 
     from utils.validate import VariantValidator
@@ -74,7 +74,7 @@ In order to make sure all variant IDs loaded into MyVariant.info strictly follow
 
 
 
-#### 5) Run validate_generator function on your generator
+#### step 5: Run validate_generator function on your generator
 
 
     t.validate_generator(db_generator)
