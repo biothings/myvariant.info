@@ -73,28 +73,45 @@ Simple queries
 
 search for everything::
 
-    q=rs58991260                        search for rsid
+    q=rs58991260                        # search for rsid
 
 
 Fielded queries
 """""""""""""""
 ::
 
-    q=chr1:69000-70000
-    q=dbsnp.vartype:snp
+    q=chr1:69000-70000                        # for a genomic range
+    q=dbsnp.vartype:snp                       # for matching value on a specific field
+    
+    q=dbnsfp.polyphen2.hdiv.pred:(D P)        # multiple values for a field
+    q=dbnsfp.polyphen2.hdiv.pred:(D OR P)     # multiple values for a field using OR, same as the above
+    
+    q=_exist_:dbsnp                           # having dbsnp field
+    q=_missing_:exac                          # missing exac field
+    
+
+.. Hint:: For a list of available fields, see :ref:`here <available_fields>`. 
 
 
-Available fields
-^^^^^^^^^^^^^^^^
+Range queries
+"""""""""""""
+::
 
-For a list of available fields, see :ref:`here <available_fields>`. 
-
+    q=dbnsfp.polyphen2.hdiv.score:>0.99
+    q=dbnsfp.polyphen2.hdiv.score:>=0.99
+    q=exac.af:<0.00001
+    q=exac.af:<=0.00001
+    
+    q=exac.ac.ac_adj:[76640 TO 80000]        # bounded (including 76640 and 80000)
+    q=exac.ac.ac_adj:{76640 TO 80000}        # unbounded
+    
 
 Wildcard queries
 """"""""""""""""
 Wildcard character "*" or "?" is supported in either simple queries or fielded queries::
     
-    q=
+    q=dbnsfp.genename:CDK?
+    q=dbnsfp.genename:CDK*
 
 .. note:: Wildcard character can not be the first character. It will be ignored.
 
@@ -105,7 +122,16 @@ Boolean operators and grouping
 You can use **AND**/**OR**/**NOT** boolean operators and grouping to form complicated queries::
 
     q=dbnsfp.polyphen2.hdiv.score:>0.99 AND chrom:1                        AND operator
-    q=_exists_:dbsnp  AND NOT dbsnp.vartype:indel                          NOT operator
+    q=_exists_:dbsnp AND NOT dbsnp.vartype:indel                           NOT operator
+    q=_exists_:dbsnp AND (NOT dbsnp.vartype:indel)                         grouping with ()
+    
+    
+Escaping reserved characters
+""""""""""""""""""""""""""""
+If you need to use these reserved characters in your query, make sure to escape them using a back slash ("\\")::
+    
+    + - = && || > < ! ( ) { } [ ] ^ " ~ * ? : \ /
+    
 
 
 Returned object
