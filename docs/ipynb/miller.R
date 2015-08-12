@@ -19,7 +19,7 @@ getVars <- function(vcf.file){
 
 vars <- lapply(vcf.files, getVars)
 snps <- lapply(vars, function(i) subset(i, DP > 15 & FS < 30 & QD > 2))
-filtered.annotations <- lapply(vars.li, filterDf)
+filtered.annotations <- lapply(snps, filterDf)
 
 gene.counts <- data.frame(table(unlist(lapply(filtered.annotations, function(i) unique(i$dbnsfp.genename)))))
 top.genes <- subset(gene.counts, Freq == 4)

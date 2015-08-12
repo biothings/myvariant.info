@@ -27,8 +27,7 @@ geneInDf <- function(df, gene){
   gene.df
 }
 
-max.of.df <- function(df){
-    #return(data.frame(subset(df, cadd.phred == max(df$cadd.phred))))
+cadd.df <- function(df){
     return(data.frame(subset(df, cadd.phred == median(df$cadd.phred))))
 }
 
@@ -36,7 +35,7 @@ max.of.df <- function(df){
 geneDf <- function(vars.list, gene){
   patho <- lapply(vars.list, function(i) geneInDf(i, gene))
   patho <- patho[sapply(patho, function(i) nrow(i) > 0)]
-  common <- do.call(rbind.fill, lapply(patho, max.of.df))
+  common <- do.call(rbind.fill, lapply(patho, cadd.df))
   df <- list("gene"=as.character(gene),
              "cadd.phred"=mean(common$cadd.phred))
   df
@@ -49,6 +48,3 @@ rankByCaddScore <- function(gene.list, df.list){
   data.frame(subset(ranked, gene != c("NULL", 0)), row.names=NULL)
 }
 
-.collapse <- function(...) {
-  paste(unlist(list(...)), sep=",", collapse=",")
-}
