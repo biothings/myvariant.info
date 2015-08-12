@@ -25,9 +25,12 @@ An example of ‘xml’ data loading module could be found under: src/dataload/c
 All JSON objects for MyVariant.info should have two major field, the ‘_id’ field and the ‘property’ field.
 
 ### 1) ’_id’ field
-Each individual JSON object contains an ‘_id’ field as the primary key. We utilize nomenclature from Human Genome Variation Society to define the ‘_id’ field in MyVariant.info. We use HGVS’s genomic reference sequence notation based on the current reference genome assembly (e.g. hg19 for human). The followings are brief representations of major types of sequence variant. More examples could be found at http://www.hgvs.org/mutnomen/recs-DNA.html.
+Each individual JSON object contains an "**_id**" field as the primary key. We utilize recommended nomenclature from Human Genome Variation Society to define the "**_id**" field in MyVariant.info. We use HGVS’s genomic reference sequence notation based on the current reference genome assembly (e.g. hg19 for human). The followings are brief representations of major types of sequence variants. More examples could be found at http://www.hgvs.org/mutnomen/recs-DNA.html.
 
-#### SNP example
+**NOTE**: The default reference genome assembly is always human hg19 in MyVariant.info, so we only use "chr??" to represent the reference genomic sequence in "**_id**" field. The valid chromosomes representations are **chr1**, **chr2**, ..., **chr22**, **chrX**, **chrY** and **chrMT**. Do not use *chr23* for *chrX*, *chr24* for *chrY*, or *chrM* for *chrMT*.
+
+
+#### SNV example
 	    e.g. chr1:g.35366C>T
    	    The above ID represents a C to T SNP on chromosome 1, genomic position 35366.
 
@@ -37,7 +40,7 @@ Each individual JSON object contains an ‘_id’ field as the primary key. We u
 
 #### Deletion example
   	    e.g. chrM:g.2947878_2947880del
-	    The above ID represents that a three nucleotides deletion between genomic position 2947878 and 2947880 on chromosome M
+	    The above ID represents that a three nucleotides deletion between genomic position 2947878 and 2947880 on chromosome M. Note that we don't include the deleted sequence in the _id field in this case.
 
 #### Deletion/Insertion example
 	    e.g. chrX: g.14112_14117delinsTG
