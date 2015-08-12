@@ -146,7 +146,7 @@ Each individual variant object contains an "**_id**" field as the primary key. W
 
     chrMT:g.8271_8279del
 
-  The above _id represents that a nine nucleotides deletion between genomic position 8271 and 8279 on chromosome MT.
+  The above _id represents that a nine nucleotides deletion between genomic position 8271 and 8279 on chromosome MT. Note that we don't include the deleted sequence in the _id field in this case.
 
 * Deletion/Insertion example::
 
