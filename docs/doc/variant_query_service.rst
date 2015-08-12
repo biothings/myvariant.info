@@ -84,7 +84,7 @@ Fielded queries
     q=dbsnp.vartype:snp                       # for matching value on a specific field
     
     q=dbnsfp.polyphen2.hdiv.pred:(D P)        # multiple values for a field
-    q=dbnsfp.polyphen2.hdiv.pred:(D OR P)     # multiple values for a field using OR, same as the above
+    q=dbnsfp.polyphen2.hdiv.pred:(D OR P)     # multiple values for a field using OR
     
     q=_exist_:dbsnp                           # having dbsnp field
     q=_missing_:exac                          # missing exac field
@@ -199,6 +199,7 @@ should return hits as:
           "total": 2
         }
 
+"**total**" in the output gives the total number of matching hits, while the actual hits are returned under "**hits**" field. "**size**" parameter controls how many hits will be returned in one request (default is 10). Adjust "**size**" parameter and "**from**" parameter to retrieve the additional hits.
 
 Faceted queries
 ----------------
