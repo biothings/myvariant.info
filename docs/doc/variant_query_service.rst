@@ -345,9 +345,16 @@ Returned result (the value of "con" variable above) from above example code shou
 
 .. Tip:: "query" field in returned object indicates the matching query term.
 
-If a query term has no match, it will return with "**notfound**" field as "**true**"::
-    params = 
-    res, con = 
+If a query term has no match, it will return with "**notfound**" field as "**true**":
+
+.. code-block:: json
+
+      [
+        ...,
+        {'query': '...',
+         'notfound': true},
+        ...
+      ]
 
 
 .. raw:: html
