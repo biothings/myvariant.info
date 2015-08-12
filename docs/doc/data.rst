@@ -122,7 +122,6 @@ is essentially a collection of fields (attributes) and their values:
 The example above omits many of the available fields.  For a full example,
 check out `this example variant <http://myvariant.info/v1/variant/chr1:g.35367G%3EA>`_, or try the `interactive API page <http://myvariant.info/v1/api>`_.
 
-.. _id_fields:
 
 _id field
 ---------
