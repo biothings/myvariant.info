@@ -122,6 +122,40 @@ is essentially a collection of fields (attributes) and their values:
 The example above omits many of the available fields.  For a full example,
 check out `this example variant <http://myvariant.info/v1/variant/chr1:g.35367G%3EA>`_, or try the `interactive API page <http://myvariant.info/v1/api>`_.
 
+.. _id_fields:
+
+_id field
+---------
+
+Each individual variant object contains an "**_id**" field as the primary key. We utilize the recommended nomenclature from `Human Genome Variation Society <http://www.hgvs.org>`_ to define the "**_id**" field in MyVariant.info. Specifically, we use HGVS’s genomic reference sequence notation based on the current reference genome assembly (e.g. hg19 for human). The followings are brief representations of major types of genetic variants. More examples could be found at HVGS `recommendations for the description of DNA sequence variants <http://www.hgvs.org/mutnomen/recs-DNA.html>`_ page.
+
+.. note:: The default reference genome assembly is always human hg19 in MyVariant.info, so we only use "chr??" to represent the reference genomic sequence in "**_id**" field. The valid chromosomes representations are **chr1**, **chr2**, ..., **chr22**, **chrX**, **chrY** and **chrMT**. Do not use *chr23* for *chrX*, *chr24* for *chrY*, or *chrM* for *chrMT*.
+
+* SNV example::
+
+      chr1:g.35366C>T
+  
+  The above _id represents a C to T SNV on chromosome 1, genomic position 35366.
+
+* Insertion example::
+
+      chr2:g.17142_17143insA
+  
+  The above _id represents that an A is inserted between genomic position 17142 and 17143 on chromosome 2.
+
+* Deletion example::
+
+    chrMT:g.8271_8279del
+
+  The above _id represents that a nine nucleotides deletion between genomic position 8271 and 8279 on chromosome MT.
+
+* Deletion/Insertion example::
+
+    chrX:g.14112_14117delinsTG
+
+  The above _id represents that six nucleotides between genomic position 14112 and 14117 are replaced by TG.
+
+
 .. _available_fields:
 
 Available fields
