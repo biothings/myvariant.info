@@ -5,20 +5,19 @@ library(S4Vectors)
 library(VariantAnnotation)
 library(plyr)
 
+## replace all NA values in the data.frame with 0
 replaceWith0 <- function(df){
   d <- data.frame(df)
   d[is.na(d)] <- 0
   DataFrame(d)
 }
 
-## apply filters to dataframe
-filterDf <- function(df){
-  df <- subset(df, DP > 15 & FS < 30 & QD > 2)
-  df <- subset(df, cadd.consequence %in% c("NON_SYNONYMOUS", "STOP_GAINED", "STOP_LOST", "CANONICAL_SPLICE", "SPLICE_SITE"))
-  df <- subset(df, exac.af < 0.01)
-  #df <- subset(df, dbsnp.dbsnp_build > 128 )
-  df <- subset(df, sapply(dbnsfp.1000gp1.af, function(i) i < 0.01 ))
-  df
+## rank genes by scaled CADD score
+rankByCaddScore <- function(gene.list, df.list){
+  y <- do.call(rbind, lapply(gene.list, function(i) geneDf(df.list, i)))
+  df <- data.frame(gene=unlist(y[,1]), cadd.phred=unlist(y[,2]))
+  ranked <- arrange(df, -cadd.phred)
+  data.frame(subset(ranked, gene != c("NULL", 0)), row.names=NULL)
 }
 
 ## get specific gene's rows of data.frame
@@ -27,6 +26,7 @@ geneInDf <- function(df, gene){
   gene.df
 }
 
+## extract median CADD scores of variants from each gene
 cadd.df <- function(df){
     return(data.frame(subset(df, cadd.phred == median(df$cadd.phred))))
 }
@@ -40,11 +40,3 @@ geneDf <- function(vars.list, gene){
              "cadd.phred"=mean(common$cadd.phred))
   df
 }
-
-rankByCaddScore <- function(gene.list, df.list){
-  y <- do.call(rbind, lapply(gene.list, function(i) geneDf(df.list, i)))
-  df <- data.frame(gene=unlist(y[,1]), cadd.phred=unlist(y[,2]))
-  ranked <- arrange(df, -cadd.phred)
-  data.frame(subset(ranked, gene != c("NULL", 0)), row.names=NULL)
-}
-
