@@ -275,9 +275,9 @@ def reindex(old_index, new_index, s):
     on the machine you run it on allows.  500-1000 seems reasonable for t2.medium '''
     def create_bulk_insert_string(results, index):
         ret_str = ''
-            for hit in results:
-                ret_str += '{"create":{"_index":"' + index + '","_type":"variant","_id":"' + hit['_id'] + '"}}\n'
-                ret_str += json.dumps(hit) + '\n'
+        for hit in results:
+            ret_str += '{"create":{"_index":"' + index + '","_type":"variant","_id":"' + hit['_id'] + '"}}\n'
+            ret_str += json.dumps(hit) + '\n'
         return ret_str
     
     es = elasticsearch.Elasticsearch('localhost:9200')
@@ -286,10 +286,10 @@ def reindex(old_index, new_index, s):
 
     try:
         while True: # do this loop until failure
-                r = es.scroll(s['_scroll_id'], scroll='5m')
-                this_l = [res['_source'] for res in r['hits']['hits']]
-                this_str = create_buil_insert_string(this_l, new_index)
-                es.bulk(body=this_str, index=new_index, doc_type='variant')
-                curr_done += len(this_l)
+            r = es.scroll(s['_scroll_id'], scroll='5m')
+            this_l = [res['_source'] for res in r['hits']['hits']]
+            this_str = create_buil_insert_string(this_l, new_index)
+            es.bulk(body=this_str, index=new_index, doc_type='variant')
+            curr_done += len(this_l)
     except:
         print('{} documents inserted'.format(curr_done))
