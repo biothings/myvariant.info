@@ -283,11 +283,13 @@ def reindex(old_index, new_index, s):
     es = elasticsearch.Elasticsearch('localhost:9200')
     s = es.search(index=old_index, body='{"query": {"match_all": {}}}', search_type='scan', scroll='5m', size=s)
     curr_done = 0
-    last_done = -1
-    while curr_done != last_done:
-        r = es.scroll(s['_scroll_id'], scroll='5m')
-        this_l = [res['_source'] for res in r['hits']['hits']]
-        this_str = create_buil_insert_string(this_l, new_index)
-        es.bulk(body=this_str, index=new_index, doc_type='variant')
-        last_done = curr_done
-        curr_done += len(this_l)
+
+    try:
+        while True: # do this loop until failure
+                r = es.scroll(s['_scroll_id'], scroll='5m')
+                this_l = [res['_source'] for res in r['hits']['hits']]
+                this_str = create_buil_insert_string(this_l, new_index)
+                es.bulk(body=this_str, index=new_index, doc_type='variant')
+                curr_done += len(this_l)
+    except:
+        print('{} documents inserted'.format(curr_done))
