@@ -12,7 +12,7 @@ def get_mapping():
                             "type": "string",
                             "analyzer": "string_lowercase"
                         },
-                        "gene_name": {
+                        "genename": {
                             "type": "string",
                             "analyzer": "string_lowercase"
                         },
@@ -86,7 +86,7 @@ def get_mapping():
                         "type": "string",
                         "analyzer": "string_lowercase"
                     },
-                    "gene_name": {
+                    "genename": {
                         "type": "string",
                         "analyzer": "string_lowercase"
                     },
@@ -102,7 +102,7 @@ def get_mapping():
                         "type": "string",
                         "analyzer": "string_lowercase"
                     },
-                    "gene_name": {
+                    "genename": {
                         "type": "string",
                         "analyzer": "string_lowercase"
                     },
@@ -113,6 +113,19 @@ def get_mapping():
                         "type": "float"
                     }
                 }
+            }
+        },
+        "vcf": {
+            "position": {
+                "type": "integer"
+            },
+            "ref": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            },
+            "alt": {
+                "type": "string",
+                "analyzer": "string_lowercase"
             }
         }
     }
