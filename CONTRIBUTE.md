@@ -9,14 +9,14 @@ If you have/find a variant annotation resource you want to include in our system
 3. all data plugins are located under [src/dataload/contrib](https://github.com/Network-of-BioThings/myvariant.info/tree/master/src/dataload/contrib) folder
 
 ## Steps to follow
-1. Write load_data function: The output of this function should be either a list or generator of JSON documents. A generator is ideal for large lists that won't fit into memory. (Details will be shown in the next section)
-2. Include Meta dictionary: you can put some metadata like "maintainer", "requirements", etc. An example could be found at [src/dataload/contrib/dbsnp/__init__.py](https://github.com/Network-of-BioThings/myvariant.info/blob/master/src/dataload/contrib/dbnsfp/__init__.py)
-3. Get mapping function: optional, this can be used to customize the indexing. You can just leave it empty. An example could be found at [src/dataload/contrib/dbsnp/__init__.py](https://github.com/Network-of-BioThings/myvariant.info/blob/master/src/dataload/contrib/dbnsfp/__init__.py)
-4. Fork this repo
+1. Fork this repo
 
+        git clone https://github.com/Network-of-BioThings/myvariant.info [**repo_name**]
 
-    git clone https://github.com/Network-of-BioThings/myvariant.info [**repo_name**]
-5. Add your own data plugin (under a subfolder)
+2. Add your own data plugin (under a subfolder): The subfolder should have two files, one parser file and another '\_\_init\_\_.py' file. In '\_\_init\_\_.py' file, you should include Meta dictionary information as well as the get_mapping function(see step 4 and 5). For parser file, you should include the load_data function(see step 3).
+3. Write load_data function: The output of this function should be either a list or generator of JSON documents. A generator is ideal for large lists that won't fit into memory. (Details will be shown in the next section)
+4. Include Meta dictionary: you can put some metadata like "maintainer", "requirements", etc. An example could be found at [src/dataload/contrib/dbsnp/\_\_init\_\_.py](https://github.com/Network-of-BioThings/myvariant.info/blob/master/src/dataload/contrib/dbnsfp/__init__.py)
+5. Get mapping function: optional, this can be used to customize the indexing. You can just leave it empty. An example could be found at [src/dataload/contrib/dbsnp/\_\_init\_\_.py](https://github.com/Network-of-BioThings/myvariant.info/blob/master/src/dataload/contrib/dbnsfp/\_\_init\_\_.py)
 6. Validate HGVS IDs (Details will be shown in the next section)
 7. Commit and send the pull request
 8. And the last, if you have trouble to code a data plugin, you can just produce a dump of JSON document list using whatever tools you like, and send over your dumped file to us. But that will require us to load it manually.
@@ -34,13 +34,13 @@ The load_data function could be divided into two parts:
 The first step is to read in source files. The source files could be in different formats, including tsv, csv, vcf, xml. There are a variety of python libraries and packages available to help read and parse these data files, e.g. python cvs library, PyVCF. Here, we have listed examples of data loading modules for some of the major formats.
 
 #### 1) tsv/csv file example
-An example of ‘tsv’ or ‘csv’ data loading module could be found under: src/dataload/contrib/dbnsfp/dbnsfp_parser.py
+An example of ‘tsv’ or ‘csv’ data loading module could be found under: [src/dataload/contrib/dbnsfp/dbnsfp_parser.py](https://github.com/Network-of-BioThings/myvariant.info/blob/master/src/dataload/contrib/dbnsfp/dbnsfp_parser.py)
 
 #### 2) vcf file example
-An example of ‘vcf’ data loading module could be found under: src/dataload/contrib/exac/exac_parser.py
+An example of ‘vcf’ data loading module could be found under: [src/dataload/contrib/exac/exac_parser.py](https://github.com/Network-of-BioThings/myvariant.info/blob/master/src/dataload/contrib/exac/exac_parser.py)
 
 #### 3) xml file example
-An example of ‘xml’ data loading module could be found under: src/dataload/contrib/clinvar/clinvar_xml_parser.py
+An example of ‘xml’ data loading module could be found under: [src/dataload/contrib/clinvar/clinvar_xml_parser.py](https://github.com/Network-of-BioThings/myvariant.info/blob/master/src/dataload/contrib/exac/exac_parser.py)
 
 ### 2. Convert each item into a JSON object
 All JSON objects for MyVariant.info should have two major field, the ‘_id’ field and the ‘property’ field.
@@ -80,7 +80,7 @@ In order to make sure all variant IDs loaded into MyVariant.info strictly follow
 ### step 1: Call load_data function and get generator of JSON documents
 
 
-    from dataload.contrib.db.db_parser import load_data
+    from dataload.contrib.[db].[db]_parser import load_data
     db_generator = load_data()
 
 
