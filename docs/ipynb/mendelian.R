@@ -17,7 +17,7 @@ rankByCaddScore <- function(gene.list, df.list){
   y <- do.call(rbind, lapply(gene.list, function(i) geneDf(df.list, i)))
   df <- data.frame(gene=unlist(y[,1]), cadd.phred=unlist(y[,2]))
   ranked <- arrange(df, -cadd.phred)
-  data.frame(subset(ranked, gene != c("NULL", 0)), row.names=NULL)
+  ranked
 }
 
 ## get specific gene's rows of data.frame
