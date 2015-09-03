@@ -1,7 +1,7 @@
 import json
 import datetime
 import tornado.web
-from ga import GAMixIn
+from utils.ga import GAMixIn
 from collections import OrderedDict
 
 SUPPORT_MSGPACK = True

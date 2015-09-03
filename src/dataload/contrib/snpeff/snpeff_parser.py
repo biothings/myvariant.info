@@ -190,7 +190,7 @@ class VCFConstruct:
                         ann.append({
                             "effect": effect,
                             "putative_impact": putative_impact,
-                            "gene_name": gene_name,
+                            "genename": gene_name,
                             "gene_id": gene_id,
                             "feature_type": feature_type,
                             "feature_id": feature_id,
@@ -229,13 +229,13 @@ class VCFConstruct:
                     (id_nmd, name_nmd, nt_nmd, pt_nmd) = nmd_info.split('|')
                     lof = {
                         "gene_id": id_lof,
-                        "gene_name": name_lof,
+                        "genename": name_lof,
                         "number_of_transcripts_in_gene": nt_lof,
                         "percent_of_transcripts_affected": pt_lof
                     }
                     nmd = {
                         "gene_id": id_nmd,
-                        "gene_name": name_nmd,
+                        "genename": name_nmd,
                         "number_of_transcripts_in_gene": nt_nmd,
                         "percent_of_transcripts_affected": pt_nmd
                     }
@@ -247,7 +247,7 @@ class VCFConstruct:
                         (id_lof, name_lof, nt_lof, pt_lof) = lof_info.split('|')
                         lof = {
                             "gene_id": id_lof,
-                            "gene_name": name_lof,
+                            "genename": name_lof,
                             "number_of_transcripts_in_gene": nt_lof,
                             "percent_of_transcripts_affected": pt_lof
                         }
@@ -256,7 +256,7 @@ class VCFConstruct:
                         (id_nmd, name_nmd, nt_nmd, pt_nmd) = nmd_info.split('|')
                         nmd = {
                             "gene_id": id_nmd,
-                            "gene_name": name_nmd,
+                            "genename": name_nmd,
                             "number_of_transcripts_in_gene": nt_nmd,
                             "percent_of_transcripts_affected": pt_nmd
                         }
