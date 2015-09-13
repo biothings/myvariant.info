@@ -239,3 +239,57 @@ class ESIndexer():
         print("\t{} documents are deleted.".format(cnt_orphan_doc))
         if dryrun:
             print("This is a dryrun, so no actual document operations.")
+
+    def find_biggest_doc(self, fields_li, min=5, return_doc=False):
+        """return the doc with the max number of fields from fields_li."""
+        import itertools
+        for n in range(len(fields_li), min - 1, -1):
+            print('>>>>', n)
+            for field_set in itertools.combinations(fields_li, n):
+                q = ' AND '.join(["_exists_:" + field for field in field_set])
+                q = {'query': {"query_string": {"query": q}}}
+                cnt = self.count(q)
+                if cnt > 0:
+                    print("\nFound {} docs with {} fields".format(cnt, len(field_set)))
+                    if return_doc:
+                        res = self._es.search(index=self._index, doc_type=self._doc_type, body=q, size=cnt)
+                        return res
+                    else:
+                        return (cnt, q)
+                else:
+                    print('.', end='')
+            print()
+
+def duplicate_index_with_new_settings(old_index, new_index, settings):
+    ''' This function will create a new index and copy the mappings from the old index
+    with the settings dict, you can change any of the settings, e.g. number of primary
+    shards.'''
+    m = es.indices.get_mapping(index=old_index)
+    mappings = m[old_index]['mappings']
+    es.indices.create(index=new_index, body='{"settings":' + json.dumps(settings) + ', "mappings":' + json.dumps(mappings) + '}')
+
+def reindex(old_index, new_index, s):
+    ''' Function to reindex by scan and scroll combined with a bulk insert.
+    old_index is the index to take docs from, new_index is the one the docs go to.
+    s is the size of each bulk insert - should set this as high as the RAM
+    on the machine you run it on allows.  500-1000 seems reasonable for t2.medium '''
+    def create_bulk_insert_string(results, index):
+        ret_str = ''
+        for hit in results:
+            ret_str += '{"create":{"_index":"' + index + '","_type":"variant","_id":"' + hit['_id'] + '"}}\n'
+            ret_str += json.dumps(hit) + '\n'
+        return ret_str
+    
+    es = elasticsearch.Elasticsearch('localhost:9200')
+    s = es.search(index=old_index, body='{"query": {"match_all": {}}}', search_type='scan', scroll='5m', size=s)
+    curr_done = 0
+
+    try:
+        while True: # do this loop until failure
+            r = es.scroll(s['_scroll_id'], scroll='5m')
+            this_l = [res['_source'] for res in r['hits']['hits']]
+            this_str = create_buil_insert_string(this_l, new_index)
+            es.bulk(body=this_str, index=new_index, doc_type='variant')
+            curr_done += len(this_l)
+    except:
+        print('{} documents inserted'.format(curr_done))

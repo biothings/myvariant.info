@@ -1,7 +1,3 @@
-import re
-from itertools import imap, groupby
-import os
-
 # Generated Mon Mar 30 11:14:08 2015 by generateDS.py version 2.15a.
 # Command line:
 #   /home/cwu/opt/devpy/bin/generateDS.py -o\
@@ -9,7 +5,7 @@ import os
 import clinvar
 
 from utils.dataload import unlist, dict_sweep, \
-    value_convert, merge_duplicate_rows, rec_handler
+    value_convert, rec_handler
 
 
 def _map_line_to_json(cp):

@@ -11,6 +11,7 @@ from config import HG19_DATAFILE
 
 SNPEFF_CMD = 'java -Xmx4g -jar /home/kevinxin/snpEff/snpEff.jar hg19'.split()
 
+
 class VCFConstruct:
     def __init__(self):
         self._chr_data = None
@@ -150,10 +151,7 @@ class VCFConstruct:
         proc = subprocess.Popen(SNPEFF_CMD, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = proc.communicate(vcf_stdin)
         assert stderr == '', stderr
-
-        snpeff_json_list = []
         vcf_stdout_raw = stdout.split('\n')
-        i = 0
         for vcf_line in vcf_stdout_raw:
             if vcf_line.startswith('#'):
                 continue
@@ -165,7 +163,7 @@ class VCFConstruct:
                 ann = []
                 # Multiple annotations per VCF line
                 for item in ann_info.split(','):
-                    if len(item.split('|'))>1:
+                    if len(item.split('|')) > 1:
                         (effect, putative_impact, gene_name, gene_id, feature_type, feature_id) = item.split('|')[1:7]
                         (transcript_biotype, exon, hgvs_coding, hgvs_protein, cdna, cds, protein, distance_to_feature) = item.split('|')[7:15]
                         print(effect)
@@ -192,7 +190,7 @@ class VCFConstruct:
                         ann.append({
                             "effect": effect,
                             "putative_impact": putative_impact,
-                            "gene_name": gene_name,
+                            "genename": gene_name,
                             "gene_id": gene_id,
                             "feature_type": feature_type,
                             "feature_id": feature_id,
@@ -231,13 +229,13 @@ class VCFConstruct:
                     (id_nmd, name_nmd, nt_nmd, pt_nmd) = nmd_info.split('|')
                     lof = {
                         "gene_id": id_lof,
-                        "gene_name": name_lof,
+                        "genename": name_lof,
                         "number_of_transcripts_in_gene": nt_lof,
                         "percent_of_transcripts_affected": pt_lof
                     }
                     nmd = {
                         "gene_id": id_nmd,
-                        "gene_name": name_nmd,
+                        "genename": name_nmd,
                         "number_of_transcripts_in_gene": nt_nmd,
                         "percent_of_transcripts_affected": pt_nmd
                     }
@@ -249,7 +247,7 @@ class VCFConstruct:
                         (id_lof, name_lof, nt_lof, pt_lof) = lof_info.split('|')
                         lof = {
                             "gene_id": id_lof,
-                            "gene_name": name_lof,
+                            "genename": name_lof,
                             "number_of_transcripts_in_gene": nt_lof,
                             "percent_of_transcripts_affected": pt_lof
                         }
@@ -258,7 +256,7 @@ class VCFConstruct:
                         (id_nmd, name_nmd, nt_nmd, pt_nmd) = nmd_info.split('|')
                         nmd = {
                             "gene_id": id_nmd,
-                            "gene_name": name_nmd,
+                            "genename": name_nmd,
                             "number_of_transcripts_in_gene": nt_nmd,
                             "percent_of_transcripts_affected": pt_nmd
                         }

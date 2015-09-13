@@ -124,9 +124,9 @@ class dbSNPASN1FlatParser:
             }
         if len(snp_line) == 5:
             allele_origin = snp_line[4][1]
-            #pat = "(.+)\((.+)\)/(.+)\((.+)\)"
-            #grp = re.match(pat, allele_orgin).groups()
-            #assert len(grp) == 4
+            # pat = "(.+)\((.+)\)/(.+)\((.+)\)"
+            # grp = re.match(pat, allele_orgin).groups()
+            # assert len(grp) == 4
             pat = "(.*)\((.+)\)"
             d = []
             for x in allele_origin.split('/'):

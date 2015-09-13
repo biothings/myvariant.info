@@ -1,6 +1,3 @@
-from .cadd_parser import load_contig
-
-
 __METADATA__ = {
     "src_name": 'CADD',
     "src_url": 'http://cadd.gs.washington.edu/',

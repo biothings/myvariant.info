@@ -21,6 +21,9 @@ class ESQuery():
         self._allowed_options = ['_source', 'start', 'from_', 'size',
                                  'sort', 'explain', 'version', 'facets']
 
+    def _use_hg38(self):
+        self._index = config.ES_INDEX_NAME_HG38
+
     def _get_variantdoc(self, hit):
         doc = hit.get('_source', hit.get('fields', {}))
         doc.setdefault('_id', hit['_id'])
@@ -123,15 +126,17 @@ class ESQuery():
     def get_variant(self, vid, **kwargs):
         '''unknown vid return None'''
         options = self._get_cleaned_query_options(kwargs)
+        kwargs = {"_source": options.kwargs["_source"]} if "_source" in options.kwargs else {}
         try:
-            res = self._es.get(index=self._index, id=vid, doc_type=self._doc_type, **options.kwargs)
+            res = self._es.get(index=self._index, id=vid, doc_type=self._doc_type, **kwargs)
         except NotFoundError:
             return
         return res if options.raw else self._get_variantdoc(res)
 
     def mget_variants(self, vid_list, **kwargs):
         options = self._get_cleaned_query_options(kwargs)
-        res = self._es.mget(body={'ids': vid_list}, index=self._index, doc_type=self._doc_type, **options.kwargs)
+        kwargs = {"_source": options.kwargs["_source"]} if "_source" in options.kwargs else {}
+        res = self._es.mget(body={'ids': vid_list}, index=self._index, doc_type=self._doc_type, **kwargs)
         return res if options.raw else [self._get_variantdoc(doc) for doc in res['docs']]
 
     def get_variant2(self, vid, **kwargs):

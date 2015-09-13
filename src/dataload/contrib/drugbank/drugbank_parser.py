@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from dataload.contrib.drugbank.drugbank_write_file import write_file
 from itertools import imap, groupby
 from utils.dataload import dict_sweep, merge_duplicate_rows
 import csv
@@ -15,9 +14,8 @@ def _map_line_to_json(fields):
     if HGVS is None:
         return
     one_snp_json = {
-    
         "_id": HGVS,
-        'drugbank': 
+        'drugbank':
             {
                 'drug': fields[2],
                 'interacting_gene_or_enzyme': fields[3],
@@ -28,11 +26,10 @@ def _map_line_to_json(fields):
                 'references': fields[7]
             }
     }
-    
     return dict_sweep(one_snp_json, ['Not Available'])
 
 
-def load_data(input_file):    
+def load_data(input_file):
     """
     write_file output and csv.reader input_file
     '/opt/myvariant.info/load_archive/drugbank/drugbank.csv'
@@ -42,4 +39,4 @@ def load_data(input_file):
     drugbank.next()
     json_rows = imap(_map_line_to_json, drugbank)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row['_id']))
-    return (merge_duplicate_rows(rg, 'drugbank') for rg in row_groups)    
+    return (merge_duplicate_rows(rg, 'drugbank') for rg in row_groups)

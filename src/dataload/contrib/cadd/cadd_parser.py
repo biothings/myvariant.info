@@ -10,19 +10,19 @@ from utils.dataload import dict_sweep, unlist, value_convert, merge_duplicate_ro
 from utils.common import timesofar
 from utils.mongo import get_src_db
 from utils.hgvs import get_hgvs_from_vcf
-## tabix file links from CADD http://cadd.gs.washington.edu/download
-## whole genome SNVs including annotations
+# tabix file links from CADD http://cadd.gs.washington.edu/download
+# whole genome SNVs including annotations
 whole_genome = 'http://krishna.gs.washington.edu/download/CADD/v1.2/whole_genome_SNVs_inclAnno.tsv.gz'
-## SNV variants on Illumina Exome BeadChip
+# SNV variants on Illumina Exome BeadChip
 exome = '/opt/myvariant.info/load_archive/cadd/HumanExome-12v1-1_A_inclAnno.tsv.gz'
-## 1000 Genomes variants SNVs and InDels including all annotations
+# 1000 Genomes variants SNVs and InDels including all annotations
 thousandgp = '/opt/myvariant.info/load_archive/cadd/1000G_inclAnno.tsv.gz'
-## Exome Aggreation Consortium variants including all annotations
+# Exome Aggreation Consortium variants including all annotations
 exac = 'opt/myvariant.info/load_archive/cadd/ExAC.r0.2_inclAnno.tsv.gz'
-## ESP6500 variants SNVs and InDels including all annotations
+# ESP6500 variants SNVs and InDels including all annotations
 esp = 'opt/myvariant.info/load_archive/cadd/ESP6500SI_inclAnno.tsv.gz'
 
-## number of fields/annotations
+# number of fields/annotations
 VALID_COLUMN_NO = 116
 
 DEPENDENCIES = ["pysam", "pymongo"]
@@ -217,8 +217,8 @@ def load_contig(contig):
     '''save cadd contig into mongodb collection.
        should be an iterable.
     '''
-    #if CADD_INPUT == "exome":
-    #CADD_INPUT = exome
+    # if CADD_INPUT == "exome":
+    # CADD_INPUT = exome
     tabix = pysam.Tabixfile(whole_genome)
     src_db = get_src_db()
     target_coll = src_db["cadd"]
@@ -235,6 +235,6 @@ def load_contig(contig):
         if cnt % 100000 == 0:
             print(cnt, timesofar(t0))
     if doc_list:
-	target_coll.insert(doc_list, manipulate=False, check_keys=False, w=0)
+        target_coll.insert(doc_list, manipulate=False, check_keys=False, w=0)
     print("successfully loaded cadd chromosome %s into mongodb" % contig)
     print("total docs: {}; total time: {}".format(cnt, timesofar(t0)))
