@@ -48,7 +48,7 @@ def reverse_complement_hgvs(hgvs_id):
         raise ValueError("Not a Valid HGVS ID")
 
 
-def get_hgvs_from_vcf(chr, pos, ref, alt, mutant_type = None):
+def get_hgvs_from_vcf(chr, pos, ref, alt, mutant_type=None):
     '''get a valid hgvs name from VCF-style "chr, pos, ref, alt" data.'''
     if len(ref) == len(alt) == 1:
         # this is a SNP
@@ -61,8 +61,8 @@ def get_hgvs_from_vcf(chr, pos, ref, alt, mutant_type = None):
             end = int(pos) + len(ref) - 1
             hgvs = 'chr{0}:g.{1}_{2}del'.format(chr, start, end)
             var_type = 'del'
-	else:
-	    end = int(pos) + len(ref) - 1
+        else:
+            end = int(pos) + len(ref) - 1
             hgvs = 'chr{0}:g.{1}_{2}delins{3}'.format(chr, pos, end, alt)
             var_type = 'delins'
     elif len(ref) == 1 and len(alt) > 1:
@@ -72,9 +72,9 @@ def get_hgvs_from_vcf(chr, pos, ref, alt, mutant_type = None):
             ins_seq = alt[1:]
             hgvs += ins_seq
             var_type = 'ins'
-	else:
-	    hgvs = 'chr{0}:g.{1}delins{2}'.format(chr, pos, alt)
-        var_type = 'delins'
+        else:
+            hgvs = 'chr{0}:g.{1}delins{2}'.format(chr, pos, alt)
+            var_type = 'delins'
     elif len(ref) > 1 and len(alt) > 1:
         end = int(pos) + len(alt) - 1
         hgvs = 'chr{0}:g.{1}_{2}delins{3}'.format(chr, pos, end, alt)

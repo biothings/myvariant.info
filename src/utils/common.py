@@ -2,6 +2,7 @@ from __future__ import print_function
 import sys
 import time
 from itertools import islice
+from contextlib import contextmanager
 import os.path
 from shlex import shlex
 import pickle
@@ -64,16 +65,24 @@ def is_float(f):
     return isinstance(f, float)
 
 
-def iter_n(iterable, n):
+def iter_n(iterable, n, with_cnt=False):
     '''
+    Iterate an iterator by chunks (of n)
+    if with_cnt is True, return (chunk, cnt) each time
     ref http://stackoverflow.com/questions/8991506/iterate-an-iterator-by-chunks-of-n-in-python
     '''
     it = iter(iterable)
+    if with_cnt:
+        cnt = 0
     while True:
         chunk = tuple(islice(it, n))
         if not chunk:
             return
-        yield chunk
+        if with_cnt:
+            cnt += len(chunk)
+            yield (chunk, cnt)
+        else:
+            yield chunk
 
 
 def anyfile(infile, mode='r'):
@@ -126,6 +135,26 @@ class open_anyfile():
 
     def __exit__(self, type, value, traceback):
         self.in_f.close()
+
+
+@contextmanager
+def open_anyfile2(infile, mode='r'):
+    '''a context manager can be used in "with" stmt.
+       accepts a filehandle or anything accepted by anyfile function.
+
+        with open_anyfile('test.txt') as in_f:
+            do_something()
+
+       This is equivelant of above open_anyfile, but simplier code flow.
+    '''
+    if is_filehandle(infile):
+        in_f = infile
+    else:
+        in_f = anyfile(infile, mode=mode)
+    try:
+        yield in_f
+    finally:
+        in_f.close()
 
 
 class dotdict(dict):
