@@ -19,7 +19,7 @@ class ESQuery():
         self._index = index or config.ES_INDEX_NAME
         self._doc_type = doc_type or config.ES_DOC_TYPE
         self._allowed_options = ['_source', 'start', 'from_', 'size',
-                                 'sort', 'explain', 'version', 'facets']
+                                 'sort', 'explain', 'version', 'facets', 'fetch_all']
 
     def _use_hg38(self):
         self._index = config.ES_INDEX_NAME_HG38
@@ -101,6 +101,7 @@ class ESQuery():
         options = dotdict()
         options.raw = kwargs.pop('raw', False)
         options.rawquery = kwargs.pop('rawquery', False)
+        options.fetch_all = kwargs.pop('fetch_all', False)
         scopes = kwargs.pop('scopes', None)
         if scopes:
             options.scopes = self._cleaned_scopes(scopes)
@@ -188,6 +189,10 @@ class ESQuery():
         interval_query = self._parse_interval_query(q)
         facets = self._parse_facets_option(kwargs)
         options = self._get_cleaned_query_options(kwargs)
+        scroll_options = {}
+        if 'fetch_all' in options and str(options['fetch_all']).lower() in ['1', 'true']:
+            scroll_options.update({'search_type':'scan', 'size': config.ES_SCROLL_SIZE, 'scroll': config.ES_SCROLL_TIME})
+        options['kwargs'].update(scroll_options)
         if interval_query:
             options['kwargs'].update(interval_query)
             res = self.query_interval(**options.kwargs)
@@ -206,6 +211,9 @@ class ESQuery():
                 res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
             except RequestError:
                 return {"error": "invalid query term.", "success": False}
+        
+        if options.fetch_all:
+            return res
 
         if not options.raw:
             _res = res['hits']
@@ -320,6 +328,9 @@ class ESQuery():
         r = self._es.indices.get(index=self._index)
         return r[list(r.keys())[0]]['mappings']['variant']['properties']
 
+    def scroll(self, scroll_id, **kwargs):
+        # return the results from a scroll id
+        return self._es.scroll(scroll_id, scroll=config.ES_SCROLL_TIME)
 
 class ESQueryBuilder:
     def __init__(self, **query_options):

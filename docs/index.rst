@@ -32,6 +32,7 @@ Documentation
     doc/data    
     doc/variant_query_service
     doc/variant_annotation_service
+    doc/packages
 
 Related links
 -------------
