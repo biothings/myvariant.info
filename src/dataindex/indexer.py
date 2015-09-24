@@ -4,7 +4,6 @@ logging.basicConfig()
 import json
 import time
 
-from elasticsearch import Elasticsearch
 from .mapping import get_mapping
 import config
 import utils.es
@@ -132,7 +131,7 @@ def create_index(index_name, mapping=None):
     es.indices.create(index=index_name, body=body)
 
 
-def _index_doc_batch(doc_batch, index_name, doc_type, update=True):
+def _index_doc_batch(doc_batch, index_name, doc_type, update=True, bulk_size=10000):
     _li = []
     for doc in doc_batch:
         if update:
@@ -161,7 +160,13 @@ def _index_doc_batch(doc_batch, index_name, doc_type, update=True):
                 }
             })
             _li.append(doc)
-    es.bulk(body=_li)
+
+        if len(_li) >= bulk_size:
+            es.bulk(body=_li)
+            _li = []
+
+    if _li:
+        es.bulk(body=_li)
 
 
 def do_index(doc_li, index_name, doc_type, step=1000, update=True, verbose=True):
