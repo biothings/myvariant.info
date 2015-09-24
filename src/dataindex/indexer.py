@@ -133,6 +133,7 @@ def create_index(index_name, mapping=None):
 
 def _index_doc_batch(doc_batch, index_name, doc_type, update=True, bulk_size=10000):
     _li = []
+    cnt = 0
     for doc in doc_batch:
         if update:
             # _li.append({
@@ -161,7 +162,8 @@ def _index_doc_batch(doc_batch, index_name, doc_type, update=True, bulk_size=100
             })
             _li.append(doc)
 
-        if len(_li) >= bulk_size:
+        cnt += 1
+        if cnt >= bulk_size:
             es.bulk(body=_li)
             _li = []
 
