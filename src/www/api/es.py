@@ -20,6 +20,8 @@ class ESQuery():
         self._doc_type = doc_type or config.ES_DOC_TYPE
         self._allowed_options = ['_source', 'start', 'from_', 'size',
                                  'sort', 'explain', 'version', 'facets', 'fetch_all']
+        self._scroll_time = '1m'
+        self._scroll_size = 100
 
     def _use_hg38(self):
         self._index = config.ES_INDEX_NAME_HG38
@@ -191,7 +193,7 @@ class ESQuery():
         options = self._get_cleaned_query_options(kwargs)
         scroll_options = {}
         if 'fetch_all' in options and str(options['fetch_all']).lower() in ['1', 'true']:
-            scroll_options.update({'search_type': 'scan', 'size': config.ES_SCROLL_SIZE, 'scroll': config.ES_SCROLL_TIME})
+            scroll_options.update({'search_type': 'scan', 'size': self._scroll_size, 'scroll': self._scroll_time})
         options['kwargs'].update(scroll_options)
         if interval_query:
             options['kwargs'].update(interval_query)
@@ -335,7 +337,7 @@ class ESQuery():
     def scroll(self, scroll_id, **kwargs):
         # return the results from a scroll ID, recognizes options.raw
         options = self._get_cleaned_query_options(kwargs)
-        r = self._es.scroll(scroll_id, scroll=config.ES_SCROLL_TIME)
+        r = self._es.scroll(scroll_id, scroll=self._scroll_time)
         scroll_id = r.get('_scroll_id')
         if scroll_id is None or not r['hits']['hits']:
             return {'success': False, 'error': 'No results to return.'}
