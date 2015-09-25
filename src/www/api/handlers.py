@@ -89,10 +89,7 @@ class QueryHandler(BaseHandler):
         scroll_id = kwargs.pop('scroll_id', None)
         _has_error = False
         if scroll_id:
-            try:
-                res = self.esq.scroll(scroll_id)['hits']
-            except:
-                res = {'success': False, 'error': 'Stale or missing scroll ID.'}
+            res = self.esq.scroll(scroll_id, **kwargs)
         elif q:
             explain = self.get_argument('explain', None)
             if explain and explain.lower() == 'true':
@@ -109,7 +106,7 @@ class QueryHandler(BaseHandler):
                 res = self.esq.query(q, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
-        
+
         self.return_json(res)
         self.ga_track(event={'category': 'v1_api',
                              'action': 'query_get',
