@@ -78,6 +78,7 @@ class QueryHandler(BaseHandler):
             facets
             callback
             email
+            fetch_all
 
             explain
             raw
@@ -91,10 +92,7 @@ class QueryHandler(BaseHandler):
         if scroll_id:
             res = self.esq.scroll(scroll_id, **kwargs)
         elif q:
-            explain = self.get_argument('explain', None)
-            if explain and explain.lower() == 'true':
-                kwargs['explain'] = True
-            for arg in ['from', 'size', 'mode']:
+            for arg in ['from', 'size']:
                 value = kwargs.get(arg, None)
                 if value:
                     try:
@@ -104,6 +102,12 @@ class QueryHandler(BaseHandler):
                         _has_error = True
             if not _has_error:
                 res = self.esq.query(q, **kwargs)
+                if kwargs.get('fetch_all', False):
+                    self.ga_track(event={'category': 'v1_api',
+                                         'action': 'fetch_all',
+                                         'label': 'total',
+                                         'value': res.get('hits', {}).get('total', None)})
+
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 

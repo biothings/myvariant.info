@@ -26,7 +26,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
     jsonp_parameter = 'callback'
     cache_max_age = 604800  # 7days
     disable_caching = False
-    boolean_parameters = set(['raw', 'rawquery', 'entrezonly', 'ensemblonly', 'dotfield'])
+    boolean_parameters = set(['raw', 'rawquery', 'fetch_all', 'explain'])
 
     def _check_fields_param(self, kwargs):
         '''support "filter" as an alias of "fields" parameter for back-compatability.'''
