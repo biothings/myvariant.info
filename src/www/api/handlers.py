@@ -217,8 +217,9 @@ class FieldsHandler(BaseHandler):
 
 APP_LIST = [
     (r"/variant/(.+)/?", VariantHandler),   # for variant get request
-    (r"/variant/?$", VariantHandler),              # for variant post request
-    (r"/query/?", QueryHandler),
-    (r"/metadata", MetaDataHandler),    # for metadata requests
-    (r"/fields", FieldsHandler),        # for available field information
+    (r"/variant/?$", VariantHandler),       # for variant post request
+    (r"/query/?", QueryHandler),            # for query get/post request
+    (r"/metadata", MetaDataHandler),        # for metadata requests
+    (r"/metadata/fields", FieldsHandler),   # for available field information
 ]
+
