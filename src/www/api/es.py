@@ -37,7 +37,11 @@ class ESQuery():
         return doc
 
     def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False):
-        '''res is the dictionary returned from a query.'''
+        '''res is the dictionary returned from a query.
+           do some reformating of raw ES results before returning.
+
+           This method is used for self.mget_variants2 and self.get_variant2 method.
+        '''
         if 'error' in res:
             return error
 
@@ -49,6 +53,19 @@ class ESQuery():
             return self._get_variantdoc(hits['hits'][0])
         else:
             return [self._get_variantdoc(hit) for hit in hits['hits']]
+
+    def _clean_res2(self, res):
+        '''res is the dictionary returned from a query.
+           do some reformating of raw ES results before returning.
+
+           This method is used for self.query method.
+        '''
+        _res = res['hits']
+        for attr in ['took', 'facets', 'aggregations', '_scroll_id']:
+            if attr in res:
+                _res[attr] = res[attr]
+        _res['hits'] = [self._get_variantdoc(hit) for hit in _res['hits']]
+        return _res
 
     def _cleaned_scopes(self, scopes):
         '''return a cleaned scopes parameter.
@@ -192,7 +209,7 @@ class ESQuery():
         facets = self._parse_facets_option(kwargs)
         options = self._get_cleaned_query_options(kwargs)
         scroll_options = {}
-        if 'fetch_all' in options and str(options['fetch_all']).lower() in ['1', 'true']:
+        if options.fetch_all:
             scroll_options.update({'search_type': 'scan', 'size': self._scroll_size, 'scroll': self._scroll_time})
         options['kwargs'].update(scroll_options)
         if interval_query:
@@ -214,28 +231,27 @@ class ESQuery():
             except RequestError:
                 return {"error": "invalid query term.", "success": False}
 
-        if options.fetch_all:
-            return res
+        # if options.fetch_all:
+        #     return res
 
         if not options.raw:
-            res = self._format_ES_output(res)
+            res = self._clean_res2(res)
         return res
 
-    def _format_ES_output(self, o):
-        # Function to format the output object o before returning
-        _res = o['hits']
-        _res['took'] = o['took']
-        if "facets" in o:
-            _res['facets'] = o['facets']
-        for v in _res['hits']:
-            del v['_type']
-            del v['_index']
-            for attr in ['fields', '_source']:
-                if attr in v:
-                    v.update(v[attr])
-                    del v[attr]
-                    break
-        return _res
+    def scroll(self, scroll_id, **kwargs):
+        '''return the results from a scroll ID, recognizes options.raw'''
+        options = self._get_cleaned_query_options(kwargs)
+        r = self._es.scroll(scroll_id, scroll=self._scroll_time)
+        scroll_id = r.get('_scroll_id')
+        if scroll_id is None or not r['hits']['hits']:
+            return {'success': False, 'error': 'No results to return.'}
+        else:
+            if not options.raw:
+                res = self._clean_res2(r)
+            # res.update({'_scroll_id': scroll_id})
+            if r['_shards']['failed']:
+                res.update({'_warning': 'Scroll request has failed on %d shards out of %d.'.format(r['_shards']['failed'], r['_shards']['total'])})
+        return res
 
     def _parse_facets_option(self, kwargs):
         facets = kwargs.pop('facets', None)
@@ -333,23 +349,6 @@ class ESQuery():
         # query the metadata to get the available fields for a variant object
         r = self._es.indices.get(index=self._index)
         return r[list(r.keys())[0]]['mappings']['variant']['properties']
-
-    def scroll(self, scroll_id, **kwargs):
-        # return the results from a scroll ID, recognizes options.raw
-        options = self._get_cleaned_query_options(kwargs)
-        r = self._es.scroll(scroll_id, scroll=self._scroll_time)
-        scroll_id = r.get('_scroll_id')
-        if scroll_id is None or not r['hits']['hits']:
-            return {'success': False, 'error': 'No results to return.'}
-        else:
-            if options.raw:
-                res = r['hits']
-            else:
-                res = self._format_ES_output(r)
-            res.update({'_scroll_id': scroll_id})
-            if r['_shards']['failed']:
-                res.update({'_warning': 'Scroll request has failed on %d shards out of %d.'.format(r['_shards']['failed'], r['_shards']['total'])})
-        return res
 
 
 class ESQueryBuilder:
