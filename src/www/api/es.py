@@ -34,6 +34,9 @@ class ESQuery():
         if hit.get('found', None) is False:
             # if found is false, pass that to the doc
             doc['found'] = hit['found']
+        # add cadd license info
+        if 'cadd' in doc:
+            doc['cadd']['_license'] = 'http://goo.gl/bkpNhq'
         return doc
 
     def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False):
