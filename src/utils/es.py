@@ -5,6 +5,7 @@ from elasticsearch import Elasticsearch, NotFoundError
 
 import config
 from utils.common import iter_n, timesofar, ask
+from dataindex.mapping import get_mapping
 
 # setup ES logging
 import logging
@@ -293,3 +294,15 @@ def reindex(old_index, new_index, s):
             curr_done += len(this_l)
     except:
         print('{} documents inserted'.format(curr_done))
+
+def get_metadata(index):
+    m = get_mapping()
+    data_src = m['variant']['properties'].keys()
+    stats = {}
+    t = ESIndexer()
+    t._index = index
+    m['total'] = t.count()
+
+    for _src in data_src:
+        stats[_src] = t.count_src(_src)[_src]
+    return stats
