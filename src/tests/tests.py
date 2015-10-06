@@ -273,6 +273,14 @@ def test_unicode():
     eq_(len(res), 2)
 
 
+def test_get_fields():
+    res = json_ok(get_ok(api + '/metadata/fields'))
+    eq_(len(res), 481)
+
+def test_fetch_all():
+    res = json_ok(get_ok(api + '/query?q=_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen&fetch_all=TRUE'))
+    assert '_scroll_id' in res 
+
 def test_msgpack():
     res = json_ok(get_ok(api + '/variant/chr11:g.66397320A>G'))
     res2 = msgpack_ok(get_ok(api + '/variant/chr11:g.66397320A>G?msgpack=true'))
