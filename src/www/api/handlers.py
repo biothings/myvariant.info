@@ -106,7 +106,7 @@ class QueryHandler(BaseHandler):
                     self.ga_track(event={'category': 'v1_api',
                                          'action': 'fetch_all',
                                          'label': 'total',
-                                         'value': res.get('hits', {}).get('total', None)})
+                                         'value': res.get('total', None)})
 
         else:
             res = {'success': False, 'error': "Missing required parameters."}
