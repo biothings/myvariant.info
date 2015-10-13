@@ -104,6 +104,26 @@ This is a brief example:
 
 See https://pypi.python.org/pypi/myvariant for more details.
 
+MyVariant R package
+-------------------
+An R wrapper for the MyVariant.info API is available in Bioconductor as of v. 3.2.  To install::
+
+    source("https://bioconductor.org/biocLite.R")
+    biocLite("myvariant")
+
+To view documentation for your installation, enter R and type::
+
+    browseVignettes("myvariant")
+
+For more information, visit the `Bioconductor myvariant page <https://www.bioconductor.org/packages/devel/bioc/html/myvariant.html>`_.
+
+Another MyVariant.info python module 
+------------------------------------
+This is another python wrapper of MyVariant.info services created by `Brian Schrader <http://brianschrader.com/about/>`_.  The repository is available `here <https://github.com/Sonictherocketman/myvariant-api>`_.
+
+You can install this package with `PyPI <https://pypi.python.org/pypi/myvariant-api>`_ like this::
+
+    pip install myvariant-api
 
 
 .. raw:: html
