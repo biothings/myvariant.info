@@ -20,9 +20,9 @@ except ImportError:
     sys.stderr.write("Warning: msgpack is not available.")
 
 
-#host = 'http://localhost:8000'
+host = 'http://localhost:8000'
 #host = 'http://dev.myvariant.info:8000'
-host = 'http://myvariant.info'
+#host = 'http://myvariant.info'
 api = host + '/v1'
 sys.stderr.write('URL base: {}\n'.format(api))
 
@@ -275,11 +275,24 @@ def test_unicode():
 
 def test_get_fields():
     res = json_ok(get_ok(api + '/metadata/fields'))
-    eq_(len(res), 481)
+    # Check to see if there are enough keys
+    ok_(len(res) > 480)
+
+    # Check some specific keys
+    assert 'cadd' in res
+    assert 'dbnsfp' in res
+    assert 'dbsnp' in res
+    assert 'wellderly' in res
+    assert 'clinvar' in res
 
 def test_fetch_all():
     res = json_ok(get_ok(api + '/query?q=_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen&fetch_all=TRUE'))
     assert '_scroll_id' in res 
+
+    # get one set of results
+    res2 = json_ok(get_ok(api + '/query?scroll_id=' + res['_scroll_id']))
+    assert 'hits' in res2
+    ok_(len(res2['hits']) == 1000) 
 
 def test_msgpack():
     res = json_ok(get_ok(api + '/variant/chr11:g.66397320A>G'))
