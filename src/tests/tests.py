@@ -285,14 +285,16 @@ def test_get_fields():
     assert 'wellderly' in res
     assert 'clinvar' in res
 
+
 def test_fetch_all():
     res = json_ok(get_ok(api + '/query?q=_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen&fetch_all=TRUE'))
-    assert '_scroll_id' in res 
+    assert '_scroll_id' in res
 
     # get one set of results
     res2 = json_ok(get_ok(api + '/query?scroll_id=' + res['_scroll_id']))
     assert 'hits' in res2
-    ok_(len(res2['hits']) == 1000) 
+    ok_(len(res2['hits']) == 1000)
+
 
 def test_msgpack():
     res = json_ok(get_ok(api + '/variant/chr11:g.66397320A>G'))
