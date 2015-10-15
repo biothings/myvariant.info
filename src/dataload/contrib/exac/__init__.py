@@ -3,7 +3,8 @@ def get_mapping():
         "exac": {
             "properties": {
                 "chrom": {
-                    "type": "integer"
+                    "type": "string",
+		    "analyzer": "string_lowercase"
                 },
                 "pos": {
                     "type": "long"
