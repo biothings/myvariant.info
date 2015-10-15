@@ -20,9 +20,9 @@ except ImportError:
     sys.stderr.write("Warning: msgpack is not available.")
 
 
-host = 'http://localhost:8000'
+#host = 'http://localhost:8000'
 #host = 'http://dev.myvariant.info:8000'
-#host = 'http://myvariant.info'
+host = 'http://myvariant.info'
 api = host + '/v1'
 sys.stderr.write('URL base: {}\n'.format(api))
 
