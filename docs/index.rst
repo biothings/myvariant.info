@@ -36,7 +36,7 @@ Documentation
 
 Related links
 -------------
-* `github repository <https://github.com/Network-of-BioThings/myvariant.info/>`_
+* `github repository <https://github.com/SuLab/myvariant.info/>`_
 
 
 .. raw :: html
