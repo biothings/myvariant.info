@@ -3,12 +3,14 @@ import glob
 from utils.dataload import list_split, dict_sweep, unlist, value_convert
 
 
-VALID_COLUMN_NO = 112
+VALID_COLUMN_NO = 132
 
 '''this parser is for dbNSFP v3.0 beta2 downloaded from
 https://sites.google.com/site/jpopgen/dbNSFP'''
+
+
 # convert one snp to json
-def _map_line_to_json(fields, version = 'hg19'):
+def _map_line_to_json(fields, version):
     # specific variable treatment
     chrom = fields[0]
     if chrom == 'M':
@@ -29,10 +31,10 @@ def _map_line_to_json(fields, version = 'hg19'):
         HGVS = HGVS_19
     elif version == 'hg38':
         HGVS = HGVS_38
-    if fields[69] == ".":
+    if fields[89] == ".":
         siphy = "."
     else:
-        freq = fields[69].split(":")
+        freq = fields[89].split(":")
         siphy = {'a': freq[0], 'c': freq[1], 'g': freq[2], 't': freq[3]}
 
     acc = fields[26].rstrip().rstrip(';').split(";")
@@ -45,9 +47,14 @@ def _map_line_to_json(fields, version = 'hg19'):
     lrt_score = fields[35].split(';')
     mutationtaster_score = fields[39].split(';')
     mutationassessor_score = fields[46].split(';')
-    metasvm_score = fields[55].split(';')
+    metasvm_score = fields[59].split(';')
     fathmm_score = fields[49].split(';')
-    lr_score = fields[58].split(';')
+    lr_score = fields[62].split(';')
+    fathmm_coding_score = fields[55].split(';')
+    integrated_fitcons_score = fields[66].split(';')
+    gm12878_fitcons_score = fields[69].split(';')
+    h1_hesc_fitcons_score = fields[72].split(';')
+    huvec_fitcons_score = fields[75].split(';')
     if len(provean_score) > 1:
         for i in range(len(provean_score)):
             if provean_score[i] == '.':
@@ -88,8 +95,27 @@ def _map_line_to_json(fields, version = 'hg19'):
         for i in range(len(lr_score)):
             if lr_score[i] == '.':
                 lr_score[i] = None
-
-    # load as json data
+    if len(fathmm_coding_score) > 1:
+        for i in range(len(fathmm_coding_score)):
+            if fathmm_coding_score[i] == '.':
+                fathmm_coding_score[i] = None
+    if len(integrated_fitcons_score) > 1:
+        for i in range(len(integrated_fitcons_score)):
+            if integrated_fitcons_score[i] == '.':
+                integrated_fitcons_score[i] = None
+    if len(gm12878_fitcons_score) > 1:
+        for i in range(len(gm12878_fitcons_score)):
+            if gm12878_fitcons_score[i] == '.':
+                gm12878_fitcons_score[i] = None
+    if len(h1_hesc_fitcons_score) > 1:
+        for i in range(len(h1_hesc_fitcons_score)):
+            if h1_hesc_fitcons_score[i] == '.':
+                h1_hesc_fitcons_score[i] = None
+    if len(huvec_fitcons_score) > 1:
+        for i in range(len(huvec_fitcons_score)):
+            if huvec_fitcons_score[i] == '.':
+                huvec_fitcons_score[i] = None
+# load as json data
     one_snp_json = {
         "_id": HGVS,
         "dbnsfp": {
@@ -118,12 +144,13 @@ def _map_line_to_json(fields, version = 'hg19'):
             },
             "genename": fields[11],
             "uniprot": uniprot,
-            "interpro_domain": fields[111],
+            "interpro_domain": fields[131],
             "cds_strand": fields[12],
             "ancestral_allele": fields[16],
             "ensembl": {
                 "geneid": fields[19],
-                "transcriptid": fields[20]
+                "transcriptid": fields[20],
+                "proteinid": fields[21]
             },
             "sift": {
                 "score": sift_score,
@@ -170,85 +197,123 @@ def _map_line_to_json(fields, version = 'hg19'):
                 "rankscore": fields[53],
                 "pred": fields[54]
             },
+            "fathmm-mkl": {
+                "coding_score": fathmm_coding_score,
+                "coding_rankscore": fields[56],
+                "coding_pred": fields[57],
+                "coding_group": fields[58]
+            },
             "metasvm": {
                 "score": metasvm_score,
-                "rankscore": fields[56],
-                "pred": fields[57]
+                "rankscore": fields[60],
+                "pred": fields[61]
             },
-            "lr": {
+            "metalr": {
                 "score": lr_score,
-                "rankscore": fields[59],
-                "pred": fields[60]
+                "rankscore": fields[63],
+                "pred": fields[64]
             },
-            "reliability_index": fields[61],
+            "reliability_index": fields[65],
             "gerp++": {
-                "nr": fields[62],
-                "rs": fields[63],
-                "rs_rankscore": fields[64]
+                "nr": fields[78],
+                "rs": fields[79],
+                "rs_rankscore": fields[80]
             },
-            "phylop_7way": {
-                "vertebrate": fields[65],
-                "vertebrate_rankscore": fields[66]
+            "integrated": {
+                "fitcons_score": integrated_fitcons_score,
+                "fitcons_rankscore": fields[67],
+                "confidence_value": fields[68]
             },
-            "phastcons_7way": {
-                "vertebrate": fields[67],
-                "vertebrate_rankscore": fields[68]
+            "gm12878": {
+                "fitcons_score": gm12878_fitcons_score,
+                "fitcons_rankscore": fields[70],
+                "confidence_value": fields[71]
+            },
+            "h1-hesc": {
+                "fitcons_score": h1_hesc_fitcons_score,
+                "fitcons_rankscore": fields[73],
+                "confidence_value": fields[74]
+            },
+            "huvec": {
+                "fitcons_score": huvec_fitcons_score,
+                "fitcons_rankscore": fields[76],
+                "confidence_value": fields[77]
+            },
+            "phylo": {
+                "p7way": {
+                    "vertebrate": fields[81],
+                    "vertebrate_rankscore": fields[82]
+                },
+                "p20way": {
+                    "mammalian": fields[83],
+                    "mammalian_rankscore": fields[84]
+                }
+            },
+            "phastcons": {
+                "7way": {
+                    "vertebrate": fields[85],
+                    "vertebrate_rankscore": fields[86]
+                },
+                "20way": {
+                    "mammalian": fields[87],
+                    "mammalian_rankscore": fields[88]
+                }
             },
             "siphy_29way": {
                 "pi": siphy,
-                "logodds": fields[70],
-                "logodds_rankscore": fields[71]
+                "logodds": fields[90],
+                "logodds_rankscore": fields[91]
             },
-            "1000gp1": {
-                "ac": fields[72],
-                "af": fields[73],
-                "afr_ac": fields[74],
-                "afr_af": fields[75],
-                "eur_ac": fields[76],
-                "eur_af": fields[77],
-                "amr_ac": fields[78],
-                "amr_af": fields[79],
-                "eas_ac": fields[80],
-                "eas_af": fields[81],
-                "sas_ac": fields[82],
-                "sas_af": fields[83]
-            },
-            "twinsuk": {
-                "ac": fields[84],
-                "af": fields[85]
-            },
-            "alspac": {
-                "ac": fields[86],
-                "af": fields[87]
-            },
-            "esp6500": {
-                "aa_ac": fields[88],
-                "aa_af": fields[89],
-                "ea_ac": fields[90],
-                "ea_af": fields[91]
-            },
-            "exac": {
+            "1000gp3": {
                 "ac": fields[92],
                 "af": fields[93],
-                "adj_ac": fields[94],
-                "adj_af": fields[95],
-                "afr_ac": fields[96],
-                "afr_af": fields[97],
+                "afr_ac": fields[94],
+                "afr_af": fields[95],
+                "eur_ac": fields[96],
+                "eur_af": fields[97],
                 "amr_ac": fields[98],
                 "amr_af": fields[99],
                 "eas_ac": fields[100],
                 "eas_af": fields[101],
-                "fin_ac": fields[102],
-                "fin_af": fields[103],
-                "nfe_ac": fields[104],
-                "nfe_af": fields[105],
-                "sas_ac": fields[106],
-                "sas_af": fields[107]
+                "sas_ac": fields[102],
+                "sas_af": fields[103]
+            },
+            "twinsuk": {
+                "ac": fields[104],
+                "af": fields[105]
+            },
+            "alspac": {
+                "ac": fields[106],
+                "af": fields[107]
+            },
+            "esp6500": {
+                "aa_ac": fields[108],
+                "aa_af": fields[109],
+                "ea_ac": fields[110],
+                "ea_af": fields[111]
+            },
+            "exac": {
+                "ac": fields[112],
+                "af": fields[113],
+                "adj_ac": fields[114],
+                "adj_af": fields[115],
+                "afr_ac": fields[116],
+                "afr_af": fields[117],
+                "amr_ac": fields[118],
+                "amr_af": fields[119],
+                "eas_ac": fields[120],
+                "eas_af": fields[121],
+                "fin_ac": fields[122],
+                "fin_af": fields[123],
+                "nfe_ac": fields[124],
+                "nfe_af": fields[125],
+                "sas_ac": fields[126],
+                "sas_af": fields[127]
             },
             "clinvar": {
-                "rs": fields[108],
-                "clinsig": fields[109],
-                "trait": fields[110]
+                "rs": fields[128],
+                "clinsig": fields[129],
+                "trait": fields[130]
             }
         }
     }
@@ -259,14 +324,14 @@ def _map_line_to_json(fields, version = 'hg19'):
 
 
 # open file, parse, pass to json mapper
-def data_generator(input_file, version = 'hg19'):
+def data_generator(input_file, version):
     open_file = open(input_file)
     db_nsfp = csv.reader(open_file, delimiter="\t")
     db_nsfp.next()  # skip header
     previous_row = None
     for row in db_nsfp:
         assert len(row) == VALID_COLUMN_NO
-        current_row = _map_line_to_json(row, version = version)
+        current_row = _map_line_to_json(row, version=version)
         if previous_row:
             if current_row["_id"] == previous_row["_id"]:
                 aa = previous_row["dbnsfp"]["aa"]
@@ -285,7 +350,7 @@ def data_generator(input_file, version = 'hg19'):
 
 
 # load path and find files, pass to data_generator
-def load_data(path, version = 'hg19'):
+def load_data(path, version='hg19'):
     for input_file in sorted(glob.glob(path)):
         print(input_file)
         data = data_generator(input_file, version=version)
