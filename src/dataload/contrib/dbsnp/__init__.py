@@ -10,7 +10,7 @@ __METADATA__ = {
 }
 
 
-infile = "/opt/myvariant.info/load_archive/dbsnp/00-All.vcf.gz"
+infile = "/home/kevinxin/dbsnp/00-All.vcf.gz"
 
 
 def load_data():
