@@ -43,7 +43,8 @@ def get_mapping():
                             "analyzer": "string_lowercase"
                         },
                         "pmid": {
-                            "type": "integer"
+                            "type": "string",
+                            "analyzer": "string_lowercase"
                         },
                         "snpid": {
                             "type": "string",
@@ -67,9 +68,6 @@ def get_mapping():
                         "paper_phenotype_categories": {
                             "type": "string",
                             "analyzer": "string_lowercase"
-                        },
-                        "date_pub": {
-                            "type": "date"
                         }
                     }
                 },
