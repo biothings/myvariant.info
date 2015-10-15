@@ -7,10 +7,8 @@ VALID_COLUMN_NO = 112
 
 '''this parser is for dbNSFP v3.0 beta2 downloaded from
 https://sites.google.com/site/jpopgen/dbNSFP'''
-
-
 # convert one snp to json
-def _map_line_to_json(fields, version='hg19'):
+def _map_line_to_json(fields, version = 'hg19'):
     # specific variable treatment
     chrom = fields[0]
     if chrom == 'M':
@@ -40,6 +38,56 @@ def _map_line_to_json(fields, version='hg19'):
     acc = fields[26].rstrip().rstrip(';').split(";")
     pos = fields[28].rstrip().rstrip(';').split(";")
     uniprot = map(dict, map(lambda t: zip(('acc', 'pos'), t), zip(acc, pos)))
+    provean_score = fields[52].split(';')
+    sift_score = fields[23].split(';')
+    hdiv_score = fields[29].split(';')
+    hvar_score = fields[32].split(';')
+    lrt_score = fields[35].split(';')
+    mutationtaster_score = fields[39].split(';')
+    mutationassessor_score = fields[46].split(';')
+    metasvm_score = fields[55].split(';')
+    fathmm_score = fields[49].split(';')
+    lr_score = fields[58].split(';')
+    if len(provean_score) > 1:
+        for i in range(len(provean_score)):
+            if provean_score[i] == '.':
+                provean_score[i] = None
+    if len(sift_score) > 1:
+        for i in range(len(sift_score)):
+            if sift_score[i] == '.':
+                sift_score[i] = None
+    if len(hdiv_score) > 1:
+        for i in range(len(hdiv_score)):
+            if hdiv_score[i] == '.':
+                hdiv_score[i] = None
+    if len(hvar_score) > 1:
+        for i in range(len(hvar_score)):
+            if hvar_score[i] == '.':
+                hvar_score[i] = None
+    if len(lrt_score) > 1:
+        for i in range(len(lrt_score)):
+            if lrt_score[i] == '.':
+                lrt_score[i] = None
+    if len(mutationtaster_score) > 1:
+        for i in range(len(mutationtaster_score)):
+            if mutationtaster_score[i] == '.':
+                mutationtaster_score[i] = None
+    if len(mutationassessor_score) > 1:
+        for i in range(len(mutationassessor_score)):
+            if mutationassessor_score[i] == '.':
+                mutationassessor_score[i] = None
+    if len(metasvm_score) > 1:
+        for i in range(len(metasvm_score)):
+            if metasvm_score[i] == '.':
+                metasvm_score[i] = None
+    if len(fathmm_score) > 1:
+        for i in range(len(fathmm_score)):
+            if fathmm_score[i] == '.':
+                fathmm_score[i] = None
+    if len(lr_score) > 1:
+        for i in range(len(lr_score)):
+            if lr_score[i] == '.':
+                lr_score[i] = None
 
     # load as json data
     one_snp_json = {
@@ -78,57 +126,57 @@ def _map_line_to_json(fields, version='hg19'):
                 "transcriptid": fields[20]
             },
             "sift": {
-                "score": fields[23],
+                "score": sift_score,
                 "converted_rankscore": fields[24],
                 "pred": fields[25]
             },
             "polyphen2": {
                 "hdiv": {
-                    "score": fields[29],
+                    "score": hdiv_score,
                     "rankscore": fields[30],
                     "pred": fields[31]
                 },
                 "hvar": {
-                    "score": fields[32],
+                    "score": hvar_score,
                     "rankscore": fields[33],
                     "pred": fields[34]
                 }
             },
             "lrt": {
-                "score": fields[35],
+                "score": lrt_score,
                 "converted_rankscore": fields[36],
                 "pred": fields[37],
                 "omega": fields[38]
             },
             "mutationtaster": {
-                "score": fields[39],
+                "score": mutationtaster_score,
                 "converted_rankscore": fields[40],
                 "pred": fields[41],
                 "model": fields[42],
                 "AAE": fields[43]
             },
             "mutationassessor": {
-                "score": fields[46],
+                "score": mutationassessor_score,
                 "rankscore": fields[47],
                 "pred": fields[48]
             },
             "fathmm": {
-                "score": fields[49],
+                "score": fathmm_score,
                 "rankscore": fields[50],
                 "pred": fields[51]
             },
             "provean": {
-                "score": fields[52],
+                "score": provean_score,
                 "rankscore": fields[53],
                 "pred": fields[54]
             },
             "metasvm": {
-                "score": fields[55],
+                "score": metasvm_score,
                 "rankscore": fields[56],
                 "pred": fields[57]
             },
             "lr": {
-                "score": fields[58],
+                "score": lr_score,
                 "rankscore": fields[59],
                 "pred": fields[60]
             },
@@ -211,14 +259,14 @@ def _map_line_to_json(fields, version='hg19'):
 
 
 # open file, parse, pass to json mapper
-def data_generator(input_file, version='hg19'):
+def data_generator(input_file, version = 'hg19'):
     open_file = open(input_file)
     db_nsfp = csv.reader(open_file, delimiter="\t")
     db_nsfp.next()  # skip header
     previous_row = None
     for row in db_nsfp:
         assert len(row) == VALID_COLUMN_NO
-        current_row = _map_line_to_json(row, version='hg19')
+        current_row = _map_line_to_json(row, version = version)
         if previous_row:
             if current_row["_id"] == previous_row["_id"]:
                 aa = previous_row["dbnsfp"]["aa"]
@@ -237,9 +285,9 @@ def data_generator(input_file, version='hg19'):
 
 
 # load path and find files, pass to data_generator
-def load_data(path):
+def load_data(path, version = 'hg19'):
     for input_file in sorted(glob.glob(path)):
         print(input_file)
-        data = data_generator(input_file)
+        data = data_generator(input_file, version=version)
         for one_snp_json in data:
             yield one_snp_json
