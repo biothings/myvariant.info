@@ -4,7 +4,7 @@ def get_mapping():
             "properties": {
                 "chrom": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+		    "analyzer": "string_lowercase"
                 },
                 "pos": {
                     "type": "long"
