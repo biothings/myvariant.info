@@ -29,8 +29,10 @@ class ESQuery():
     def _get_variantdoc(self, hit):
         doc = hit.get('_source', hit.get('fields', {}))
         doc.setdefault('_id', hit['_id'])
-        if '_version' in hit:
-            doc.setdefault('_version', hit['_version'])
+        for attr in ['_score', '_version']:
+            if attr in hit:
+                doc.setdefault(attr, hit[attr])
+
         if hit.get('found', None) is False:
             # if found is false, pass that to the doc
             doc['found'] = hit['found']
