@@ -140,6 +140,11 @@ class ESQuery():
         options.kwargs = kwargs
         return options
 
+    def get_number_of_shards(self):
+        n_shards = self._es.indices.get_settings(self._index)[self._index]['settings']['index']['number_of_shards']
+        n_shards = int(n_shards)
+        return n_shards
+
     def exists(self, vid):
         """return True/False if a variant id exists or not."""
         try:
