@@ -1,4 +1,7 @@
 __METADATA__ = {
+    "requirements": [
+        "pysam>=0.8.1",
+    ],
     "src_name": 'CADD',
     "src_url": 'http://cadd.gs.washington.edu/',
     "version": '1.2',

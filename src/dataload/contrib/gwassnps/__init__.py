@@ -1,4 +1,7 @@
 __METADATA__ = {
+    "requirements": [
+        "MySQL-python>=1.2.5",
+    ],
     "src_name": 'gwassnps',
     "src_url": None,
     "version": None,

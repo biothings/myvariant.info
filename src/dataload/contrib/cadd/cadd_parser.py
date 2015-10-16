@@ -25,8 +25,6 @@ esp = 'opt/myvariant.info/load_archive/cadd/ESP6500SI_inclAnno.tsv.gz'
 # number of fields/annotations
 VALID_COLUMN_NO = 116
 
-DEPENDENCIES = ["pysam", "pymongo"]
-
 
 # convert one snp to json
 def _map_line_to_json(fields):
