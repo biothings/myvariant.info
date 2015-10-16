@@ -35,4 +35,4 @@ HG19_DATAFILE = '/path/to/hg19_bit_p13.pyobj'
 ###############################
 FIELD_NOTES_PATH = os.path.join(SRC_PATH, 'www/context/myvariant_field_table_notes.json')
 GA_ACCOUNT = ''
-RUN_IN_PROD = False    # set to True in prod ser
+RUN_IN_PROD = False    # set to True in prod server
