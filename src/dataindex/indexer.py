@@ -176,13 +176,21 @@ def do_index(doc_li, index_name, doc_type, step=1000, update=True, verbose=True)
         _index_doc_batch(doc_batch, index_name, doc_type, update=update)
 
 
-def do_index_from_collection(collection, index_name, doc_type, skip, step=10000, update=True):
+def do_index_from_collection_0(collection, index_name, doc_type, skip, step=10000, update=True):
     from utils.mongo import doc_feeder
+
     for doc_batch in doc_feeder(collection, step=step, s=skip, inbatch=True):
         _index_doc_batch(doc_batch, index_name, doc_type, update=update)
 
 
+def do_index_from_collection(collection, index_name, doc_type=None, skip=0, step=10000, update=True):
+    esi = utils.es.ESIndexer(index=index_name, doc_type=doc_type, step=step)
+    esi.s = skip
+    esi.build_index(collection, verbose=True, query=None, bulk=True, update=update)
+
+
 def index_dbsnp():
+    '''deprecated'''
     total = 0
     t0 = time.time()
     with open('../../data/snp130_42514') as fp:
@@ -202,6 +210,7 @@ def index_dbsnp():
 
 
 def index_cosmic():
+    '''deprecated'''
     total = 0
     t0 = time.time()
     with open('../../data/cosmicsnps_42714_fix') as fp:
