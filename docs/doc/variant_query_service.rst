@@ -48,11 +48,11 @@ from
 
 fetch_all
 """""""""
-    Optional, a boolen allowing fast retrieval of all unsorted query hits.  The return object contains a **_scroll_id** field, which, when passed as a parameter to the query endpoint returns the next 1000 query results.  Using **fetch_all** causes the results to be inherently unsorted, therefore the **sort** parameter is ignored.  For more information see `examples using fetch_all here <#scrolling-queries>`_.  Default: FALSE.
+    Optional, a boolean, which when TRUE, allows fast retrieval of all unsorted query hits.  The return object contains a **_scroll_id** field, which when passed as a parameter to the query endpoint, returns the next 1000 query results.  Setting **fetch_all** = TRUE causes the results to be inherently unsorted, therefore the **sort** parameter is ignored.  For more information see `examples using fetch_all here <#scrolling-queries>`_.  Default: FALSE.
 
 scroll_id
 """""""""
-    Optional, a string containing the **_scroll_id** returned from a query request with **fetch_all** = TRUE.  Supplying a valid **scroll_id** will return the next 1000 unordered results.  If the next results are not obtained within 1 minute of the previous set of results, the **scroll_id** becomes stale, and a new one must be obtained with another query request with **fetch_all** = TRUE.  All other parameters are ignored when the **scroll_id** parameter is supplied.  For more information see `examples using fetch_all here <#scrolling-queries>`_.
+    Optional, a string containing the **_scroll_id** returned from a query request with **fetch_all** = TRUE.  Supplying a valid **scroll_id** will return the next 1000 unordered results.  If the next results are not obtained within 1 minute of the previous set of results, the **scroll_id** becomes stale, and a new one must be obtained with another query request with **fetch_all** = TRUE.  All other parameters are ignored when the **scroll_id** parameter is supplied.  For more information see `examples using scroll_id here <#scrolling-queries>`_.
 
 sort
 """"
@@ -148,7 +148,7 @@ At this point a scroll has been set up for your query.  To get the next batch of
 
     http://myvariant.info/v1/query?scroll_id=c2NhbjsxMDsxMTU1NjY5MTpxSnFkTFdVQlJ6T1dRVzNQaWRzQkhROzExNTU4MjYxOkVfS2tXOVpJUkMtenFRbkVxc3BFd3c7MTE1NTY2OTI6cUpxZExXVUJSek9XUVczUGlkc0JIUTsxMTU1NjY5MDpxSnFkTFdVQlJ6T1dRVzNQaWRzQkhROzkyNDcyNzg6NE1XY21jUDlUV08tSi1KYzhrTDVnQTs5MjQ2OTc4Ok5nM0d0czYzUlcyU0dUU1dFemo5Mmc7OTI0NzI3OTo0TVdjbWNQOVRXTy1KLUpjOGtMNWdBOzkyNDY4NzU6Tm5CRWloSDlST2liMDhlVDdFWHlNZzs5MjQ3MTEyOlpQb3M5cDh6VDMyNnczenFhMW1hcVE7OTI0NzA4MjoxNzBGcVVkV1NwU3QtQzJnWHh3RzV3OzE7dG90YWxfaGl0czo1ODc1OTs=
 
-Your scroll will remain active for 1 minute from the last time you requested results from it.  If your scroll expires before you get the last batch of results, you must re-request the scroll_id by setting **fetch_all** = TRUE as in step 1.
+.. Hint:: Your scroll will remain active for 1 minute from the last time you requested results from it.  If your scroll expires before you get the last batch of results, you must re-request the scroll_id by setting **fetch_all** = TRUE as in step 1.
 
 Boolean operators and grouping
 """"""""""""""""""""""""""""""
