@@ -46,6 +46,14 @@ from
     q=cdk*&size=50                     first 50 hits
     q=cdk*&size=50&from=50             the next 50 hits
 
+fetch_all
+"""""""""
+    Optional, a boolen allowing fast retrieval of all unsorted query hits.  The return object contains a **_scroll_id** field, which, when passed as a parameter to the query endpoint returns the next 1000 query results.  Using **fetch_all** causes the results to be inherently unsorted, therefore the **sort** parameter is ignored.  For more information see `examples using fetch_all here <#scrolling-queries>`_.  Default: FALSE.
+
+scroll_id
+"""""""""
+    Optional, a string containing the **_scroll_id** returned from a query request with **fetch_all** = TRUE.  Supplying a valid **scroll_id** will return the next 1000 unordered results.  If the next results are not obtained within 1 minute of the previous set of results, the **scroll_id** becomes stale, and a new one must be obtained with another query request with **fetch_all** = TRUE.  All other parameters are ignored when the **scroll_id** parameter is supplied.  For more information see `examples using fetch_all here <#scrolling-queries>`_.
+
 sort
 """"
     Optional, the comma-separated fields to sort on. Prefix with "-" for descending order, otherwise in ascending order. Default: sort by matching scores in descending order.
@@ -115,6 +123,32 @@ Wildcard character "*" or "?" is supported in either simple queries or fielded q
 
 .. note:: Wildcard character can not be the first character. It will be ignored.
 
+
+Scrolling queries
+"""""""""""""""""
+If you want to return ALL results of a very large query, sometimes the paging method described `above <#from>`_ can take too long.  In these cases, you can use a scrolling query.  
+This is a two-step process that turns off database sorting to allow very fast retrieval of all query results.  To begin a scrolling query, you first call the query
+endpoint as you normally would, but with an extra parameter **fetch_all** = TRUE.  For example, a GET request to::
+
+    http://myvariant.info/v1/query?q=cadd.phred:>50&fetch_all=TRUE
+
+Returns the following object:
+
+.. code-block:: json
+
+    {
+      "_scroll_id": "c2NhbjsxMDs5MjQ2OTc2Ok5nM0d0czYzUlcyU0dUU1dFemo5Mmc7MTE1NTgyNjA6RV9La1c5WklSQy16cVFuRXFzcEV3dzs5MjQ2ODc0Ok5uQkVpaEg5Uk9pYjA4ZVQ3RVh5TWc7OTI0Njg3MTpObkJFaWhIOVJPaWIwOGVUN0VYeU1nOzkyNDY4NzI6Tm5CRWloSDlST2liMDhlVDdFWHlNZzs5MjQ3Mjc3OjRNV2NtY1A5VFdPLUotSmM4a0w1Z0E7OTI0Njk3NzpOZzNHdHM2M1JXMlNHVFNXRXpqOTJnOzkyNDY4NzM6Tm5CRWloSDlST2liMDhlVDdFWHlNZzs5MjQ3MDgxOjE3MEZxVWRXU3BTdC1DMmdYeHdHNXc7MTE1NTgyNTk6RV9La1c5WklSQy16cVFuRXFzcEV3dzsxO3RvdGFsX2hpdHM6NTg3NTk7",
+      "hits": [],
+      "max_score": 0.0,
+      "took": 84,
+      "total": 58759
+    }
+
+At this point a scroll has been set up for your query.  To get the next batch of 1000 unordered results, simply execute a GET request to the following address, supplying the _scroll_id from the first step into the **scroll_id** parameter in the second step::
+
+    http://myvariant.info/v1/query?scroll_id=c2NhbjsxMDsxMTU1NjY5MTpxSnFkTFdVQlJ6T1dRVzNQaWRzQkhROzExNTU4MjYxOkVfS2tXOVpJUkMtenFRbkVxc3BFd3c7MTE1NTY2OTI6cUpxZExXVUJSek9XUVczUGlkc0JIUTsxMTU1NjY5MDpxSnFkTFdVQlJ6T1dRVzNQaWRzQkhROzkyNDcyNzg6NE1XY21jUDlUV08tSi1KYzhrTDVnQTs5MjQ2OTc4Ok5nM0d0czYzUlcyU0dUU1dFemo5Mmc7OTI0NzI3OTo0TVdjbWNQOVRXTy1KLUpjOGtMNWdBOzkyNDY4NzU6Tm5CRWloSDlST2liMDhlVDdFWHlNZzs5MjQ3MTEyOlpQb3M5cDh6VDMyNnczenFhMW1hcVE7OTI0NzA4MjoxNzBGcVVkV1NwU3QtQzJnWHh3RzV3OzE7dG90YWxfaGl0czo1ODc1OTs=
+
+Your scroll will remain active for 1 minute from the last time you requested results from it.  If your scroll expires before you get the last batch of results, you must re-request the scroll_id by setting **fetch_all** = TRUE as in step 1.
 
 Boolean operators and grouping
 """"""""""""""""""""""""""""""
