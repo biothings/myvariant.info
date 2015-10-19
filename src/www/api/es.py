@@ -13,6 +13,10 @@ class MVQueryError(Exception):
     pass
 
 
+class MVScrollSetupError(Exception):
+    pass
+
+
 class ESQuery():
     def __init__(self, index=None, doc_type=None, es_host=None):
         self._es = get_es(es_host)
@@ -21,7 +25,13 @@ class ESQuery():
         self._allowed_options = ['_source', 'start', 'from_', 'size',
                                  'sort', 'explain', 'version', 'facets', 'fetch_all']
         self._scroll_time = '1m'
-        self._scroll_size = 100
+        self._total_scroll_size = 1000   # Total number of hits to return per scroll batch
+        if self._total_scroll_size % self.get_number_of_shards() == 0:
+            # Total hits per shard per scroll batch
+            self._scroll_size = self._total_scroll_size / self.get_number_of_shards()
+        else:
+            raise MVScrollSetupError("_total_scroll_size of {} can't be ".format(self._total_scroll_size) +
+                                     "divided evenly among {} shards.".format(self.get_number_of_shards()))
 
     def _use_hg38(self):
         self._index = config.ES_INDEX_NAME_HG38
