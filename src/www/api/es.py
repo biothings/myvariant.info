@@ -28,7 +28,7 @@ class ESQuery():
         self._total_scroll_size = 1000   # Total number of hits to return per scroll batch
         if self._total_scroll_size % self.get_number_of_shards() == 0:
             # Total hits per shard per scroll batch
-            self._scroll_size = self._total_scroll_size / self.get_number_of_shards()
+            self._scroll_size = int(self._total_scroll_size / self.get_number_of_shards())
         else:
             raise MVScrollSetupError("_total_scroll_size of {} can't be ".format(self._total_scroll_size) +
                                      "divided evenly among {} shards.".format(self.get_number_of_shards()))
