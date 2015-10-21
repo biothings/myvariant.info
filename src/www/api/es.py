@@ -270,7 +270,7 @@ class ESQuery():
                 res = self._clean_res2(r)
             # res.update({'_scroll_id': scroll_id})
             if r['_shards']['failed']:
-                res.update({'_warning': 'Scroll request has failed on %d shards out of %d.'.format(r['_shards']['failed'], r['_shards']['total'])})
+                res.update({'_warning': 'Scroll request has failed on {} shards out of {}.'.format(r['_shards']['failed'], r['_shards']['total'])})
         return res
 
     def _parse_facets_option(self, kwargs):
