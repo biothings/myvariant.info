@@ -19,7 +19,6 @@ try:
 except ImportError:
     sys.stderr.write("Warning: msgpack is not available.")
 
-
 #host = 'http://localhost:8000'
 #host = 'http://dev.myvariant.info:8000'
 host = 'http://myvariant.info'
@@ -227,13 +226,13 @@ def test_variant_post():
     res = json_ok(post_ok(api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'fields': 'dbsnp'}))
     eq_(len(res), 2)
     for _g in res:
-        eq_(set(_g), set(['_id', 'query', 'dbsnp']))
+        eq_(set(_g), set(['_id', '_score', 'query', 'dbsnp']))
 
     # TODO redo this test, doesn't test much really....
     res = json_ok(post_ok(api + '/variant', {'ids': 'chr16:g.28883241A>G,chr11:g.66397320A>G', 'filter': 'dbsnp.chrom'}))
     eq_(len(res), 2)
     for _g in res:
-        eq_(set(_g), set(['_id', 'query', 'dbsnp']))
+        eq_(set(_g), set(['_id', '_score', 'query', 'dbsnp']))
 
     # Test a large variant post
     res = json_ok(post_ok(api + '/variant', {'ids': variant_list.VARIANT_POST_LIST}))
