@@ -180,6 +180,16 @@ class MetaDataHandler(BaseHandler):
                 "snpeff": 313576885,
                 "wellderly": 21240519
             },
+            "src_version": {
+                "cadd": "1.2",
+                "clinvar": "201510",
+                "cosmic": "68",
+                "dbnsfp": "3.0c",
+                "dbsnp": "144",
+                "evs": "2",
+                "exac": "0.3",
+                "grasp": "2.0.0.0"
+            },
             "timestamp": "2015-10-21T07:02:18.178506"
         })
 
@@ -222,4 +232,3 @@ APP_LIST = [
     (r"/metadata", MetaDataHandler),        # for metadata requests
     (r"/metadata/fields", FieldsHandler),   # for available field information
 ]
-
