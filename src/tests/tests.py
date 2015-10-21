@@ -11,6 +11,7 @@ except ImportError:
     from urllib import urlencode
 import json
 import sys
+import os
 from nose.tools import ok_, eq_
 import variant_list
 
@@ -19,9 +20,12 @@ try:
 except ImportError:
     sys.stderr.write("Warning: msgpack is not available.")
 
-#host = 'http://localhost:8000'
-#host = 'http://dev.myvariant.info:8000'
-host = 'http://myvariant.info'
+host = os.getenv("MV_HOST")
+if not host:
+    #host = 'http://localhost:8000'
+    #host = 'http://dev.myvariant.info:8000'
+    host = 'http://myvariant.info'
+    
 api = host + '/v1'
 sys.stderr.write('URL base: {}\n'.format(api))
 
