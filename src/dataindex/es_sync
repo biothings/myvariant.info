@@ -59,7 +59,7 @@ class ESSyncer():
 
     def delete(self, field, ids):
         cnt_update = 0
-        t.cnt_delete = 0
+        cnt_delete = 0
         for _id in ids:
             # get doc from index based on id
             if self._esi.exists(_id):
@@ -112,3 +112,4 @@ class ESSyncer():
                 yield _es_info
             else:
                 print 'id not exists:', _id
+
