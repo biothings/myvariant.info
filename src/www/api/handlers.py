@@ -182,7 +182,7 @@ class MetaDataHandler(BaseHandler):
             },
             "src_version": {
                 "cadd": "1.2",
-                "clinvar": "201510",
+                "clinvar": "201509",
                 "cosmic": "68",
                 "dbnsfp": "3.0c",
                 "dbsnp": "144",
