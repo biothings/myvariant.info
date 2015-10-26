@@ -1,4 +1,8 @@
 from __future__ import print_function
+import base64
+import os
+import random
+import string
 import sys
 import time
 from itertools import islice
@@ -330,3 +334,6 @@ def list2dict(a_list, keyitem, alwayslist=False):
             current_value.append(value)
             _dict[key] = current_value
     return _dict
+
+def get_random_string():
+    return base64.b64encode(os.urandom(6), random.sample(string.letters, 2))
