@@ -311,3 +311,9 @@ def test_msgpack():
     res = json_ok(get_ok(api + '/metadata'))
     res2 = msgpack_ok(get_ok(api + '/metadata?msgpack=true'))
     ok_(res, res2)
+
+def test_licenses():
+    # cadd license
+    res = json_ok(get_ok(api + '/query?q=_exists_:cadd&size=1&fields=cadd'))
+    assert '_license' in res['hits'][0]['cadd']
+    assert res['hits'][0]['cadd']['_license'] is not None
