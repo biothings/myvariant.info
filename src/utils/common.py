@@ -337,3 +337,6 @@ def list2dict(a_list, keyitem, alwayslist=False):
 
 def get_random_string():
     return base64.b64encode(os.urandom(6), random.sample(string.letters, 2))
+
+def get_timestamp():
+    return time.strftime('%Y%m%d')
