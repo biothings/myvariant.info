@@ -4,6 +4,12 @@ from .grasp_parser import load_data as _load_data
 
 GRASP_INPUT_FILE = '/opt/myvariant.info/load_archive/grasp/GRASP2fullDataset'
 
+__METADATA__ = {
+    "src_name": 'grasp',
+    "src_url": 'https://s3.amazonaws.com/NHLBI_Public/GRASP/GraspFullDataset2.zip',
+    "version": '2.0.0.0',
+    "field": 'grasp'
+}
 
 def load_data():
     grasp_data = _load_data(GRASP_INPUT_FILE)
