@@ -72,6 +72,44 @@ def get_mapping():
                         "genename": {
                             "type": "string",
                             "analyzer": "string_lowercase"
+                        },
+                        "prot": {
+                            "properties": {
+                                "protpos": {
+                                    "type": "integer"
+                                },
+                                "rel_prot_pos": {
+                                    "type": "float"
+                                },
+                                "domain": {
+                                    "type": "string",
+                                    "analyzer": "string_lowercase"
+                                }
+                            }
+                        },
+                        "feature_id": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "ccds_id": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "cds": {
+                            "properties": {
+                                "cdna_pos": {
+                                    "type": "integer"
+                                },
+                                "cds_pos": {
+                                    "type": "integer"
+                                },
+                                "rel_cdna_pos": {
+                                    "type": "float"
+                                },
+                                "rel_cds_pos": {
+                                    "type": "float"
+                                }
+                            }
                         }
                     }
                 },
