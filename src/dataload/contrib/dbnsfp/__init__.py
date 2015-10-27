@@ -15,7 +15,7 @@ def get_mapping():
             "properties": {
                 "rsid": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
                     "include_in_all": True
                 },
                 "chrom": {
@@ -81,7 +81,7 @@ def get_mapping():
                 },
                 "genename": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
                     "include_in_all": True
                 },
                 "uniprot": {
