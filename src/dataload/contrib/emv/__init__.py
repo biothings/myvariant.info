@@ -26,6 +26,7 @@ def get_mapping():
                 "gene": {
                     "type": "string",
                     "analyzer": "string_lowercase"
+                    "include_in_all": True
                 },
                 "egl_variant": {
                     "type": "string",
@@ -48,6 +49,7 @@ def get_mapping():
                 "clinvar_rcv": {
                     "type": "string",
                     "analyzer": "string_lowercase"
+                    "include_in_all": True
                 }
             }
         }
