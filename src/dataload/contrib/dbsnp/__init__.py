@@ -90,6 +90,7 @@ def get_mapping():
                         "symbol": {
                             "type": "string",
                             "analyzer": "string_lowercase"
+                            "include_in_all": True
                         },
                         "geneid": {
                             "type": "string",
