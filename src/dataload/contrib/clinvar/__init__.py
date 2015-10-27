@@ -32,7 +32,7 @@ def get_mapping():
                     "properties": {
                         "symbol": {
                             "type": "string",
-                            "analyzer": "string_lowercase"
+                            "analyzer": "string_lowercase",
                             "include_in_all": True
                         },
                         "id": {
@@ -59,7 +59,7 @@ def get_mapping():
                 },
                 "rcv_accession": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
                     "include_in_all": True
                 },
                 "cytogenic": {
@@ -105,7 +105,7 @@ def get_mapping():
                 },
                 "clinvar_id": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
                     "include_in_all": True
                 },
                 "coding_hgvs_only": {
