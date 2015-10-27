@@ -130,6 +130,7 @@ def get_mapping():
                 "genename": {
                     "type": "string",
                     "analyzer": "string_lowercase"
+                    "include_in_all": True
                 },
                 "ucsc_cons": {
                     "type": "double"
