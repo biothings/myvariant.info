@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 __METADATA__ = {
     "src_name": 'clinvar',
-    "src_url": 'ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/xml/ClinVarFullRelease_2015-09.xml.gz',
+    "src_url": 'ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/xml/',
     "release": '2015-09',
     "field": 'clinvar'
 }
