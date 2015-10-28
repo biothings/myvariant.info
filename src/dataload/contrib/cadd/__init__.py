@@ -77,10 +77,12 @@ def get_mapping():
                         "prot": {
                             "properties": {
                                 "protpos": {
-                                    "type": "integer"
+                                    "type": "integer",
+                                    "index": "no"
                                 },
                                 "rel_prot_pos": {
-                                    "type": "float"
+                                    "type": "float",
+                                    "index": "no"
                                 },
                                 "domain": {
                                     "type": "string",
@@ -90,25 +92,31 @@ def get_mapping():
                         },
                         "feature_id": {
                             "type": "string",
-                            "analyzer": "string_lowercase"
+                            "analyzer": "string_lowercase",
+                            "index": "no"
                         },
                         "ccds_id": {
                             "type": "string",
-                            "analyzer": "string_lowercase"
+                            "analyzer": "string_lowercase",
+                            "index": "no"
                         },
                         "cds": {
                             "properties": {
                                 "cdna_pos": {
-                                    "type": "integer"
+                                    "type": "integer",
+                                    "index": "no"
                                 },
                                 "cds_pos": {
-                                    "type": "integer"
+                                    "type": "integer",
+                                    "index": "no"
                                 },
                                 "rel_cdna_pos": {
-                                    "type": "float"
+                                    "type": "float",
+                                    "index": "no"
                                 },
                                 "rel_cds_pos": {
-                                    "type": "float"
+                                    "type": "float",
+                                    "index": "no"
                                 }
                             }
                         }
