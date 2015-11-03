@@ -201,8 +201,6 @@ class FieldsHandler(BaseHandler):
         notes = json.load(open(config.FIELD_NOTES_PATH, 'r'))
         es_mapping = self.esq.query_fields()
 
-        print(es_mapping)
-
         def get_indexed_properties_in_dict(d, prefix):
             r = {}
             for (k, v) in d.items():
