@@ -201,6 +201,8 @@ class FieldsHandler(BaseHandler):
         notes = json.load(open(config.FIELD_NOTES_PATH, 'r'))
         es_mapping = self.esq.query_fields()
 
+        print(es_mapping)
+
         def get_indexed_properties_in_dict(d, prefix):
             r = {}
             for (k, v) in d.items():
@@ -214,6 +216,10 @@ class FieldsHandler(BaseHandler):
                 else:
                     r[prefix + '.' + k]['type'] = 'object'
                     r.update(get_indexed_properties_in_dict(v['properties'], prefix + '.' + k))
+                if ('include_in_all' in v) and v['include_in_all']:
+                    r[prefix + '.' + k]['include_in_all'] = True
+                else:
+                    r[prefix + '.' + k]['include_in_all'] = False
             return r
 
         r = {}
