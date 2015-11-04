@@ -318,3 +318,12 @@ def test_licenses():
     res = json_ok(get_ok(api + '/query?q=_exists_:cadd&size=1&fields=cadd'))
     assert '_license' in res['hits'][0]['cadd']
     assert res['hits'][0]['cadd']['_license']
+
+
+def test_jsonld():
+    res = json_ok(get_ok(api + '/variant/chr11:g.66397320A>G?jsonld=true'))
+    assert '@context' in res
+
+    res = json_ok(post_ok(api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'jsonld': 'true'}))
+    for r in res:
+        assert '@context' in r 

@@ -23,7 +23,7 @@ class ESQuery():
         self._index = index or config.ES_INDEX_NAME
         self._doc_type = doc_type or config.ES_DOC_TYPE
         self._allowed_options = ['_source', 'start', 'from_', 'size',
-                                 'sort', 'explain', 'version', 'facets', 'fetch_all']
+                                 'sort', 'explain', 'version', 'facets', 'fetch_all', 'jsonld', 'host']
         self._scroll_time = '1m'
         self._total_scroll_size = 1000   # Total number of hits to return per scroll batch
         if self._total_scroll_size % self.get_number_of_shards() == 0:
@@ -39,7 +39,7 @@ class ESQuery():
     def _get_variantdoc(self, hit):
         doc = hit.get('_source', hit.get('fields', {}))
         doc.setdefault('_id', hit['_id'])
-        for attr in ['_score', '_version']:
+        for attr in ['_score', '_version', '@context']:
             if attr in hit:
                 doc.setdefault(attr, hit[attr])
 
@@ -136,6 +136,8 @@ class ESQuery():
         options.raw = kwargs.pop('raw', False)
         options.rawquery = kwargs.pop('rawquery', False)
         options.fetch_all = kwargs.pop('fetch_all', False)
+        options.jsonld = kwargs.pop('jsonld', False)
+        options.host = kwargs.pop('host', 'myvariant.info')
         scopes = kwargs.pop('scopes', None)
         if scopes:
             options.scopes = self._cleaned_scopes(scopes)
@@ -171,6 +173,8 @@ class ESQuery():
             res = self._es.get(index=self._index, id=vid, doc_type=self._doc_type, **kwargs)
         except NotFoundError:
             return
+        if options.jsonld:
+            res['@context'] = 'http://' + options.host + '/context/variant.jsonld'
         return res if options.raw else self._get_variantdoc(res)
 
     def mget_variants(self, vid_list, **kwargs):
@@ -207,6 +211,7 @@ class ESQuery():
 
         assert len(res) == len(vid_list)
         _res = []
+
         for i in range(len(res)):
             hits = res[i]
             qterm = vid_list[i]
@@ -220,6 +225,8 @@ class ESQuery():
             else:
                 for hit in hits:
                     hit[u'query'] = qterm
+                    if options.jsonld:
+                        hit['@context'] = 'http://' + options.host + '/context/variant.jsonld'
                     _res.append(hit)
         return _res
 
