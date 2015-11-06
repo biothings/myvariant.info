@@ -31,7 +31,7 @@
             "@id": "http://identifiers.org/dbsnp/",
             "@type": "@id"
         },
-        "uniport_id": {
+        "uniprot_id": {
             "@id": "http://identifiers.org/uniprot/",
             "@type": "@id"
         },
