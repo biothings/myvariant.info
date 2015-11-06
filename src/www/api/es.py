@@ -39,7 +39,7 @@ class ESQuery():
     def _get_variantdoc(self, hit):
         doc = hit.get('_source', hit.get('fields', {}))
         doc.setdefault('_id', hit['_id'])
-        for attr in ['_score', '_version', '@context']:
+        for attr in ['_score', '_version']:
             if attr in hit:
                 doc.setdefault(attr, hit[attr])
 
@@ -153,7 +153,8 @@ class ESQuery():
         return options
 
     def get_number_of_shards(self):
-        n_shards = self._es.indices.get_settings(self._index)[self._index]['settings']['index']['number_of_shards']
+        r = self._es.indices.get_settings(self._index)
+        n_shards = r[list(r.keys())[0]]['settings']['index']['number_of_shards']
         n_shards = int(n_shards)
         return n_shards
 
@@ -173,9 +174,14 @@ class ESQuery():
             res = self._es.get(index=self._index, id=vid, doc_type=self._doc_type, **kwargs)
         except NotFoundError:
             return
+
+        if options.raw:
+            return res
+
+        res = self._get_variantdoc(res)
         if options.jsonld:
             res['@context'] = 'http://' + options.host + '/context/variant.jsonld'
-        return res if options.raw else self._get_variantdoc(res)
+        return res
 
     def mget_variants(self, vid_list, **kwargs):
         options = self._get_cleaned_query_options(kwargs)

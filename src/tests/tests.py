@@ -326,4 +326,4 @@ def test_jsonld():
 
     res = json_ok(post_ok(api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'jsonld': 'true'}))
     for r in res:
-        assert '@context' in r 
+        assert '@context' in r
