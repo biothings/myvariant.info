@@ -27,6 +27,8 @@ if src_path not in sys.path:
 from www.api.es import ESQuery
 from www.helper import add_apps
 from www.api.handlers import APP_LIST as api_app_list
+from www.api.handlers import MetaDataHandler
+from www.api.handlers import FieldsHandler
 from www.beacon.handlers import APP_LIST as beacon_app_list
 
 __USE_WSGI__ = False
@@ -66,6 +68,8 @@ class MainHandler(tornado.web.RequestHandler):
 APP_LIST = [
     (r"/", MainHandler),
     (r"/status", StatusCheckHandler),
+    (r"/metadata", MetaDataHandler),
+    (r"/metadata/fields", FieldsHandler),
 ]
 
 APP_LIST += add_apps('api', api_app_list)
