@@ -67,6 +67,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
             else:
                 _args[k] = v
         _args.pop(self.jsonp_parameter, None)   # exclude jsonp parameter if passed.
+        _args['host'] = self.request.host
         if SUPPORT_MSGPACK:
             _args.pop('msgpack', None)
         self._check_fields_param(_args)
