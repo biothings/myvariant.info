@@ -94,7 +94,7 @@ Fielded queries
     q=dbnsfp.polyphen2.hdiv.pred:(D P)        # multiple values for a field
     q=dbnsfp.polyphen2.hdiv.pred:(D OR P)     # multiple values for a field using OR
     
-    q=_exist_:dbsnp                           # having dbsnp field
+    q=_exists_:dbsnp                          # having dbsnp field
     q=_missing_:exac                          # missing exac field
     
 
