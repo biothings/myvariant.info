@@ -47,17 +47,19 @@ def to_number(val):
     return val
 
 
-def value_convert(d):
-    """convert string numbers into integers or floats"""
+def value_convert(d,keys=None):
+    """convert string numbers into integers or floats
+        skip converting certain keys in keys list to interger/float"""
     for key, val in d.items():
         if isinstance(val, dict):
-            value_convert(val)
-        elif isinstance(val, list):
-            d[key] = [to_number(x) for x in val]
-        elif isinstance(val, tuple):
-            d[key] = tuple([to_number(x) for x in val])
-        else:
-            d[key] = to_number(val)
+            value_convert(val,keys)
+        if key not in keys:
+            if isinstance(val, list):
+                d[key] = [to_number(x) for x in val]
+            elif isinstance(val, tuple):
+                d[key] = tuple([to_number(x) for x in val])
+            else:
+                d[key] = to_number(val)
     return d
 
 
