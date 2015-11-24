@@ -2,7 +2,7 @@
 __METADATA__ = {
     "src_name": 'clinvar',
     "src_url": 'ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/xml/',
-    "release": '2015-09',
+    "release": '2015-11',
     "field": 'clinvar'
 }
 
@@ -10,10 +10,6 @@ def get_mapping():
     mapping = {
         "clinvar": {
             "properties": {
-                "clinical_significance": {
-                    "type": "string",
-                    "analyzer": "string_lowercase"
-                },
                 "hg19": {
                     "properties": {
                         "start": {
@@ -32,8 +28,7 @@ def get_mapping():
                     "properties": {
                         "symbol": {
                             "type": "string",
-                            "analyzer": "string_lowercase",
-                            "include_in_all": True
+                            "analyzer": "string_lowercase"
                         },
                         "id": {
                             "type": "long"
@@ -44,69 +39,180 @@ def get_mapping():
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "name": {
-                    "type": "string",
-                    "analyzer": "string_lowercase"
-                },
-                "origin": {
-                    "type": "string",
-                    "analyzer": "string_lowercase"
-                },
                 "rsid": {
                     "type": "string",
                     "analyzer": "string_lowercase"
-                    "include_in_all": True
                 },
-                "rcv_accession": {
-                    "type": "string",
-                    "analyzer": "string_lowercase",
-                    "include_in_all": True
-                },
-                "cytogenic": {
-                    "type": "string",
-                    "analyzer": "string_lowercase"
-                },
-                "review_status": {
-                    "type": "string"
-                },
-                "hgvs": {
+                "rcv": {
+                    "type": "nested",
                     "properties": {
-                        "genomic": {
+                        "accession": {
                             "type": "string",
                             "analyzer": "string_lowercase"
                         },
-                        "coding": {
+                        "clinical_significance": {
                             "type": "string",
                             "analyzer": "string_lowercase"
                         },
-                        "non-coding": {
+                        "number_submitters": {
+                            "type": "byte"
+                        },
+                        "review_status": {
+                            "type": "string"
+                        },
+                        "conditions": {
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "analyzer": "string_lowercase"
+                                },
+                                "synonyms": {
+                                    "type": "string",
+                                    "analyzer": "string_lowercase"
+                                },
+                                "identifiers": {
+                                    "properties": {
+                                        "efo": {
+                                            "type": "string",
+                                            "analyzer": "string_lowercase"
+                                        },
+                                        "gene": {
+                                            "type": "string",
+                                            "analyzer": "string_lowercase"
+                                        },
+                                        "medgen": {
+                                            "type": "string",
+                                            "analyzer": "string_lowercase"
+                                        },
+                                        "omim": {
+                                            "type": "string",
+                                            "analyzer": "string_lowercase"
+                                        },
+                                        "orphanet": {
+                                            "type": "string",
+                                            "analyzer": "string_lowercase"
+                                        },
+                                        "human_phenotype_ontology": {
+                                            "type": "string",
+                                            "analyzer": "string_lowercase"
+                                        }
+                                    }
+                                },
+                                "age_of_onset": {
+                                    "type": "string",
+                                    "analyzer": "string_lowercase"
+                                }
+                            }
+                        }
+                    }
+                },
+                "xref": {
+                    "properties": {
+                        "brca1-hci": {
                             "type": "string",
                             "analyzer": "string_lowercase"
                         },
-                        "protein": {
+                        "breast_cancer_information_core_(bic)_(brca1)": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "breast_cancer_information_core_(bic)_(brca2)": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "cosmic": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "dbrbc": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "dbvar": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "gucy2c_database": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "leiden_muscular_dystrophy_(cav3)": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "leiden_muscular_dystrophy_(dag1)": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "leiden_muscular_dystrophy_(dpm3)": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "leiden_muscular_dystrophy_(myl2)": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "brca1-hci": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "brca1-hci": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "brca1-hci": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "brca1-hci": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "brca1-hci": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "brca1-hci": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "brca1-hci": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "brca1-hci": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "brca1-hci": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "brca1-hci": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "brca1-hci": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "brca1-hci": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "brca1-hci": {
                             "type": "string",
                             "analyzer": "string_lowercase"
                         }
                     }
                 },
-                "number_submitters": {
-                    "type": "byte"
-                },
-                "last_evaluated": {
+                "cytogenic": {
                     "type": "string",
-                    "index": "no"
-                },
-                "other_ids": {
-                    "type": "string"
+                    "analyzer": "string_lowercase"
                 },
                 "allele_id": {
                     "type": "string",
                     "index": "no"
-                },
-                "clinvar_id": {
-                    "type": "string",
-                    "analyzer": "string_lowercase",
-                    "include_in_all": True
                 },
                 "coding_hgvs_only": {
                     "type": "boolean"
