@@ -6,6 +6,9 @@ __METADATA__ = {
     "field": 'clinvar'
 }
 
+# -*- coding: utf-8 -*-
+
+
 def get_mapping():
     mapping = {
         "clinvar": {
@@ -19,6 +22,32 @@ def get_mapping():
                             "type": "long"
                         }
                     }
+                },
+                "hg38": {
+                    "properties": {
+                        "start": {
+                            "type": "long"
+                        },
+                        "end": {
+                            "type": "long"
+                        }
+                    }
+                },
+                "omim": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "uniprot": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "cosmic": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
+                "dbvar": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
                 },
                 "chrom": {
                     "type": "string",
@@ -58,7 +87,19 @@ def get_mapping():
                             "type": "byte"
                         },
                         "review_status": {
-                            "type": "string"
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "last_evaluated": {
+                            "type": "date"
+                        },
+                        "preferred_name": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "origin": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
                         },
                         "conditions": {
                             "properties": {
@@ -106,114 +147,17 @@ def get_mapping():
                         }
                     }
                 },
-                "xref": {
-                    "properties": {
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "breast_cancer_information_core_(bic)_(brca1)": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "breast_cancer_information_core_(bic)_(brca2)": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "cosmic": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "dbrbc": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "dbvar": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "gucy2c_database": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "leiden_muscular_dystrophy_(cav3)": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "leiden_muscular_dystrophy_(dag1)": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "leiden_muscular_dystrophy_(dpm3)": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "leiden_muscular_dystrophy_(myl2)": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        },
-                        "brca1-hci": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
-                        }
-                    }
-                },
                 "cytogenic": {
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
                 "allele_id": {
-                    "type": "string",
-                    "index": "no"
+                    "type": "integer"
                 },
+                "variant_id": {
+                    "type": "integer"
+                },
+
                 "coding_hgvs_only": {
                     "type": "boolean"
                 },
