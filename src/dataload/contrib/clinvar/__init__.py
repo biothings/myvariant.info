@@ -80,15 +80,13 @@ def get_mapping():
                             "analyzer": "string_lowercase"
                         },
                         "clinical_significance": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
+                            "type": "string"
                         },
                         "number_submitters": {
                             "type": "byte"
                         },
                         "review_status": {
-                            "type": "string",
-                            "analyzer": "string_lowercase"
+                            "type": "string"
                         },
                         "last_evaluated": {
                             "type": "date"
@@ -104,12 +102,10 @@ def get_mapping():
                         "conditions": {
                             "properties": {
                                 "name": {
-                                    "type": "string",
-                                    "analyzer": "string_lowercase"
+                                    "type": "string"
                                 },
                                 "synonyms": {
-                                    "type": "string",
-                                    "analyzer": "string_lowercase"
+                                    "type": "string"
                                 },
                                 "identifiers": {
                                     "properties": {
