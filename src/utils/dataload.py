@@ -47,13 +47,13 @@ def to_number(val):
     return val
 
 
-def value_convert(d,keys=None):
+def value_convert(d, skipped_keys=[]):
     """convert string numbers into integers or floats
-        skip converting certain keys in keys list to interger/float"""
+       skip converting certain keys in skipped_keys list"""
     for key, val in d.items():
         if isinstance(val, dict):
-            value_convert(val,keys)
-        if key not in keys:
+            value_convert(val, skipped_keys)
+        if key not in skipped_keys:
             if isinstance(val, list):
                 d[key] = [to_number(x) for x in val]
             elif isinstance(val, tuple):
