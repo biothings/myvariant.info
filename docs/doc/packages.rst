@@ -117,7 +117,36 @@ To view documentation for your installation, enter R and type::
 
 For more information, visit the `Bioconductor myvariant page <https://www.bioconductor.org/packages/devel/bioc/html/myvariant.html>`_.
 
-Another MyVariant.info python module 
+
+MyVariant Node.js package
+------------------------
+`myvariantjs <https://www.npmjs.com/package/myvariantjs>`_ is a `Node.js <https://nodejs.org>`_ wrapper for the MyVariant.info API, developed and maintained by `Larry Hengl <https://github.com/larryhengl>`_.  To install::
+
+    npm install myvariantjs --save
+
+Some brief usage examples::
+
+    var mv = require('myvariantjs');
+    mv.getvariant('chr9:g.107620835G>A');
+    mv.getvariant('chr9:g.107620835G>A', ['dbnsfp.genename', 'cadd.phred']);
+
+    mv.getvariants("chr1:g.866422C>T,chr1:g.876664G>A,chr1:g.69635G>C");  // string of delimited ids
+    mv.getvariants(["chr1:g.866422C>T", "chr1:g.876664G>A","chr1:g.69635G>C"]);
+
+    mv.query("chr1:69000-70000", {fields:'dbnsfp.genename'});
+    mv.query("dbsnp.rsid:rs58991260", {fields:'dbnsfp'});
+
+    mv.querymany(['rs58991260', 'rs2500'], 'dbsnp.rsid');
+    mv.querymany(['RCV000083620', 'RCV000083611', 'RCV000083584'], 'clinvar.rcv_accession');
+
+
+For more information, visit its `API and usage docs <https://github.com/larryhengl/myvariantjs/blob/master/docs/api.md>`_, and it `github code repository <https://github.com/larryhengl/myvariantjs>`_.
+
+You can also check out `this neat demo application <http://larryhengl.github.io/myvariantjs-demo/>`_ developed by Larry using this `myvariantjs <https://www.npmjs.com/package/myvariantjs>`_ package.
+
+
+
+Another MyVariant.info python module
 ------------------------------------
 This is another python wrapper of MyVariant.info services created by `Brian Schrader <http://brianschrader.com/about/>`_.  The repository is available `here <https://github.com/Sonictherocketman/myvariant-api>`_.
 
