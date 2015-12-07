@@ -120,7 +120,7 @@ For more information, visit the `Bioconductor myvariant page <https://www.biocon
 
 MyVariant Node.js package
 ------------------------
-`myvariantjs <https://www.npmjs.com/package/myvariantjs>`_ is a `Node.js <https://nodejs.org>`_ wrapper for the MyVariant.info API, developed and maintained by `Larry Hengl <https://github.com/larryhengl>`_.  To install::
+`myvariantjs <https://www.npmjs.com/package/myvariantjs>`_ is a `Node.js <https://nodejs.org>`_ wrapper for the MyVariant.info API, developed and maintained by `Larry Hengl <http://larryhengl.github.io/>`_.  To install::
 
     npm install myvariantjs --save
 
@@ -140,7 +140,7 @@ Some brief usage examples::
     mv.querymany(['RCV000083620', 'RCV000083611', 'RCV000083584'], 'clinvar.rcv_accession');
 
 
-For more information, visit its `API and usage docs <https://github.com/larryhengl/myvariantjs/blob/master/docs/api.md>`_, and it `github code repository <https://github.com/larryhengl/myvariantjs>`_.
+For more information, visit its `API and usage docs <https://github.com/larryhengl/myvariantjs/blob/master/docs/api.md>`_, and its `github code repository <https://github.com/larryhengl/myvariantjs>`_.
 
 You can also check out `this neat demo application <http://larryhengl.github.io/myvariantjs-demo/>`_ developed by Larry using this `myvariantjs <https://www.npmjs.com/package/myvariantjs>`_ package.
 
