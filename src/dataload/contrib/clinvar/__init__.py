@@ -74,6 +74,7 @@ def get_mapping():
                 },
                 "rcv": {
                     "type": "nested",
+                    "include_in_parent": True,     # NOTE: this is not available in ES 2.x
                     "properties": {
                         "accession": {
                             "type": "string",
