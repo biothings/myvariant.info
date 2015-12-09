@@ -14,7 +14,7 @@
                             "Name": "q",
                             "Type": "string",
                             "Required": "Y",
-                            "Description": "query string. Examples: \"rs58991260\", \"chr1:69000-70000\", \"dbsnp.vartype:snp\". The detailed query syntax can be found at <docs url here> (coming soon)"
+                            "Description": "query string. Examples: \"rs58991260\", \"chr1:69000-70000\", \"dbsnp.vartype:snp\". The detailed query syntax can be found at http://docs.myvariant.info/en/latest/doc/variant_query_service.html#query-syntax"
                         },
                         {
                             "Name": "fields",
@@ -40,6 +40,16 @@
                             "Name": "facets",
                             "Type": "string",
                             "Description": "a single field or comma-separated fields to return facets, for example, “facets=dbsnp.vartype."
+                        },
+                        {
+                            "Name": "fetch_all",
+                            "Type": "string",
+                            "Description": "if TRUE, allows fast retrieval of all unsorted query hits in 1000 hit batches.  The return object contains a _scroll_id field, which when passed back to the query endpoint in the scroll_id parameter, returns the next 1000 unordered results."
+                        },
+                        {
+                            "Name": "scroll_id",
+                            "Type": "string",
+                            "Description": "the scroll_id from a previous request with fetch_all = TRUE.  When this request is made, the response contains the next 1000 unordered query hits from your query (until no hits are left to return).  As the query was supplied in the original query request (with fetch_all = TRUE), the query (q parameter) is ignored if scroll_id is supplied."
                         },
                         {
                             "Name": "callback",
@@ -166,7 +176,20 @@
                             "Description": "you can pass a \"callback\" parameter to make a JSONP call."
                         }
                     ]
-                }
+                },
+                {
+                    "MethodName": "Available fields service",
+                    "Synopsis": "Get list of available fields in MyVariant.info.",
+                    "HTTPMethod": "GET",
+                    "URI": "/v1/metadata/fields",
+                    "parameters": [
+                        {
+                            "Name": "callback",
+                            "Type": "string",
+                            "Description": "you can pass a \"callback\" parameter to make a JSONP call."
+                        }
+                    ]
+                }        
             ]
         }
     ]

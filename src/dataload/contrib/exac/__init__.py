@@ -1,3 +1,10 @@
+__METADATA__ = {
+    "src_name": 'exac',
+    "src_url": 'ftp://ftp.broadinstitute.org/pub/ExAC_release/release0.3/ExAC.r0.3.nonpsych.sites.vcf.gz',
+    "version": '0.3',
+    "field": 'exac'
+}
+
 def get_mapping():
     mapping = {
         "exac": {

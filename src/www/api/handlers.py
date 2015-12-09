@@ -26,6 +26,8 @@ class VariantHandler(BaseHandler):
         '''
         if vid:
             kwargs = self.get_query_params()
+            if kwargs.pop('hg38', False):
+                self.esq._use_hg38()
             variant = self.esq.get_variant(vid, **kwargs)
             if variant:
                 self.return_json(variant)
@@ -46,6 +48,8 @@ class VariantHandler(BaseHandler):
             email
         '''
         kwargs = self.get_query_params()
+        if kwargs.pop('hg38', False):
+            self.esq._use_hg38()
         ids = kwargs.pop('ids', None)
         if ids:
             ids = re.split('[\s\r\n+|,]+', ids)
@@ -74,18 +78,21 @@ class QueryHandler(BaseHandler):
             facets
             callback
             email
+            fetch_all
 
             explain
             raw
         '''
         kwargs = self.get_query_params()
+        if kwargs.pop('hg38', False):
+            self.esq._use_hg38()
         q = kwargs.pop('q', None)
+        scroll_id = kwargs.pop('scroll_id', None)
         _has_error = False
-        if q:
-            explain = self.get_argument('explain', None)
-            if explain and explain.lower() == 'true':
-                kwargs['explain'] = True
-            for arg in ['from', 'size', 'mode']:
+        if scroll_id:
+            res = self.esq.scroll(scroll_id, **kwargs)
+        elif q:
+            for arg in ['from', 'size']:
                 value = kwargs.get(arg, None)
                 if value:
                     try:
@@ -95,6 +102,12 @@ class QueryHandler(BaseHandler):
                         _has_error = True
             if not _has_error:
                 res = self.esq.query(q, **kwargs)
+                if kwargs.get('fetch_all', False):
+                    self.ga_track(event={'category': 'v1_api',
+                                         'action': 'fetch_all',
+                                         'label': 'total',
+                                         'value': res.get('total', None)})
+
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 
@@ -115,6 +128,8 @@ class QueryHandler(BaseHandler):
             jsoninput   if true, input "q" is a json string, must be decoded as a list.
         '''
         kwargs = self.get_query_params()
+        if kwargs.pop('hg38', False):
+            self.esq._use_hg38()
         q = kwargs.pop('q', None)
         jsoninput = kwargs.pop('jsoninput', None) in ('1', 'true')
         if q:
@@ -148,21 +163,34 @@ class MetaDataHandler(BaseHandler):
         # For now, just return a hardcoded object, later we'll actually query the ES db for this information
         self.return_json({
             "stats": {
-                'total': 286219908,
-                'evs': 1977300,
-                'cadd': 163690986,
-                'wellderly': 21240519,
-                'dbnsfp': 78045379,
-                'snpedia': 5907,
-                'clinvar': 85789,
-                'docm': 1119,
-                'mutdb': 420221,
-                'cosmic': 1024498,
-                'dbsnp': 110234210,
-                'emv': 12066,
-                'gwassnps': 15243
+                "total": 316403311,
+                "cadd": 163690986,
+                "clinvar": 114627,
+                "cosmic": 1024498,
+                "dbnsfp": 82030830,
+                "dbsnp": 145132257,
+                "docm": 1119,
+                "emv": 12066,
+                "evs": 1977300,
+                "exac": 10195872,
+                "grasp": 2212148,
+                "gwassnps": 15243,
+                "mutdb": 420221,
+                "snpedia": 5907,
+                "snpeff": 313576885,
+                "wellderly": 21240519
             },
-            "timestamp": "2015-04-15T11:39:48.309000"
+            "src_version": {
+                "cadd": "1.2",
+                "clinvar": "201509",
+                "cosmic": "68",
+                "dbnsfp": "3.0c",
+                "dbsnp": "144",
+                "evs": "2",
+                "exac": "0.3",
+                "grasp": "2.0.0.0"
+            },
+            "timestamp": "2015-10-21T07:02:18.178506"
         })
 
 
@@ -186,6 +214,10 @@ class FieldsHandler(BaseHandler):
                 else:
                     r[prefix + '.' + k]['type'] = 'object'
                     r.update(get_indexed_properties_in_dict(v['properties'], prefix + '.' + k))
+                if ('include_in_all' in v) and v['include_in_all']:
+                    r[prefix + '.' + k]['include_in_all'] = True
+                else:
+                    r[prefix + '.' + k]['include_in_all'] = False
             return r
 
         r = {}
@@ -199,8 +231,8 @@ class FieldsHandler(BaseHandler):
 
 APP_LIST = [
     (r"/variant/(.+)/?", VariantHandler),   # for variant get request
-    (r"/variant/?$", VariantHandler),              # for variant post request
-    (r"/query/?", QueryHandler),
-    (r"/metadata", MetaDataHandler),    # for metadata requests
-    (r"/fields", FieldsHandler),        # for available field information
+    (r"/variant/?$", VariantHandler),       # for variant post request
+    (r"/query/?", QueryHandler),            # for query get/post request
+    (r"/metadata", MetaDataHandler),        # for metadata requests
+    (r"/metadata/fields", FieldsHandler),   # for available field information
 ]

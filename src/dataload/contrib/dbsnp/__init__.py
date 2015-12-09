@@ -3,6 +3,9 @@ from .dbsnp_vcf_parser import parse_vcf
 
 
 __METADATA__ = {
+    "requirements": [
+        "PyVCF>=0.6.7",
+    ],
     "src_name": 'dbSNP',
     "src_url": 'http://www.ncbi.nlm.nih.gov/SNP/',
     "version": '142',
@@ -10,7 +13,7 @@ __METADATA__ = {
 }
 
 
-infile = "/opt/myvariant.info/load_archive/dbsnp/00-All.vcf.gz"
+infile = "/home/kevinxin/dbsnp/00-All.vcf.gz"
 
 
 def load_data():
@@ -86,7 +89,8 @@ def get_mapping():
                     "properties": {
                         "symbol": {
                             "type": "string",
-                            "analyzer": "string_lowercase"
+                            "analyzer": "string_lowercase",
+                            "include_in_all": True
                         },
                         "geneid": {
                             "type": "string",

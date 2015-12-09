@@ -54,7 +54,6 @@ def _map_line_to_json(fields):
 
     one_snp_json = {
         "_id": HGVS,
-<<<<<<< HEAD
         "evs":
             {
                 "chrom": chrom,
@@ -77,43 +76,43 @@ def _map_line_to_json(fields):
                         "european_american": count_dict(fields[4]),
                         "african_american": count_dict(fields[5]),
                         "all": count_dict(fields[6])
-                     },
+                    },
                 "ma_fin_percent":
                     {
                         "european_american": ma_fin_percent[0],
                         "african_american": ma_fin_percent[1],
                         "all": ma_fin_percent[2]
-                     },
+                    },
                 "genotype_count":
                     {
                         "european_american": count_dict(fields[8]),
                         "african_american": count_dict(fields[9]),
                         "all_genotype": count_dict(fields[10])
-                     },
+                    },
                 "avg_sample_read": fields[11],
                 "gene":
                     {
                         "symbol": fields[12],
                         "accession": fields[13]
-                     },
+                    },
                 "function_gvs": fields[14],
                 "hgvs":
                     {
                         "coding": fields[16],
                         "protein": fields[15]
-                     },
+                    },
                 "coding_dna_size": fields[17],
                 "conservation":
                     {
                         "phast_cons": fields[18],
                         "gerp": fields[19]
-                     },
+                    },
                 "grantham_score": fields[20],
                 "polyphen2":
                     {
                         "class": polyphen(fields[21])[0],
                         "score": polyphen(fields[21])[1]
-                     },
+                    },
                 "ref_base_ncbi": fields[22],
                 "chimp_allele": fields[23],
                 "clinical_info": fields[24],
@@ -124,73 +123,9 @@ def _map_line_to_json(fields):
                     {
                         "ea": fields[28],
                         "aa": fields[29]
-                     }
-            }
-         }
-=======
-        "evs": {
-            "chrom": chrom,
-            "hg19": {
-                "start": hg19[0],
-                "end": hg19[1]
-            },
-            "hg38": {
-                "start": hg38[0],
-                "end": hg38[1]
-            },
-            "rsid": fields[1],
-            "dbsnp_version": get_dbsnp(fields[2]),
-            "ref": ref,
-            "alt": alt,
-            "allele_count": {
-                "european_american": count_dict(fields[4]),
-                "african_american": count_dict(fields[5]),
-                "all": count_dict(fields[6])
-            },
-            "ma_fin_percent": {
-                "european_american": ma_fin_percent[0],
-                "african_american": ma_fin_percent[1],
-                "all": ma_fin_percent[2]
-            },
-            "genotype_count": {
-                "european_american": count_dict(fields[8]),
-                "african_american": count_dict(fields[9]),
-                "all_genotype": count_dict(fields[10])
-            },
-            "avg_sample_read": fields[11],
-            "gene": {
-                "symbol": fields[12],
-                "accession": fields[13]
-            },
-            "function_gvs": fields[14],
-            "hgvs": {
-                "coding": fields[16],
-                "protein": fields[15]
-            },
-            "coding_dna_size": fields[17],
-            "conservation": {
-                "phast_cons": fields[18],
-                "gerp": fields[19]
-            },
-            "grantham_score": fields[20],
-            "polyphen2": {
-                "class": polyphen(fields[21])[0],
-                "score": polyphen(fields[21])[1]
-            },
-            "ref_base_ncbi": fields[22],
-            "chimp_allele": fields[23],
-            "clinical_info": fields[24],
-            "filter_status": fields[25],
-            "on_illumina_human_exome_chip": fields[26],
-            "gwas_pubmed_info": fields[27],
-            "estimated_age_kyrs": {
-                "ea": fields[28],
-                "aa": fields[29]
+                    }
             }
         }
-    }
->>>>>>> 4cdff9ae14fa4c74acd237520a17ae1927f8aafd
-
     return dict_sweep(value_convert(one_snp_json), vals=["NA", "none", "unknown"])
 
 

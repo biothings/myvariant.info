@@ -1,24 +1,12 @@
-from .dbnsfp_parser import load_data as _load_data
 
-
-<<<<<<< HEAD
 DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP3.0b2c_variant.chr*'
-=======
+
 __METADATA__ = {
     "src_name": 'dbNSFP',
     "src_url": 'https://sites.google.com/site/jpopgen/dbNSFP',
-    "version": '2.9',
+    "version": '3.0',
     "field": 'dbnsfp'
 }
-
-
-DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP2.9_variant*'
->>>>>>> 4cdff9ae14fa4c74acd237520a17ae1927f8aafd
-
-
-def load_data():
-    dbnsfp_data = _load_data(DBNSFP_INPUT_FILE)
-    return dbnsfp_data
 
 
 def get_mapping():
@@ -27,7 +15,8 @@ def get_mapping():
             "properties": {
                 "rsid": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
+                    "include_in_all": True
                 },
                 "chrom": {
                     "type": "string",
@@ -92,7 +81,8 @@ def get_mapping():
                 },
                 "genename": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
+                    "include_in_all": True
                 },
                 "uniprot": {
                     "properties": {
@@ -103,7 +93,7 @@ def get_mapping():
                             "type": "string"
                         }
                     }
-                 },
+                },
                 "interpro_domain": {
                     "type": "string"
                 },
@@ -119,6 +109,9 @@ def get_mapping():
                             "type": "string"
                         },
                         "geneid": {
+                            "type": "string"
+                        },
+                        "proteinid": {
                             "type": "string"
                         }
                     }
@@ -241,6 +234,24 @@ def get_mapping():
                         }
                     }
                 },
+                "fathmm-mkl": {
+                    "properties": {
+                        "coding_score": {
+                            "type": "float"
+                        },
+                        "coding_rankscore": {
+                            "type": "float"
+                        },
+                        "coding_pred": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        },
+                        "coding_group": {
+                            "type": "string",
+                            "analyzer": "string_lowercase"
+                        }
+                    }
+                },
                 "metasvm": {
                     "properties": {
                         "score": {
@@ -254,16 +265,16 @@ def get_mapping():
                         }
                     }
                 },
-                "lr": {
+                "metalr": {
                     "properties": {
-                        "pred": {
-                            "type": "string"
-                        },
                         "score": {
                             "type": "float"
                         },
                         "rankscore": {
                             "type": "float"
+                        },
+                        "pred": {
+                            "type": "string"
                         }
                     }
                 },
@@ -283,23 +294,103 @@ def get_mapping():
                         }
                     }
                 },
-                "phylop_7way": {
+                "integrated": {
                     "properties": {
-                        "vertebrate": {
+                        "fitcons_score": {
                             "type": "float"
                         },
-                        "vertebrate_rankscore": {
+                        "fitcons_rankscore": {
+                            "type": "float"
+                        },
+                        "confidence_value": {
                             "type": "float"
                         }
                     }
                 },
-                "phastcons_7way": {
+                "gm12878": {
                     "properties": {
-                        "vertebrate": {
+                        "fitcons_score": {
                             "type": "float"
                         },
-                        "vertebrate_rankscore": {
+                        "fitcons_rankscore": {
                             "type": "float"
+                        },
+                        "confidence_value": {
+                            "type": "float"
+                        }
+                    }
+                },
+                "h1-hesc": {
+                    "properties": {
+                        "fitcons_score": {
+                            "type": "float"
+                        },
+                        "fitcons_rankscore": {
+                            "type": "float"
+                        },
+                        "confidence_value": {
+                            "type": "float"
+                        }
+                    }
+                },
+                "huvec": {
+                    "properties": {
+                        "fitcons_score": {
+                            "type": "float"
+                        },
+                        "fitcons_rankscore": {
+                            "type": "float"
+                        },
+                        "confidence_value": {
+                            "type": "float"
+                        }
+                    }
+                },
+                "phylo": {
+                    "properties": {
+                        "p7way": {
+                            "properties": {
+                                "vertebrate": {
+                                    "type": "float"
+                                },
+                                "vertebrate_rankscore": {
+                                    "type": "float"
+                                }
+                            }
+                        },
+                        "p20way": {
+                            "properties": {
+                                "mammalian": {
+                                    "type": "float"
+                                },
+                                "mammalian_rankscore": {
+                                    "type": "float"
+                                }
+                            }
+                        }
+                    }
+                },
+                "phastcons": {
+                    "properties": {
+                        "7way": {
+                            "properties": {
+                                "vertebrate": {
+                                    "type": "float"
+                                },
+                                "vertebrate_rankscore": {
+                                    "type": "float"
+                                }
+                            }
+                        },
+                        "20way": {
+                            "properties": {
+                                "mammalian": {
+                                    "type": "float"
+                                },
+                                "mammalian_rankscore": {
+                                    "type": "float"
+                                }
+                            }
                         }
                     }
                 },
@@ -329,7 +420,7 @@ def get_mapping():
                         }
                     }
                 },
-                "1000gp1": {
+                "1000gp3": {
                     "properties": {
                         "ac": {
                             "type": "integer"

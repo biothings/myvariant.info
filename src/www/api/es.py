@@ -13,26 +13,50 @@ class MVQueryError(Exception):
     pass
 
 
+class MVScrollSetupError(Exception):
+    pass
+
+
 class ESQuery():
     def __init__(self, index=None, doc_type=None, es_host=None):
         self._es = get_es(es_host)
         self._index = index or config.ES_INDEX_NAME
         self._doc_type = doc_type or config.ES_DOC_TYPE
         self._allowed_options = ['_source', 'start', 'from_', 'size',
-                                 'sort', 'explain', 'version', 'facets']
+                                 'sort', 'explain', 'version', 'facets', 'fetch_all', 'jsonld', 'host']
+        self._scroll_time = '1m'
+        self._total_scroll_size = 1000   # Total number of hits to return per scroll batch
+        if self._total_scroll_size % self.get_number_of_shards() == 0:
+            # Total hits per shard per scroll batch
+            self._scroll_size = int(self._total_scroll_size / self.get_number_of_shards())
+        else:
+            raise MVScrollSetupError("_total_scroll_size of {} can't be ".format(self._total_scroll_size) +
+                                     "divided evenly among {} shards.".format(self.get_number_of_shards()))
+
+    def _use_hg38(self):
+        self._index = config.ES_INDEX_NAME_HG38
 
     def _get_variantdoc(self, hit):
         doc = hit.get('_source', hit.get('fields', {}))
         doc.setdefault('_id', hit['_id'])
-        if '_version' in hit:
-            doc.setdefault('_version', hit['_version'])
+        for attr in ['_score', '_version']:
+            if attr in hit:
+                doc.setdefault(attr, hit[attr])
+
         if hit.get('found', None) is False:
             # if found is false, pass that to the doc
             doc['found'] = hit['found']
+        # add cadd license info
+        if 'cadd' in doc:
+            doc['cadd']['_license'] = 'http://goo.gl/bkpNhq'
         return doc
 
     def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False):
-        '''res is the dictionary returned from a query.'''
+        '''res is the dictionary returned from a query.
+           do some reformating of raw ES results before returning.
+
+           This method is used for self.mget_variants2 and self.get_variant2 method.
+        '''
         if 'error' in res:
             return error
 
@@ -44,6 +68,19 @@ class ESQuery():
             return self._get_variantdoc(hits['hits'][0])
         else:
             return [self._get_variantdoc(hit) for hit in hits['hits']]
+
+    def _clean_res2(self, res):
+        '''res is the dictionary returned from a query.
+           do some reformating of raw ES results before returning.
+
+           This method is used for self.query method.
+        '''
+        _res = res['hits']
+        for attr in ['took', 'facets', 'aggregations', '_scroll_id']:
+            if attr in res:
+                _res[attr] = res[attr]
+        _res['hits'] = [self._get_variantdoc(hit) for hit in _res['hits']]
+        return _res
 
     def _cleaned_scopes(self, scopes):
         '''return a cleaned scopes parameter.
@@ -98,6 +135,9 @@ class ESQuery():
         options = dotdict()
         options.raw = kwargs.pop('raw', False)
         options.rawquery = kwargs.pop('rawquery', False)
+        options.fetch_all = kwargs.pop('fetch_all', False)
+        options.jsonld = kwargs.pop('jsonld', False)
+        options.host = kwargs.pop('host', 'myvariant.info')
         scopes = kwargs.pop('scopes', None)
         if scopes:
             options.scopes = self._cleaned_scopes(scopes)
@@ -112,6 +152,12 @@ class ESQuery():
         options.kwargs = kwargs
         return options
 
+    def get_number_of_shards(self):
+        r = self._es.indices.get_settings(self._index)
+        n_shards = r[list(r.keys())[0]]['settings']['index']['number_of_shards']
+        n_shards = int(n_shards)
+        return n_shards
+
     def exists(self, vid):
         """return True/False if a variant id exists or not."""
         try:
@@ -123,15 +169,24 @@ class ESQuery():
     def get_variant(self, vid, **kwargs):
         '''unknown vid return None'''
         options = self._get_cleaned_query_options(kwargs)
+        kwargs = {"_source": options.kwargs["_source"]} if "_source" in options.kwargs else {}
         try:
-            res = self._es.get(index=self._index, id=vid, doc_type=self._doc_type, **options.kwargs)
+            res = self._es.get(index=self._index, id=vid, doc_type=self._doc_type, **kwargs)
         except NotFoundError:
             return
-        return res if options.raw else self._get_variantdoc(res)
+
+        if options.raw:
+            return res
+
+        res = self._get_variantdoc(res)
+        if options.jsonld:
+            res['@context'] = 'http://' + options.host + '/context/variant.jsonld'
+        return res
 
     def mget_variants(self, vid_list, **kwargs):
         options = self._get_cleaned_query_options(kwargs)
-        res = self._es.mget(body={'ids': vid_list}, index=self._index, doc_type=self._doc_type, **options.kwargs)
+        kwargs = {"_source": options.kwargs["_source"]} if "_source" in options.kwargs else {}
+        res = self._es.mget(body={'ids': vid_list}, index=self._index, doc_type=self._doc_type, **kwargs)
         return res if options.raw else [self._get_variantdoc(doc) for doc in res['docs']]
 
     def get_variant2(self, vid, **kwargs):
@@ -162,6 +217,7 @@ class ESQuery():
 
         assert len(res) == len(vid_list)
         _res = []
+
         for i in range(len(res)):
             hits = res[i]
             qterm = vid_list[i]
@@ -175,6 +231,8 @@ class ESQuery():
             else:
                 for hit in hits:
                     hit[u'query'] = qterm
+                    if options.jsonld:
+                        hit['@context'] = 'http://' + options.host + '/context/variant.jsonld'
                     _res.append(hit)
         return _res
 
@@ -183,6 +241,10 @@ class ESQuery():
         interval_query = self._parse_interval_query(q)
         facets = self._parse_facets_option(kwargs)
         options = self._get_cleaned_query_options(kwargs)
+        scroll_options = {}
+        if options.fetch_all:
+            scroll_options.update({'search_type': 'scan', 'size': self._scroll_size, 'scroll': self._scroll_time})
+        options['kwargs'].update(scroll_options)
         if interval_query:
             options['kwargs'].update(interval_query)
             res = self.query_interval(**options.kwargs)
@@ -202,20 +264,26 @@ class ESQuery():
             except RequestError:
                 return {"error": "invalid query term.", "success": False}
 
+        # if options.fetch_all:
+        #     return res
+
         if not options.raw:
-            _res = res['hits']
-            _res['took'] = res['took']
-            if "facets" in res:
-                _res['facets'] = res['facets']
-            for v in _res['hits']:
-                del v['_type']
-                del v['_index']
-                for attr in ['fields', '_source']:
-                    if attr in v:
-                        v.update(v[attr])
-                        del v[attr]
-                        break
-            res = _res
+            res = self._clean_res2(res)
+        return res
+
+    def scroll(self, scroll_id, **kwargs):
+        '''return the results from a scroll ID, recognizes options.raw'''
+        options = self._get_cleaned_query_options(kwargs)
+        r = self._es.scroll(scroll_id, scroll=self._scroll_time)
+        scroll_id = r.get('_scroll_id')
+        if scroll_id is None or not r['hits']['hits']:
+            return {'success': False, 'error': 'No results to return.'}
+        else:
+            if not options.raw:
+                res = self._clean_res2(r)
+            # res.update({'_scroll_id': scroll_id})
+            if r['_shards']['failed']:
+                res.update({'_warning': 'Scroll request has failed on {} shards out of {}.'.format(r['_shards']['failed'], r['_shards']['total'])})
         return res
 
     def _parse_facets_option(self, kwargs):

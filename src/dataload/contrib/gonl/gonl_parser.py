@@ -4,7 +4,6 @@ import time
 from utils.common import timesofar
 
 
-
 # split ";" separated fields into comma separated lists, strip.
 def list_split(d):
     for key, val in d.items():
@@ -83,9 +82,9 @@ def _map_line_to_json(fields):
     FILTER = fields[6]
     info = fields[7].split(";")
     varType = "."
-    AC="."
-    AF="."
-    AN="."
+    AC = "."
+    AF = "."
+    AN = "."
 
     for i in info:
         i = i.strip()
@@ -96,8 +95,8 @@ def _map_line_to_json(fields):
         elif i.startswith("AN="):
             AN = i.strip("AN=")
         elif i.startswith("set"):
-            varType=i.strip("set=")
-    
+            varType = i.strip("set=")
+
     # load as json data
     print "HGVS " + HGVS
     print chrom
@@ -110,7 +109,7 @@ def _map_line_to_json(fields):
     print AC
     print AF
     print AN
-    
+
     one_snp_json = {
 
         "_id": HGVS,
@@ -128,7 +127,7 @@ def _map_line_to_json(fields):
                 "varType": varType,
                 "rsID": rsID,
                 "QUAL": QUAL,
-                "FILTER": FILTER
+                "FILTER": FILTER,
                 "AC": AC,
                 "AF": AF,
                 "AN": AN
@@ -138,12 +137,12 @@ def _map_line_to_json(fields):
     one_snp_json = list_split(dict_sweep(unlist(value_convert(one_snp_json))))
     one_snp_json["gonl"]["chrom"] = str(one_snp_json["gonl"]["chrom"])
     return one_snp_json
-    
+
 
 # open file, parse, pass to json mapper
 def data_generator(input_file):
     open_file = open(input_file)
-    #load vcf file
+    # load vcf file
     line = open_file.readline()
 
     while line.strip() != "":
@@ -152,7 +151,6 @@ def data_generator(input_file):
             line = open_file.readline()
         else:
             line = line.split("\t")
-            current_row = _map_line_to_json(line)
             line = open_file.readline()
     open_file.close()
 
@@ -165,13 +163,15 @@ def load_data(path):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
-    
+
+
 def getFileList():
     input_file_list = []
-    for i in range(1,22):
+    for i in range(1, 22):
         filename = "https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr"+str(x)+".snps_indels.r5.vcf.gz"
         input_file_list.append(filename)
     return input_file_list
+
 
 # load collection into mongodb
 def load_collection(database, input_file_list, collection_name):
@@ -191,4 +191,4 @@ def load_collection(database, input_file_list, collection_name):
         cnt += 1
         if cnt % 100000 == 0:
             print cnt, timesofar(t1)
-    print "successfully loaded %s into mongodb" % collection_name 
+    print "successfully loaded %s into mongodb" % collection_name

@@ -5,22 +5,27 @@ run as "nosetests tests"
     or "nosetests tests:test_main"
 '''
 import httplib2
-import urllib.request
-import urllib.parse
-import urllib.error
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
 import json
 import sys
+import os
 from nose.tools import ok_, eq_
+import variant_list
 
 try:
     import msgpack
 except ImportError:
     sys.stderr.write("Warning: msgpack is not available.")
 
+host = os.getenv("MV_HOST")
+if not host:
+    #host = 'http://localhost:8000'
+    #host = 'http://dev.myvariant.info:8000'
+    host = 'http://myvariant.info'
 
-#host = 'http://localhost:8000'
-#host = 'http://dev.myvariant.info:8000'
-host = 'http://myvariant.info'
 api = host + '/v1'
 sys.stderr.write('URL base: {}\n'.format(api))
 
@@ -86,7 +91,7 @@ def head_ok(url):
 
 def post_ok(url, params):
     headers = {'Content-type': 'application/x-www-form-urlencoded'}
-    res, con = h.request(url, 'POST', urllib.parse.urlencode(encode_dict(params)), headers=headers)
+    res, con = h.request(url, 'POST', urlencode(encode_dict(params)), headers=headers)
     eq_(res.status, 200)
     return con
 
@@ -128,6 +133,9 @@ def test_query():
     has_hits('rs58991260')
     has_hits('chr1:69000-70000')
     has_hits('dbsnp.vartype:snp')
+    has_hits('_exists_:dbnsfp')
+    has_hits('dbnsfp.genename:BTK')
+    has_hits('_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen')
 
     con = get_ok(api + '/query?q=rs58991260&callback=mycallback')
     ok_(con.startswith('mycallback('.encode('utf-8')))
@@ -186,14 +194,24 @@ def test_variant():
     res = json_ok(get_ok(api + '/variant/chr16:g.28883241A>G'))
     eq_(res['_id'], "chr16:g.28883241A>G")
 
+    res = json_ok(get_ok(api + '/variant/chr1:g.35367G>A'))
+    eq_(res['_id'], "chr1:g.35367G>A")
+
+    res = json_ok(get_ok(api + '/variant/chr7:g.55241707G>T'))
+    eq_(res['_id'], "chr7:g.55241707G>T")
+
     # testing non-ascii character
-    get_404(api + '/variant/' + '54097\xef\xbf\xbd\xef\xbf\xbdmouse')
+    get_404(api + '/variant/' + 'chr7:g.55241707G>T\xef\xbf\xbd\xef\xbf\xbdmouse')
 
     # testing filtering parameters
     res = json_ok(get_ok(api + '/variant/chr16:g.28883241A>G?fields=dbsnp,dbnsfp,cadd'))
     eq_(set(res), set(['_id', '_version', 'dbnsfp', 'cadd', 'dbsnp']))
-    res = json_ok(get_ok(api + '/variant/chr16:g.28883241A>G?filter=wellderly'))
+    res = json_ok(get_ok(api + '/variant/chr16:g.28883241A>G?fields=wellderly'))
     eq_(set(res), set(['_id', '_version', 'wellderly']))
+    res = json_ok(get_ok(api + '/variant/chr9:g.107620835G>A?fields=dbsnp'))
+    eq_(set(res), set(['_id', '_version', 'dbsnp']))
+    res = json_ok(get_ok(api + '/variant/chr1:g.31349647C>T?fields=dbnsfp.clinvar,dbsnp.gmaf,clinvar.hgvs.coding'))
+    eq_(set(res), set(['_id', '_version', 'dbsnp', 'dbnsfp', 'clinvar']))
 
     get_404(api + '/variant')
     get_404(api + '/variant/')
@@ -212,17 +230,21 @@ def test_variant_post():
     res = json_ok(post_ok(api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'fields': 'dbsnp'}))
     eq_(len(res), 2)
     for _g in res:
-        eq_(set(_g), set(['_id', 'query', 'dbsnp']))
+        eq_(set(_g), set(['_id', '_score', 'query', 'dbsnp']))
 
     # TODO redo this test, doesn't test much really....
     res = json_ok(post_ok(api + '/variant', {'ids': 'chr16:g.28883241A>G,chr11:g.66397320A>G', 'filter': 'dbsnp.chrom'}))
     eq_(len(res), 2)
     for _g in res:
-        eq_(set(_g), set(['_id', 'query', 'dbsnp']))
+        eq_(set(_g), set(['_id', '_score', 'query', 'dbsnp']))
+
+    # Test a large variant post
+    res = json_ok(post_ok(api + '/variant', {'ids': variant_list.VARIANT_POST_LIST}))
+    eq_(len(res), 999)
 
 
 def test_metadata():
-    get_ok(host + '/metadata')
+    #get_ok(host + '/metadata')
     get_ok(api + '/metadata')
 
 
@@ -254,6 +276,29 @@ def test_unicode():
     eq_(len(res), 2)
 
 
+def test_get_fields():
+    res = json_ok(get_ok(api + '/metadata/fields'))
+    # Check to see if there are enough keys
+    ok_(len(res) > 480)
+
+    # Check some specific keys
+    assert 'cadd' in res
+    assert 'dbnsfp' in res
+    assert 'dbsnp' in res
+    assert 'wellderly' in res
+    assert 'clinvar' in res
+
+
+def test_fetch_all():
+    res = json_ok(get_ok(api + '/query?q=_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen&fetch_all=TRUE'))
+    assert '_scroll_id' in res
+
+    # get one set of results
+    res2 = json_ok(get_ok(api + '/query?scroll_id=' + res['_scroll_id']))
+    assert 'hits' in res2
+    ok_(len(res2['hits']) == 1000)
+
+
 def test_msgpack():
     res = json_ok(get_ok(api + '/variant/chr11:g.66397320A>G'))
     res2 = msgpack_ok(get_ok(api + '/variant/chr11:g.66397320A>G?msgpack=true'))
@@ -266,3 +311,19 @@ def test_msgpack():
     res = json_ok(get_ok(api + '/metadata'))
     res2 = msgpack_ok(get_ok(api + '/metadata?msgpack=true'))
     ok_(res, res2)
+
+
+def test_licenses():
+    # cadd license
+    res = json_ok(get_ok(api + '/query?q=_exists_:cadd&size=1&fields=cadd'))
+    assert '_license' in res['hits'][0]['cadd']
+    assert res['hits'][0]['cadd']['_license']
+
+
+def test_jsonld():
+    res = json_ok(get_ok(api + '/variant/chr11:g.66397320A>G?jsonld=true'))
+    assert '@context' in res
+
+    res = json_ok(post_ok(api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'jsonld': 'true'}))
+    for r in res:
+        assert '@context' in r

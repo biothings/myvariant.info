@@ -1,10 +1,12 @@
-# -*- coding: utf-8 -*-
-
 import csv
-
 import requests
+from itertools import groupby
+try:
+    import itertools.imap as map
+    import itertools.ifilter as filter
+except ImportError:
+    pass
 
-from itertools import groupby, imap, ifilter
 from utils.dataload import dict_sweep, list_split, unlist, value_convert, merge_duplicate_rows
 
 
@@ -132,9 +134,9 @@ def load_data(input_file):
     open_file = open('%s.tsv' % input_file)
     open_file = csv.reader(open_file, delimiter="\t")
     open_file.next()
-    grasp = imap(row_generator, open_file)
+    grasp = map(row_generator, open_file)
     grasp = ifilter(lambda row: row[58] != "", grasp)
-    json_rows = imap(_map_line_to_json, grasp)
+    json_rows = map(_map_line_to_json, grasp)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "grasp") for rg in row_groups)

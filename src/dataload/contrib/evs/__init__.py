@@ -56,7 +56,8 @@ def get_mapping():
                     "properties": {
                         "symbol": {
                             "type": "string",
-                            "analyzer": "string_lowercase"
+                            "analyzer": "string_lowercase",
+                            "include_in_all": True
                         },
                         "accession": {
                             "type": "string",
@@ -89,7 +90,8 @@ def get_mapping():
                 },
                 "rsid": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
+                    "include_in_all": True
                 }
             }
         }

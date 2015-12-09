@@ -8,7 +8,7 @@ Variant annotation data
 Data sources
 ------------
 
-We currently obtain variant annotation data from several data resources and 
+We currently obtain variant annotation data from several data resources and
 keep them up-to-date, so that you don't have to do it:
 
 .. _dbNSFP: https://sites.google.com/site/jpopgen/dbNSFP
@@ -21,19 +21,21 @@ keep them up-to-date, so that you don't have to do it:
 .. _COSMIC: http://cancer.sanger.ac.uk/cancergenome/projects/cosmic/
 .. _DOCM: http://docm.genome.wustl.edu/
 .. _SNPedia: http://www.snpedia.com
-.. _EMVClass: http://geneticslab.emory.edu/emvclass/emvclass.php 
+.. _EMVClass: http://geneticslab.emory.edu/emvclass/emvclass.php
 .. _Scripps Wellderly: http://www.stsiweb.org/wellderly/
+.. _EXAC: http://exac.broadinstitute.org/
+.. _GRASP: http://iapps.nhlbi.nih.gov/GRASP
 
-Total variants loaded: **286,219,908**
+Total variants loaded: **316,403,311**
 
 +-------------------------------+---------------+---------------------------+----------------------------+
 | Source                        | version       | # of variants             | key name*                  |
 +===============================+===============+===========================+============================+
-| `dbNSFP`_                     |v2.9           | 78,045,379                | dbnsfp                     |
+| `dbNSFP`_                     |v3.0c          | 82,030,830                | dbnsfp                     |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `dbSNP`_                      |v142           | 110,234,210               |dbsnp                       |
+| `dbSNP`_                      |v144           | 145,132,257               |dbsnp                       |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `ClinVar`_                    |20150323       |85,789                     |clinvar                     |
+| `ClinVar`_                    |201509         | 114,627                   |clinvar                     |
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `EVS`_                        | v2            | 1,977,300                 | evs                        |
 +-------------------------------+---------------+---------------------------+----------------------------+
@@ -41,9 +43,9 @@ Total variants loaded: **286,219,908**
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `MutDB`_                      | \-            | 420,221                   |mutdb                       |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `GWAS Catalog`_               |from UCSC      |15,243                     |gwassnps                    |
+| `GWAS Catalog`_               |from UCSC      | 15,243                    |gwassnps                    |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `COSMIC`_                     |v68 from UCSC  |1,024,498                  |cosmic                      |
+| `COSMIC`_                     |v68 from UCSC  | 1,024,498                 |cosmic                      |
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `DOCM`_                       | \-            | 1,119                     | docm                       |
 +-------------------------------+---------------+---------------------------+----------------------------+
@@ -51,23 +53,30 @@ Total variants loaded: **286,219,908**
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `EMVClass`_                   | \-            | 12,066                    |emv                         |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `Scripps Wellderly`_          | \-            |21,240,519                 | wellderly                  |
+| `Scripps Wellderly`_          | \-            | 21,240,519                | wellderly                  |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `EXAC`_                       | v0.3          | 10,195,872                | exac                       |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `GRASP`_                      | v2.0.0.0      | 2,212,148                 | grasp                      |
 +-------------------------------+---------------+---------------------------+----------------------------+
 
-\* key name: this is the key for the specific annotation data in a variant object. 
+\* key name: this is the key for the specific annotation data in a variant object.
 
 The most updated information can be accessed `here <http://myvariant.info/v1/metadata>`_.
+
+.. note:: Each data source may have its own usage restrictions (e.g. `CADD`_ data are free for non-commercial use only). Please refer to the data source pages above for their specific restrictions.
+
 
 .. _variant_object:
 
 Variant object
 ---------------
 
-Variant annotation data are both stored and returned as a variant object, which 
+Variant annotation data are both stored and returned as a variant object, which
 is essentially a collection of fields (attributes) and their values:
 
 .. code-block :: json
-        
+
         {
           "_id": "chr1:g.35367G>A",
           "_version": 2,
@@ -84,7 +93,7 @@ is essentially a collection of fields (attributes) and their values:
               "gene_id": "ENSG00000237613",
             },
             "ref": "G",
-            "type": "SNV"  
+            "type": "SNV"
           },
           "dbnsfp": {
             "aa": {
@@ -110,8 +119,41 @@ is essentially a collection of fields (attributes) and their values:
           }
         }
 
-The example above omits many of the available fields.  For a full example, 
+The example above omits many of the available fields.  For a full example,
 check out `this example variant <http://myvariant.info/v1/variant/chr1:g.35367G%3EA>`_, or try the `interactive API page <http://myvariant.info/v1/api>`_.
+
+
+_id field
+---------
+
+Each individual variant object contains an "**_id**" field as the primary key. We utilize the recommended nomenclature from `Human Genome Variation Society <http://www.hgvs.org>`_ to define the "**_id**" field in MyVariant.info. Specifically, we use HGVS’s genomic reference sequence notation based on the current reference genome assembly (e.g. hg19 for human). The followings are brief representations of major types of genetic variants. More examples could be found at HVGS `recommendations for the description of DNA sequence variants <http://www.hgvs.org/mutnomen/recs-DNA.html>`_ page.
+
+.. note:: The default reference genome assembly is always human hg19 in MyVariant.info, so we only use "chr??" to represent the reference genomic sequence in "**_id**" field. The valid chromosomes representations are **chr1**, **chr2**, ..., **chr22**, **chrX**, **chrY** and **chrMT**. Do not use *chr23* for *chrX*, *chr24* for *chrY*, or *chrM* for *chrMT*.
+
+* SNV example::
+
+      chr1:g.35366C>T
+  
+  The above _id represents a C to T SNV on chromosome 1, genomic position 35366.
+
+* Insertion example::
+
+      chr2:g.17142_17143insA
+  
+  The above _id represents that an A is inserted between genomic position 17142 and 17143 on chromosome 2.
+
+* Deletion example::
+
+    chrMT:g.8271_8279del
+
+  The above _id represents that a nine nucleotides deletion between genomic position 8271 and 8279 on chromosome MT. Note that we don't include the deleted sequence in the _id field in this case.
+
+* Deletion/Insertion example::
+
+    chrX:g.14112_14117delinsTG
+
+  The above _id represents that six nucleotides between genomic position 14112 and 14117 are replaced by TG.
+
 
 .. _available_fields:
 
@@ -154,4 +196,4 @@ or as inputs to the fields parameter, e.g.
         </tbody>
     </table>
 
-    <div id="spacer" style="height:300px"></div> 
+    <div id="spacer" style="height:300px"></div>

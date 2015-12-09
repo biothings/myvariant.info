@@ -9,8 +9,8 @@ __METADATA__ = {
 }
 
 
-## must convert column 3, the coding HGVS nomenclature, to genomic.
-## paste new column to file before loading data
+# must convert column 3, the coding HGVS nomenclature, to genomic.
+# paste new column to file before loading data
 EMV_INPUT_FILE = '/opt/myvariant.info/load_archive/emv/emv.csv'
 
 
@@ -25,7 +25,8 @@ def get_mapping():
             "properties": {
                 "gene": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
+                    "include_in_all": True
                 },
                 "egl_variant": {
                     "type": "string",
@@ -47,7 +48,8 @@ def get_mapping():
                 },
                 "clinvar_rcv": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
+                    "include_in_all": True
                 }
             }
         }

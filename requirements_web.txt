@@ -1,0 +1,16 @@
+# Required python modules for running a web node of MyVariant.info
+# To install all requirement, run
+#    pip install -r requirements_web.txt
+
+# required
+tornado==4.2.1
+elasticsearch==2.0.0
+#   patched pyga for python 3
+-e git+https://github.com/cyrus0824/py-ga-mob.git#egg=pyga
+
+# optional
+msgpack-python==0.4.6
+
+# for nosetests
+nose>=1.3.7
+httplib2>=0.8

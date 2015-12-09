@@ -1,32 +1,56 @@
-import re
-from itertools import imap, groupby
-import os
-
 # Generated Mon Mar 30 11:14:08 2015 by generateDS.py version 2.15a.
 # Command line:
 #   /home/cwu/opt/devpy/bin/generateDS.py -o\
 # "clinvar.py" -s "clinvarsubs.py" /home/cwu/Desktop/clinvar_public.xsd
-import clinvar
+import clinvar1
 
-from utils.dataload import unlist, dict_sweep, \
-    value_convert, merge_duplicate_rows, rec_handler
+
+from utils.dataload1 import unlist, dict_sweep, \
+    value_convert, rec_handler
 
 
 def _map_line_to_json(cp):
-    clinical_siginificance = cp.ReferenceClinVarAssertion.\
-        ClinicalSignificance.Description
+    try:
+        clinical_significance = cp.ReferenceClinVarAssertion.\
+            ClinicalSignificance.Description
+    except:
+        clinical_significance = None
     rcv_accession = cp.ReferenceClinVarAssertion.ClinVarAccession.Acc
-    review_status = cp.ReferenceClinVarAssertion.ClinicalSignificance.\
-        ReviewStatus
-    last_evaluated = cp.ReferenceClinVarAssertion.ClinicalSignificance.\
-        DateLastEvaluated
-    CLINVAR_ID = cp.ReferenceClinVarAssertion.MeasureSet.ID
+    try:
+        review_status = cp.ReferenceClinVarAssertion.ClinicalSignificance.\
+            ReviewStatus
+    except:
+        review_status = None
+    try:
+        last_evaluated = cp.ReferenceClinVarAssertion.ClinicalSignificance.\
+            DateLastEvaluated
+    except:
+        last_evaluated = None
     number_submitters = len(cp.ClinVarAssertion)
     # some items in clinvar_xml doesn't have origin information
     try:
         origin = cp.ReferenceClinVarAssertion.ObservedIn[0].Sample.Origin
     except:
         origin = None
+    trait = cp.ReferenceClinVarAssertion.TraitSet.Trait[0]
+    synonyms = []
+    conditions_name = ''
+    for name in trait.Name:
+        if name.ElementValue.Type == 'Alternate':
+            synonyms.append(name.ElementValue.get_valueOf_())
+        if name.ElementValue.Type == 'Preferred':
+            conditions_name += name.ElementValue.get_valueOf_()
+    identifiers = {}
+    for item in trait.XRef:
+        identifiers[item.DB] = item.ID
+    for symbol in trait.Symbol:
+        if symbol.ElementValue.Type == 'Preferred':
+            conditions_name += ' (' + symbol.ElementValue.get_valueOf_() + ')'
+    age_of_onset = ''
+    for _set in trait.AttributeSet:
+        if _set.Attribute.Type == 'age of onset':
+            age_of_onset = _set.Attribute.get_valueOf_()
+
     # MeasureSet.Measure return a list, there might be multiple
     # Measure under one MeasureSet
     for Measure in cp.ReferenceClinVarAssertion.MeasureSet.Measure:
@@ -160,14 +184,15 @@ def _map_line_to_json(cp):
         else:
             print 'no measure.attribute', rcv_accession
             return
-        other_ids = ''
+        xref = {}
         rsid = None
         # loop through XRef to find rsid as well as other ids
         if Measure.XRef:
             for XRef in Measure.XRef:
                 if XRef.Type == 'rs':
                     rsid = 'rs' + str(XRef.ID)
-                other_ids = other_ids + XRef.DB + ':' + XRef.ID + ';'
+                if XRef.DB != 'dbSNP':
+                    xref[XRef.DB] = XRef.ID
         # make sure the hgvs_id is not none
         if hgvs_id:
             one_snp_json = {
@@ -183,29 +208,38 @@ def _map_line_to_json(cp):
                                 "end": chromEnd
                             },
                         "type": variation_type,
-                        "name": name,
                         "gene":
                             {
                                 "id": gene_id,
                                 "symbol": symbol
                             },
-                        "clinical_significance": clinical_siginificance,
+                        "rcv":
+                            {
+                                "accession": rcv_accession,
+                                "clinical_significance": clinical_significance,
+                                "number_submitters": number_submitters,
+                                "review_status": review_status,
+                                "last_evaluated": str(last_evaluated),
+                                "preferred_name": name,
+                                "origin": origin,
+                                "conditions":
+                                    {
+                                        "name": conditions_name,
+                                        "synonyms": synonyms,
+                                        "identifiers": identifiers,
+                                        "age_of_onset": age_of_onset
+                                    }
+                            },
                         "rsid": rsid,
-                        "rcv_accession": rcv_accession,
-                        "origin": origin,
                         "cytogenic": cytogenic,
-                        "review_status": review_status,
                         "hgvs": HGVS,
-                        "number_submitters": number_submitters,
-                        "last_evaluated": str(last_evaluated),
-                        "other_ids": other_ids,
-                        "clinvar_id": CLINVAR_ID,
+                        "xref": xref,
                         "coding_hgvs_only": coding_hgvs_only,
                         "ref": ref,
                         "alt": alt
                     }
                 }
-            obj = (dict_sweep(unlist(value_convert(one_snp_json)), [None]))
+            obj = (dict_sweep(unlist(value_convert(one_snp_json, ['chrom','OMIM','id'])), [None, '']))
             yield obj
 
 
@@ -219,7 +253,7 @@ def load_data(input_file):
         if record.startswith('\n</ReleaseSet>'):
             continue
         try:
-            record_parsed = clinvar.parseString(record, silence=1)
+            record_parsed = clinvar1.parseString(record, silence=1)
         except:
             print(record)
             raise

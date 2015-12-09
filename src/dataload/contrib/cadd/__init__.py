@@ -1,7 +1,7 @@
-from .cadd_parser import load_contig
-
-
 __METADATA__ = {
+    "requirements": [
+        "pysam>=0.8.1",
+    ],
     "src_name": 'CADD',
     "src_url": 'http://cadd.gs.washington.edu/',
     "version": '1.2',
@@ -71,7 +71,54 @@ def get_mapping():
                         },
                         "genename": {
                             "type": "string",
-                            "analyzer": "string_lowercase"
+                            "analyzer": "string_lowercase",
+                            "include_in_all": True
+                        },
+                        "prot": {
+                            "properties": {
+                                "protpos": {
+                                    "type": "integer",
+                                    "index": "no"
+                                },
+                                "rel_prot_pos": {
+                                    "type": "float",
+                                    "index": "no"
+                                },
+                                "domain": {
+                                    "type": "string",
+                                    "analyzer": "string_lowercase"
+                                }
+                            }
+                        },
+                        "feature_id": {
+                            "type": "string",
+                            "analyzer": "string_lowercase",
+                            "index": "no"
+                        },
+                        "ccds_id": {
+                            "type": "string",
+                            "analyzer": "string_lowercase",
+                            "index": "no"
+                        },
+                        "cds": {
+                            "properties": {
+                                "cdna_pos": {
+                                    "type": "integer",
+                                    "index": "no"
+                                },
+                                "cds_pos": {
+                                    "type": "integer",
+                                    "index": "no"
+                                },
+                                "rel_cdna_pos": {
+                                    "type": "float",
+                                    "index": "no"
+                                },
+                                "rel_cds_pos": {
+                                    "type": "float",
+                                    "index": "no"
+                                }
+                            }
                         }
                     }
                 },

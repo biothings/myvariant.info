@@ -26,7 +26,7 @@ while 1:
         sys.stderr.write("DONE")
         break
 
-    sys.stderr.write("%d\n"%(offset))
+    sys.stderr.write("%d\n" %(offset))
     sys.stderr.flush()
 
     while 1:
@@ -47,8 +47,8 @@ while 1:
         riskAllele = snp[14]
         pValue = snp[16]
 
-        #try:
-        Cursor2 = MySQLHG19_snplocal.cursor()
+        # try:
+        Cursor2 = MySQLHG19.cursor()
         SQLLine = "SELECT observed FROM snp138 WHERE name = '%s'" % (rsid)
         Cursor2.execute(SQLLine)
         if Cursor2.rowcount == 0:
@@ -60,8 +60,8 @@ while 1:
         allele2 = observed[1]
 
         HGVS = "%s:g.%d%s>%s" % (chrom, chromEnd, allele1, allele2)
-        dbSNPdict[HGVS] = { "rsid":rsid, "chrom":chrom, "chromStart":chromStart, "chromEnd":chromEnd, "allele1":allele1, "allele2":allele2, "pubmedID":pubMedID, "trait":trait, "_id":HGVS }
-        #except:
+        dbSNPdict[HGVS] = {"rsid": rsid, "chrom": chrom, "chromStart": chromStart, "chromEnd": chromEnd, "allele1": allele1, "allele2": allele2, "pubmedID": pubMedID, "trait": trait, "_id": HGVS}
+        # except:
         #    continue
         pass
 
@@ -72,5 +72,3 @@ while 1:
     gc.collect()
 
     pass
-
-

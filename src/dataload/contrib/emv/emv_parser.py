@@ -13,8 +13,8 @@ except ImportError:
 
 from utils.dataload import dict_sweep, value_convert, unlist, merge_duplicate_rows
 
-## merge EMV file with genomic ID file
-#def file_merge(emv_file, id_file):
+#  merge EMV file with genomic ID file
+# def file_merge(emv_file, id_file):
 #    os.system("cut -f3 genomic_id.txt > genomic_id3.txt")
 #    os.system("paste -d"," genomic_id3.txt EmVClass.2014-3.csv > emv.csv")
 

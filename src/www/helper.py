@@ -1,7 +1,7 @@
 import json
 import datetime
 import tornado.web
-from ga import GAMixIn
+from utils.ga import GAMixIn
 from collections import OrderedDict
 
 SUPPORT_MSGPACK = True
@@ -26,7 +26,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
     jsonp_parameter = 'callback'
     cache_max_age = 604800  # 7days
     disable_caching = False
-    boolean_parameters = set(['raw', 'rawquery', 'entrezonly', 'ensemblonly', 'dotfield'])
+    boolean_parameters = set(['raw', 'rawquery', 'fetch_all', 'explain', 'jsonld'])
 
     def _check_fields_param(self, kwargs):
         '''support "filter" as an alias of "fields" parameter for back-compatability.'''
@@ -67,6 +67,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
             else:
                 _args[k] = v
         _args.pop(self.jsonp_parameter, None)   # exclude jsonp parameter if passed.
+        _args['host'] = self.request.host
         if SUPPORT_MSGPACK:
             _args.pop('msgpack', None)
         self._check_fields_param(_args)
@@ -80,28 +81,29 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
     #         return None
     #     return tornado.escape.json_decode(user_json)
 
+    def _sort_response_object(self, d, depth=0):
+        '''sort this dictionary.  max_depth is how many levels deep we should sort
+           dictionary keys.  lists are included as a level.
+           depth is the current depth, pretty basic recursion
+        '''
+        max_depth = 6
+        depth += 1
+        if (depth <= max_depth) and isinstance(d, list):
+            return [self._sort_response_object(ds, depth) for ds in d]
+        elif (depth <= max_depth) and isinstance(d, dict):
+            return OrderedDict([(k, self._sort_response_object(d[k], depth)) for k in sorted(d)])
+        else:
+            return d
+
     def return_json(self, data, encode=True, indent=None):
         '''return passed data object as JSON response.
            if <jsonp_parameter> is passed, return a valid JSONP response.
            if encode is False, assumes input data is already a JSON encoded
            string.
         '''
-        # sort this dictionary.  max_depth is how many levels deep we should sort
-        # dictionary keys.  lists are included as a level.  depth is the current depth, pretty basic recursion
-        max_depth = 6
-        depth = 0
+        # call the recursive function to sort the data by keys
+        data = self._sort_response_object(data, depth=0)
 
-        def sort_response_object(d, depth):
-            depth += 1
-            if (depth <= max_depth) and (type(d) is list):
-                return [sort_response_object(ds, depth) for ds in d]
-            elif (depth <= max_depth) and (type(d) is dict):
-                return OrderedDict([(k, sort_response_object(v, depth)) for (k, v) in sorted(d.items(), key=lambda x: x[0])])
-            else:
-                return d
-
-        # actually call the recursive function above to sort the data
-        data = sort_response_object(data, depth)
         indent = indent or 2   # tmp settings
         jsoncallback = self.get_argument(self.jsonp_parameter, '')  # return as JSONP
         if SUPPORT_MSGPACK:
