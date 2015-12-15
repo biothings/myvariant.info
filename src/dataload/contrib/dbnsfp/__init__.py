@@ -8,11 +8,6 @@ __METADATA__ = {
 }
 
 
-def load_data():
-    dbnsfp_data = _load_data(DBNSFP_INPUT_FILE)
-    return dbnsfp_data
-
-
 def get_mapping():
     mapping = {
         "dbnsfp": {
