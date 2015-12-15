@@ -42,8 +42,14 @@ def encode_dict(d):
     '''urllib.urlencode (python 2.x) cannot take unicode string.
        encode as utf-8 first to get it around.
     '''
-    return dict([(key, val.encode('utf-8')) for key, val in d.items()
-                 if isinstance(val, str)])
+    if sys.version_info.major >= 3:
+        # no need to do anything
+        return d
+    else:
+        def smart_encode(s):
+            return s.encode('utf-8') if isinstance(s, unicode) else s   # noqa
+
+        return dict([(key, smart_encode(val)) for key, val in d.items()])
 
 
 def truncate(s, limit):
@@ -255,7 +261,7 @@ def test_query_facets():
 def test_unicode():
     s = '基因'
 
-    get_404(api + '/gene/' + s)
+    get_404(api + '/variant/' + s)
 
     res = json_ok(post_ok(api + '/variant', {'ids': s}))
     eq_(res[0]['notfound'], True)
