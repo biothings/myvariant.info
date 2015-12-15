@@ -18,7 +18,7 @@ class MVScrollSetupError(Exception):
 
 
 class ESQuery():
-    def __init__(self, index=None, doc_type=None, es_host=None):
+    def __init__(self, index=None, doc_type=None, es_host=None, _use_hg38=False):
         self._es = get_es(es_host)
         self._index = index or config.ES_INDEX_NAME
         self._doc_type = doc_type or config.ES_DOC_TYPE

@@ -160,6 +160,8 @@ class MetaDataHandler(BaseHandler):
     disable_caching = True
 
     def get(self):
+        if kwargs.pop('hg38', False):
+            self.esq._use_hg38()
         # For now, just return a hardcoded object, later we'll actually query the ES db for this information
         self.return_json({
             "stats": {
