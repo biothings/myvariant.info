@@ -1,3 +1,5 @@
+from .dbnsfp_parser import load_data as _load_data
+
 
 DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP3.0b2c_variant.chr*'
 
@@ -9,14 +11,21 @@ __METADATA__ = {
 }
 
 
+DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP2.9_variant*'
+
+
+def load_data():
+    dbnsfp_data = _load_data(DBNSFP_INPUT_FILE)
+    return dbnsfp_data
+
+
 def get_mapping():
     mapping = {
         "dbnsfp": {
             "properties": {
                 "rsid": {
                     "type": "string",
-                    "analyzer": "string_lowercase",
-                    "include_in_all": True
+                    "analyzer": "string_lowercase"
                 },
                 "chrom": {
                     "type": "string",
@@ -81,8 +90,7 @@ def get_mapping():
                 },
                 "genename": {
                     "type": "string",
-                    "analyzer": "string_lowercase",
-                    "include_in_all": True
+                    "analyzer": "string_lowercase"
                 },
                 "uniprot": {
                     "properties": {
