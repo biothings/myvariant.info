@@ -8,6 +8,25 @@ __METADATA__ = {
     "field": "cadd"
 }
 
+exome = '/opt/myvariant.info/load_archive/cadd/HumanExome-12v1-1_A_inclAnno.tsv.gz'
+# 1000 Genomes variants SNVs and InDels including all annotations
+thousandgp = '/opt/myvariant.info/load_archive/cadd/1000G_inclAnno.tsv.gz'
+# Exome Aggreation Consortium variants including all annotations
+exac = 'opt/myvariant.info/load_archive/cadd/ExAC.r0.2_inclAnno.tsv.gz'
+# ESP6500 variants SNVs and InDels including all annotations
+esp = 'opt/myvariant.info/load_archive/cadd/ESP6500SI_inclAnno.tsv.gz'
+
+
+def load_data(file, contig):
+    tabix = pysam.Tabixfile(file)
+    fetch = tabix.fetch(contig)
+    rows = map(lambda x: x.split('\t'), fetch)
+    annos = (row for row in rows if "CodingTranscript" in row[9])
+    json_rows = map(_map_line_to_json, annos)
+    json_rows = (row for row in json_rows if row)
+    row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
+    return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
+
 
 def get_mapping():
     mapping = {

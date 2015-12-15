@@ -8,7 +8,7 @@ __METADATA__ = {
     ],
     "src_name": 'dbSNP',
     "src_url": 'http://www.ncbi.nlm.nih.gov/SNP/',
-    "version": '142',
+    "version": '144',
     "field": "dbsnp"
 }
 

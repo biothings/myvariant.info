@@ -2,10 +2,7 @@ from __future__ import print_function
 import time
 import pysam
 from itertools import groupby
-try:
-    import itertools.imap as map
-except ImportError:
-    pass
+from itertools import imap
 from utils.dataload import dict_sweep, unlist, value_convert, merge_duplicate_rows
 from utils.common import timesofar
 from utils.mongo import get_src_db
@@ -200,6 +197,13 @@ def _map_line_to_json(fields):
 
     return dict_sweep(unlist(value_convert(one_snp_json)), ["NA"])
 
+def load_data(contig):
+    tabix = pysam.Tabixfile(whole_genome)
+    fetch = tabix.fetch(contig)
+    for row in fetch:
+        anno = row.split('\t')
+        if 'CodingTranscript' in anno[9]:
+            yield _map_line_to_json(anno)
 
 def fetch_generator(tabix, contig):
     fetch = tabix.fetch(contig)
@@ -219,7 +223,7 @@ def load_contig(contig):
     # CADD_INPUT = exome
     tabix = pysam.Tabixfile(whole_genome)
     src_db = get_src_db()
-    target_coll = src_db["cadd"]
+    target_coll = src_db["cadd_v1.3"]
     t0 = time.time()
     cnt = 0
     docs = (doc for doc in fetch_generator(tabix, contig))
