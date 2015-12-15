@@ -176,7 +176,7 @@ class VariantValidator:
         return out
 
     def validate_src(self, collection, return_false=False,
-                     return_none=False, return_true=False, verbose=False, flag_invalid=False):
+                     return_none=False, return_true=False, verbose=False, flag_invalid=False, generator=False):
         '''Validate hgvs ids from a src collection.'''
 
         return_dict = {
@@ -205,6 +205,44 @@ class VariantValidator:
         cnt_d = {True: 0, False: 0, None: 0}    # cnt_d
         # validate each item in the cursor
         for item in cursor:
+            _id = item['_id']
+            valid = self.validate_hgvs(_id, verbose=verbose)
+            if valid == False and flag_invalid:
+                collection.update({"_id": _id}, {'$set':{"unmatched_ref": "True"}})
+            cnt_d[valid] += 1
+            if return_dict[valid]:
+                out[valid].append(_id)
+
+        # print out counts
+        print("\n# of VALID HGVS IDs:\t{0}".format(cnt_d[True]))
+        print("# of INVALID HGVS IDs:\t{0}".format(cnt_d[False]))
+        print("# of HGVS IDs skipped:\t {0}".format(cnt_d[None]))
+
+        out['summary'] = cnt_d
+        return out
+
+    def validate_generator(self, generator, return_false=False,
+                     return_none=False, return_true=False, verbose=False, flag_invalid=False):
+        '''Validate hgvs ids from a src collection.'''
+
+        return_dict = {
+            False: return_false,
+            True: return_true,
+            None: return_none
+        }
+
+        out = {}
+        print_only = not (return_false or return_none or return_true)
+        if not print_only:
+            # output dictionary, three keys: 'false','true','none'
+            for k in return_dict:
+                if return_dict[k]:
+                    out[k] = []
+
+        # initialize the count
+        cnt_d = {True: 0, False: 0, None: 0}    # cnt_d
+        # validate each item in the cursor
+        for item in generator:
             _id = item['_id']
             valid = self.validate_hgvs(_id, verbose=verbose)
             if valid == False and flag_invalid:
