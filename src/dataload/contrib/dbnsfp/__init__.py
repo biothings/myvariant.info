@@ -1,6 +1,3 @@
-from .dbnsfp_parser import load_data as _load_data
-
-
 DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP3.0b2c_variant.chr*'
 
 __METADATA__ = {
@@ -9,9 +6,6 @@ __METADATA__ = {
     "version": '3.0',
     "field": 'dbnsfp'
 }
-
-
-DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP2.9_variant*'
 
 
 def load_data():
