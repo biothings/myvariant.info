@@ -1,4 +1,3 @@
-
 DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP3.0b2c_variant.chr*'
 
 __METADATA__ = {
@@ -15,8 +14,7 @@ def get_mapping():
             "properties": {
                 "rsid": {
                     "type": "string",
-                    "analyzer": "string_lowercase",
-                    "include_in_all": True
+                    "analyzer": "string_lowercase"
                 },
                 "chrom": {
                     "type": "string",
@@ -81,8 +79,7 @@ def get_mapping():
                 },
                 "genename": {
                     "type": "string",
-                    "analyzer": "string_lowercase",
-                    "include_in_all": True
+                    "analyzer": "string_lowercase"
                 },
                 "uniprot": {
                     "properties": {

@@ -2,10 +2,10 @@
 # Command line:
 #   /home/cwu/opt/devpy/bin/generateDS.py -o\
 # "clinvar.py" -s "clinvarsubs.py" /home/cwu/Desktop/clinvar_public.xsd
-import clinvar1
+import clinvar
 
 
-from utils.dataload1 import unlist, dict_sweep, \
+from utils.dataload import unlist, dict_sweep, \
     value_convert, rec_handler
 
 
@@ -26,6 +26,7 @@ def _map_line_to_json(cp):
             DateLastEvaluated
     except:
         last_evaluated = None
+    variant_id = cp.ReferenceClinVarAssertion.MeasureSet.ID
     number_submitters = len(cp.ClinVarAssertion)
     # some items in clinvar_xml doesn't have origin information
     try:
@@ -42,7 +43,11 @@ def _map_line_to_json(cp):
             conditions_name += name.ElementValue.get_valueOf_()
     identifiers = {}
     for item in trait.XRef:
-        identifiers[item.DB] = item.ID
+        if item.DB == 'Human Phenotype Ontology':
+            key = 'Human_Phenotype_Ontology'
+        else:
+            key = item.DB
+        identifiers[key.lower()] = item.ID
     for symbol in trait.Symbol:
         if symbol.ElementValue.Type == 'Preferred':
             conditions_name += ' (' + symbol.ElementValue.get_valueOf_() + ')'
@@ -64,6 +69,8 @@ def _map_line_to_json(cp):
         chrom = None
         chromStart = None
         chromEnd = None
+        chromStart_38 = None
+        chromEnd_38 = None
         ref = None
         alt = None
         if Measure.SequenceLocation:
@@ -75,6 +82,9 @@ def _map_line_to_json(cp):
                     chromEnd = SequenceLocation.stop
                     ref = SequenceLocation.referenceAllele
                     alt = SequenceLocation.alternateAllele
+                if 'GRCh38' in SequenceLocation.Assembly:
+                    chromStart_38 = SequenceLocation.start
+                    chromEnd_38 = SequenceLocation.stop
         if Measure.MeasureRelationship:
             try:
                 symbol = Measure.MeasureRelationship[0].\
@@ -184,15 +194,25 @@ def _map_line_to_json(cp):
         else:
             print 'no measure.attribute', rcv_accession
             return
-        xref = {}
         rsid = None
+        cosmic = None
+        dbvar = None
+        uniprot = None
+        omim = None
         # loop through XRef to find rsid as well as other ids
         if Measure.XRef:
             for XRef in Measure.XRef:
                 if XRef.Type == 'rs':
                     rsid = 'rs' + str(XRef.ID)
-                if XRef.DB != 'dbSNP':
-                    xref[XRef.DB] = XRef.ID
+                elif XRef.DB == 'COSMIC':
+                    cosmic = XRef.ID
+                elif XRef.DB == 'OMIM':
+                    omim = XRef.ID
+                elif XRef.DB == 'UniProtKB/Swiss-Prot':
+                    uniprot = XRef.ID
+                elif XRef.DB == 'dbVar':
+                    dbvar = XRef.ID
+
         # make sure the hgvs_id is not none
         if hgvs_id:
             one_snp_json = {
@@ -201,11 +221,21 @@ def _map_line_to_json(cp):
                 "clinvar":
                     {
                         "allele_id": allele_id,
+                        "variant_id": variant_id,
                         "chrom": chrom,
+                        "omim": omim,
+                        "cosmic": cosmic,
+                        "uniprot": uniprot,
+                        "dbvar": dbvar,
                         "hg19":
                             {
                                 "start": chromStart,
                                 "end": chromEnd
+                            },
+                        "hg38":
+                            {
+                                "start": chromStart_38,
+                                "end": chromEnd_38
                             },
                         "type": variation_type,
                         "gene":
@@ -233,13 +263,14 @@ def _map_line_to_json(cp):
                         "rsid": rsid,
                         "cytogenic": cytogenic,
                         "hgvs": HGVS,
-                        "xref": xref,
                         "coding_hgvs_only": coding_hgvs_only,
                         "ref": ref,
                         "alt": alt
                     }
                 }
-            obj = (dict_sweep(unlist(value_convert(one_snp_json, ['chrom','OMIM','id'])), [None, '']))
+            obj = (dict_sweep(unlist(value_convert(one_snp_json,
+                                                 ['chrom', 'omim', 'id', 'orphanet', 'gene',
+                                                  'rettbase_(cdkl5)', 'cosmic', 'dbrbc'])), [None, '', 'None']))
             yield obj
 
 
