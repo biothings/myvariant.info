@@ -1,26 +1,11 @@
 from __future__ import print_function
-import time
 import pysam
+import dbm
 from itertools import groupby
-try:
-    import itertools.imap as map
-except ImportError:
-    pass
+from itertools import imap
 from utils.dataload import dict_sweep, unlist, value_convert, merge_duplicate_rows
-from utils.common import timesofar
-from utils.mongo import get_src_db
 from utils.hgvs import get_hgvs_from_vcf
 # tabix file links from CADD http://cadd.gs.washington.edu/download
-# whole genome SNVs including annotations
-whole_genome = 'http://krishna.gs.washington.edu/download/CADD/v1.2/whole_genome_SNVs_inclAnno.tsv.gz'
-# SNV variants on Illumina Exome BeadChip
-exome = '/opt/myvariant.info/load_archive/cadd/HumanExome-12v1-1_A_inclAnno.tsv.gz'
-# 1000 Genomes variants SNVs and InDels including all annotations
-thousandgp = '/opt/myvariant.info/load_archive/cadd/1000G_inclAnno.tsv.gz'
-# Exome Aggreation Consortium variants including all annotations
-exac = 'opt/myvariant.info/load_archive/cadd/ExAC.r0.2_inclAnno.tsv.gz'
-# ESP6500 variants SNVs and InDels including all annotations
-esp = 'opt/myvariant.info/load_archive/cadd/ESP6500SI_inclAnno.tsv.gz'
 
 # number of fields/annotations
 VALID_COLUMN_NO = 116
@@ -198,41 +183,29 @@ def _map_line_to_json(fields):
         }
     }
 
-    return dict_sweep(unlist(value_convert(one_snp_json)), ["NA"])
+    obj = dict_sweep(unlist(value_convert(one_snp_json)), ["NA"])
+    yield obj
+
+
+def load_data(contig):
+    tabix = pysam.Tabixfile('/home/kevinxin/cadd/whole_genome_SNVs_inclAnno.tsv.gz')
+    data = fetch_generator(tabix, contig)
+    for doc in data:
+        yield doc
 
 
 def fetch_generator(tabix, contig):
+    dbfile_path = 'home/kevinxin/cadd/' + 'cadd_id' + contig
+    db = dbm.open(dbfile_path)
+    ids = db.keys()
+    set_ids = set(ids)
+    print(len(ids))
     fetch = tabix.fetch(contig)
-    rows = map(lambda x: x.split('\t'), fetch)
-    annos = (row for row in rows if "CodingTranscript" in row[9])
-    json_rows = map(_map_line_to_json, annos)
+    rows = imap(lambda x: x.split('\t'), fetch)
+#   looking for annotype as 'codingtranscript', 'noncodingtranscript'
+    annos = (row for row in rows if "CodingTranscript" in row[9] or
+             get_hgvs_from_vcf(row[0], row[1], row[2], row[4]) in set_ids)
+    json_rows = imap(_map_line_to_json, annos)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
-
-
-def load_contig(contig):
-    '''save cadd contig into mongodb collection.
-       should be an iterable.
-    '''
-    # if CADD_INPUT == "exome":
-    # CADD_INPUT = exome
-    tabix = pysam.Tabixfile(whole_genome)
-    src_db = get_src_db()
-    target_coll = src_db["cadd"]
-    t0 = time.time()
-    cnt = 0
-    docs = (doc for doc in fetch_generator(tabix, contig))
-    doc_list = []
-    for doc in docs:
-        doc_list.append(doc)
-        cnt += 1
-        if len(doc_list) == 100:
-            target_coll.insert(doc_list, manipulate=False, check_keys=False, w=0)
-            doc_list = []
-        if cnt % 100000 == 0:
-            print(cnt, timesofar(t0))
-    if doc_list:
-        target_coll.insert(doc_list, manipulate=False, check_keys=False, w=0)
-    print("successfully loaded cadd chromosome %s into mongodb" % contig)
-    print("total docs: {}; total time: {}".format(cnt, timesofar(t0)))
