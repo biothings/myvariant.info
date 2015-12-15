@@ -4,7 +4,7 @@ __METADATA__ = {
     ],
     "src_name": 'CADD',
     "src_url": 'http://cadd.gs.washington.edu/',
-    "version": '1.2',
+    "version": '1.3',
     "field": "cadd"
 }
 
