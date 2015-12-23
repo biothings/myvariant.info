@@ -5,9 +5,22 @@ try:
 except:
     from pymongo import MongoClient as Connection
 from config import (DATA_SRC_SERVER, DATA_SRC_PORT, DATA_SRC_DATABASE,
-                    DATA_SERVER_USERNAME, DATA_SERVER_PASSWORD)
+                    DATA_SRC_DUMP_COLLECTION, DATA_SERVER_USERNAME, DATA_SERVER_PASSWORD)
 from utils.common import timesofar, ask
 
+def get_conn(server, port):
+    uri = "mongodb://{}:{}@{}:{}".format(DATA_SERVER_USERNAME,
+                                         DATA_SERVER_PASSWORD,
+                                         server, port)
+    conn = Connection(uri)
+    return conn
+
+def get_src_conn():
+    return get_conn(DATA_SRC_SERVER, DATA_SRC_PORT)
+
+def get_target_db(conn=None):
+    conn = conn or get_conn(DATA_SRC_SERVER, DATA_SRC_PORT)
+    return conn[DATA_SRC_DATABASE]
 
 def get_src_db(conn=None):
     uri = "mongodb://{}:{}@{}:{}/{}".format(DATA_SERVER_USERNAME,
@@ -18,6 +31,9 @@ def get_src_db(conn=None):
     conn = Connection(uri)
     return conn[DATA_SRC_DATABASE]
 
+def get_src_dump(conn=None):
+    conn = conn or get_src_db()
+    return conn[DATA_SRC_DATABASE][DATA_SRC_DUMP_COLLECTION]
 
 def doc_feeder(collection, step=1000, s=None, e=None, inbatch=False, query=None, batch_callback=None, fields=None):
     '''A iterator for returning docs in a collection, with batch query.
@@ -26,11 +42,12 @@ def doc_feeder(collection, step=1000, s=None, e=None, inbatch=False, query=None,
        batch_callback is a callback function as fn(cnt, t), called after every batch
        fields is optional parameter passed to find to restrict fields to return.
     '''
-    cur = collection.find(query, timeout=False, fields=fields)
+    src = get_src_db()
+    cur = src[collection].find()
     n = cur.count()
     s = s or 0
     e = e or n
-    print('Retrieving {} documents from database "{}".'.format(n, collection.name))
+    print('Retrieving {} documents from database "{}".'.format(n, collection))
     t0 = time.time()
     if inbatch:
         doc_li = []

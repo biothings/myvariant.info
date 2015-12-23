@@ -95,7 +95,6 @@ def anyfile(infile, mode='r'):
     if infile is a two value tuple, then first one is the compressed file;
       the second one is the actual filename in the compressed file.
       e.g., ('a.zip', 'aa.txt')
-
     '''
     if isinstance(infile, tuple):
         infile, rawfile = infile[:2]
@@ -122,7 +121,6 @@ def is_filehandle(fh):
 class open_anyfile():
     '''a context manager can be used in "with" stmt.
        accepts a filehandle or anything accepted by anyfile function.
-
         with open_anyfile('test.txt') as in_f:
             do_something()
     '''
@@ -179,10 +177,8 @@ def split_ids(q):
         (either single or double quoted)
         more detailed rules see:
         http://docs.python.org/2/library/shlex.html#parsing-rules
-
         e.g. split_ids('CDK2 CDK3') --> ['CDK2', 'CDK3']
              split_ids('"CDK2 CDK3"\n CDk4')  --> ['CDK2 CDK3', 'CDK4']
-
     '''
     # Python3 strings are already unicode, .encode
     # now returns a bytearray, which cannot be searched with
@@ -277,7 +273,6 @@ def loadobj(filename, mode='file'):
     '''Loads a compressed object from disk file (or file-like handler) or
         MongoDB gridfs file (mode='gridfs')
            obj = loadobj('data.pyobj')
-
            obj = loadobj(('data.pyobj', mongo_db), mode='gridfs')
     '''
     if mode == 'gridfs':

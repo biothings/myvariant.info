@@ -29,7 +29,7 @@ def load_source(collection_name, src_module=None, src_data=None, inbatch=True, n
                 target_coll.insert(doc, manipulate=False, check_keys=False, w=0)
             else:
                 doc_list.append(doc)
-                if len(doc_list) == 100:
+                if len(doc_list) == 2:
                     target_coll.insert(doc_list, manipulate=False, check_keys=False, w=0)
                     doc_list = []
             if cnt % 100000 == 0:

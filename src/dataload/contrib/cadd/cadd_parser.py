@@ -193,6 +193,13 @@ def load_data(contig):
     for doc in data:
         yield doc
 
+def load_data(contig):
+    tabix = pysam.Tabixfile(whole_genome)
+    fetch = tabix.fetch(contig)
+    for row in fetch:
+        anno = row.split('\t')
+        if 'CodingTranscript' in anno[9]:
+            yield _map_line_to_json(anno)
 
 def fetch_generator(tabix, contig):
     dbfile_path = 'home/kevinxin/cadd/' + 'cadd_id' + contig
