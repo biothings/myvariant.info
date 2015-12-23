@@ -165,9 +165,9 @@ class MetaDataHandler(BaseHandler):
         # For now, just return a hardcoded object, later we'll actually query the ES db for this information
         self.return_json({
             "stats": {
-                "total": 316403311,
-                "cadd": 163690986,
-                "clinvar": 114627,
+                "total": 334293173,
+                "cadd": 226932858,
+                "clinvar": 127745,
                 "cosmic": 1024498,
                 "dbnsfp": 82030830,
                 "dbsnp": 145132257,
@@ -179,12 +179,12 @@ class MetaDataHandler(BaseHandler):
                 "gwassnps": 15243,
                 "mutdb": 420221,
                 "snpedia": 5907,
-                "snpeff": 313576885,
+                "snpeff": 316823328,
                 "wellderly": 21240519
             },
             "src_version": {
-                "cadd": "1.2",
-                "clinvar": "201509",
+                "cadd": "1.3",
+                "clinvar": "201511",
                 "cosmic": "68",
                 "dbnsfp": "3.0c",
                 "dbsnp": "144",

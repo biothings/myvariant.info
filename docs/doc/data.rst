@@ -26,7 +26,7 @@ keep them up-to-date, so that you don't have to do it:
 .. _EXAC: http://exac.broadinstitute.org/
 .. _GRASP: http://iapps.nhlbi.nih.gov/GRASP
 
-Total variants loaded: **316,403,311**
+Total variants loaded: **334,293,173**
 
 +-------------------------------+---------------+---------------------------+----------------------------+
 | Source                        | version       | # of variants             | key name*                  |
@@ -35,11 +35,11 @@ Total variants loaded: **316,403,311**
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `dbSNP`_                      |v144           | 145,132,257               |dbsnp                       |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `ClinVar`_                    |201509         | 114,627                   |clinvar                     |
+| `ClinVar`_                    |201511         | 127,745                   |clinvar                     |
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `EVS`_                        | v2            | 1,977,300                 | evs                        |
 +-------------------------------+---------------+---------------------------+----------------------------+
-| `CADD`_                       | v1.2          | 163,690,986               | cadd                       |
+| `CADD`_                       | v1.3          | 226,932,858               | cadd                       |
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `MutDB`_                      | \-            | 420,221                   |mutdb                       |
 +-------------------------------+---------------+---------------------------+----------------------------+
@@ -133,13 +133,13 @@ Each individual variant object contains an "**_id**" field as the primary key. W
 * SNV example::
 
       chr1:g.35366C>T
-  
+
   The above _id represents a C to T SNV on chromosome 1, genomic position 35366.
 
 * Insertion example::
 
       chr2:g.17142_17143insA
-  
+
   The above _id represents that an A is inserted between genomic position 17142 and 17143 on chromosome 2.
 
 * Deletion example::
