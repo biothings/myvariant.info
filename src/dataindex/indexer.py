@@ -124,7 +124,7 @@ def verify_collection(collection, return_ids=False, step=10000):
 
 
 def create_index(index_name, mapping=None):
-    body = {'settings': {'number_of_shards': 10}}
+    body = {'settings': {'number_of_shards': 20}}
     mapping = mapping or get_mapping()
     mapping = {"mappings": mapping}
     body.update(mapping)
