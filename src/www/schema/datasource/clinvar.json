@@ -1,0 +1,6 @@
+{
+    "data_source_name": "clinvar",
+    "data_source_url": "http://www.clinvar.com/",
+    "data_fields": "http://myvariant.info/metadata/fields?search=clinvar",
+    "type": "data source"
+}
