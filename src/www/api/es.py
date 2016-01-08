@@ -23,7 +23,7 @@ class ESQuery():
         self._index = index or config.ES_INDEX_NAME
         self._doc_type = doc_type or config.ES_DOC_TYPE
         self._allowed_options = ['_source', 'start', 'from_', 'size',
-                                 'sort', 'explain', 'version', 'facets', 'fetch_all', 'jsonld', 'host']
+                                 'sort', 'explain', 'version', 'facets', 'fetch_all', 'jsonld']  # , 'host']
         self._scroll_time = '1m'
         self._total_scroll_size = 1000   # Total number of hits to return per scroll batch
         if self._total_scroll_size % self.get_number_of_shards() == 0:

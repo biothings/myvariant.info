@@ -200,6 +200,7 @@ class FieldsHandler(BaseHandler):
     def get(self):
         notes = json.load(open(config.FIELD_NOTES_PATH, 'r'))
         es_mapping = self.esq.query_fields()
+        kwargs = self.get_query_params()
 
         def get_indexed_properties_in_dict(d, prefix):
             r = {}
@@ -221,11 +222,14 @@ class FieldsHandler(BaseHandler):
             return r
 
         r = {}
+        search = kwargs.pop('search', None)
+        prefix = kwargs.pop('prefix', None)
         for (k, v) in get_indexed_properties_in_dict(es_mapping, '').items():
             k1 = k.lstrip('.')
-            r[k1] = v
-            if k1 in notes:
-                r[k1]['notes'] = notes[k1]
+            if (search and search in k1) or (prefix and k1.startswith(prefix)) or (not search and not prefix):
+                r[k1] = v
+                if k1 in notes:
+                    r[k1]['notes'] = notes[k1]
         self.return_json(r)
 
 
