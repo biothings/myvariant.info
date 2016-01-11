@@ -1,4 +1,6 @@
 {
     "field_name": "nmd",
-    "type": "data node"
+    "type": "data node",
+    "path": "snpeff/nmd",
+    "data_source": "snpeff"
 }

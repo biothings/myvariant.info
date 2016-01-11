@@ -1,4 +1,6 @@
 {
     "field_name": "conditions",
-    "type": "data node"
+    "type": "data node",
+    "path": "clinvar/rcv/conditions",
+    "data_source": "clinvar"
 }

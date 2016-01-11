@@ -1,4 +1,6 @@
 {
     "field_name": "lof",
-    "type": "data node"
+    "type": "data node",
+    "path": "snpeff/lof",
+    "data_source": "snpeff"
 }
