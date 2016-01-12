@@ -432,7 +432,11 @@ class ESIndexer():
                 break
             else:
                 for doc in res['hits']['hits']:
-                    yield doc['_source']
+                    _doc = doc['_source']
+                    # "_id" field is not stored by default
+                    # so it may not be returned in _source
+                    _doc.setdefault("_id", doc["_id"])
+                    yield _doc
                     cnt += 1
                 if verbose:
                     print('done.[%.1f%%,%s]' % (min(cnt, n)*100./n, timesofar(t1)))
