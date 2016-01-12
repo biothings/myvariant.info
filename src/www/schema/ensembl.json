@@ -1,0 +1,6 @@
+{
+    "field_name": "ensembl",
+    "type": "data node",
+    "path": "dbnsfp.ensembl",
+    "data_source": "dbnsfp"
+}

@@ -1,0 +1,6 @@
+{
+    "field_name": "uniprot",
+    "type": "data node",
+    "path": "dbnsfp.uniprot",
+    "data_source": "dbnsfp"
+}
