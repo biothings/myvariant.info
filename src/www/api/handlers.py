@@ -190,7 +190,7 @@ class MetaDataHandler(BaseHandler):
                 "exac": "0.3",
                 "grasp": "2.0.0.0"
             },
-            "timestamp": "2015-10-21T07:02:18.178506"
+            "timestamp": "2015-12-28T13:30:10.178506"
         })
 
 
