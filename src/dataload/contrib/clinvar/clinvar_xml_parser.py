@@ -284,7 +284,7 @@ def load_data(input_file):
         if record.startswith('\n</ReleaseSet>'):
             continue
         try:
-            record_parsed = clinvar1.parseString(record, silence=1)
+            record_parsed = clinvar.parseString(record, silence=1)
         except:
             print(record)
             raise

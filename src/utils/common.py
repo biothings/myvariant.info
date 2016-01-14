@@ -335,3 +335,70 @@ def get_random_string():
 
 def get_timestamp():
     return time.strftime('%Y%m%d')
+
+class LogPrint:
+    def __init__(self, log_f, log=1, timestamp=0):
+        '''If this class is set to sys.stdout, it will output both log_f and __stdout__.
+           log_f is a file handler.
+        '''
+        self.log_f = log_f
+        self.log = log
+        self.timestamp = timestamp
+        if self.timestamp:
+            self.log_f.write('*'*10 + 'Log starts at ' + time.ctime() + '*'*10 + '\n')
+
+    def write(self, text):
+        sys.__stdout__.write(text)
+        if self.log:
+            self.log_f.write(text)
+            self.flush()
+
+    def flush(self):
+        self.log_f.flush()
+
+    def start(self):
+        sys.stdout = self
+
+    def pause(self):
+        sys.stdout = sys.__stdout__
+
+    def resume(self):
+        sys.stdout = self
+
+    def close(self):
+        if self.timestamp:
+            self.log_f.write('*'*10 + 'Log ends at ' + time.ctime() + '*'*10 + '\n')
+        sys.stdout = sys.__stdout__
+        self.log_f.close()
+
+    def fileno(self):
+        return self.log_f.fileno()
+
+
+def safewfile(filename, prompt=True, default='C', mode='w'):
+    '''return a file handle in 'w' mode,use alternative name if same name exist.
+       if prompt == 1, ask for overwriting,appending or changing name,
+       else, changing to available name automatically.'''
+    suffix = 1
+    while 1:
+        if not os.path.exists(filename):
+            break
+        print('Warning:"%s" exists.' % filename, end='')
+        if prompt:
+            option = ask('Overwrite,Append or Change name?', 'OAC')
+        else:
+            option = default
+        if option == 'O':
+            if not prompt or ask('You sure?') == 'Y':
+                print("Overwritten.")
+                break
+        elif option == 'A':
+            print("Append to original file.")
+            f = open(filename, 'a')
+            f.write('\n' + "=" * 20 + 'Appending on ' + time.ctime() + "=" * 20 + '\n')
+            return f, filename
+        print('Use "%s" instead.' % addsuffix(filename, '_' + str(suffix)))
+        filename = addsuffix(filename, '_' + str(suffix))
+        suffix += 1
+    return open(filename, mode), filename
+

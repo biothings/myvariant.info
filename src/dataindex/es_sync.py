@@ -1,8 +1,8 @@
-import jsonpatch
-
+from __future__ import print_function
 import config
 from utils.es import ESIndexer, get_es
 from utils.mongo import get_src_db
+from utils.diff import apply_patch
 
 
 class ESSyncer():
@@ -27,7 +27,6 @@ class ESSyncer():
             if len(id_list) == 100:
                 id_list_all += self._esi.mexists(id_list)
                 id_list = []
-                print cnt
         if id_list:
             id_list_all += self._esi.mexists(id_list)
         cnt_update = 0
@@ -54,8 +53,8 @@ class ESSyncer():
                 }
                 cnt_create += 1
             yield es_info
-        print 'items updated: ', cnt_update
-        print 'items newly created: ', cnt_create
+        print('items updated: ', cnt_update)
+        print('items newly created: ', cnt_create)
 
     def delete(self, field, ids):
         cnt_update = 0
@@ -65,7 +64,7 @@ class ESSyncer():
             if self._esi.exists(_id):
                 doc = self._esi.get_variant(_id)['_source']
                 # case one: only exist target field, or target field/snpeff/vcf, then we need to delete this item
-                if set(doc) == set(['_id', field]) or set(doc) == set(['_id', field, 'snpeff', 'vcf']):
+                if set(doc) == set([field]) or set(doc) == set([field, 'snpeff', 'vcf']):
                     es_info = {
                         '_op_type': 'delete',
                         '_index': self._index,
@@ -87,19 +86,19 @@ class ESSyncer():
                     cnt_update += 1
                 yield es_info
             else:
-                print 'id not exists: ', _id
-        print 'items updated: ', cnt_update
-        print 'items deleted: ', cnt_delete
+                print('id not exists: ', _id)
+        print('items updated: ', cnt_update)
+        print('items deleted: ', cnt_delete)
 
     def _update_one(self, _id, _patch):
         doc = self._esi.get_variant(_id)['_source']
-        doc = jsonpatch.apply_patch(doc, _patch)
+        doc = apply_patch(doc, _patch)
         es_info = {
-            '_op_type': 'update',
+            '_op_type': 'create',
             '_index': self._index,
             '_type': self._doc_type,
             "_id": _id,
-            'doc': doc
+            '_source': doc
         }
         return es_info
 
@@ -111,5 +110,15 @@ class ESSyncer():
                 _es_info = self._update_one(_id, _patch)
                 yield _es_info
             else:
-                print 'id not exists:', _id
+                print('id not exists:', _id)
 
+    def update1(self, id_patchs):
+        for _id_patch in id_patchs:
+            _id = _id_patch['_id']
+            _patch = _id_patch['patch']
+            if self._esi.exists(_id):
+                _es_info = self._update_one(_id, _patch)
+                self._esi.delete_doc(_id)
+                yield _es_info
+            else:
+                print('id not exists:', _id)

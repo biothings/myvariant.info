@@ -1,3 +1,4 @@
+from dataload.contrib.clinvar.clinvar_dump import main
 # -*- coding: utf-8 -*-
 __METADATA__ = {
     "src_name": 'clinvar',
@@ -7,6 +8,10 @@ __METADATA__ = {
 }
 
 # -*- coding: utf-8 -*-
+
+
+def download():
+    return main()
 
 
 def get_mapping():
