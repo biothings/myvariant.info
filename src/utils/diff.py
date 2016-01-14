@@ -5,7 +5,7 @@ from __future__ import print_function
 import jsonpatch
 import time
 import os.path
-from utils.common import timesofar
+from utils.common import timesofar, get_timestamp
 from utils.backend import GeneDocMongoDBBackend, GeneDocESBackend
 from utils.mongo import get_src_db
 from utils.es import ESIndexer
@@ -161,7 +161,9 @@ def diff_collections(b1, b2, use_parallel=True, step=10000):
 
     changes = {'update': _updates,
                'delete': _deletes,
-               'add': _adds}
+               'add': _adds,
+               'source': b2.target_collection.name,
+               'timestamp': get_timestamp()}
     return changes
 
 
