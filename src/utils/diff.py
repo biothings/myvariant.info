@@ -13,7 +13,7 @@ from utils import jsondiff
 
 
 def apply_patch(doc, patch):
-    return jsonpatch.apply_path(doc, patch)
+    return jsonpatch.apply_patch(doc, patch)
 
 
 def diff_doc(doc_1, doc_2, exclude_attrs=['_timestamp']):
