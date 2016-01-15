@@ -138,6 +138,7 @@ class ESSyncer():
         bulk(self._es, add_list)
         bulk(self._es, delete_list)
         bulk(self._es, update_list)
+        print('wait 2 min for es to prepare')
         sleep(120)
         if validate:
             q = {
