@@ -207,7 +207,7 @@ class FieldsHandler(BaseHandler):
             for (k, v) in d.items():
                 r[prefix + '.' + k] = {}
                 r[prefix + '.' + k]['indexed'] = False
-                if 'type' in v:
+                if 'properties' not in v:
                     r[prefix + '.' + k]['type'] = v['type']
                     if ('index' not in v) or ('index' in v and v['index'] != 'no'):
                         # indexed field
