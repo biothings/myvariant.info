@@ -1,8 +1,12 @@
 from __future__ import print_function
+from time import sleep
 import config
+from elasticsearch.helpers import bulk
 from utils.es import ESIndexer, get_es
 from utils.mongo import get_src_db
-from utils.diff import apply_patch
+from utils.diff import apply_patch, diff_collections, get_backend
+from utils.common import loadobj, get_random_string
+from dataload.__init__ import load_source
 
 
 class ESSyncer():
@@ -122,3 +126,37 @@ class ESSyncer():
                 yield _es_info
             else:
                 print('id not exists:', _id)
+
+    def main(self, index, collection, diff_filepath, validate=False):
+        self._index = index
+        self._esi._index = index
+        diff = loadobj(diff_filepath)
+        source_collection = diff['source']
+        add_list = self.add(source_collection, diff['add'])
+        delete_list = self.delete(collection, diff['delete'])
+        update_list = self.update1(diff['update'])
+        bulk(self._es, add_list)
+        bulk(self._es, delete_list)
+        bulk(self._es, update_list)
+        sleep(120)
+        if validate:
+            q = {
+                "query": {
+                    "constant_score": {
+                        "filter": {
+                            "exists": {
+                                "field": collection
+                            }
+                        }
+                    }
+                }
+            }
+            data = self._esi.doc_feeder(query=q, _source=collection)
+            temp_collection = collection + '_temp_' + get_random_string()
+            self._src[temp_collection].drop()
+            load_source(temp_collection, src_data=data)
+            c1 = get_backend(source_collection, 'mongodb')
+            c2 = get_backend(temp_collection, 'mongodb')
+            diff_result = diff_collections(c1, c2, use_parallel=False)
+            self._src[temp_collection].drop()
+            return diff_result
