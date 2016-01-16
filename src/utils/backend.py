@@ -277,14 +277,14 @@ class GeneDocCouchDBBackend(GeneDocBackendBase):
         for i in range(0, len(doc_li), step):
             output.extend(self.target_db.update(doc_li[i:i+step]))
             if verbose:
-                print '\t%d-%d Done [%s]...' % (i+1, min(i+step, len(doc_li)), timesofar(t0))
+                print('\t%d-%d Done [%s]...' % (i+1, min(i+step, len(doc_li)), timesofar(t0)))
 
         res = list2dict(list_itemcnt([x[0] for x in output]), 0)
-        print "Done![%s, %d OK, %d Error]" % (timesofar(t0), res.get(True, 0), res.get(False, 0))
+        print("Done![%s, %d OK, %d Error]" % (timesofar(t0), res.get(True, 0), res.get(False, 0)))
         res = listsort(list_itemcnt([x[2].args[0] for x in output if x[0] is False]), 1, reverse=True)
-        print '\n'.join(['\t%s\t%d' % x for x in res[:10]])
+        print('\n'.join(['\t%s\t%d' % x for x in res[:10]]))
         if len(res) > 10:
-            print "\t%d lines omitted..." % (len(res)-10)
+            print("\t%d lines omitted..." % (len(res)-10))
 
     def _homologene_trimming(self, species_li):
         '''A special step to remove species not included in <species_li>
@@ -338,7 +338,7 @@ class GeneDocCouchDBBackend(GeneDocBackendBase):
             self._homologene_trimming(species_li)
             #perform final updates now
             #self.target_db.update(self._doc_cache.values())
-            print "Now doing the actual updating..."
+            print("Now doing the actual updating...")
             self._db_upload(self._doc_cache.values())
             self._doc_cache = {}
         self.target_db.commit()
