@@ -5,7 +5,7 @@ from utils.common import get_timestamp, get_random_string, timesofar
 from utils.mongo import get_src_db, get_src_master
 
 
-def load_source(collection_name, src_module=None, src_data=None, inbatch=True, new_collection=True):
+def load_source(collection_name, src_module=None, src_data=None, inbatch=True, new_collection=True, step=1000):
     '''save src data into mongodb collection.
        if src_module is provided, src_data = src_module.load_data()
        if new_collection is True, it requires the target collection is empty.
@@ -26,11 +26,11 @@ def load_source(collection_name, src_module=None, src_data=None, inbatch=True, n
         for doc in src_data:
             cnt += 1
             if not inbatch:
-                target_coll.insert(doc, manipulate=False, check_keys=False, w=0)
+                target_coll.insert_one(doc)
             else:
                 doc_list.append(doc)
-                if len(doc_list) == 100:
-                    target_coll.insert(doc_list, manipulate=False, check_keys=False, w=0)
+                if len(doc_list) == step:
+                    target_coll.insert_many(doc_list)
                     doc_list = []
             if cnt % 100000 == 0:
                 print(cnt, timesofar(t0))
