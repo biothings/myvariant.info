@@ -2,11 +2,33 @@
 # Command line:
 #   /home/cwu/opt/devpy/bin/generateDS.py -o\
 # "clinvar.py" -s "clinvarsubs.py" /home/cwu/Desktop/clinvar_public.xsd
-import clinvar
-
+import clinvar1
+from itertools import groupby
 
 from utils.dataload import unlist, dict_sweep, \
     value_convert, rec_handler
+
+
+def merge_rcv_accession(generator):
+    groups = []
+    for key, group in groupby(generator, lambda x: x['_id']):
+        groups.append(list(group))
+
+    # get the number of groups, and uniquekeys
+    print "number of groups: ", len(groups), "\n"
+
+    # loop through each item, if item number >1, merge rcv accession number
+    for item in groups:
+        rcv_new = []
+        if len(item) > 1:
+            json_item = item[0]
+            for _item in item:
+                    rcv_info = _item['clinvar']['rcv']
+                    rcv_new.append(rcv_info)
+            json_item['clinvar']['rcv'] = rcv_new
+            yield json_item
+        else:
+            yield item[0]
 
 
 def _map_line_to_json(cp):
@@ -258,7 +280,7 @@ def _map_line_to_json(cp):
                                         "synonyms": synonyms,
                                         "identifiers": identifiers,
                                         "age_of_onset": age_of_onset
-                                    }
+                                }
                             },
                         "rsid": rsid,
                         "cytogenic": cytogenic,
@@ -267,10 +289,10 @@ def _map_line_to_json(cp):
                         "ref": ref,
                         "alt": alt
                     }
-                }
+            }
             obj = (dict_sweep(unlist(value_convert(one_snp_json,
-                                                 ['chrom', 'omim', 'id', 'orphanet', 'gene',
-                                                  'rettbase_(cdkl5)', 'cosmic', 'dbrbc'])), [None, '', 'None']))
+                                                   ['chrom', 'omim', 'id', 'orphanet', 'gene',
+                                                    'rettbase_(cdkl5)', 'cosmic', 'dbrbc'])), [None, '', 'None']))
             yield obj
 
 
@@ -284,7 +306,7 @@ def load_data(input_file):
         if record.startswith('\n</ReleaseSet>'):
             continue
         try:
-            record_parsed = clinvar.parseString(record, silence=1)
+            record_parsed = clinvar1.parseString(record, silence=1)
         except:
             print(record)
             raise
