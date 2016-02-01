@@ -155,7 +155,7 @@ class ESIndexer():
         '''add a doc to the index. If id is not None, the existing doc will be
            updated.
         '''
-        return self._es.index(self.ES_INDEX_NAME, self.ES_INDEX_TYPE, doc, id=id)
+        return self._es.index(self._index, self._doc_type, doc, id=id)
 
     def index_bulk(self, docs, step=None):
         index_name = self._index
@@ -515,7 +515,7 @@ def get_metadata(index):
     stats = {}
     t = ESIndexer()
     t._index = index
-    m['total'] = t.count()
+    stats['total'] = t.count()
 
     for _src in data_src:
         stats[_src] = t.count_src(_src)[_src]
