@@ -3,31 +3,31 @@
         "@context": {
             "rsid": "http://identifiers.org/dbsnp/",
             "genename": "http://identifiers.org/hgnc.symbol/",
-            "cadd": "http://example.org/cadd/",
-            "clinvar": "http://example.org/clinvar/",
-            "dbnsfp": "http://example.org/dbnsfp/",
-            "dbsnp": "http://example.org/dbsnp/",
-            "docm": "http://example.org/docm/",
-            "emv": "http://example.org/emv/",
-            "evs": "http://example.org/evs/",
-            "gwassnps": "http://example.org/gwassnps/",
-            "mutdb": "http://example.org/mutdb/",
-            "snpeff": "http://example.org/snpeff/",
-            "gene": "http://example.org/gene/",
-            "rcv": "http://example.org/rcv/",
-            "conditions": "http://example.org/conditions",
-            "identifiers": "http://example.org/identifiers",
-            "uniprot": "http://example.org/uniprot",
-            "ensembl": "http://example.org/ensembl/",
-            "ann": "http://example.org/ann/",
-            "lof": "http://example.org/lof/",
-            "nmd": "http://example.org/nmd/"
+            "cadd": "http://schema.myvariant.info/datasource/cadd/",
+            "clinvar": "http://schema.myvariant.info/datasource/clinvar/",
+            "dbnsfp": "http://schema.myvariant.info/datasource/dbnsfp/",
+            "dbsnp": "http://schema.myvariant.info/datasource/dbsnp/",
+            "docm": "http://schema.myvariant.info/datasource/docm/",
+            "emv": "http://schema.myvariant.info/datasource/emv/",
+            "evs": "http://schema.myvariant.info/datasource/evs/",
+            "gwassnps": "http://schema.myvariant.info/datasource/gwassnps/",
+            "mutdb": "http://schema.myvariant.info/datasource/mutdb/",
+            "snpeff": "http://schema.myvariant.info/datasource/snpeff/",
+            "gene": "http://schema.myvariant.info/datanode/gene/",
+            "rcv": "http://schema.myvariant.info/datanode/rcv/",
+            "conditions": "http://schema.myvariant.info/datanode/conditions/",
+            "identifiers": "http://schema.myvariant.info/datanode/identifiers/",
+            "uniprot": "http://schema.myvariant.info/datanode/uniprot/",
+            "ensembl": "http://schema.myvariant.info/datanode/ensembl/",
+            "ann": "http://schema.myvariant.info/datanode/ann/",
+            "lof": "http://schema.myvariant.info/datanode/lof/",
+            "nmd": "http://schema.myvariant.info/datanode/nmd/"
         }
     },
     "cadd/gene": {
         "@context": {
             "feature_id": "http://identifiers.org/ensembl/",
-            "gene_id": "http://identifiers.org/ensembl",
+            "gene_id": "http://identifiers.org/ensembl/",
             "ccds_id": "http://identifiers.org/ccds/"
         }
     },
@@ -39,7 +39,7 @@
     },
     "clinvar/rcv": {
         "@context": {
-            "accession": "http://identifer.org/clinvar"
+            "accession": "http://identifers.org/clinvar/"
         }
     },
     "clinvar/rcv/conditions/identifiers": {
@@ -61,9 +61,9 @@
     },
     "dbnsfp/ensembl": {
         "@context": {
-            "transcripid": "http://identifiers.org/ensembl",
-            "geneid": "http://identifiers.org/ensembl",
-            "proteinid": "http://identifiers.org/ensembl"
+            "transcripid": "http://identifiers.org/ensembl/",
+            "geneid": "http://identifiers.org/ensembl/",
+            "proteinid": "http://identifiers.org/ensembl/"
         }
     },
     "dbsnp/gene": {
@@ -73,8 +73,8 @@
     },
     "docm": {
         "@context": {
-            "ensembl_gene_id": "http://identifiers.org/ensembl",
-            "transcript_name": "http://identifiers.org/ensembl",
+            "ensembl_gene_id": "http://identifiers.org/ensembl/",
+            "transcript_name": "http://identifiers.org/ensembl/",
             "default_gene_name": "http://identifiers.org/hgnc.symbol/"
         }
     },
