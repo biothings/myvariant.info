@@ -9,6 +9,10 @@ function extractLast( term ) {
     return split( term ).pop();
 }
 
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
 function successHandler(data, textStatus, jqXHR) {
     jQuery('.introduction').hide();
     jQuery('.json-view').remove();
@@ -75,6 +79,8 @@ jQuery(document).ready(function() {
         var queryText = jQuery('#main-input').val();
         var fieldsText = jQuery('#fields-input').val();
         if(!(fieldsText)) {fieldsText = 'all';}
+        if(endsWith(fieldsText, ', ')) {fieldsText = fieldsText.substring(0, fieldsText.length - 2);}
+        if(endsWith(fieldsText, ',')) {fieldsText = fieldsText.substring(0, fieldsText.length - 1);}
         if(searchType == 1) {
             // HGVS ID query
             errorHandler("Query executing . . .", "executing");
