@@ -21,8 +21,8 @@ function successHandler(data, textStatus, jqXHR) {
     jQuery('.results').html("<div class='json-panel'><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button></div><div class='json-view'></div>").show();
     jQuery('.json-view').JSONView(data); //, {collapsed: true});
     jQuery('.json-view').JSONView('expand');
-    jQuery('#expand-json').click(function() {jQuery('json-view').JSONView('expand');});
-    jQuery('#collapse-json').click(function() {jQuery('json-view').JSONView('collapse');});
+    jQuery('#expand-json').click(function() {jQuery('.json-view').JSONView('expand');});
+    jQuery('#collapse-json').click(function() {jQuery('.json-view').JSONView('collapse');});
 }
 
 function errorHandler(message, m_class) {
