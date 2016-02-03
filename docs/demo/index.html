@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/jquery-ui.min.css" rel="stylesheet">
+    <link href="css/jquery.jsonview.css" rel="stylesheet">
+    <!--<link href="css/bootstrap.min.css" rel="stylesheet">-->
+    <link href="css/front.css" rel="stylesheet">
+    <script src="js/jquery-1.12.0.min.js"></script>
+    <!--<script src="js/bootstrap.min.js"></script>-->
+    <!--<script src="js/typeahead.js"></script>-->
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/jquery.jsonview.js"></script>
+</head>
+<body>
+    <script type="text/javascript">
+        var theseFields = ['all'];
+
+        function split( val ) {
+            return val.split( /,\s*/ );
+        }
+        function extractLast( term ) {
+            return split( term ).pop();
+        }
+ 
+        jQuery(document).ready(function() {
+            var serverAddress = 'myvariant.info';
+            // Get the available fields
+            jQuery.get('https://' + serverAddress + '/metadata/fields').done(
+                function(data) {
+                    // success, get the fields
+                    jQuery.each(data, function(key, value) {theseFields.push(key)});
+                    jQuery( "#fields-input" )
+                      // don't navigate away from the field on tab when selecting an item
+                      .bind( "keydown", function( event ) {
+                        if ( event.keyCode === jQuery.ui.keyCode.TAB &&
+                            $( this ).autocomplete( "instance" ).menu.active ) {
+                          event.preventDefault();
+                        }
+                      })
+                      .autocomplete({
+                        minLength: 2,
+                        source: function( request, response ) {
+                          // delegate back to autocomplete, but extract the last term
+                          response( jQuery.ui.autocomplete.filter(
+                            theseFields, extractLast( request.term ) ) );
+                        },
+                        focus: function() {
+                          // prevent value inserted on focus
+                          return false;
+                        },
+                        select: function( event, ui ) {
+                          var terms = split( this.value );
+                          // remove the current input
+                          terms.pop();
+                          // add the selected item
+                          terms.push( ui.item.value );
+                          // add placeholder to get the comma-and-space at the end
+                          terms.push( "" );
+                          this.value = terms.join( ", " );
+                          return false;
+                        }
+                      });
+                }
+            ).fail(
+                function() {
+                    // couldn't get fields
+                    console.log("Error getting available fields.");
+                }
+            );
+
+            // Make this a button
+            jQuery('button').button();
+            // Make this a select menu widget
+            jQuery('#search-type').selectmenu({
+                change: function() {
+                    if(jQuery(this).val() == 1) {
+                        // Query by HGVS ID
+                        jQuery('#main-input').val("");
+                        jQuery('#main-input').attr('placeholder', 'Enter comma separated HGVS ids here');
+                        jQuery('#main-input').prop('disabled', false);
+                        jQuery("#fields-input").prop('disabled', false);
+                        jQuery("#query-param-group").hide();                    
+                    }
+                    else if(jQuery(this).val() == 2) {
+                        jQuery('#main-input').val("");
+                        jQuery('#main-input').attr('placeholder', 'Enter query here');
+                        jQuery('#main-input').prop('disabled', false);
+                        jQuery("#fields-input").prop('disabled', false);
+                        jQuery("#query-param-group").show();                    
+                    }
+                    else if(jQuery(this).val() == 3) {
+                        jQuery('#main-input').val("");
+                        jQuery('#main-input').attr('placeholder', 'Query myvariant.info metadata');
+                        jQuery('#main-input').prop('disabled', true);
+                        jQuery("#fields-input").prop('disabled', true);
+                        jQuery("#query-param-group").hide();                    
+                    }
+                    else if(jQuery(this).val() == 4) {
+                        jQuery('#main-input').val("");
+                        jQuery('#main-input').attr('placeholder', 'Query myvariant.info available fields');
+                        jQuery('#main-input').prop('disabled', true);
+                        jQuery("#fields-input").prop('disabled', true);
+                        jQuery("#query-param-group").hide();                    
+                    }
+                }
+            });
+        });
+    </script>
+    <div class='top-navbar'>
+        <div class='navbar-row'>
+            <select id="search-type">
+                <option value="1" selected="selected">HGVS ID</option>
+                <option value="2">Text Query</option>
+                <option value="3">Metadata</option>
+                <option value="4">Available Fields</option>
+            </select>
+            <input type="text" id="main-input" placeholder="Enter comma separated HGVS ids here">
+            <button type="button" class='ui-button ui-corner-all ui-widget ui-state-default'>Search</button>
+        </div>
+        <div class='navbar-row'>
+            <label for="fields-input">Return Fields</label>
+            <input type="text" id="fields-input" value="all">
+        </div>
+    </div>
+
+    <div class="container">
+
+
+    </div> <!-- /container -->
+
+</body>
+</html>
