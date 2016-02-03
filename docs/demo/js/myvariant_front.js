@@ -15,13 +15,20 @@ function endsWith(str, suffix) {
 
 function successHandler(data, textStatus, jqXHR) {
     jQuery('.introduction').hide();
+    jQuery('.json-panel button').remove();
+    jQuery('.json-panel').remove();
     jQuery('.json-view').remove();
-    jQuery('.results').html("<div class='json-view'></div>").show();
+    jQuery('.results').html("<div class='json-panel'><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button></div><div class='json-view'></div>").show();
     jQuery('.json-view').JSONView(data); //, {collapsed: true});
+    jQuery('.json-view').JSONView('expand');
+    jQuery('#expand-json').click(function() {jQuery('json-view').JSONView('expand');});
+    jQuery('#collapse-json').click(function() {jQuery('json-view').JSONView('collapse');});
 }
 
 function errorHandler(message, m_class) {
     jQuery('.introduction').hide();
+    jQuery('.json-panel button').remove();
+    jQuery('.json-panel').remove();
     jQuery('.json-view').remove();
     jQuery('.results').html("<p class='" + m_class + "'>" + message + "</p>").show();
 }
