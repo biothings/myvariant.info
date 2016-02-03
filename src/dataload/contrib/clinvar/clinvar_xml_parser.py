@@ -216,6 +216,8 @@ def _map_line_to_json(cp):
         else:
             print 'no measure.attribute', rcv_accession
             return
+        for key in HGVS:
+            HGVS[key].sort()
         rsid = None
         cosmic = None
         dbvar = None
@@ -296,7 +298,7 @@ def _map_line_to_json(cp):
             yield obj
 
 
-def load_data(input_file):
+def rcv_feeder(input_file):
     # the first two line of clinvar_xml is not useful information
     cv_data = rec_handler(input_file, block_end='</ClinVarSet>\n',
                           skip=2, include_block_end=True)
@@ -312,3 +314,10 @@ def load_data(input_file):
             raise
         for record_mapped in _map_line_to_json(record_parsed):
             yield record_mapped
+
+def load_data(input_file):
+    data_generator = rcv_feeder(input_file)
+    data_list = list(data_generator)
+    data_list_sorted = sorted(data_list, key=lambda k: k['_id'])
+    data_merge_rcv = merge_rcv_accession(data_list_sorted)
+    return data_merge_rcv
