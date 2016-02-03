@@ -17,7 +17,7 @@ function successHandler(data, textStatus, jqXHR) {
     jQuery('.introduction').hide();
     jQuery('.json-view').remove();
     jQuery('.results').html("<div class='json-view'></div>").show();
-    jQuery('.json-view').JSONView(data, {collapsed: true});
+    jQuery('.json-view').JSONView(data); //, {collapsed: true});
 }
 
 function errorHandler(message, m_class) {
