@@ -1,0 +1,31 @@
+body {
+    margin: 0px;
+}
+#main-input {
+    width: 500px;
+    font-size: 0.8em;
+    margin-right: 8px;
+}
+#fields-input {
+    width: 300px;
+}
+.ui-widget {
+    font-size: 0.8em;
+}
+.ui-selectmenu-button {
+    width: 140px !important;
+    float: left;
+    margin-right: 8px;
+}
+.navbar-row {
+    width: 100%;
+    float: left;
+    padding-left:50px;
+    padding-top:5px;
+    padding-bottom:5px;
+}
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
