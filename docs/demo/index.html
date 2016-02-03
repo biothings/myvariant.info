@@ -26,9 +26,9 @@
         }
  
         jQuery(document).ready(function() {
-            var serverAddress = '52.89.71.55';
+            var serverAddress = 'myvariant.info';
             // Get the available fields
-            jQuery.get('http://' + serverAddress + '/metadata/fields').done(
+            jQuery.get('https://' + serverAddress + '/metadata/fields').done(
                 function(data) {
                     // success, get the fields
                     jQuery.each(data, function(key, value) {theseFields.push(key)});
