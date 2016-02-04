@@ -32,6 +32,7 @@ body {
     z-index: 0;
     position: absolute;
     min-height: 1px;
+    padding-top: 10px;
     padding-left: 10px;
     padding-right: 10px;
     padding-bottom: 10px;
@@ -117,4 +118,17 @@ body {
     max-height: 200px;
     overflow-x: hidden;
     overflow-y: auto;
+}
+.json-panel {
+    margin-bottom: 10px;
+}
+.error {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 0.8em;
+    color: red;
+}
+.executing {
+    color: black;
+    font-size: 0.8em;
+    font-family: Verdana, Geneva, sans-serif;
 }
