@@ -8,6 +8,8 @@ import config
 # a query to get variants with most of fields:
 # _exists_:dbnsfp AND _exists_:dbsnp AND _exists_:mutdb AND _exists_:cosmic AND _exists_:clinvar AND _exists_:gwassnps
 
+HG38_FIELDS = ['clinvar.hg38', 'dbnsfp.hg38','evs.hg38']
+HG19_FIELDS = ['dbnsfp.hg19', 'dbsnp.hg19', 'evs.hg19', 'mutdb.hg19', 'docm.hg19']
 
 class MVQueryError(Exception):
     pass
@@ -26,6 +28,7 @@ class ESQuery():
                                  'sort', 'explain', 'version', 'facets', 'fetch_all', 'jsonld']  # , 'host']
         self._scroll_time = '1m'
         self._total_scroll_size = 1000   # Total number of hits to return per scroll batch
+        self._hg38 = _use_hg38
         if self._total_scroll_size % self.get_number_of_shards() == 0:
             # Total hits per shard per scroll batch
             self._scroll_size = int(self._total_scroll_size / self.get_number_of_shards())
@@ -34,7 +37,22 @@ class ESQuery():
                                      "divided evenly among {} shards.".format(self.get_number_of_shards()))
 
     def _use_hg38(self):
-        self._index = config.ES_INDEX_NAME_HG38
+        self._hg38 = True
+
+    def _use_hg19(self):
+        self._hg38 = False
+
+    def _get_genome_assembly_type(self):
+        if self._hg38:
+            try:
+                return config.HG38_FIELDS 
+            except AttributeError:
+                return HG38_FIELDS
+        else:
+            try:
+                return config.HG19_FIELDS
+            except AttributeError:
+                return HG19_FIELDS
 
     def _get_variantdoc(self, hit):
         doc = hit.get('_source', hit.get('fields', {}))
@@ -358,13 +376,12 @@ class ESQuery():
                 }
             }
         }
-        hg19_interval_fields = ['dbnsfp.hg19', 'dbsnp.hg19', 'evs.hg19', 'mutdb.hg19', 'docm.hg19']
-        for field in hg19_interval_fields:
+        for field in self._get_genome_assembly_type():
             _q = {
                 "bool": {
                     "must": [
                         {
-                            "term": {"chrom": chr.lower()}
+                            "term": {field.split(".")[0] + ".chrom": chr.lower()}
                         },
                         {
                             "range": {field + ".start": {"lte": gend}}
@@ -376,6 +393,7 @@ class ESQuery():
                 }
             }
             _query["query"]["bool"]["should"].append(_q)
+            print(_query)
         return self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **kwargs)
 
     def query_fields(self, **kwargs):

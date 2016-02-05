@@ -26,6 +26,7 @@ class VariantHandler(BaseHandler):
         '''
         if vid:
             kwargs = self.get_query_params()
+            self.esq._use_hg19()
             if kwargs.pop('hg38', False):
                 self.esq._use_hg38()
             variant = self.esq.get_variant(vid, **kwargs)
@@ -48,6 +49,7 @@ class VariantHandler(BaseHandler):
             email
         '''
         kwargs = self.get_query_params()
+        self.esq._use_hg19()
         if kwargs.pop('hg38', False):
             self.esq._use_hg38()
         ids = kwargs.pop('ids', None)
@@ -84,6 +86,7 @@ class QueryHandler(BaseHandler):
             raw
         '''
         kwargs = self.get_query_params()
+        self.esq._use_hg19()
         if kwargs.pop('hg38', False):
             self.esq._use_hg38()
         q = kwargs.pop('q', None)
@@ -128,6 +131,7 @@ class QueryHandler(BaseHandler):
             jsoninput   if true, input "q" is a json string, must be decoded as a list.
         '''
         kwargs = self.get_query_params()
+        self.esq._use_hg19()
         if kwargs.pop('hg38', False):
             self.esq._use_hg38()
         q = kwargs.pop('q', None)
