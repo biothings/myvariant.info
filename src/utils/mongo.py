@@ -31,6 +31,10 @@ def get_src_db(conn=None):
     conn = Connection(uri)
     return conn[DATA_SRC_DATABASE]
 
+def get_src_master(conn=None):
+    conn = conn or get_src_conn()
+    return conn[DATA_SRC_DATABASE][DATA_SRC_MASTER_COLLECTION]
+
 def get_src_dump(conn=None):
     conn = conn or get_src_db()
     return conn[DATA_SRC_DATABASE][DATA_SRC_DUMP_COLLECTION]
