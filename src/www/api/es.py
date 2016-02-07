@@ -8,8 +8,11 @@ import config
 # a query to get variants with most of fields:
 # _exists_:dbnsfp AND _exists_:dbsnp AND _exists_:mutdb AND _exists_:cosmic AND _exists_:clinvar AND _exists_:gwassnps
 
-HG38_FIELDS = ['clinvar.hg38', 'dbnsfp.hg38','evs.hg38']
-HG19_FIELDS = ['dbnsfp.hg19', 'dbsnp.hg19', 'evs.hg19', 'mutdb.hg19', 'docm.hg19']
+HG38_FIELDS = ['clinvar.hg38', 'dbnsfp.hg38', 'evs.hg38']
+HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19', 'dbsnp.hg19', 'docm.hg19', 'evs.hg19', 'grasp.hg19', 'mutdb.hg19', 'wellderly.hg19']
+CHROM_FIELDS = ['cadd.chrom', 'clinvar.chrom', 'cosmic.chrom', 'dbnsfp.chrom', 'dbsnp.chrom', 'docm.chrom',
+                'evs.chrom', 'exac.chrom', 'mutdb.chrom', 'wellderly.chrom']
+
 
 class MVQueryError(Exception):
     pass
@@ -45,7 +48,7 @@ class ESQuery():
     def _get_genome_assembly_type(self):
         if self._hg38:
             try:
-                return config.HG38_FIELDS 
+                return config.HG38_FIELDS
             except AttributeError:
                 return HG38_FIELDS
         else:
@@ -53,6 +56,12 @@ class ESQuery():
                 return config.HG19_FIELDS
             except AttributeError:
                 return HG19_FIELDS
+
+    def _get_chrom_fields(self):
+        try:
+            return config.CHROM_FIELDS
+        except AttributeError:
+            return CHROM_FIELDS
 
     def _get_variantdoc(self, hit):
         doc = hit.get('_source', hit.get('fields', {}))
@@ -369,31 +378,58 @@ class ESQuery():
         #         }
         #     }
         # }
+        #_query = {
+        #    "query": {
+        #        "bool": {
+        #            "must": []
+        #        }
+        #    }
+        #}
         _query = {
             "query": {
                 "bool": {
-                    "should": []
+                    "must": [{
+                        "bool": {
+                            "should": [{
+                                "term": {field: chr.lower()}
+                            } for field in self._get_chrom_fields()]
+                        }
+                    }, {
+                        "bool": {
+                            "should": [{
+                                "bool": {
+                                    "must": [
+                                        {
+                                            "range": {field + ".start": {"lte": gend}}
+                                        },
+                                        {
+                                            "range": {field + ".end": {"gte": gstart}}
+                                        }
+                                    ]
+                                }
+                            } for field in self._get_genome_assembly_type()]
+                        }
+                    }]
                 }
             }
         }
-        for field in self._get_genome_assembly_type():
-            _q = {
-                "bool": {
-                    "must": [
-                        {
-                            "term": {field.split(".")[0] + ".chrom": chr.lower()}
-                        },
-                        {
-                            "range": {field + ".start": {"lte": gend}}
-                        },
-                        {
-                            "range": {field + ".end": {"gte": gstart}}
-                        }
-                    ]
-                }
-            }
-            _query["query"]["bool"]["should"].append(_q)
-            print(_query)
+        #for field in self._get_genome_assembly_type():
+        #    _q = {
+        #        "bool": {
+        #            "must": [
+        #                {
+        #                    "term": {field.split(".")[0] + ".chrom": chr.lower()}
+        #                },
+        #                {
+        #                    "range": {field + ".start": {"lte": gend}}
+        #                },
+        #                {
+        #                    "range": {field + ".end": {"gte": gstart}}
+        #                }
+        #            ]
+        #        }
+        #    }
+        #    _query["query"]["bool"]["must"].append(_q)
         return self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **kwargs)
 
     def query_fields(self, **kwargs):
