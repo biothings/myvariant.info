@@ -31,7 +31,7 @@ function successHandler(data, textStatus, jqXHR) {
     jQuery('#expand-json').click(function() {jQuery('.json-view').JSONView('expand');});
     jQuery('#collapse-json').click(function() {jQuery('.json-view').JSONView('collapse');});
     if('total' in data) {
-        jQuery('#total-text').html(data['total'] + " total results.  Showing most relevant " + jQuery('#size-input') + ".");
+        jQuery('#total-text').html(data['total'] + " total results.  Showing most relevant " + jQuery('#size-input').val() + ".").show();
     }
 }
 
@@ -137,6 +137,7 @@ jQuery(document).ready(function() {
                 jQuery('#main-input').prop('disabled', false);
                 jQuery("#fields-input").prop('disabled', false);
                 jQuery("#size-input").hide();
+                jQuery("label[for='size-input']").hide();
             }
             else if(jQuery(this).val() == 2) {
                 jQuery('#main-input').val("");
@@ -144,6 +145,7 @@ jQuery(document).ready(function() {
                 jQuery('#main-input').prop('disabled', false);
                 jQuery("#fields-input").prop('disabled', false);
                 jQuery("#size-input").show();
+                jQuery("label[for='size-input']").show();
             }
             else if(jQuery(this).val() == 3) {
                 jQuery('#main-input').val("");
@@ -152,6 +154,7 @@ jQuery(document).ready(function() {
                 jQuery('#main-input').prop('disabled', true);
                 jQuery("#fields-input").prop('disabled', true);
                 jQuery("#size-input").hide();
+                jQuery("label[for='size-input']").hide();
             }
             else if(jQuery(this).val() == 4) {
                 jQuery('#main-input').val("");
@@ -160,6 +163,7 @@ jQuery(document).ready(function() {
                 jQuery('#main-input').prop('disabled', true);
                 jQuery("#fields-input").prop('disabled', true);
                 jQuery("#size-input").hide();
+                jQuery("label[for='size-input']").hide();
             }
         }
     });

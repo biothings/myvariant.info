@@ -124,6 +124,8 @@ body {
 }
 #total-text {
     display: none;
+    margin-bottom: 9px;
+    margin-top: 0px;
 }
 #size-input {
     display: none;
@@ -137,4 +139,7 @@ body {
     color: black;
     font-size: 0.8em;
     font-family: Verdana, Geneva, sans-serif;
+}
+label[for="size-input"] {
+    display: none;
 }
