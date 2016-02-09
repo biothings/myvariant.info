@@ -122,6 +122,9 @@ body {
 .json-panel {
     margin-bottom: 10px;
 }
+#total-text {
+    display: none;
+}
 .error {
     font-family: Verdana, Geneva, sans-serif;
     font-size: 0.8em;

@@ -1,6 +1,12 @@
 var theseFields = ['all'];
 var serverAddress = 'myvariant.info';
 
+function htmlEncode(value){
+  //create a in-memory div, set it's inner text(which jQuery automatically encodes)
+  //then grab the encoded contents back out.  The div never exists on the page.
+  return jQuery('<div/>').text(value).html().replace(/&/g,'%26');
+}
+
 function split( val ) {
     return val.split( /,\s*/ );
 }
@@ -18,12 +24,15 @@ function successHandler(data, textStatus, jqXHR) {
     jQuery('.json-panel button').remove();
     jQuery('.json-panel').remove();
     jQuery('.json-view').remove();
-    jQuery('.results').html("<div class='json-panel'><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button></div><div class='json-view'></div>").show();
+    jQuery('.results').html("<div class='json-panel'><p id='total-text'></p><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button></div><div class='json-view'></div>").show();
     jQuery('.json-panel button').button();
     jQuery('.json-view').JSONView(data); //, {collapsed: true});
     jQuery('.json-view').JSONView('expand');
     jQuery('#expand-json').click(function() {jQuery('.json-view').JSONView('expand');});
     jQuery('#collapse-json').click(function() {jQuery('.json-view').JSONView('collapse');});
+    if('total' in data) {
+        jQuery('#total-text').html(data['total'] + " total results.  Showing most relevant " + jQuery('#size-input') + ".");
+    }
 }
 
 function errorHandler(message, m_class) {
@@ -84,8 +93,8 @@ jQuery(document).ready(function() {
         // Search button click handler
         var searchType = jQuery('#search-type').val();
         var endpointBase = 'https://' + serverAddress;
-        var queryText = jQuery('#main-input').val();
-        var fieldsText = jQuery('#fields-input').val();
+        var queryText = htmlEncode(jQuery('#main-input').val());
+        var fieldsText = htmlEncode(jQuery('#fields-input').val());
         if(!(fieldsText)) {fieldsText = 'all';}
         if(endsWith(fieldsText, ', ')) {fieldsText = fieldsText.substring(0, fieldsText.length - 2);}
         if(endsWith(fieldsText, ',')) {fieldsText = fieldsText.substring(0, fieldsText.length - 1);}
@@ -102,13 +111,10 @@ jQuery(document).ready(function() {
             }
         }
         else if(searchType == 2) {
+            var querySize = jQuery('#size-input').val();
             // Full text query
             errorHandler("Query executing . . .", "executing");
-            //jQuery.ajax(endpointBase + '/v1/query?q=' + queryText + '&fields=' + fieldsText, {
-            //    success: successHandler,
-            //    error: function(jqXHR, textStatus, errorThrown) {errorHandler("Couldn't retreive results for query " + jQuery('#main-input').val() + "."); console.log(jqXHR); console.log(textStatus); console.log(errorThrown);}
-            //});
-            jQuery.get(endpointBase + '/v1/query?q=' + queryText + '&fields=' + fieldsText).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
+            jQuery.get(endpointBase + '/v1/query?q=' + queryText + '&fields=' + fieldsText '&size=' + querySize).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
         }
         else if(searchType == 3) {
             // metadata query
@@ -130,14 +136,14 @@ jQuery(document).ready(function() {
                 jQuery('#main-input').attr('placeholder', 'Enter comma separated HGVS ids here');
                 jQuery('#main-input').prop('disabled', false);
                 jQuery("#fields-input").prop('disabled', false);
-                jQuery("#query-param-group").hide();
+                jQuery("#size-input").hide();
             }
             else if(jQuery(this).val() == 2) {
                 jQuery('#main-input').val("");
                 jQuery('#main-input').attr('placeholder', 'Enter query here');
                 jQuery('#main-input').prop('disabled', false);
                 jQuery("#fields-input").prop('disabled', false);
-                jQuery("#query-param-group").show();
+                jQuery("#size-input").show();
             }
             else if(jQuery(this).val() == 3) {
                 jQuery('#main-input').val("");
@@ -145,7 +151,7 @@ jQuery(document).ready(function() {
                 jQuery('#main-input').attr('placeholder', 'No input accepted');
                 jQuery('#main-input').prop('disabled', true);
                 jQuery("#fields-input").prop('disabled', true);
-                jQuery("#query-param-group").hide();
+                jQuery("#size-input").hide();
             }
             else if(jQuery(this).val() == 4) {
                 jQuery('#main-input').val("");
@@ -153,7 +159,7 @@ jQuery(document).ready(function() {
                 jQuery('#main-input').attr('placeholder', 'No input accepted');
                 jQuery('#main-input').prop('disabled', true);
                 jQuery("#fields-input").prop('disabled', true);
-                jQuery("#query-param-group").hide();
+                jQuery("#size-input").hide();
             }
         }
     });
