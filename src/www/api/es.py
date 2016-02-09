@@ -273,8 +273,9 @@ class ESQuery():
             scroll_options.update({'search_type': 'scan', 'size': self._scroll_size, 'scroll': self._scroll_time})
         options['kwargs'].update(scroll_options)
         if interval_query:
-            options['kwargs'].update(interval_query)
-            res = self.query_interval(**options.kwargs)
+            _query = self.build_interval_query(chr=interval_query["chr"],
+                                               gstart=interval_query["gstart"],
+                                               gend=interval_query["gend"], **options['kwargs'])
         else:
             _query = {
                 "query": {
@@ -286,10 +287,14 @@ class ESQuery():
             }
             if facets:
                 _query['facets'] = facets
-            try:
-                res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
-            except RequestError:
-                return {"error": "invalid query term.", "success": False}
+
+        if options.rawquery:
+            return _query
+
+        try:
+            res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
+        except RequestError:
+            return {"error": "invalid query term.", "success": False}
 
         # if options.fetch_all:
         #     return res
@@ -335,7 +340,7 @@ class ESQuery():
             if mat:
                 return mat.groupdict()
 
-    def query_interval(self, chr, gstart, gend, **kwargs):
+    def build_interval_query(self, chr, gstart, gend, **kwargs):
         #gstart = safe_genome_pos(gstart)
         #gend = safe_genome_pos(gend)
         if chr.lower().startswith('chr'):
@@ -430,7 +435,7 @@ class ESQuery():
         #        }
         #    }
         #    _query["query"]["bool"]["must"].append(_q)
-        return self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **kwargs)
+        return _query
 
     def query_fields(self, **kwargs):
         # query the metadata to get the available fields for a variant object
