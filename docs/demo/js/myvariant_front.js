@@ -31,7 +31,7 @@ function successHandler(data, textStatus, jqXHR) {
     jQuery('#expand-json').click(function() {jQuery('.json-view').JSONView('expand');});
     jQuery('#collapse-json').click(function() {jQuery('.json-view').JSONView('collapse');});
     if('total' in data) {
-        jQuery('#total-text').html(data['total'] + " total results.  Showing most relevant " + jQuery('#size-input').val() + ".").show();
+        jQuery('#total-text').html(data['total'] + " total results.  Showing most relevant " + data["hits"].length + ".").show();
     }
 }
 
