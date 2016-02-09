@@ -114,7 +114,7 @@ jQuery(document).ready(function() {
             var querySize = jQuery('#size-input').val();
             // Full text query
             errorHandler("Query executing . . .", "executing");
-            jQuery.get(endpointBase + '/v1/query?q=' + queryText + '&fields=' + fieldsText '&size=' + querySize).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
+            jQuery.get(endpointBase + '/v1/query?q=' + queryText + '&fields=' + fieldsText + '&size=' + querySize).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
         }
         else if(searchType == 3) {
             // metadata query
