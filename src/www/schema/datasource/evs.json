@@ -1,5 +1,5 @@
 {
     "data_source_name": "evs",
     "data_source_uri": "http://evs.gs.washington.edu/EVS/",
-    "data_fields": "http://myvariant.info/metadata/fields?search=evs"
+    "data_fields": "http://myvariant.info/metadata/fields?prefix=evs"
 }
