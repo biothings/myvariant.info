@@ -87,6 +87,9 @@ jQuery(document).ready(function() {
             console.log("Error getting available fields.");
         }
     );
+    // genome assembly
+    jQuery('#genome-assembly').buttonset();
+
     // variant examples
     jQuery('.variant-example a').click(function() {
         if(jQuery(this).data().example == "1") {
@@ -110,6 +113,13 @@ jQuery(document).ready(function() {
             jQuery('#main-input').val("_exists_:clinvar.hg38");
             jQuery("#fields-input").val("clinvar");
             jQuery("#size-input").val("10").selectmenu('refresh', true);
+        }
+        else if(jQuery(this).data().example == "3") { 
+            jQuery('#main-input').val("chr1:69000-70000");
+            jQuery("#fields-input").val("");
+            jQuery("#size-input").val("100").selectmenu('refresh', true);
+            jQuery("#hg19").prop("checked", true);
+            jQuery("#genome-assembly").buttonset('refresh', true);
         }
         else if(jQuery(this).data().example == "help") { 
             
@@ -140,9 +150,12 @@ jQuery(document).ready(function() {
         }
         else if(searchType == 2) {
             var querySize = jQuery('#size-input').val();
+            var gaType = jQuery('#genome-assembly input:checked').val();
+            if(gaType == 'hg38') {gaType = '&hg38=True';}
+            else {gaType = '';}
             // Full text query
             errorHandler("Query executing . . .", "executing");
-            jQuery.get(endpointBase + '/v1/query?q=' + queryText + '&fields=' + fieldsText + '&size=' + querySize).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
+            jQuery.get(endpointBase + '/v1/query?q=' + queryText + '&fields=' + fieldsText + '&size=' + querySize + gaType).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
         }
         else if(searchType == 3) {
             // metadata query
@@ -169,6 +182,8 @@ jQuery(document).ready(function() {
                 jQuery("#fields-input").prop('disabled', false);
                 jQuery("#size-input-button").hide();
                 jQuery("label[for='size-input-button']").hide();
+                jQuery("#genome-assembly").hide();
+                jQuery("label[for='genome-assembly']").hide();
                 jQuery(".examples").hide();
                 jQuery(".variant-example").show();
             }
@@ -179,6 +194,8 @@ jQuery(document).ready(function() {
                 jQuery("#fields-input").prop('disabled', false);
                 jQuery("#size-input-button").show();
                 jQuery("label[for='size-input-button']").show();
+                jQuery("#genome-assembly").show();
+                jQuery("label[for='genome-assembly']").show();
                 jQuery(".examples").hide();
                 jQuery(".query-example").show();
             }
@@ -190,6 +207,8 @@ jQuery(document).ready(function() {
                 jQuery("#fields-input").prop('disabled', true);
                 jQuery("#size-input-button").hide();
                 jQuery("label[for='size-input-button']").hide();
+                jQuery("#genome-assembly").hide();
+                jQuery("label[for='genome-assembly']").hide();
                 jQuery(".examples").hide();
                 jQuery(".filler").show();
             }
@@ -201,6 +220,8 @@ jQuery(document).ready(function() {
                 jQuery("#fields-input").prop('disabled', true);
                 jQuery("#size-input-button").hide();
                 jQuery("label[for='size-input-button']").hide();
+                jQuery("#genome-assembly").hide();
+                jQuery("label[for='genome-assembly']").hide();
                 jQuery(".examples").hide();
                 jQuery(".filler").show();
             }
