@@ -1,4 +1,4 @@
-var theseFields = ['all'];
+var theseFields = [];
 var serverAddress = 'myvariant.info';
 
 function htmlEncode(value){
@@ -31,7 +31,7 @@ function successHandler(data, textStatus, jqXHR) {
     jQuery('#expand-json').click(function() {jQuery('.json-view').JSONView('expand');});
     jQuery('#collapse-json').click(function() {jQuery('.json-view').JSONView('collapse');});
     if('total' in data) {
-        jQuery('#total-text').html(data['total'] + " total results.  Showing most relevant " + data["hits"].length + ".").show();
+        jQuery('#total-text').html(data['total'] + " total results.  Showing top " + data["hits"].length + " results.").show();
     }
 }
 
@@ -87,6 +87,34 @@ jQuery(document).ready(function() {
             console.log("Error getting available fields.");
         }
     );
+    // variant examples
+    jQuery('.variant-example a').click(function() {
+        if(jQuery(this).data().example == "1") {
+            jQuery("#main-input").val("chr1:g.35366C>T");
+            jQuery("#fields-input").val("");
+        }
+        else if(jQuery(this).data().example == "2") { 
+            jQuery("#main-input").val("chr2:g.17142_17143insA");
+            jQuery("#fields-input").val("");
+        }
+    });
+
+    // query examples
+    jQuery('.query-example a').click(function() {
+        if(jQuery(this).data().example == "1") { 
+            jQuery("#main-input").val("dbnsfp.genename:CDK*");
+            jQuery("#fields-input").val("");
+            jQuery("#size-input").val("10").selectmenu('refresh', true);
+        }
+        else if(jQuery(this).data().example == "2") { 
+            jQuery('#main-input').val("_exists_:clinvar.hg38");
+            jQuery("#fields-input").val("clinvar");
+            jQuery("#size-input").val("10").selectmenu('refresh', true);
+        }
+        else if(jQuery(this).data().example == "help") { 
+            
+        }
+    });
 
     // Make this a button
     jQuery('#search-button').button().click(function() {
@@ -127,6 +155,9 @@ jQuery(document).ready(function() {
             jQuery.get(endpointBase + '/metadata/fields').done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve available fields.  API error.", "error");});
         }
     });
+    // Select menu is a widget
+    jQuery('#size-input').selectmenu();
+
     // Make this a select menu widget
     jQuery('#search-type').selectmenu({
         change: function() {
@@ -136,34 +167,42 @@ jQuery(document).ready(function() {
                 jQuery('#main-input').attr('placeholder', 'Enter comma separated HGVS ids here');
                 jQuery('#main-input').prop('disabled', false);
                 jQuery("#fields-input").prop('disabled', false);
-                jQuery("#size-input").hide();
-                jQuery("label[for='size-input']").hide();
+                jQuery("#size-input-button").hide();
+                jQuery("label[for='size-input-button']").hide();
+                jQuery(".examples").hide();
+                jQuery(".variant-example").show();
             }
             else if(jQuery(this).val() == 2) {
                 jQuery('#main-input').val("");
                 jQuery('#main-input').attr('placeholder', 'Enter query here');
                 jQuery('#main-input').prop('disabled', false);
                 jQuery("#fields-input").prop('disabled', false);
-                jQuery("#size-input").show();
-                jQuery("label[for='size-input']").show();
+                jQuery("#size-input-button").show();
+                jQuery("label[for='size-input-button']").show();
+                jQuery(".examples").hide();
+                jQuery(".query-example").show();
             }
             else if(jQuery(this).val() == 3) {
                 jQuery('#main-input').val("");
-                jQuery('#fields-input').val("all");
+                jQuery('#fields-input').val("");
                 jQuery('#main-input').attr('placeholder', 'No input accepted');
                 jQuery('#main-input').prop('disabled', true);
                 jQuery("#fields-input").prop('disabled', true);
-                jQuery("#size-input").hide();
-                jQuery("label[for='size-input']").hide();
+                jQuery("#size-input-button").hide();
+                jQuery("label[for='size-input-button']").hide();
+                jQuery(".examples").hide();
+                jQuery(".filler").show();
             }
             else if(jQuery(this).val() == 4) {
                 jQuery('#main-input').val("");
-                jQuery('#fields-input').val("all");
+                jQuery('#fields-input').val("");
                 jQuery('#main-input').attr('placeholder', 'No input accepted');
                 jQuery('#main-input').prop('disabled', true);
                 jQuery("#fields-input").prop('disabled', true);
-                jQuery("#size-input").hide();
-                jQuery("label[for='size-input']").hide();
+                jQuery("#size-input-button").hide();
+                jQuery("label[for='size-input-button']").hide();
+                jQuery(".examples").hide();
+                jQuery(".filler").show();
             }
         }
     });

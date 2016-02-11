@@ -30,10 +30,23 @@
             <button id="search-button" type="button" class='ui-button ui-corner-all ui-widget ui-state-default'>Search</button>
         </div>
         <div class='navbar-row second'>
+            <p class='examples variant-example'><a href="javascript:;" data-example="1">chr1:g.35366C>T</a><a href="javascript:;" data-example="2">chr2:g.17142_17143insA</a></p>
+            <p class='examples query-example'><a href="javascript:;" data-example="1">dbnsfp.genename:CDK*</a><a href="javascript:;" data-example="2">_exists_:clinvar.hg38</a><a href="http://docs.myvariant.info/en/latest/doc/variant_query_service.html#query-syntax" target="_blank" class="help-link">Help?</a></p>
+            <p class='examples filler'>&nbsp;</p>
+        </div>
+        <div class='navbar-row third'>
             <label for="fields-input">Return Fields:</label>
-            <input type="text" id="fields-input" value="all">
+            <input type="text" id="fields-input" placeholder="all">
             <label for="size-input">Size:</label>
-            <input type="number" id="size-input" value="10" min="0" max="1000">
+            <select id="size-input">
+                <option value="1">1</option>
+                <option value="10" selected="selected">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+            </select>
+            <!--<input type="number" id="size-input" value="10" min="0" max="1000">-->
         </div>
     </div>
 
