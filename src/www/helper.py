@@ -54,6 +54,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
                 #            " can put other stuff here, or make a special "
                 #            "404 error template.</body></html>")
                 self.return_json({'notfound': True, 'error': 'input id is invalid'})
+                self.finish()
             else:
                 self.finish("<html><title>%(code)d: %(message)s</title>"
                             "<body>%(code)d: %(message)s</body></html>" % {
