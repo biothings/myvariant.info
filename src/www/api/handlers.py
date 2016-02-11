@@ -25,6 +25,9 @@ class VariantHandler(BaseHandler):
             email
         '''
         if vid:
+            if re.search('chr[0-9]?:[0-9]+', self.request.uri):
+                # redirect if they forgot the g.
+                self.redirect(':g.'.join(self.request.uri.split(':')))
             kwargs = self.get_query_params()
             self.esq._use_hg19()
             if kwargs.pop('hg38', False):
