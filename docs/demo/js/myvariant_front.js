@@ -37,7 +37,7 @@ function errorHandler(message, m_class) {
     jQuery('.results').html("<p class='" + m_class + "'>" + message + "</p>").show();
 }
 
-jQuery(document).ready(function() {
+aQuery(document).ready(function() {
     // Get the available fields
     jQuery.get('https://' + serverAddress + '/metadata/fields').done(
         function(data) {
@@ -83,6 +83,18 @@ jQuery(document).ready(function() {
     );
     // genome assembly
     jQuery('#genome-assembly').buttonset();
+    jQuery("#hg19").button("option", "icons", { primary: 'ui-icon-check' });
+    jQuery("#hg38").button("option", "icons", { primary: 'ui-icon-check' });
+
+    jQuery("#genome-assembly input[type=radio]").on("click", function () {
+        jQuery("#genome-assembly input[type=radio]").each(function () {
+            if (jQuery(this).is(":checked")) {
+                jQuery(this).button("option", "icons", { primary: 'ui-icon-check' });
+            } else {
+                jQuery(this).button("option", "icons", { primary: 'ui-icon-cancel' });
+            }
+        });
+    });
 
     // variant examples
     jQuery('.variant-example a').click(function() {
