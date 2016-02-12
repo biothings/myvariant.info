@@ -1,12 +1,6 @@
 var theseFields = [];
 var serverAddress = 'myvariant.info';
 
-function htmlEncode(value){
-  //create a in-memory div, set it's inner text(which jQuery automatically encodes)
-  //then grab the encoded contents back out.  The div never exists on the page.
-  return jQuery('<div/>').text(value).html().replace(/&/g,'%26');
-}
-
 function split( val ) {
     return val.split( /,\s*/ );
 }
@@ -131,8 +125,8 @@ jQuery(document).ready(function() {
         // Search button click handler
         var searchType = jQuery('#search-type').val();
         var endpointBase = 'https://' + serverAddress;
-        var queryText = htmlEncode(jQuery('#main-input').val());
-        var fieldsText = htmlEncode(jQuery('#fields-input').val());
+        var queryText = encodeURIComponent(jQuery('#main-input').val());
+        var fieldsText = encodeURIComponent(jQuery('#fields-input').val());
         if(!(fieldsText)) {fieldsText = 'all';}
         if(endsWith(fieldsText, ', ')) {fieldsText = fieldsText.substring(0, fieldsText.length - 2);}
         if(endsWith(fieldsText, ',')) {fieldsText = fieldsText.substring(0, fieldsText.length - 1);}
