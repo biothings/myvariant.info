@@ -89,8 +89,6 @@ jQuery(document).ready(function() {
 
     jQuery("#genome-assembly input[type=radio]").on("click", function () {
         jQuery("#genome-assembly input[type=radio]").each(function () {
-            console.log(this);
-            console.log(jQuery(this));
             if (jQuery(this).is(":checked")) {
                 jQuery("label[for='" + jQuery(this).attr('id') + "'] span.ui-icon-check").show();
             } else {
@@ -109,6 +107,10 @@ jQuery(document).ready(function() {
             jQuery("#main-input").val("chr2:g.17142_17143insA");
             jQuery("#fields-input").val("");
         }
+        else if(jQuery(this).data().example == "3") { 
+            jQuery("#main-input").val("chrMT:g.8271_8279del");
+            jQuery("#fields-input").val("");
+        }
     });
 
     // query examples
@@ -119,14 +121,14 @@ jQuery(document).ready(function() {
             jQuery("#size-input").val("10").selectmenu('refresh', true);
         }
         else if(jQuery(this).data().example == "2") { 
-            jQuery('#main-input').val("_exists_:clinvar.hg38");
-            jQuery("#fields-input").val("clinvar");
+            jQuery('#main-input').val("exac.ac.ac_adj:[76640 TO 80000]");
+            jQuery("#fields-input").val("");
             jQuery("#size-input").val("10").selectmenu('refresh', true);
         }
         else if(jQuery(this).data().example == "3") { 
             jQuery('#main-input').val("chr1:69000-70000");
             jQuery("#fields-input").val("");
-            jQuery("#size-input").val("100").selectmenu('refresh', true);
+            jQuery("#size-input").val("10").selectmenu('refresh', true);
             jQuery("#hg19").prop("checked", true);
             jQuery("#genome-assembly").buttonset('refresh', true);
         }

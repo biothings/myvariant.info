@@ -103,7 +103,7 @@
     font-size: 0.8em;
     float: left;
     margin-left: 5px;
-    margin-top: 1px;
+    margin-top: 2px;
 }
 .ui-widget {
     font-size: 0.8em;
@@ -215,4 +215,6 @@ label[for="genome-assembly"] {
     display: none;
     float: left;
     margin-left: 5px;
+    font-size: 0.8em;
+    margin-top: 1px;
 }
