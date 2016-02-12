@@ -335,10 +335,16 @@ class ESQuery():
             , otherwise, return None.
         '''
         pattern = r'chr(?P<chr>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)'
+        spattern = r'chr(?P<chr>\w+):(?P<gstart>[0-9,]+)'
         if query:
             mat = re.search(pattern, query)
             if mat:
                 return mat.groupdict()
+            mat = re.search(spattern, query)
+            if mat:
+                r = mat.groupdict()
+                r['gend'] = r['gstart']
+                return r
 
     def build_interval_query(self, chr, gstart, gend, **kwargs):
         #gstart = safe_genome_pos(gstart)
