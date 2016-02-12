@@ -224,6 +224,11 @@ class ESIndexer():
         actions = (_get_bulk(doc) for doc in partial_docs)
         return helpers.bulk(self._es, actions, chunk_size=step, **kwargs)
 
+    def get_mapping(self):
+        """return the current index mapping"""
+        m = self._es.indices.get_mapping(index=self._index, doc_type=self._doc_type)
+        return m
+
     def update_mapping(self, m):
         assert list(m) == [self._doc_type]
         # assert m[self._doc_type].keys() == ['properties']
@@ -231,6 +236,30 @@ class ESIndexer():
         print(json.dumps(m, indent=2))
         if ask("Continue to update above mapping?") == 'Y':
             print(self._es.indices.put_mapping(index=self._index, doc_type=self._doc_type, body=m))
+
+    def get_mapping_meta(self):
+        """return the current _meta field."""
+        m = self.get_mapping()
+        m = m[self._index]['mappings'][self._doc_type]
+        return m.get('_meta', {})
+
+    def update_mapping_meta(self, meta, confirm=True):
+        allowed_keys = set(['_meta', '_timestamp'])
+        if isinstance(meta, dict) and len(set(meta) - allowed_keys) == 0:
+            current_meta = self.get_mapping_meta()
+            print('\033[34;06m{}\033[0m:'.format('[Current _meta]'))
+            print(json.dumps(current_meta, indent=2))
+            print('\033[34;06m{}\033[0m:'.format('[Replace with new _meta]'))
+            print(json.dumps(meta, indent=2))
+            if not confirm or ask('Continue to update above _meta field to "{}" index?'.format(self._index)) == "Y":
+                body = {self._doc_type: meta}
+                print(self._es.indices.put_mapping(
+                    doc_type=self._doc_type,
+                    body=body,
+                    index=self._index
+                ))
+        else:
+            raise ValueError('Input "meta" should have and only have "_meta" field.')
 
     #def build_index(self, collection, update_mapping=False, verbose=False, query=None):
     @wrapper
