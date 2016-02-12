@@ -85,9 +85,12 @@ jQuery(document).ready(function() {
     jQuery('#genome-assembly').buttonset();
     jQuery("#hg19").button("option", "icons", { primary: 'ui-icon-check' });
     jQuery("#hg38").button("option", "icons", { primary: 'ui-icon-check' });
+    jQuery("label[for='hg38'] span.ui-icon-check").hide();
 
     jQuery("#genome-assembly input[type=radio]").on("click", function () {
         jQuery("#genome-assembly input[type=radio]").each(function () {
+            console.log(this);
+            console.log(jQuery(this));
             if (jQuery(this).is(":checked")) {
                 jQuery(this).button("option", "icons", { primary: 'ui-icon-check' });
             } else {
