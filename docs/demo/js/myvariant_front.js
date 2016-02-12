@@ -37,7 +37,7 @@ function errorHandler(message, m_class) {
     jQuery('.results').html("<p class='" + m_class + "'>" + message + "</p>").show();
 }
 
-aQuery(document).ready(function() {
+jQuery(document).ready(function() {
     // Get the available fields
     jQuery.get('https://' + serverAddress + '/metadata/fields').done(
         function(data) {
