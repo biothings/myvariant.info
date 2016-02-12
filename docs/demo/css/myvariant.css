@@ -46,7 +46,7 @@
     padding-left: 10px;
     padding-right: 10px;
     padding-bottom: 10px;
-    font-family: Verdana, Geneva, sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 0.75em;
 }
 .introduction {
@@ -89,7 +89,7 @@
     top: 68px;
     left: 12px;
     float: left;
-    font-family: Verdana, Geneva, sans-serif;
+    font-family: 'Open Sans', sans-serif;
 }  
 #main-input {
     width: 500px;
@@ -148,7 +148,7 @@
     height: 15px;
 }
 .navbar-row label {
-    font-family: Verdana, Geneva, sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 0.7em;
 }
 #search-button {
@@ -182,14 +182,14 @@
     margin-left: 5px;
 }
 .error {
-    font-family: Verdana, Geneva, sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 0.8em;
     color: red;
 }
 .executing {
     color: black;
     font-size: 0.8em;
-    font-family: Verdana, Geneva, sans-serif;
+    font-family: 'Open Sans', sans-serif;
 }
 label[for="size-input-button"] {
     display: none;
