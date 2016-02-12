@@ -25,9 +25,13 @@ class VariantHandler(BaseHandler):
             email
         '''
         if vid:
-            if re.search('chr[0-9]?:[0-9]+', self.request.uri):
-                # redirect if they forgot the g.
-                self.redirect(':g.'.join(self.request.uri.split(':')))
+            # Get rid of HGVS ID errors
+            m = re.search('chr.{1,2}(?P<delim>:[g\.]{0,2})\d+', self.request.uri)
+            if m:
+                de = m.group('delim')
+                if de and de != ':g.':
+                    self.redirect(':g.'.join(self.request.uri.split(de)), permanent=True)
+            # Test for HGVS formatting errors
             kwargs = self.get_query_params()
             self.esq._use_hg19()
             if kwargs.pop('hg38', False):
