@@ -143,10 +143,11 @@ jQuery(document).ready(function() {
         var searchType = jQuery('#search-type').val();
         var endpointBase = 'https://' + serverAddress;
         var queryText = encodeURIComponent(jQuery('#main-input').val());
-        var fieldsText = encodeURIComponent(jQuery('#fields-input').val());
+        var fieldsText = jQuery('#fields-input').val();
         if(!(fieldsText)) {fieldsText = 'all';}
         if(endsWith(fieldsText, ', ')) {fieldsText = fieldsText.substring(0, fieldsText.length - 2);}
         if(endsWith(fieldsText, ',')) {fieldsText = fieldsText.substring(0, fieldsText.length - 1);}
+        fieldsText = encodeURIComponent(fieldsText);
         if(searchType == 1) {
             // HGVS ID query
             errorHandler("Query executing . . .", "executing");
