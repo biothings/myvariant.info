@@ -92,9 +92,9 @@ jQuery(document).ready(function() {
             console.log(this);
             console.log(jQuery(this));
             if (jQuery(this).is(":checked")) {
-                jQuery(this).button("option", "icons", { primary: 'ui-icon-check' });
+                jQuery("label[for='" + jQuery(this).attr('id') + "'] span.ui-icon-check").show();
             } else {
-                jQuery(this).button("option", "icons", { primary: 'ui-icon-cancel' });
+                jQuery("label[for='" + jQuery(this).attr('id') + "'] span.ui-icon-check").hide();
             }
         });
     });
