@@ -6,6 +6,7 @@ from elasticsearch import helpers
 
 import config
 from utils.common import iter_n, timesofar, ask
+from utils.mongo import get_src_dump
 from dataindex.mapping import get_mapping
 
 # setup ES logging
@@ -556,7 +557,7 @@ def reindex(old_index, new_index, s):
         print('{} documents inserted'.format(curr_done))
 
 
-def get_metadata(index):
+def get_metadata_stats(index):
     m = get_mapping()
     data_src = m['variant']['properties'].keys()
     stats = {}
@@ -567,3 +568,17 @@ def get_metadata(index):
     for _src in data_src:
         stats[_src] = t.count_src(_src)[_src]
     return stats
+
+
+def get_metadata(index):
+    '''
+    return metadata information for count stats and release time
+    '''
+    stats = get_metadata_stats(index)
+    src_dump = get_src_dump()
+    release = {}
+    for _doc in src_dump.find():
+        release[_doc['_id']] = _doc['release']
+    timestamp = time.strftime('%Y%m%d')
+    info = {"src_version": release, "stats": stats, "timestamp": timestamp}
+    return info
