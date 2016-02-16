@@ -35,7 +35,7 @@ def get_hgvs_name(record, as_list=False):
                                            record.REF,
                                            alt)
             _alt_list.append(alt)
-            _pos_list.append(OrderedDict(start=record.POS, end=record.POS + 1))   # end is start+1 for snp
+            _pos_list.append(OrderedDict(start=record.POS, end=record.POS))   # end is the same as start for snp
 
         elif record.is_indel:
             if record.is_deletion:
