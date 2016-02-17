@@ -1,17 +1,16 @@
 from __future__ import print_function
-from time import sleep
+from time import sleep, time
 import config
 from elasticsearch.helpers import bulk
 from utils.es import ESIndexer, get_es
 from utils.mongo import get_src_db
 from utils.diff import apply_patch, diff_collections, get_backend
-from utils.common import loadobj, get_random_string
+from utils.common import loadobj, get_random_string, timesofar
 from dataload.__init__ import load_source
 
 
 class ESSyncer():
     def __init__(self, index=None, doc_type=None, es_host=None, step=5000):
-        es_host = 'su07:9200'
         self._es = get_es(es_host)
         self._index = index or config.ES_INDEX_NAME
         self._doc_type = doc_type or config.ES_DOC_TYPE
@@ -29,10 +28,10 @@ class ESSyncer():
             id_list.append(_id)
             cnt += 1
             if len(id_list) == 100:
-                id_list_all += self._esi.mexists(id_list)
+                id_list_all += self._esi.mexists(id_list, verbose=False)
                 id_list = []
         if id_list:
-            id_list_all += self._esi.mexists(id_list)
+            id_list_all += self._esi.mexists(id_list, verbose=False)
         cnt_update = 0
         cnt_create = 0
         for _id, _exists in id_list_all:
@@ -43,7 +42,7 @@ class ESSyncer():
                     '_index': self._index,
                     '_type': self._doc_type,
                     "_id": _id,
-                    'doc': self._src[collection].get_from_id(_id)
+                    'doc': self._src[collection].find_one({'_id': _id})
                 }
                 cnt_update += 1
             # case two: this id not exists in current index, then create a new one
@@ -53,7 +52,7 @@ class ESSyncer():
                     '_index': self._index,
                     '_type': self._doc_type,
                     "_id": _id,
-                    '_source': self._src[collection].get_from_id(_id)
+                    '_source': self._src[collection].find_one({'_id': _id})
                 }
                 cnt_create += 1
             yield es_info
@@ -98,7 +97,7 @@ class ESSyncer():
         doc = self._esi.get_variant(_id)['_source']
         doc = apply_patch(doc, _patch)
         es_info = {
-            '_op_type': 'create',
+            '_op_type': 'index',
             '_index': self._index,
             '_type': self._doc_type,
             "_id": _id,
@@ -127,20 +126,35 @@ class ESSyncer():
             else:
                 print('id not exists:', _id)
 
-    def main(self, index, collection, diff_filepath, validate=False):
+    def main(self, index, collection, diff_filepath, validate=False, wait=60):
         self._index = index
         self._esi._index = index
         diff = loadobj(diff_filepath)
         source_collection = diff['source']
         add_list = self.add(source_collection, diff['add'])
         delete_list = self.delete(collection, diff['delete'])
-        update_list = self.update1(diff['update'])
+        update_list = self.update(diff['update'])
+        t00 = time()
+        print('Adding new {} docs...'.format(len(diff['add'])))
+        t0 = time()
         bulk(self._es, add_list)
+        print("Done. [{}]".format(timesofar(t0)))
+        print('Deleting {} docs'.format(len(diff['delete'])))
+        t0 = time()
         bulk(self._es, delete_list)
+        print("Done. [{}]".format(timesofar(t0)))
+        print('Updating {} docs'.format(len(diff['update'])))
+        t0 = time()
         bulk(self._es, update_list)
-        print('wait 2 min for es to prepare')
-        sleep(120)
+        print("Done. [{}]".format(timesofar(t0)))
+        print("="*20)
+        print("Finished! [{}]".format(timesofar(t00)))
         if validate:
+	    print('Waiting {}s to let ES to finish...'.format(wait), end="")
+            sleep(wait)
+            print("Done.")
+            print("Validating...")
+            t0 = time()
             q = {
                 "query": {
                     "constant_score": {
@@ -160,4 +174,5 @@ class ESSyncer():
             c2 = get_backend(temp_collection, 'mongodb')
             diff_result = diff_collections(c1, c2, use_parallel=False)
             self._src[temp_collection].drop()
+            print("Done. [{}]".format(t0))
             return diff_result

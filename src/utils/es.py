@@ -95,7 +95,7 @@ class ESIndexer():
             return False
 
     @wrapper
-    def mexists(self, vid_list):
+    def mexists(self, vid_list, verbose=True):
         q = {
             "query": {
                 "ids": {
@@ -105,7 +105,8 @@ class ESIndexer():
         }
         res = self._es.search(index=self._index, doc_type=self._doc_type, body=q, fields=None, size=len(vid_list))
         id_set = set([doc['_id'] for doc in res['hits']['hits']])
-        print('..', len(id_set), end='')   # print out # of matching hits
+        if verbose:
+            print('Found {} out of {} exist.'.format(len(id_set), len(vid_list)))
         return [(vid, vid in id_set) for vid in vid_list]
 
     @wrapper
@@ -343,23 +344,39 @@ class ESIndexer():
         }
         return self._es.indices.optimize(index=self._index, params=params)
 
-    def clean_field(self, field, dryrun=True, step=5000):
+    def clean_field(self, field, ids=None, dryrun=True, step=5000):
         '''remove a top-level field from ES index, if the field is the only field of the doc,
            remove the doc as well.
+           if ids is provided as a list, only operate on docs for these ids.
+           By default, it will loop through all docs contains that field.
            step is the size of bulk update on ES
            try first with dryrun turned on, and then perform the actual updates with dryrun off.
         '''
-        q = {
-            "query": {
-                "constant_score": {
-                    "filter": {
-                        "exists": {
-                            "field": field
+        if ids:
+            assert isinstance(ids, list), "input \"ids\" should be a list"
+            q = {
+                "query": {
+                    "constant_score": {
+                        "filter": {
+                            "ids": {
+                                "values": ids
+                            }
                         }
                     }
                 }
             }
-        }
+        else:
+            q = {
+                "query": {
+                    "constant_score": {
+                        "filter": {
+                            "exists": {
+                                "field": field
+                            }
+                        }
+                    }
+                }
+            }
         cnt_orphan_doc = 0
         cnt = 0
         _li = []
@@ -401,6 +418,7 @@ class ESIndexer():
         print("\t{} documents are deleted.".format(cnt_orphan_doc))
         if dryrun:
             print("This is a dryrun, so no actual document operations.")
+            return _li
 
     @wrapper
     def doc_feeder(self, step=10000, verbose=True, query=None, scroll='10m', **kwargs):
