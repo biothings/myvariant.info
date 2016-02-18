@@ -5,7 +5,6 @@ from tornado.web import HTTPError
 from www.helper import BaseHandler
 from .es import ESQuery
 from utils.common import split_ids
-from utils.es import ESIndexer
 import config
 
 
@@ -169,11 +168,12 @@ class QueryHandler(BaseHandler):
 
 
 class MetaDataHandler(BaseHandler):
+    esq = ESQuery()
     disable_caching = True
 
     def get(self):
-        # For now, just return a hardcoded object, later we'll actually query the ES db for this information
-        self.return_json(ESIndexer().get_mapping_meta())
+        _meta = self.esq.get_mapping_meta()
+        self.return_json(_meta)
 
 
 class FieldsHandler(BaseHandler):

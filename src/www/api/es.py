@@ -448,6 +448,12 @@ class ESQuery():
         r = self._es.indices.get(index=self._index)
         return r[list(r.keys())[0]]['mappings']['variant']['properties']
 
+    def get_mapping_meta(self):
+        """return the current _meta field."""
+        m = self._es.indices.get_mapping(index=self._index, doc_type=self._doc_type)
+        m = m[self._index]['mappings'][self._doc_type]
+        return m.get('_meta', {})
+
 
 class ESQueryBuilder:
     def __init__(self, **query_options):
