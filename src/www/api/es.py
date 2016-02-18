@@ -8,6 +8,11 @@ import config
 # a query to get variants with most of fields:
 # _exists_:dbnsfp AND _exists_:dbsnp AND _exists_:mutdb AND _exists_:cosmic AND _exists_:clinvar AND _exists_:gwassnps
 
+HG38_FIELDS = ['clinvar.hg38', 'dbnsfp.hg38', 'evs.hg38']
+HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19', 'dbsnp.hg19', 'docm.hg19', 'evs.hg19', 'grasp.hg19', 'mutdb.hg19', 'wellderly.hg19']
+CHROM_FIELDS = ['cadd.chrom', 'clinvar.chrom', 'cosmic.chrom', 'dbnsfp.chrom', 'dbsnp.chrom', 'docm.chrom',
+                'evs.chrom', 'exac.chrom', 'mutdb.chrom', 'wellderly.chrom']
+
 
 class MVQueryError(Exception):
     pass
@@ -26,6 +31,7 @@ class ESQuery():
                                  'sort', 'explain', 'version', 'facets', 'fetch_all', 'jsonld']  # , 'host']
         self._scroll_time = '1m'
         self._total_scroll_size = 1000   # Total number of hits to return per scroll batch
+        self._hg38 = _use_hg38
         if self._total_scroll_size % self.get_number_of_shards() == 0:
             # Total hits per shard per scroll batch
             self._scroll_size = int(self._total_scroll_size / self.get_number_of_shards())
@@ -34,7 +40,28 @@ class ESQuery():
                                      "divided evenly among {} shards.".format(self.get_number_of_shards()))
 
     def _use_hg38(self):
-        self._index = config.ES_INDEX_NAME_HG38
+        self._hg38 = True
+
+    def _use_hg19(self):
+        self._hg38 = False
+
+    def _get_genome_assembly_type(self):
+        if self._hg38:
+            try:
+                return config.HG38_FIELDS
+            except AttributeError:
+                return HG38_FIELDS
+        else:
+            try:
+                return config.HG19_FIELDS
+            except AttributeError:
+                return HG19_FIELDS
+
+    def _get_chrom_fields(self):
+        try:
+            return config.CHROM_FIELDS
+        except AttributeError:
+            return CHROM_FIELDS
 
     def _get_variantdoc(self, hit):
         doc = hit.get('_source', hit.get('fields', {}))
@@ -246,8 +273,9 @@ class ESQuery():
             scroll_options.update({'search_type': 'scan', 'size': self._scroll_size, 'scroll': self._scroll_time})
         options['kwargs'].update(scroll_options)
         if interval_query:
-            options['kwargs'].update(interval_query)
-            res = self.query_interval(**options.kwargs)
+            _query = self.build_interval_query(chr=interval_query["chr"],
+                                               gstart=interval_query["gstart"],
+                                               gend=interval_query["gend"], **options['kwargs'])
         else:
             _query = {
                 "query": {
@@ -259,10 +287,14 @@ class ESQuery():
             }
             if facets:
                 _query['facets'] = facets
-            try:
-                res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
-            except RequestError:
-                return {"error": "invalid query term.", "success": False}
+
+        if options.rawquery:
+            return _query
+
+        try:
+            res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
+        except RequestError:
+            return {"error": "invalid query term.", "success": False}
 
         # if options.fetch_all:
         #     return res
@@ -303,12 +335,18 @@ class ESQuery():
             , otherwise, return None.
         '''
         pattern = r'chr(?P<chr>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)'
+        spattern = r'chr(?P<chr>\w+):(?P<gstart>[0-9,]+)'
         if query:
             mat = re.search(pattern, query)
             if mat:
                 return mat.groupdict()
+            mat = re.search(spattern, query)
+            if mat:
+                r = mat.groupdict()
+                r['gend'] = r['gstart']
+                return r
 
-    def query_interval(self, chr, gstart, gend, **kwargs):
+    def build_interval_query(self, chr, gstart, gend, **kwargs):
         #gstart = safe_genome_pos(gstart)
         #gend = safe_genome_pos(gend)
         if chr.lower().startswith('chr'):
@@ -351,32 +389,59 @@ class ESQuery():
         #         }
         #     }
         # }
+        #_query = {
+        #    "query": {
+        #        "bool": {
+        #            "must": []
+        #        }
+        #    }
+        #}
         _query = {
             "query": {
                 "bool": {
-                    "should": []
+                    "must": [{
+                        "bool": {
+                            "should": [{
+                                "term": {field: chr.lower()}
+                            } for field in self._get_chrom_fields()]
+                        }
+                    }, {
+                        "bool": {
+                            "should": [{
+                                "bool": {
+                                    "must": [
+                                        {
+                                            "range": {field + ".start": {"lte": gend}}
+                                        },
+                                        {
+                                            "range": {field + ".end": {"gte": gstart}}
+                                        }
+                                    ]
+                                }
+                            } for field in self._get_genome_assembly_type()]
+                        }
+                    }]
                 }
             }
         }
-        hg19_interval_fields = ['dbnsfp.hg19', 'dbsnp.hg19', 'evs.hg19', 'mutdb.hg19', 'docm.hg19']
-        for field in hg19_interval_fields:
-            _q = {
-                "bool": {
-                    "must": [
-                        {
-                            "term": {"chrom": chr.lower()}
-                        },
-                        {
-                            "range": {field + ".start": {"lte": gend}}
-                        },
-                        {
-                            "range": {field + ".end": {"gte": gstart}}
-                        }
-                    ]
-                }
-            }
-            _query["query"]["bool"]["should"].append(_q)
-        return self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **kwargs)
+        #for field in self._get_genome_assembly_type():
+        #    _q = {
+        #        "bool": {
+        #            "must": [
+        #                {
+        #                    "term": {field.split(".")[0] + ".chrom": chr.lower()}
+        #                },
+        #                {
+        #                    "range": {field + ".start": {"lte": gend}}
+        #                },
+        #                {
+        #                    "range": {field + ".end": {"gte": gstart}}
+        #                }
+        #            ]
+        #        }
+        #    }
+        #    _query["query"]["bool"]["must"].append(_q)
+        return _query
 
     def query_fields(self, **kwargs):
         # query the metadata to get the available fields for a variant object

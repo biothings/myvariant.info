@@ -1,4 +1,4 @@
-var theseFields = ['all'];
+var theseFields = [];
 var serverAddress = 'myvariant.info';
 
 function split( val ) {
@@ -18,12 +18,15 @@ function successHandler(data, textStatus, jqXHR) {
     jQuery('.json-panel button').remove();
     jQuery('.json-panel').remove();
     jQuery('.json-view').remove();
-    jQuery('.results').html("<div class='json-panel'><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button></div><div class='json-view'></div>").show();
+    jQuery('.results').html("<div class='json-panel'><p id='total-text'></p><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button></div><div class='json-view'></div>").show();
     jQuery('.json-panel button').button();
     jQuery('.json-view').JSONView(data); //, {collapsed: true});
     jQuery('.json-view').JSONView('expand');
     jQuery('#expand-json').click(function() {jQuery('.json-view').JSONView('expand');});
     jQuery('#collapse-json').click(function() {jQuery('.json-view').JSONView('collapse');});
+    if('total' in data) {
+        jQuery('#total-text').html(data['total'] + " total result(s).  Showing top " + data["hits"].length + " result(s).").show();
+    }
 }
 
 function errorHandler(message, m_class) {
@@ -78,17 +81,73 @@ jQuery(document).ready(function() {
             console.log("Error getting available fields.");
         }
     );
+    // genome assembly
+    jQuery('#genome-assembly').buttonset();
+    jQuery("#hg19").button("option", "icons", { primary: 'ui-icon-check' });
+    jQuery("#hg38").button("option", "icons", { primary: 'ui-icon-check' });
+    jQuery("label[for='hg38'] span.ui-icon-check").hide();
+
+    jQuery("#genome-assembly input[type=radio]").on("click", function () {
+        jQuery("#genome-assembly input[type=radio]").each(function () {
+            if (jQuery(this).is(":checked")) {
+                jQuery("label[for='" + jQuery(this).attr('id') + "'] span.ui-icon-check").show();
+            } else {
+                jQuery("label[for='" + jQuery(this).attr('id') + "'] span.ui-icon-check").hide();
+            }
+        });
+    });
+
+    // variant examples
+    jQuery('.variant-example a').click(function() {
+        if(jQuery(this).data().example == "1") {
+            jQuery("#main-input").val("chr1:g.35366C>T");
+            jQuery("#fields-input").val("");
+        }
+        else if(jQuery(this).data().example == "2") { 
+            jQuery("#main-input").val("chr2:g.17142_17143insA");
+            jQuery("#fields-input").val("");
+        }
+        else if(jQuery(this).data().example == "3") { 
+            jQuery("#main-input").val("chrMT:g.8271_8279del");
+            jQuery("#fields-input").val("");
+        }
+    });
+
+    // query examples
+    jQuery('.query-example a').click(function() {
+        if(jQuery(this).data().example == "1") { 
+            jQuery("#main-input").val("dbnsfp.genename:CDK*");
+            jQuery("#fields-input").val("");
+            jQuery("#size-input").val("10").selectmenu('refresh', true);
+        }
+        else if(jQuery(this).data().example == "2") { 
+            jQuery('#main-input').val("exac.ac.ac_adj:[76640 TO 80000]");
+            jQuery("#fields-input").val("");
+            jQuery("#size-input").val("10").selectmenu('refresh', true);
+        }
+        else if(jQuery(this).data().example == "3") { 
+            jQuery('#main-input').val("chr1:69000-70000");
+            jQuery("#fields-input").val("");
+            jQuery("#size-input").val("10").selectmenu('refresh', true);
+            jQuery("#hg19").prop("checked", true);
+            jQuery("#genome-assembly").buttonset('refresh', true);
+        }
+        else if(jQuery(this).data().example == "help") { 
+            
+        }
+    });
 
     // Make this a button
     jQuery('#search-button').button().click(function() {
         // Search button click handler
         var searchType = jQuery('#search-type').val();
         var endpointBase = 'https://' + serverAddress;
-        var queryText = jQuery('#main-input').val();
+        var queryText = encodeURIComponent(jQuery('#main-input').val());
         var fieldsText = jQuery('#fields-input').val();
         if(!(fieldsText)) {fieldsText = 'all';}
         if(endsWith(fieldsText, ', ')) {fieldsText = fieldsText.substring(0, fieldsText.length - 2);}
         if(endsWith(fieldsText, ',')) {fieldsText = fieldsText.substring(0, fieldsText.length - 1);}
+        fieldsText = encodeURIComponent(fieldsText);
         if(searchType == 1) {
             // HGVS ID query
             errorHandler("Query executing . . .", "executing");
@@ -102,13 +161,13 @@ jQuery(document).ready(function() {
             }
         }
         else if(searchType == 2) {
+            var querySize = jQuery('#size-input').val();
+            var gaType = jQuery('#genome-assembly input:checked').val();
+            if(gaType == 'hg38') {gaType = '&hg38=True';}
+            else {gaType = '';}
             // Full text query
             errorHandler("Query executing . . .", "executing");
-            //jQuery.ajax(endpointBase + '/v1/query?q=' + queryText + '&fields=' + fieldsText, {
-            //    success: successHandler,
-            //    error: function(jqXHR, textStatus, errorThrown) {errorHandler("Couldn't retreive results for query " + jQuery('#main-input').val() + "."); console.log(jqXHR); console.log(textStatus); console.log(errorThrown);}
-            //});
-            jQuery.get(endpointBase + '/v1/query?q=' + queryText + '&fields=' + fieldsText).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
+            jQuery.get(endpointBase + '/v1/query?q=' + queryText + '&fields=' + fieldsText + '&size=' + querySize + gaType).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
         }
         else if(searchType == 3) {
             // metadata query
@@ -121,6 +180,9 @@ jQuery(document).ready(function() {
             jQuery.get(endpointBase + '/metadata/fields').done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve available fields.  API error.", "error");});
         }
     });
+    // Select menu is a widget
+    jQuery('#size-input').selectmenu();
+
     // Make this a select menu widget
     jQuery('#search-type').selectmenu({
         change: function() {
@@ -130,30 +192,50 @@ jQuery(document).ready(function() {
                 jQuery('#main-input').attr('placeholder', 'Enter comma separated HGVS ids here');
                 jQuery('#main-input').prop('disabled', false);
                 jQuery("#fields-input").prop('disabled', false);
-                jQuery("#query-param-group").hide();
+                jQuery("#size-input-button").hide();
+                jQuery("label[for='size-input-button']").hide();
+                jQuery("#genome-assembly").hide();
+                jQuery("label[for='genome-assembly']").hide();
+                jQuery(".examples").hide();
+                jQuery(".variant-example").show();
             }
             else if(jQuery(this).val() == 2) {
                 jQuery('#main-input').val("");
                 jQuery('#main-input').attr('placeholder', 'Enter query here');
                 jQuery('#main-input').prop('disabled', false);
                 jQuery("#fields-input").prop('disabled', false);
-                jQuery("#query-param-group").show();
+                jQuery("#size-input-button").show();
+                jQuery("label[for='size-input-button']").show();
+                jQuery("#genome-assembly").show();
+                jQuery("label[for='genome-assembly']").show();
+                jQuery(".examples").hide();
+                jQuery(".query-example").show();
             }
             else if(jQuery(this).val() == 3) {
                 jQuery('#main-input').val("");
-                jQuery('#fields-input').val("all");
+                jQuery('#fields-input').val("");
                 jQuery('#main-input').attr('placeholder', 'No input accepted');
                 jQuery('#main-input').prop('disabled', true);
                 jQuery("#fields-input").prop('disabled', true);
-                jQuery("#query-param-group").hide();
+                jQuery("#size-input-button").hide();
+                jQuery("label[for='size-input-button']").hide();
+                jQuery("#genome-assembly").hide();
+                jQuery("label[for='genome-assembly']").hide();
+                jQuery(".examples").hide();
+                jQuery(".filler").show();
             }
             else if(jQuery(this).val() == 4) {
                 jQuery('#main-input').val("");
-                jQuery('#fields-input').val("all");
+                jQuery('#fields-input').val("");
                 jQuery('#main-input').attr('placeholder', 'No input accepted');
                 jQuery('#main-input').prop('disabled', true);
                 jQuery("#fields-input").prop('disabled', true);
-                jQuery("#query-param-group").hide();
+                jQuery("#size-input-button").hide();
+                jQuery("label[for='size-input-button']").hide();
+                jQuery("#genome-assembly").hide();
+                jQuery("label[for='genome-assembly']").hide();
+                jQuery(".examples").hide();
+                jQuery(".filler").show();
             }
         }
     });

@@ -4,18 +4,17 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="css/jquery-ui.min.css" rel="stylesheet">
-    <link href="css/jquery-ui.theme.min.css" rel="stylesheet">
-    <link href="css/jquery.jsonview.css" rel="stylesheet">
-    <link href="css/front.css" rel="stylesheet">
-    <script src="js/jquery-1.12.0.min.js"></script>
-    <script src="js/jquery-ui.min.js"></script>
-    <script src="js/jquery.jsonview.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href="css/myvariant.css" rel="stylesheet">
+    <link href="https://cdn.rawgit.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="https://cdn.rawgit.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.min.js"></script>
     <script src="js/myvariant_front.js"></script>
 </head>
 <body>
     <div class='top-navbar'>
-        <a href="http://myvariant.info" class="logo-link"><img src='css/myvariant.png' id='myvariant-logo'></img></a>
+        <a href="http://myvariant.info" class="logo-link"><img src='https://myvariant.info/static/myvariant.png' id='myvariant-logo'></img></a>
         <p class="logo-text">MyVariant.info</p>
         <div class='spacer'>
         </div>
@@ -30,8 +29,28 @@
             <button id="search-button" type="button" class='ui-button ui-corner-all ui-widget ui-state-default'>Search</button>
         </div>
         <div class='navbar-row second'>
+            <p class='examples variant-example'><a href="javascript:;" data-example="1">chr1:g.35366C>T</a><a href="javascript:;" data-example="2">chr2:g.17142_17143insA</a><a href="javascript:;" data-example="3">chrMT:g.8271_8279del</a></p>
+            <p class='examples query-example'><a href="javascript:;" data-example="1">dbnsfp.genename:CDK*</a><a href="javascript:;" data-example="2">exac.ac.ac_adj:[76640 TO 80000]</a><a href="javascript:;" data-example="3">chr1:69000-70000</a><a href="http://docs.myvariant.info/en/latest/doc/variant_query_service.html#query-syntax" target="_blank" class="help-link">Help?</a></p>
+            <p class='examples filler'>&nbsp;</p>
+        </div>
+        <div class='navbar-row third'>
             <label for="fields-input">Return Fields:</label>
-            <input type="text" id="fields-input" value="all">
+            <input type="text" id="fields-input" placeholder="all">
+            <label for="size-input">Size:</label>
+            <select id="size-input">
+                <option value="1">1</option>
+                <option value="10" selected="selected">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+            </select>
+            <label for="genome-assembly">Chromosome position in:</label>
+            <div id="genome-assembly">
+                <input type="radio" value="hg19" id="hg19" name="radio" checked="checked"><label for="hg19">HG19</label>
+                <input type="radio" value="hg38" id="hg38" name="radio"><label for="hg38">HG38</label>
+            </div>
+            <!--<input type="number" id="size-input" value="10" min="0" max="1000">-->
         </div>
     </div>
 

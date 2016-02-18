@@ -1,6 +1,7 @@
 import json
 import datetime
 import tornado.web
+import traceback
 from utils.ga import GAMixIn
 from collections import OrderedDict
 
@@ -26,7 +27,40 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
     jsonp_parameter = 'callback'
     cache_max_age = 604800  # 7days
     disable_caching = False
-    boolean_parameters = set(['raw', 'rawquery', 'fetch_all', 'explain', 'jsonld'])
+    boolean_parameters = set(['raw', 'rawquery', 'fetch_all', 'explain', 'jsonld', 'hg38'])
+
+    def write_error(self, status_code, **kwargs):
+        """Override to implement custom error pages.
+
+        ``write_error`` may call `write`, `render`, `set_header`, etc
+        to produce output as usual.
+
+        If this error was caused by an uncaught exception (including
+        HTTPError), an ``exc_info`` triple will be available as
+        ``kwargs["exc_info"]``.  Note that this exception may not be
+        the "current" exception for purposes of methods like
+        ``sys.exc_info()`` or ``traceback.format_exc``.
+        """
+        if self.settings.get("serve_traceback") and "exc_info" in kwargs:
+            # in debug mode, try to send a traceback
+            self.set_header('Content-Type', 'text/plain')
+            for line in traceback.format_exception(*kwargs["exc_info"]):
+                self.write(line)
+            self.finish()
+        else:
+            if status_code == 404:
+                #self.finish("<html><title>Special 404 Page</title>"
+                #            "<body>This is a special 404 page.  We"
+                #            " can put other stuff here, or make a special "
+                #            "404 error template.</body></html>")
+                self.return_json({'notfound': True, 'error': 'input id is invalid'})
+                self.finish()
+            else:
+                self.finish("<html><title>%(code)d: %(message)s</title>"
+                            "<body>%(code)d: %(message)s</body></html>" % {
+                                "code": status_code,
+                                "message": self._reason,
+                            })
 
     def _check_fields_param(self, kwargs):
         '''support "filter" as an alias of "fields" parameter for back-compatability.'''

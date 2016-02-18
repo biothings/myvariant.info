@@ -26,6 +26,10 @@ keep them up-to-date, so that you don't have to do it:
 .. _EXAC: http://exac.broadinstitute.org/
 .. _GRASP: http://iapps.nhlbi.nih.gov/GRASP
 
+.. raw:: html
+
+    <div class='metadata-table'>
+
 Total variants loaded: **334,292,622**
 
 +-------------------------------+---------------+---------------------------+----------------------------+
@@ -59,6 +63,10 @@ Total variants loaded: **334,292,622**
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `GRASP`_                      | v2.0.0.0      | 2,212,148                 | grasp                      |
 +-------------------------------+---------------+---------------------------+----------------------------+
+
+.. raw:: html
+
+    </div>
 
 \* key name: this is the key for the specific annotation data in a variant object.
 

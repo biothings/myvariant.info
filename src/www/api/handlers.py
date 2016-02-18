@@ -5,6 +5,7 @@ from tornado.web import HTTPError
 from www.helper import BaseHandler
 from .es import ESQuery
 from utils.common import split_ids
+from utils.es import ESIndexer
 import config
 
 
@@ -25,7 +26,15 @@ class VariantHandler(BaseHandler):
             email
         '''
         if vid:
+            # Get rid of HGVS ID errors
+            m = re.search('chr.{1,2}(?P<delim>:[g\.]{0,2})\d+', self.request.uri)
+            if m:
+                de = m.group('delim')
+                if de and de != ':g.':
+                    self.redirect(':g.'.join(self.request.uri.split(de)), permanent=True)
+            # Test for HGVS formatting errors
             kwargs = self.get_query_params()
+            self.esq._use_hg19()
             if kwargs.pop('hg38', False):
                 self.esq._use_hg38()
             variant = self.esq.get_variant(vid, **kwargs)
@@ -48,6 +57,7 @@ class VariantHandler(BaseHandler):
             email
         '''
         kwargs = self.get_query_params()
+        self.esq._use_hg19()
         if kwargs.pop('hg38', False):
             self.esq._use_hg38()
         ids = kwargs.pop('ids', None)
@@ -84,6 +94,7 @@ class QueryHandler(BaseHandler):
             raw
         '''
         kwargs = self.get_query_params()
+        self.esq._use_hg19()
         if kwargs.pop('hg38', False):
             self.esq._use_hg38()
         q = kwargs.pop('q', None)
@@ -128,6 +139,7 @@ class QueryHandler(BaseHandler):
             jsoninput   if true, input "q" is a json string, must be decoded as a list.
         '''
         kwargs = self.get_query_params()
+        self.esq._use_hg19()
         if kwargs.pop('hg38', False):
             self.esq._use_hg38()
         q = kwargs.pop('q', None)
@@ -161,37 +173,7 @@ class MetaDataHandler(BaseHandler):
 
     def get(self):
         # For now, just return a hardcoded object, later we'll actually query the ES db for this information
-        self.return_json({
-            "stats": {
-                "total": 334292622,
-                "cadd": 226932858,
-                "clinvar": 124047,
-                "cosmic": 1024498,
-                "dbnsfp": 82030830,
-                "dbsnp": 145132257,
-                "docm": 1119,
-                "emv": 12066,
-                "evs": 1977300,
-                "exac": 10195872,
-                "grasp": 2212148,
-                "gwassnps": 15243,
-                "mutdb": 420221,
-                "snpedia": 5907,
-                "snpeff": 316823328,
-                "wellderly": 21240519
-            },
-            "src_version": {
-                "cadd": "1.3",
-                "clinvar": "201601",
-                "cosmic": "68",
-                "dbnsfp": "3.0c",
-                "dbsnp": "144",
-                "evs": "2",
-                "exac": "0.3",
-                "grasp": "2.0.0.0"
-            },
-            "timestamp": "2016-01-15T16:20:09.781506"
-        })
+        self.return_json(ESIndexer().get_mapping_meta())
 
 
 class FieldsHandler(BaseHandler):
