@@ -396,16 +396,11 @@ class ESQuery():
         #        }
         #    }
         #}
+
         _query = {
             "query": {
-                "bool": {
-                    "must": [{
-                        "bool": {
-                            "should": [{
-                                "term": {field: chr.lower()}
-                            } for field in self._get_chrom_fields()]
-                        }
-                    }, {
+                "filtered": {
+                    "query": {
                         "bool": {
                             "should": [{
                                 "bool": {
@@ -420,10 +415,18 @@ class ESQuery():
                                 }
                             } for field in self._get_genome_assembly_type()]
                         }
-                    }]
+                    },
+                    "filter": {
+                        "bool": {
+                            "should": [{
+                                "term": {field: chr.lower()}
+                            } for field in self._get_chrom_fields()]
+                        }
+                    }
                 }
             }
         }
+
         #for field in self._get_genome_assembly_type():
         #    _q = {
         #        "bool": {
