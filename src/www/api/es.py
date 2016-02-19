@@ -275,7 +275,8 @@ class ESQuery():
         if interval_query:
             _query = self.build_interval_query(chr=interval_query["chr"],
                                                gstart=interval_query["gstart"],
-                                               gend=interval_query["gend"], **options['kwargs'])
+                                               gend=interval_query["gend"], 
+                                               rquery=interval_query["query"], **options['kwargs'])
         else:
             _query = {
                 "query": {
@@ -326,27 +327,26 @@ class ESQuery():
                 _facets[field] = {"terms": {"field": field}}
             return _facets
 
-    def _parse_interval_query(self, query):
-        '''Check if the input query string matches interval search regex,
-           if yes, return a dictionary with three key-value pairs:
-              chr
-              gstart
-              gend
-            , otherwise, return None.
-        '''
-        pattern = r'chr(?P<chr>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)'
-        spattern = r'chr(?P<chr>\w+):(?P<gstart>[0-9,]+)'
-        if query:
-            mat = re.search(pattern, query)
-            if mat:
-                return mat.groupdict()
-            mat = re.search(spattern, query)
-            if mat:
-                r = mat.groupdict()
-                r['gend'] = r['gstart']
-                return r
+    def _parse_interval_query(self, q):
+        interval_pattern = r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*'
+        single_pattern = r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>\w+):(?P<gend>(?P<gstart>[0-9,]+))\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*'
+        patterns = [interval_pattern, single_pattern]
+        if q:
+            for pattern in patterns:
+                mat = re.search(pattern, q)
+                if mat:
+                    r = mat.groupdict()
+                    if r['pre_query']:
+                        r['query'] = r['pre_query'].rstrip(r['pre_and']).rstrip()
+                        if r['post_query']:
+                            r['query'] += ' ' + r['post_query']
+                    elif r['post_query']:
+                        r['query'] = r['post_query'].lstrip(r['post_and']).lstrip()
+                    else:
+                        r['query'] = None
+                    return r
 
-    def build_interval_query(self, chr, gstart, gend, **kwargs):
+    def build_interval_query(self, chr, gstart, gend, rquery, **kwargs):
         #gstart = safe_genome_pos(gstart)
         #gend = safe_genome_pos(gend)
         if chr.lower().startswith('chr'):
@@ -397,50 +397,36 @@ class ESQuery():
         #    }
         #}
         _query = {
-            "query": {
-                "bool": {
-                    "must": [{
-                        "bool": {
-                            "should": [{
-                                "term": {field: chr.lower()}
-                            } for field in self._get_chrom_fields()]
-                        }
-                    }, {
-                        "bool": {
-                            "should": [{
-                                "bool": {
-                                    "must": [
-                                        {
-                                            "range": {field + ".start": {"lte": gend}}
-                                        },
-                                        {
-                                            "range": {field + ".end": {"gte": gstart}}
-                                        }
-                                    ]
-                                }
-                            } for field in self._get_genome_assembly_type()]
-                        }
-                    }]
+            "filtered": {
+                "filter": {
+                    "bool": {
+                        "must": [{
+                            "bool": {
+                                "should": [{
+                                    "term": {field: chr.lower()}
+                                } for field in self._get_chrom_fields()]
+                            }
+                        }, {
+                            "bool": {
+                                "should": [{
+                                    "bool": {
+                                        "must": [
+                                            {
+                                                "range": {field + ".start": {"lte": gend}}
+                                            },
+                                            {
+                                                "range": {field + ".end": {"gte": gstart}}
+                                            }
+                                        ]
+                                    }
+                                } for field in self._get_genome_assembly_type()]
+                            }
+                        }]
                 }
             }
         }
-        #for field in self._get_genome_assembly_type():
-        #    _q = {
-        #        "bool": {
-        #            "must": [
-        #                {
-        #                    "term": {field.split(".")[0] + ".chrom": chr.lower()}
-        #                },
-        #                {
-        #                    "range": {field + ".start": {"lte": gend}}
-        #                },
-        #                {
-        #                    "range": {field + ".end": {"gte": gstart}}
-        #                }
-        #            ]
-        #        }
-        #    }
-        #    _query["query"]["bool"]["must"].append(_q)
+        if rquery:
+            _query["filtered"]["query"] = {"query_string": {"query": rquery}}
         return _query
 
     def query_fields(self, **kwargs):
