@@ -292,10 +292,11 @@ class ESQuery():
         if options.rawquery:
             return _query
 
-        try:
-            res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
-        except RequestError:
-            return {"error": "invalid query term.", "success": False}
+        #try:
+        res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
+        #except RequestError:
+        #    return {"error": "invalid query term.", "success": False}
+
 
         # if options.fetch_all:
         #     return res
@@ -397,37 +398,39 @@ class ESQuery():
         #    }
         #}
         _query = {
-            "filtered": {
-                "filter": {
-                    "bool": {
-                        "must": [{
-                            "bool": {
-                                "should": [{
-                                    "term": {field: chr.lower()}
-                                } for field in self._get_chrom_fields()]
-                            }
-                        }, {
-                            "bool": {
-                                "should": [{
-                                    "bool": {
-                                        "must": [
-                                            {
-                                                "range": {field + ".start": {"lte": gend}}
-                                            },
-                                            {
-                                                "range": {field + ".end": {"gte": gstart}}
-                                            }
-                                        ]
-                                    }
-                                } for field in self._get_genome_assembly_type()]
-                            }
-                        }]
+            "query": {
+                "filtered": {
+                    "filter": {
+                        "bool": {
+                            "must": [{
+                                "bool": {
+                                    "should": [{
+                                        "term": {field: chr.lower()}
+                                    } for field in self._get_chrom_fields()]
+                                }
+                            }, {
+                                "bool": {
+                                    "should": [{
+                                        "bool": {
+                                            "must": [
+                                                {
+                                                    "range": {field + ".start": {"lte": gend}}
+                                                },
+                                                {
+                                                    "range": {field + ".end": {"gte": gstart}}
+                                                }
+                                            ]
+                                        }
+                                    } for field in self._get_genome_assembly_type()]
+                                }
+                            }]
+                        }
                     }
                 }
             }
         }
         if rquery:
-            _query["filtered"]["query"] = {"query_string": {"query": rquery}}
+            _query["query"]["filtered"]["query"] = {"query_string": {"query": rquery}}
         return _query
 
     def query_fields(self, **kwargs):
