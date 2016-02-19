@@ -422,6 +422,7 @@ class ESQuery():
                                 } for field in self._get_genome_assembly_type()]
                             }
                         }]
+                    }
                 }
             }
         }
