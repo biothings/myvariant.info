@@ -292,11 +292,10 @@ class ESQuery():
         if options.rawquery:
             return _query
 
-        #try:
-        res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
-        #except RequestError:
-        #    return {"error": "invalid query term.", "success": False}
-
+        try:
+            res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
+        except RequestError:
+            return {"error": "invalid query term.", "success": False}
 
         # if options.fetch_all:
         #     return res
