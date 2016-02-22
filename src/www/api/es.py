@@ -382,12 +382,10 @@ class ESQueryBuilder:
         return '\n'.join(_q)
 
     def build_default_query(self, q, facets=None):
-        print("FACETS")
-        print(facets)
+        """ Default query for request to /query endpoint - called by the ESQuery.query method. """
         _query = {
             "query": {
                 "query_string": {
-                    #"default_field" : "content",
                     "query": q
                 }
             }
@@ -397,6 +395,7 @@ class ESQueryBuilder:
         return _query
 
     def build_interval_query(self, chr, gstart, gend, rquery, hg38, **kwargs):
+        """ Build an interval query - called by the ESQuery.query method. """
         if chr.lower().startswith('chr'):
             chr = chr[3:]
 
