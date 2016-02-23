@@ -68,7 +68,7 @@ class MainHandler(tornado.web.RequestHandler):
 class DemoHandler(tornado.web.RequestHandler):
     ''' Redirect to the rawgit address for the demo page. '''
     def get(self):
-        self.redirect('https://rawgit.com/')
+        self.redirect('https://cdn.rawgit.com/SuLab/myvariant.info/demo_version/docs/demo/index.html')
 
 APP_LIST = [
     (r"/", MainHandler),
