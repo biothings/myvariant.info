@@ -34,7 +34,7 @@ class VariantHandler(BaseHandler):
             # Test for HGVS formatting errors
             kwargs = self.get_query_params()
             self.esq._use_hg19()
-            if kwargs.pop('hg38', False):
+            if kwargs.pop('assembly', 'hg19').lower() == 'hg38':
                 self.esq._use_hg38()
             variant = self.esq.get_variant(vid, **kwargs)
             if variant:
@@ -57,7 +57,7 @@ class VariantHandler(BaseHandler):
         '''
         kwargs = self.get_query_params()
         self.esq._use_hg19()
-        if kwargs.pop('hg38', False):
+        if kwargs.pop('assembly', 'hg19').lower() == 'hg38':
             self.esq._use_hg38()
         ids = kwargs.pop('ids', None)
         if ids:
@@ -94,7 +94,7 @@ class QueryHandler(BaseHandler):
         '''
         kwargs = self.get_query_params()
         self.esq._use_hg19()
-        if kwargs.pop('hg38', False):
+        if kwargs.pop('assembly', 'hg19').lower() == 'hg38':
             self.esq._use_hg38()
         q = kwargs.pop('q', None)
         scroll_id = kwargs.pop('scroll_id', None)
@@ -139,7 +139,7 @@ class QueryHandler(BaseHandler):
         '''
         kwargs = self.get_query_params()
         self.esq._use_hg19()
-        if kwargs.pop('hg38', False):
+        if kwargs.pop('assembly', 'hg19').lower() == 'hg38':
             self.esq._use_hg38()
         q = kwargs.pop('q', None)
         jsoninput = kwargs.pop('jsoninput', None) in ('1', 'true')

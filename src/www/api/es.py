@@ -45,24 +45,6 @@ class ESQuery():
     def _use_hg19(self):
         self._hg38 = False
 
-    def _get_genome_assembly_type(self):
-        if self._hg38:
-            try:
-                return config.HG38_FIELDS
-            except AttributeError:
-                return HG38_FIELDS
-        else:
-            try:
-                return config.HG19_FIELDS
-            except AttributeError:
-                return HG19_FIELDS
-
-    def _get_chrom_fields(self):
-        try:
-            return config.CHROM_FIELDS
-        except AttributeError:
-            return CHROM_FIELDS
-
     def _get_variantdoc(self, hit):
         doc = hit.get('_source', hit.get('fields', {}))
         doc.setdefault('_id', hit['_id'])
@@ -272,21 +254,15 @@ class ESQuery():
         if options.fetch_all:
             scroll_options.update({'search_type': 'scan', 'size': self._scroll_size, 'scroll': self._scroll_time})
         options['kwargs'].update(scroll_options)
+        qbdr = ESQueryBuilder(**options.kwargs)
         if interval_query:
-            _query = self.build_interval_query(chr=interval_query["chr"],
+            _query = qbdr.build_interval_query(chr=interval_query["chr"],
                                                gstart=interval_query["gstart"],
-                                               gend=interval_query["gend"], **options['kwargs'])
+                                               gend=interval_query["gend"],
+                                               rquery=interval_query["query"],
+                                               hg38=self._hg38, **options['kwargs'])
         else:
-            _query = {
-                "query": {
-                    "query_string": {
-                        #"default_field" : "content",
-                        "query": q
-                    }
-                }
-            }
-            if facets:
-                _query['facets'] = facets
+            _query = qbdr.build_default_query(q=q, facets=facets)
 
         if options.rawquery:
             return _query
@@ -295,9 +271,6 @@ class ESQuery():
             res = self._es.search(index=self._index, doc_type=self._doc_type, body=_query, **options.kwargs)
         except RequestError:
             return {"error": "invalid query term.", "success": False}
-
-        # if options.fetch_all:
-        #     return res
 
         if not options.raw:
             res = self._clean_res2(res)
@@ -326,25 +299,24 @@ class ESQuery():
                 _facets[field] = {"terms": {"field": field}}
             return _facets
 
-    def _parse_interval_query(self, query):
-        '''Check if the input query string matches interval search regex,
-           if yes, return a dictionary with three key-value pairs:
-              chr
-              gstart
-              gend
-            , otherwise, return None.
-        '''
-        pattern = r'chr(?P<chr>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)'
-        spattern = r'chr(?P<chr>\w+):(?P<gstart>[0-9,]+)'
-        if query:
-            mat = re.search(pattern, query)
-            if mat:
-                return mat.groupdict()
-            mat = re.search(spattern, query)
-            if mat:
-                r = mat.groupdict()
-                r['gend'] = r['gstart']
-                return r
+    def _parse_interval_query(self, q):
+        interval_pattern = r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*'
+        single_pattern = r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>\w+):(?P<gend>(?P<gstart>[0-9,]+))\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*'
+        patterns = [interval_pattern, single_pattern]
+        if q:
+            for pattern in patterns:
+                mat = re.search(pattern, q)
+                if mat:
+                    r = mat.groupdict()
+                    if r['pre_query']:
+                        r['query'] = r['pre_query'].rstrip(r['pre_and']).rstrip()
+                        if r['post_query']:
+                            r['query'] += ' ' + r['post_query']
+                    elif r['post_query']:
+                        r['query'] = r['post_query'].lstrip(r['post_and']).lstrip()
+                    else:
+                        r['query'] = None
+                    return r
 
     def build_interval_query(self, chr, gstart, gend, **kwargs):
         #gstart = safe_genome_pos(gstart)
@@ -462,13 +434,25 @@ class ESQueryBuilder:
     def __init__(self, **query_options):
         self._query_options = query_options
 
+    def _get_genome_position_fields(self, hg38=False):
+        if hg38:
+            try:
+                return config.HG38_FIELDS
+            except AttributeError:
+                return HG38_FIELDS
+        else:
+            try:
+                return config.HG19_FIELDS
+            except AttributeError:
+                return HG19_FIELDS
+
+    def _get_chrom_fields(self):
+        try:
+            return config.CHROM_FIELDS
+        except AttributeError:
+            return CHROM_FIELDS
+
     def build_id_query(self, vid, scopes=None):
-        # _default_scopes = [
-        #     '_id',
-        #     'rsid', "dbnsfp.rsid", "dbsnp.rsid", "evs.rsid", "mutdb.rsid"  # for rsid
-        #     "dbsnp.gene.symbol", 'evs.gene.symbol', 'clinvar.gene.symbol',
-        #     'dbnsfp.genename', "cadd.gene.genename", "docm.genename",      # for gene symbols
-        # ]
         _default_scopes = '_id'
         scopes = scopes or _default_scopes
         if is_str(scopes):
@@ -502,3 +486,57 @@ class ESQueryBuilder:
             _q.extend(['{}', json.dumps(self.build_id_query(id, scopes))])
         _q.append('')
         return '\n'.join(_q)
+
+    def build_default_query(self, q, facets=None):
+        """ Default query for request to /query endpoint - called by the ESQuery.query method. """
+        _query = {
+            "query": {
+                "query_string": {
+                    "query": q
+                }
+            }
+        }
+        if facets:
+            _query['facets'] = facets
+        return _query
+
+    def build_interval_query(self, chr, gstart, gend, rquery, hg38, **kwargs):
+        """ Build an interval query - called by the ESQuery.query method. """
+        if chr.lower().startswith('chr'):
+            chr = chr[3:]
+
+        _query = {
+            "query": {
+                "filtered": {
+                    "filter": {
+                        "bool": {
+                            "must": [{
+                                "bool": {
+                                    "should": [{
+                                        "term": {field: chr.lower()}
+                                    } for field in self._get_chrom_fields()]
+                                }
+                            }, {
+                                "bool": {
+                                    "should": [{
+                                        "bool": {
+                                            "must": [
+                                                {
+                                                    "range": {field + ".start": {"lte": gend}}
+                                                },
+                                                {
+                                                    "range": {field + ".end": {"gte": gstart}}
+                                                }
+                                            ]
+                                        }
+                                    } for field in self._get_genome_position_fields(hg38)]
+                                }
+                            }]
+                        }
+                    }
+                }
+            }
+        }
+        if rquery:
+            _query["query"]["filtered"]["query"] = {"query_string": {"query": rquery}}
+        return _query
