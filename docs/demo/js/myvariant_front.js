@@ -151,7 +151,7 @@ jQuery(document).ready(function() {
         if(searchType == 1) {
             // HGVS ID query
             errorHandler("Query executing . . .", "executing");
-            if(queryText.indexOf(",") == -1) {
+            if(queryText.indexOf("%2C") == -1) {
                 // get to variant endpoint
                 jQuery.get(endpointBase + '/v1/variant/' + queryText + '?fields=' + fieldsText).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve annotation " + jQuery('#main-input').val() + ".  ", "error");});
             }
