@@ -157,7 +157,7 @@ jQuery(document).ready(function() {
             errorHandler("Query executing . . .", "executing");
             if(queryText.indexOf(",") == -1) {
                 // get to variant endpoint
-                jQuery.get(endpointBase + '/v1/variant/' + encodeURIcomponent(queryText) + '?fields=' + encodeURIcomponent(fieldsText)).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve annotation " + jQuery('#main-input').val() + ".  ", "error");});
+                jQuery.get(endpointBase + '/v1/variant/' + encodeURIComponent(queryText) + '?fields=' + encodeURIComponent(fieldsText)).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve annotation " + jQuery('#main-input').val() + ".  ", "error");});
             }
             else {
                 // post to variant endpoint
@@ -171,7 +171,7 @@ jQuery(document).ready(function() {
             else {gaType = '';}
             // Full text query
             errorHandler("Query executing . . .", "executing");
-            jQuery.get(endpointBase + '/v1/query?q=' + encodeURIcomponent(queryText) + '&fields=' + encodeURIcomponent(fieldsText) + '&size=' + querySize + gaType).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
+            jQuery.get(endpointBase + '/v1/query?q=' + encodeURIComponent(queryText) + '&fields=' + encodeURIComponent(fieldsText) + '&size=' + querySize + gaType).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
         }
         else if(searchType == 3) {
             // metadata query
