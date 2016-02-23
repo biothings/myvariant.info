@@ -1,6 +1,11 @@
 var theseFields = [];
 var serverAddress = 'myvariant.info';
 
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 function split( val ) {
     return val.split( /,\s*/ );
 }
@@ -157,7 +162,7 @@ jQuery(document).ready(function() {
             }
             else {
                 // post to variant endpoint
-                jQuery.post(endpointBase + '/v1/variant', {'ids': queryText, 'fields': fieldsText}).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Error retrieving annotations.", "error");});
+                jQuery.post(endpointBase + '/v1/variant', {'ids': queryText.replaceAll('%2C', ','), 'fields': fieldsText}).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Error retrieving annotations.", "error");});
             }
         }
         else if(searchType == 2) {
