@@ -27,7 +27,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
     jsonp_parameter = 'callback'
     cache_max_age = 604800  # 7days
     disable_caching = False
-    boolean_parameters = set(['raw', 'rawquery', 'fetch_all', 'explain', 'jsonld', 'hg38'])
+    boolean_parameters = set(['raw', 'rawquery', 'fetch_all', 'explain', 'jsonld'])
 
     def write_error(self, status_code, **kwargs):
         """Override to implement custom error pages.
@@ -48,11 +48,8 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
                 self.write(line)
             self.finish()
         else:
-            if status_code == 404:
-                #self.finish("<html><title>Special 404 Page</title>"
-                #            "<body>This is a special 404 page.  We"
-                #            " can put other stuff here, or make a special "
-                #            "404 error template.</body></html>")
+            if '/variant' in self.request.uri and status_code == 404:
+                # For 404 with /variant endpoint, respond with a json object
                 self.return_json({'notfound': True, 'error': 'input id is invalid'})
                 self.finish()
             else:

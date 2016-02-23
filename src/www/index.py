@@ -65,11 +65,17 @@ class MainHandler(tornado.web.RequestHandler):
             self.render(os.path.join(STATIC_PATH, 'index.html'))
 
 
+class DemoHandler(tornado.web.RequestHandler):
+    ''' Redirect to the rawgit address for the demo page. '''
+    def get(self):
+        self.redirect('https://rawgit.com/')
+
 APP_LIST = [
     (r"/", MainHandler),
     (r"/status", StatusCheckHandler),
     (r"/metadata", MetaDataHandler),
     (r"/metadata/fields", FieldsHandler),
+    (r"/demo", DemoHandler),
 ]
 
 APP_LIST += add_apps('api', api_app_list)

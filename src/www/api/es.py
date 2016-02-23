@@ -318,10 +318,116 @@ class ESQuery():
                         r['query'] = None
                     return r
 
+    def build_interval_query(self, chr, gstart, gend, **kwargs):
+        #gstart = safe_genome_pos(gstart)
+        #gend = safe_genome_pos(gend)
+        if chr.lower().startswith('chr'):
+            chr = chr[3:]
+        # _query = {
+        #     "query": {
+        #         "bool": {
+        #             "should": [
+        #                 {
+        #                     "bool": {
+        #                         "must": [
+        #                             {
+        #                                 "term": {"chrom": chr.lower()}
+        #                             },
+        #                             {
+        #                                 "range": {"chromStart": {"lte": gend}}
+        #                             },
+        #                             {
+        #                                 "range": {"chromEnd": {"gte": gstart}}
+        #                             }
+        #                         ]
+        #                     }
+        #                 },
+        #                 {
+        #                     "bool": {
+        #                         "must": [
+        #                             {
+        #                                 "term": {"chrom": chr.lower()}
+        #                             },
+        #                             {
+        #                                 "range": {"dbnsfp.hg19.start": {"lte": gend}}
+        #                             },
+        #                             {
+        #                                 "range": {"dbnsfp.hg19.end": {"gte": gstart}}
+        #                             }
+        #                         ]
+        #                     }
+        #                 }
+        #             ]
+        #         }
+        #     }
+        # }
+        #_query = {
+        #    "query": {
+        #        "bool": {
+        #            "must": []
+        #        }
+        #    }
+        #}
+
+        _query = {
+            "query": {
+                "filtered": {
+                    "query": {
+                        "bool": {
+                            "should": [{
+                                "bool": {
+                                    "must": [
+                                        {
+                                            "range": {field + ".start": {"lte": gend}}
+                                        },
+                                        {
+                                            "range": {field + ".end": {"gte": gstart}}
+                                        }
+                                    ]
+                                }
+                            } for field in self._get_genome_assembly_type()]
+                        }
+                    },
+                    "filter": {
+                        "bool": {
+                            "should": [{
+                                "term": {field: chr.lower()}
+                            } for field in self._get_chrom_fields()]
+                        }
+                    }
+                }
+            }
+        }
+
+        #for field in self._get_genome_assembly_type():
+        #    _q = {
+        #        "bool": {
+        #            "must": [
+        #                {
+        #                    "term": {field.split(".")[0] + ".chrom": chr.lower()}
+        #                },
+        #                {
+        #                    "range": {field + ".start": {"lte": gend}}
+        #                },
+        #                {
+        #                    "range": {field + ".end": {"gte": gstart}}
+        #                }
+        #            ]
+        #        }
+        #    }
+        #    _query["query"]["bool"]["must"].append(_q)
+        return _query
+
     def query_fields(self, **kwargs):
         # query the metadata to get the available fields for a variant object
         r = self._es.indices.get(index=self._index)
         return r[list(r.keys())[0]]['mappings']['variant']['properties']
+
+    def get_mapping_meta(self):
+        """return the current _meta field."""
+        m = self._es.indices.get_mapping(index=self._index, doc_type=self._doc_type)
+        m = m[self._index]['mappings'][self._doc_type]
+        return m.get('_meta', {})
 
 
 class ESQueryBuilder:

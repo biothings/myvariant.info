@@ -333,3 +333,18 @@ def test_jsonld():
     res = json_ok(post_ok(api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'jsonld': 'true'}))
     for r in res:
         assert '@context' in r
+
+def test_genome_assembly():
+    res = json_ok(get_ok(api + '/query?q=clinvar.ref:C%20AND%20chr11:56319006%20AND%20clinvar.alt:A&assembly=hg38'))
+    eq_(res["hits"][0]["_id"], "chr11:g.56086482C>A")
+
+def test_HGVS_redirect():
+    res = json_ok(get_ok(api + '/variant/chr11:66397320A>G'))
+    res2 = json_ok(get_ok(api + '/variant/chr11:g66397320A>G'))
+    res3 = json_ok(get_ok(api + '/variant/chr11:.66397320A>G'))
+    res4 = json_ok(get_ok(api + '/variant/chr11:g.66397320A>G'))
+
+    eq_(res, res2)
+    eq_(res2, res3)
+    eq_(res3, res4)
+    eq_(res["_id"], 'chr11:g.66397320A>G')
