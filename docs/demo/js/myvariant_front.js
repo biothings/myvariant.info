@@ -167,7 +167,7 @@ jQuery(document).ready(function() {
         else if(searchType == 2) {
             var querySize = jQuery('#size-input').val();
             var gaType = jQuery('#genome-assembly input:checked').val();
-            if(gaType == 'hg38') {gaType = '&hg38=True';}
+            if(gaType == 'hg38') {gaType = '&assembly=hg38';}
             else {gaType = '';}
             // Full text query
             errorHandler("Query executing . . .", "executing");
