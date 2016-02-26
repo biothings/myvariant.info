@@ -68,14 +68,15 @@ class MainHandler(tornado.web.RequestHandler):
 class DemoHandler(tornado.web.RequestHandler):
     ''' Redirect to the rawgit address for the demo page. '''
     def get(self):
-        self.redirect('https://cdn.rawgit.com/SuLab/myvariant.info/demo_version/docs/demo/index.html')
+        with open('../docs/demo/index.html', 'r') as demo_file:
+            self.write(demo_file.read())
 
 APP_LIST = [
     (r"/", MainHandler),
     (r"/status", StatusCheckHandler),
     (r"/metadata", MetaDataHandler),
     (r"/metadata/fields", FieldsHandler),
-    #(r"/demo", DemoHandler),
+    (r"/demo", DemoHandler),
 ]
 
 APP_LIST += add_apps('api', api_app_list)
