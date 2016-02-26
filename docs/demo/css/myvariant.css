@@ -201,20 +201,7 @@ label[for="fields-input"] {
     float: left;
     margin-top: 4px;
 }
-label[for="genome-assembly"] {
-    float: left;
-    margin-top: 4px;
-    margin-left: 10px;
-    display: none;
-}
 .help-link {
     color: #6cd02f;
     text-decoration: none;
-}
-#genome-assembly {
-    display: none;
-    float: left;
-    margin-left: 5px;
-    font-size: 0.8em;
-    margin-top: 1px;
 }
