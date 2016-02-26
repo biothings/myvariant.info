@@ -68,7 +68,7 @@ class MainHandler(tornado.web.RequestHandler):
 class DemoHandler(tornado.web.RequestHandler):
     ''' Redirect to the rawgit address for the demo page. '''
     def get(self):
-        with open('../docs/demo/index.html', 'r') as demo_file:
+        with open('../../docs/demo/index.html', 'r') as demo_file:
             self.write(demo_file.read())
 
 APP_LIST = [
