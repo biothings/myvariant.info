@@ -124,6 +124,7 @@ jQuery(document).ready(function() {
             jQuery('#main-input').val("chr1:69000-70000");
             jQuery("#fields-input").val("");
             jQuery("#size-input").val("10").selectmenu('refresh', true);
+        }
         else if(jQuery(this).data().example == "help") { 
             
         }
