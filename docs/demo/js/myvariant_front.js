@@ -25,6 +25,7 @@ function successHandler(data, textStatus, jqXHR, searchURL) {
     jQuery('.json-view').remove();
     if(searchURL) {
         jQuery('.results').html("<div class='json-panel'><p id='total-text'></p><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button><a href='" + searchURL + "' target='_blank'>" + searchURL + "</a></div><div class='json-view'></div>").show();
+    }
     else { 
         jQuery('.results').html("<div class='json-panel'><p id='total-text'></p><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button></div><div class='json-view'></div>").show();
     }
