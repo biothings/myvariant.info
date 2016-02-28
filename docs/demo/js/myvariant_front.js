@@ -141,13 +141,15 @@ jQuery(document).ready(function() {
         if(endsWith(fieldsText, ', ')) {fieldsText = fieldsText.substring(0, fieldsText.length - 2);}
         if(endsWith(fieldsText, ',')) {fieldsText = fieldsText.substring(0, fieldsText.length - 1);}
         var searchURL = '';
+        var getURL = '';
         if(searchType == 1) {
             // HGVS ID query
             errorHandler("Query executing . . .", "executing");
             if(queryText.indexOf(",") == -1) {
                 // get to variant endpoint
-                searchURL = endpointBase + '/v1/variant/' + encodeURIComponent(queryText) + '?fields=' + encodeURIComponent(fieldsText);
-                jQuery.get(searchURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve annotation " + jQuery('#main-input').val() + ".  ", "error");});
+                getURL = endpointBase + '/v1/variant/' + encodeURIComponent(queryText) + '?fields=' + encodeURIComponent(fieldsText);
+                searchURL = decodeURIComponent(getURL);
+                jQuery.get(getURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve annotation " + jQuery('#main-input').val() + ".  ", "error");});
             }
             else {
                 // post to variant endpoint
@@ -158,20 +160,23 @@ jQuery(document).ready(function() {
             // Full text query
             errorHandler("Query executing . . .", "executing");
             var querySize = jQuery('#size-input').val();
-            searchURL = endpointBase + '/v1/query?q=' + encodeURIComponent(queryText) + '&fields=' + encodeURIComponent(fieldsText) + '&size=' + querySize;
-            jQuery.get(searchURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
+            getURL = endpointBase + '/v1/query?q=' + encodeURIComponent(queryText) + '&fields=' + encodeURIComponent(fieldsText) + '&size=' + querySize;
+            searchURL = decodeURIComponent(getURL);
+            jQuery.get(getURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
         }
         else if(searchType == 3) {
             // metadata query
             errorHandler("Query executing . . .", "executing");
-            searchURL = endpointBase + '/metadata';
-            jQuery.get(searchURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve MyVariant database metadata.  API error.", "error");});
+            getURL = endpointBase + '/metadata';
+            searchURL = decodeURIComponent(getURL);
+            jQuery.get(getURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve MyVariant database metadata.  API error.", "error");});
         }
         else if(searchType == 4) {
             // available fields query
             errorHandler("Query executing . . .", "executing");
-            searchURL = endpointBase + '/metadata/fields';
-            jQuery.get(searchURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve available fields.  API error.", "error");});
+            getURL = endpointBase + '/metadata/fields';
+            searchURL = decodeURIComponent(getURL);
+            jQuery.get(getURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve available fields.  API error.", "error");});
         }
     });
     // Select menu is a widget

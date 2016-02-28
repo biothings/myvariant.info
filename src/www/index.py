@@ -76,7 +76,7 @@ APP_LIST = [
     (r"/status", StatusCheckHandler),
     (r"/metadata", MetaDataHandler),
     (r"/metadata/fields", FieldsHandler),
-    (r"/demo", DemoHandler),
+    (r"/demo/?$", DemoHandler),
 ]
 
 APP_LIST += add_apps('api', api_app_list)
