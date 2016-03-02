@@ -58,6 +58,10 @@ def get_mapping():
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
+                "alt": {
+                    "type": "string",
+                    "analyzer": "string_lowercase"
+                },
                 "type": {
                     "type": "string",
                     "analyzer": "string_lowercase"
