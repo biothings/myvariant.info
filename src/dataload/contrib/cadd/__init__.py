@@ -8,24 +8,13 @@ __METADATA__ = {
     "field": "cadd"
 }
 
-exome = '/opt/myvariant.info/load_archive/cadd/HumanExome-12v1-1_A_inclAnno.tsv.gz'
-# 1000 Genomes variants SNVs and InDels including all annotations
-thousandgp = '/opt/myvariant.info/load_archive/cadd/1000G_inclAnno.tsv.gz'
-# Exome Aggreation Consortium variants including all annotations
-exac = 'opt/myvariant.info/load_archive/cadd/ExAC.r0.2_inclAnno.tsv.gz'
-# ESP6500 variants SNVs and InDels including all annotations
-esp = 'opt/myvariant.info/load_archive/cadd/ESP6500SI_inclAnno.tsv.gz'
-
-
-def load_data(file, contig):
-    tabix = pysam.Tabixfile(file)
-    fetch = tabix.fetch(contig)
-    rows = map(lambda x: x.split('\t'), fetch)
-    annos = (row for row in rows if "CodingTranscript" in row[9])
-    json_rows = map(_map_line_to_json, annos)
-    json_rows = (row for row in json_rows if row)
-    row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-    return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
+exome = '/opt/myvariant.info/load_archive/cadd/HumanExome-12v1-1_A_inclAn"no".tsv.gz'
+# 1000 Ge"no"mes variants SNVs and InDels including all an"no"tations
+thousandgp = '/opt/myvariant.info/load_archive/cadd/1000G_inclAn"no".tsv.gz'
+# Exome Aggreation Consortium variants including all an"no"tations
+exac = 'opt/myvariant.info/load_archive/cadd/ExAC.r0.2_inclAn"no".tsv.gz'
+# ESP6500 variants SNVs and InDels including all an"no"tations
+esp = 'opt/myvariant.info/load_archive/cadd/ESP6500SI_inclAn"no".tsv.gz'
 
 
 def get_mapping():
@@ -39,6 +28,346 @@ def get_mapping():
                 "chrom": {
                     "type": "string",
                     "analyzer": "string_lowercase"
+                },
+                "anc": {
+                    "type": "string",
+                    "index": "no"
+                },
+                "length": {
+                    "type": "integer",
+                    "index": "no"
+                },
+                "istv": {
+                    "type": "string",
+                    "index": "no"
+                },
+                "isderived": {
+                    "type": "string",
+                    "index": "no"
+                },
+                "gc": {
+                    "type": "float",
+                    "index": "no"
+                },
+                "cpg": {
+                    "type": "float",
+                    "index": "no"
+                },
+                "mapability": {
+                    "properties": {
+                        "20bp": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "35bp": {
+                            "type": "float",
+                            "index": "no"
+                        }
+                    }
+                },
+                "scoresegdup": {
+                    "type": "float",
+                    "index": "no"
+                },
+                "phast_cons": {
+                    "properties": {
+                        "primate": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "mammalian": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "vertebrate": {
+                            "type": "float",
+                            "index": "no"
+                        }
+                    }
+                },
+                "phylop": {
+                    "properties": {
+                        "primate": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "mammalian": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "vertebrate": {
+                            "type": "float",
+                            "index": "no"
+                        }
+                    }
+                },
+                "gerp": {
+                    "properties": {
+                        "n": {
+                            "type": "integer",
+                            "index": "no"
+                        },
+                        "s": {
+                            "type": "integer",
+                            "index": "no"
+                        },
+                        "rs": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "rs_pval": {
+                            "type": "float",
+                            "index": "no"
+                        }
+                    }
+                },
+                "bstatistic": {
+                    "type": "integer",
+                    "index": "no"
+                },
+                "mutindex": {
+                    "type": "integer",
+                    "index": "no"
+                },
+                "dna": {
+                    "properties": {
+                        "helt": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "mgw": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "prot": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "roll": {
+                            "type": "float",
+                            "index": "no"
+                        }
+                    }
+                },
+                "mirsvr": {
+                    "properties": {
+                        "score": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "e": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "aln": {
+                            "type": "integer",
+                            "index": "no"
+                        }
+                    }
+                },
+                "targetscans": {
+                    "type": "integer",
+                    "index": "no"
+                },
+                "fitcons": {
+                    "type": "float",
+                    "index": "no"
+                },
+                "chmm": {
+                    "properties": {
+                        "tssa": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "tssaflnk": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "txflnk": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "tx": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "txwk": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "enh": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "znfrpts": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "het": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "tssbiv": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "bivflnk": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "enhbiv": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "reprpc": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "reprpcwk": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "quies": {
+                            "type": "float",
+                            "index": "no"
+                        }
+                    }
+                },
+                "encode": {
+                    "properties": {
+                        "exp": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "h3k27ac": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "h3k4me1": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "h3k4me3": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "nucleo": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "occ": {
+                            "type": "integer",
+                            "index": "no"
+                        },
+                        "p_val": {
+                            "properties": {
+                                "comb": {
+                                    "type": "float",
+                                    "index": "no"
+                                },
+                                "dnas": {
+                                    "type": "float",
+                                    "index": "no"
+                                },
+                                "faire": {
+                                    "type": "float",
+                                    "index": "no"
+                                },
+                                "polii": {
+                                    "type": "float",
+                                    "index": "no"
+                                },
+                                "ctcf": {
+                                    "type": "float",
+                                    "index": "no"
+                                },
+                                "mycp": {
+                                    "type": "float",
+                                    "index": "no"
+                                }
+                            }
+                        },
+                        "sig": {
+                            "properties": {
+                                "dnase": {
+                                    "type": "float",
+                                    "index": "no"
+                                },
+                                "faire": {
+                                    "type": "float",
+                                    "index": "no"
+                                },
+                                "polii": {
+                                    "type": "float",
+                                    "index": "no"
+                                },
+                                "ctcf": {
+                                    "type": "float",
+                                    "index": "no"
+                                },
+                                "myc": {
+                                    "type": "float",
+                                    "index": "no"
+                                }
+                            }
+                        }
+                    }
+                },
+                "segway": {
+                    "type": "string",
+                    "analyzer": "string_lowercase",
+                    "index": "no"
+                },
+                "motif": {
+                    "properties": {
+                        "toverlap": {
+                            "type": "integer",
+                            "index": "no"
+                        },
+                        "dist": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "ecount": {
+                            "type": "integer",
+                            "index": "no"
+                        },
+                        "ename": {
+                            "type": "string",
+                            "analyzer": "string_lowercase",
+                            "index": "no"
+                        },
+                        "ehipos": {
+                            "type": "string",
+                            "analyzer": "string_lowercase",
+                            "index": "no"
+                        },
+                        "escorechng": {
+                            "type": "float",
+                            "index": "no"
+                        }
+                    }
+                },
+                "tf": {
+                    "properties": {
+                        "bs": {
+                            "type": "integer",
+                            "index": "no"
+                        },
+                        "bs_peaks": {
+                            "type": "integer",
+                            "index": "no"
+                        },
+                        "bs_peaks_max": {
+                            "type": "float",
+                            "index": "no"
+                        }
+                    }
+                },
+                "isknownvariant": {
+                    "type": "string",
+                    "analyzer": "string_lowercase",
+                    "index": "no"
                 },
                 "consequence": {
                     "type": "string",
@@ -70,6 +399,14 @@ def get_mapping():
                     "properties": {
                         "af": {
                             "type": "float"
+                        },
+                        "afr": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "eur": {
+                            "type": "float",
+                            "index": "no"
                         }
                     }
                 },
@@ -77,6 +414,22 @@ def get_mapping():
                     "properties": {
                         "af": {
                             "type": "float"
+                        },
+                        "asn": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "amr": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "afr": {
+                            "type": "float",
+                            "index": "no"
+                        },
+                        "eur": {
+                            "type": "float",
+                            "index": "no"
                         }
                     }
                 },
@@ -151,6 +504,26 @@ def get_mapping():
                 "dst2spltype": {
                     "type": "string",
                     "analyzer": "string_lowercase"
+                },
+                "exon": {
+                    "type": "string",
+                    "analyzer": "string_lowercase",
+                    "index": "no"
+                },
+                "intron": {
+                    "type": "string",
+                    "analyzer": "string_lowercase",
+                    "index": "no"
+                },
+                "oaa": {
+                    "type": "string",
+                    "analyzer": "string_lowercase",
+                    "index": "no"
+                },
+                "naa": {
+                    "type": "string",
+                    "analyzer": "string_lowercase",
+                    "index": "no"
                 },
                 "grantham": {
                     "type": "integer"
