@@ -1,6 +1,6 @@
 import re
 import json
-from utils.common import dotdict, is_str, is_seq
+from utils.common import dotdict, is_str, is_seq, find_doc
 from utils.es import get_es
 from elasticsearch import NotFoundError, RequestError
 import config
@@ -32,6 +32,8 @@ class ESQuery():
         self._scroll_time = '1m'
         self._total_scroll_size = 1000   # Total number of hits to return per scroll batch
         self._hg38 = _use_hg38
+        self._jsonld = False
+        self._context = json.loads(open(config.JSONLD_CONTEXT_PATH, 'r').read())
         if self._total_scroll_size % self.get_number_of_shards() == 0:
             # Total hits per shard per scroll batch
             self._scroll_size = int(self._total_scroll_size / self.get_number_of_shards())
@@ -58,7 +60,35 @@ class ESQuery():
         # add cadd license info
         if 'cadd' in doc:
             doc['cadd']['_license'] = 'http://goo.gl/bkpNhq'
+        if self._jsonld:
+            doc = self._insert_jsonld(doc)
         return doc
+
+    def _insert_jsonld(self, k):
+        ''' Insert the jsonld links into this document.  Called by _get_variantdoc. '''
+        # get the context
+        context = self._context
+
+        # set the root
+        k.update(context['root'])
+
+        for key in context:
+            if key != 'root':
+                keys = key.split('/')
+                try:
+                    doc = find_doc(k, keys)
+                    if type(doc) == list:
+                        for _d in doc:
+                            _d.update(context[key])
+                    elif type(doc) == dict:
+                        doc.update(context[key])
+                    else:
+                        continue
+                        #print('error')
+                except:
+                    continue
+                    #print('keyerror')
+        return k
 
     def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False):
         '''res is the dictionary returned from a query.
@@ -146,6 +176,7 @@ class ESQuery():
         options.rawquery = kwargs.pop('rawquery', False)
         options.fetch_all = kwargs.pop('fetch_all', False)
         options.jsonld = kwargs.pop('jsonld', False)
+        self._jsonld = options.jsonld
         options.host = kwargs.pop('host', 'myvariant.info')
         scopes = kwargs.pop('scopes', None)
         if scopes:
@@ -188,8 +219,6 @@ class ESQuery():
             return res
 
         res = self._get_variantdoc(res)
-        if options.jsonld:
-            res['@context'] = 'http://' + options.host + '/context/variant.jsonld'
         return res
 
     def mget_variants(self, vid_list, **kwargs):
@@ -240,8 +269,6 @@ class ESQuery():
             else:
                 for hit in hits:
                     hit[u'query'] = qterm
-                    if options.jsonld:
-                        hit['@context'] = 'http://' + options.host + '/context/variant.jsonld'
                     _res.append(hit)
         return _res
 

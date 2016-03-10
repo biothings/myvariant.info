@@ -34,5 +34,6 @@ HG19_DATAFILE = '/path/to/hg19_bit_p13.pyobj'
 # For www module only         #
 ###############################
 FIELD_NOTES_PATH = os.path.join(SRC_PATH, 'www/context/myvariant_field_table_notes.json')
+JSONLD_CONTEXT_PATH = os.path.join(SRC_PATH, 'www/context/context.json')
 GA_ACCOUNT = ''
 RUN_IN_PROD = False    # set to True in prod server
