@@ -107,6 +107,10 @@ def _map_line_to_json(cp):
                 if 'GRCh38' in SequenceLocation.Assembly:
                     chromStart_38 = SequenceLocation.start
                     chromEnd_38 = SequenceLocation.stop
+                    if not ref:
+                        ref = SequenceLocation.referenceAllele
+                    if not alt:
+                        alt = SequenceLocation.alternateAllele
         if Measure.MeasureRelationship:
             try:
                 symbol = Measure.MeasureRelationship[0].\

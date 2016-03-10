@@ -1,5 +1,5 @@
 {
     "data_source_name": "dbsnp",
     "data_source_uri": "http://www.ncbi.nlm.nih.gov/SNP/",
-    "data_fields": "http://myvariant.info/metadata/fields?search=dbsnp"
+    "data_fields": "http://myvariant.info/metadata/fields?prefix=dbsnp"
 }

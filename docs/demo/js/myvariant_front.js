@@ -18,12 +18,17 @@ function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
-function successHandler(data, textStatus, jqXHR) {
+function successHandler(data, textStatus, jqXHR, searchURL) {
     jQuery('.introduction').hide();
     jQuery('.json-panel button').remove();
     jQuery('.json-panel').remove();
     jQuery('.json-view').remove();
-    jQuery('.results').html("<div class='json-panel'><p id='total-text'></p><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button></div><div class='json-view'></div>").show();
+    if(searchURL) {
+        jQuery('.results').html("<div class='json-panel'><p id='total-text'></p><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button><a href='" + searchURL + "' target='_blank'>" + searchURL + "</a></div><div class='json-view'></div>").show();
+    }
+    else { 
+        jQuery('.results').html("<div class='json-panel'><p id='total-text'></p><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button></div><div class='json-view'></div>").show();
+    }
     jQuery('.json-panel button').button();
     jQuery('.json-view').JSONView(data); //, {collapsed: true});
     jQuery('.json-view').JSONView('expand');
@@ -86,21 +91,6 @@ jQuery(document).ready(function() {
             console.log("Error getting available fields.");
         }
     );
-    // genome assembly
-    jQuery('#genome-assembly').buttonset();
-    jQuery("#hg19").button("option", "icons", { primary: 'ui-icon-check' });
-    jQuery("#hg38").button("option", "icons", { primary: 'ui-icon-check' });
-    jQuery("label[for='hg38'] span.ui-icon-check").hide();
-
-    jQuery("#genome-assembly input[type=radio]").on("click", function () {
-        jQuery("#genome-assembly input[type=radio]").each(function () {
-            if (jQuery(this).is(":checked")) {
-                jQuery("label[for='" + jQuery(this).attr('id') + "'] span.ui-icon-check").show();
-            } else {
-                jQuery("label[for='" + jQuery(this).attr('id') + "'] span.ui-icon-check").hide();
-            }
-        });
-    });
 
     // variant examples
     jQuery('.variant-example a').click(function() {
@@ -134,8 +124,6 @@ jQuery(document).ready(function() {
             jQuery('#main-input').val("chr1:69000-70000");
             jQuery("#fields-input").val("");
             jQuery("#size-input").val("10").selectmenu('refresh', true);
-            jQuery("#hg19").prop("checked", true);
-            jQuery("#genome-assembly").buttonset('refresh', true);
         }
         else if(jQuery(this).data().example == "help") { 
             
@@ -152,36 +140,43 @@ jQuery(document).ready(function() {
         if(!(fieldsText)) {fieldsText = 'all';}
         if(endsWith(fieldsText, ', ')) {fieldsText = fieldsText.substring(0, fieldsText.length - 2);}
         if(endsWith(fieldsText, ',')) {fieldsText = fieldsText.substring(0, fieldsText.length - 1);}
+        var searchURL = '';
+        var getURL = '';
         if(searchType == 1) {
             // HGVS ID query
             errorHandler("Query executing . . .", "executing");
             if(queryText.indexOf(",") == -1) {
                 // get to variant endpoint
-                jQuery.get(endpointBase + '/v1/variant/' + encodeURIComponent(queryText) + '?fields=' + encodeURIComponent(fieldsText)).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve annotation " + jQuery('#main-input').val() + ".  ", "error");});
+                getURL = endpointBase + '/v1/variant/' + encodeURIComponent(queryText) + '?fields=' + encodeURIComponent(fieldsText);
+                searchURL = decodeURIComponent(getURL);
+                jQuery.get(getURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve annotation " + jQuery('#main-input').val() + ".  ", "error");});
             }
             else {
                 // post to variant endpoint
-                jQuery.post(endpointBase + '/v1/variant', {'ids': queryText, 'fields': fieldsText}).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Error retrieving annotations.", "error");});
+                jQuery.post(endpointBase + '/v1/variant', {'ids': queryText, 'fields': fieldsText}).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, '');}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Error retrieving annotations.", "error");});
             }
         }
         else if(searchType == 2) {
-            var querySize = jQuery('#size-input').val();
-            var gaType = jQuery('#genome-assembly input:checked').val();
-            if(gaType == 'hg38') {gaType = '&hg38=True';}
-            else {gaType = '';}
             // Full text query
             errorHandler("Query executing . . .", "executing");
-            jQuery.get(endpointBase + '/v1/query?q=' + encodeURIComponent(queryText) + '&fields=' + encodeURIComponent(fieldsText) + '&size=' + querySize + gaType).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
+            var querySize = jQuery('#size-input').val();
+            getURL = endpointBase + '/v1/query?q=' + encodeURIComponent(queryText) + '&fields=' + encodeURIComponent(fieldsText) + '&size=' + querySize;
+            searchURL = decodeURIComponent(getURL);
+            jQuery.get(getURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
         }
         else if(searchType == 3) {
             // metadata query
             errorHandler("Query executing . . .", "executing");
-            jQuery.get(endpointBase + '/metadata').done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve MyVariant database metadata.  API error.", "error");});
+            getURL = endpointBase + '/metadata';
+            searchURL = decodeURIComponent(getURL);
+            jQuery.get(getURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve MyVariant database metadata.  API error.", "error");});
         }
         else if(searchType == 4) {
             // available fields query
             errorHandler("Query executing . . .", "executing");
-            jQuery.get(endpointBase + '/metadata/fields').done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve available fields.  API error.", "error");});
+            getURL = endpointBase + '/metadata/fields';
+            searchURL = decodeURIComponent(getURL);
+            jQuery.get(getURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve available fields.  API error.", "error");});
         }
     });
     // Select menu is a widget
@@ -198,8 +193,6 @@ jQuery(document).ready(function() {
                 jQuery("#fields-input").prop('disabled', false);
                 jQuery("#size-input-button").hide();
                 jQuery("label[for='size-input-button']").hide();
-                jQuery("#genome-assembly").hide();
-                jQuery("label[for='genome-assembly']").hide();
                 jQuery(".examples").hide();
                 jQuery(".variant-example").show();
             }
@@ -210,8 +203,6 @@ jQuery(document).ready(function() {
                 jQuery("#fields-input").prop('disabled', false);
                 jQuery("#size-input-button").show();
                 jQuery("label[for='size-input-button']").show();
-                jQuery("#genome-assembly").show();
-                jQuery("label[for='genome-assembly']").show();
                 jQuery(".examples").hide();
                 jQuery(".query-example").show();
             }
@@ -223,8 +214,6 @@ jQuery(document).ready(function() {
                 jQuery("#fields-input").prop('disabled', true);
                 jQuery("#size-input-button").hide();
                 jQuery("label[for='size-input-button']").hide();
-                jQuery("#genome-assembly").hide();
-                jQuery("label[for='genome-assembly']").hide();
                 jQuery(".examples").hide();
                 jQuery(".filler").show();
             }
@@ -236,8 +225,6 @@ jQuery(document).ready(function() {
                 jQuery("#fields-input").prop('disabled', true);
                 jQuery("#size-input-button").hide();
                 jQuery("label[for='size-input-button']").hide();
-                jQuery("#genome-assembly").hide();
-                jQuery("label[for='genome-assembly']").hide();
                 jQuery(".examples").hide();
                 jQuery(".filler").show();
             }

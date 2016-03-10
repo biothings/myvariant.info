@@ -479,7 +479,7 @@ class ESIndexer():
                 break
             else:
                 for doc in res['hits']['hits']:
-                    _doc = doc['_source']
+                    _doc = doc.get('_source', {})
                     # "_id" field is not stored by default
                     # so it may not be returned in _source
                     _doc.setdefault("_id", doc["_id"])
