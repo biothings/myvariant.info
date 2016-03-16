@@ -330,9 +330,35 @@ def test_jsonld():
     res = json_ok(get_ok(api + '/variant/chr11:g.66397320A>G?jsonld=true'))
     assert '@context' in res
 
+    # Check some subfields
+    assert 'snpeff' in res and '@context' in res['snpeff']
+
+    assert 'ann' in res['snpeff'] and '@context' in res['snpeff']['ann'][0]
+
+    # Check a post with jsonld
     res = json_ok(post_ok(api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'jsonld': 'true'}))
     for r in res:
         assert '@context' in r
+
+    # Check a query get with jsonld
+    res = json_ok(get_ok(api + '/query?q=_exists_:clinvar&fields=clinvar&size=1&jsonld=true'))
+
+    assert '@context' in res['hits'][0]
+
+    # subfields
+    assert 'clinvar' in res['hits'][0] and '@context' in res['hits'][0]['clinvar']
+    assert 'gene' in res['hits'][0]['clinvar'] and '@context' in res['hits'][0]['clinvar']['gene']
+
+    # Check query post with jsonld
+    res = json_ok(post_ok(api + '/query', {'q': 'rs58991260,rs2500',
+                                           'scopes': 'dbsnp.rsid',
+                                           'jsonld': 'true'}))
+
+    assert len(res) == 2
+    assert '@context' in res[0] and '@context' in res[1]
+    assert 'snpeff' in res[1] and '@context' in res[1]['snpeff']
+    assert 'ann' in res[1]['snpeff'] and '@context' in res[1]['snpeff']['ann'][0]
+
 
 def test_genome_assembly():
     res = json_ok(get_ok(api + '/query?q=clinvar.ref:C%20AND%20chr11:56319006%20AND%20clinvar.alt:A&assembly=hg38'))
