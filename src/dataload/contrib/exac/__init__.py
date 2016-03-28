@@ -1,3 +1,7 @@
+from .exac_parser import load_data as _load_data
+
+EXAC_INPUT_FILE = '<file_path_to_exac_vcf_file>'
+
 __METADATA__ = {
     "src_name": 'exac',
     "src_url": 'ftp://ftp.broadinstitute.org/pub/ExAC_release/release0.3/ExAC.r0.3.nonpsych.sites.vcf.gz',
@@ -5,13 +9,19 @@ __METADATA__ = {
     "field": 'exac'
 }
 
+
+def load_data():
+    exac_data = _load_data(EXAC_INPUT_FILE)
+    return exac_data
+
+
 def get_mapping():
     mapping = {
         "exac": {
             "properties": {
                 "chrom": {
                     "type": "string",
-		    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase"
                 },
                 "pos": {
                     "type": "long"
