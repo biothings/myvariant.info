@@ -9,9 +9,9 @@ import config
 # _exists_:dbnsfp AND _exists_:dbsnp AND _exists_:mutdb AND _exists_:cosmic AND _exists_:clinvar AND _exists_:gwassnps
 
 HG38_FIELDS = ['clinvar.hg38', 'dbnsfp.hg38', 'evs.hg38']
-HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19', 'dbsnp.hg19', 'docm.hg19', 'evs.hg19', 'grasp.hg19', 'mutdb.hg19', 'wellderly.hg19']
+HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19', 'dbsnp.hg19', 'docm.hg19', 'evs.hg19', 'grasp.hg19'] #, 'mutdb.hg19', 'wellderly.hg19']
 CHROM_FIELDS = ['cadd.chrom', 'clinvar.chrom', 'cosmic.chrom', 'dbnsfp.chrom', 'dbsnp.chrom', 'docm.chrom',
-                'evs.chrom', 'exac.chrom', 'mutdb.chrom', 'wellderly.chrom']
+                'evs.chrom', 'exac.chrom']#, 'mutdb.chrom', 'wellderly.chrom']
 
 
 class MVQueryError(Exception):
@@ -344,106 +344,6 @@ class ESQuery():
                     else:
                         r['query'] = None
                     return r
-
-    def build_interval_query(self, chr, gstart, gend, **kwargs):
-        #gstart = safe_genome_pos(gstart)
-        #gend = safe_genome_pos(gend)
-        if chr.lower().startswith('chr'):
-            chr = chr[3:]
-        # _query = {
-        #     "query": {
-        #         "bool": {
-        #             "should": [
-        #                 {
-        #                     "bool": {
-        #                         "must": [
-        #                             {
-        #                                 "term": {"chrom": chr.lower()}
-        #                             },
-        #                             {
-        #                                 "range": {"chromStart": {"lte": gend}}
-        #                             },
-        #                             {
-        #                                 "range": {"chromEnd": {"gte": gstart}}
-        #                             }
-        #                         ]
-        #                     }
-        #                 },
-        #                 {
-        #                     "bool": {
-        #                         "must": [
-        #                             {
-        #                                 "term": {"chrom": chr.lower()}
-        #                             },
-        #                             {
-        #                                 "range": {"dbnsfp.hg19.start": {"lte": gend}}
-        #                             },
-        #                             {
-        #                                 "range": {"dbnsfp.hg19.end": {"gte": gstart}}
-        #                             }
-        #                         ]
-        #                     }
-        #                 }
-        #             ]
-        #         }
-        #     }
-        # }
-        #_query = {
-        #    "query": {
-        #        "bool": {
-        #            "must": []
-        #        }
-        #    }
-        #}
-
-        _query = {
-            "query": {
-                "filtered": {
-                    "query": {
-                        "bool": {
-                            "should": [{
-                                "bool": {
-                                    "must": [
-                                        {
-                                            "range": {field + ".start": {"lte": gend}}
-                                        },
-                                        {
-                                            "range": {field + ".end": {"gte": gstart}}
-                                        }
-                                    ]
-                                }
-                            } for field in self._get_genome_assembly_type()]
-                        }
-                    },
-                    "filter": {
-                        "bool": {
-                            "should": [{
-                                "term": {field: chr.lower()}
-                            } for field in self._get_chrom_fields()]
-                        }
-                    }
-                }
-            }
-        }
-
-        #for field in self._get_genome_assembly_type():
-        #    _q = {
-        #        "bool": {
-        #            "must": [
-        #                {
-        #                    "term": {field.split(".")[0] + ".chrom": chr.lower()}
-        #                },
-        #                {
-        #                    "range": {field + ".start": {"lte": gend}}
-        #                },
-        #                {
-        #                    "range": {field + ".end": {"gte": gstart}}
-        #                }
-        #            ]
-        #        }
-        #    }
-        #    _query["query"]["bool"]["must"].append(_q)
-        return _query
 
     def query_fields(self, **kwargs):
         # query the metadata to get the available fields for a variant object
