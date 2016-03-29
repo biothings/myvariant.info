@@ -532,9 +532,43 @@ class ESQueryBuilder:
         if chr.lower().startswith('chr'):
             chr = chr[3:]
 
+        # ES 1.x query
+        #_query = {
+        #    "query": {
+        #        "filtered": {
+        #            "filter": {
+        #                "bool": {
+        #                    "must": [{
+        #                        "bool": {
+        #                            "should": [{
+        #                                "term": {field: chr.lower()}
+        #                            } for field in self._get_chrom_fields()]
+        #                        }
+        #                    }, {
+        #                        "bool": {
+        #                            "should": [{
+        #                                "bool": {
+        #                                    "must": [
+        #                                        {
+        #                                            "range": {field + ".start": {"lte": gend}}
+        #                                        },
+        #                                        {
+        #                                            "range": {field + ".end": {"gte": gstart}}
+        #                                        }
+        #                                    ]
+        #                                }
+        #                            } for field in self._get_genome_position_fields(hg38)]
+        #                        }
+        #                    }]
+        #                }
+        #            }
+        #        }
+        #    }
+        #}
+        # ES 2.x query
         _query = {
             "query": {
-                "filtered": {
+                "bool": {
                     "filter": {
                         "bool": {
                             "must": [{
@@ -565,5 +599,5 @@ class ESQueryBuilder:
             }
         }
         if rquery:
-            _query["query"]["filtered"]["query"] = {"query_string": {"query": rquery}}
+            _query["query"]["bool"]["must"] = {"query_string": {"query": rquery}}
         return _query
