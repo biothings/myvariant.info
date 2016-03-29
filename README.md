@@ -46,11 +46,11 @@ How to contribute
 If you have/find a variant annotation resource you want to included in our system, you can following the guideline below to contribute a JSON importer (let's call it "**data plugin**") for it.
 
 * Code in Python (at least for now)
-* Using hg19 genome assembly for genomic cordinates (assuming we are dealing with human variants for now)
+* Using hg19 or hg38 genome assembly for genomic cordinates (assuming we are dealing with human variants for now)
 * all data plugins is under *[src/dataload/contrib](https://github.com/SuLab/myvariant.info/tree/master/src/dataload/contrib)* folder.
-* check out the example *[src/dataload/contrib/cosmic](https://github.com/SuLab/myvariant.info/tree/master/src/dataload/contrib/cosmic)* for loading cosmic data from UCSC server. The following should be defined:
-  * **load_data** function: the output of this function should be either a **list** or **[generator](https://wiki.python.org/moin/Generators)** of JSON documents. A **generator** is ideal for large lists won't fit into memeory. For example, [*cosmic*](https://github.com/SuLab/myvariant.info/tree/master/src/dataload/contrib/cosmic) example above uses generator. See [requirements/example](#a-very-simple-rule-to-aggregate-variant-annotations) above for each JSON document.
+* check out the example *[src/dataload/contrib/exac](https://github.com/SuLab/myvariant.info/tree/master/src/dataload/contrib/exac)* for loading EXAC data from its VCF file. The following should be defined:
+  * **load_data** function: the output of this function should be either a **list** or **[generator](https://wiki.python.org/moin/Generators)** of JSON documents. A **generator** is ideal for large lists won't fit into memeory. For example, [*exac*](https://github.com/SuLab/myvariant.info/tree/master/src/dataload/contrib/exac) example above uses generator. See [requirements/example](#a-very-simple-rule-to-aggregate-variant-annotations) above for each JSON document.
   * **Meta** dictionary: you can put some metadata like "maintainer", "requirements", etc. Note that "requirements" is a list of strings follows [pip requirements.txt format](https://pip.pypa.io/en/1.1/requirements.html).
   * **get_mapping** function: optional, this can be used to customize the indexing. You can just leave it empty.
-* fork this repo, and add your own data plugin (under a subfolder, like *cosmic* example), commit and send the pull request.
+* fork this repo, and add your own data plugin (under a subfolder, like *exac* example), commit and send the pull request.
 * And the last, if you have trouble to code a data plugin, you can just produce a dump of JSON document list using whatever tools you like, and send over your dumped file to us. But that will require us to load it manually.
