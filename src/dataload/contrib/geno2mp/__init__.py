@@ -11,5 +11,5 @@ __METADATA__ = {
 
 
 def load_data():
-    exac_data = _load_data(GENO2MP_INPUT_FILE)
-    return exac_data
+    geno2mp_data = _load_data(GENO2MP_INPUT_FILE)
+    return geno2mp_data
