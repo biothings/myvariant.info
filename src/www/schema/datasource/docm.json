@@ -1,5 +1,0 @@
-{
-    "data_source_name": "docm",
-    "data_source_uri": "http://docm.genome.wustl.edu",
-    "data_fields": "http://myvariant.info/metadata/fields?prefix=docm"
-}

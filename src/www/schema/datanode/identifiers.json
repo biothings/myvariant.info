@@ -1,6 +1,0 @@
-{
-    "field_name": "identifiers",
-    "type": "data node",
-    "path": "clinvar/rcv/conditions/identifiers",
-    "data_source": "clinvar"
-}

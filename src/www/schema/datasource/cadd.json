@@ -1,5 +1,0 @@
-{
-    "data_source_name": "cadd",
-    "data_source_uri": "http://cadd.gs.washington.edu/",
-    "data_fields": "http://myvariant.info/metadata/fields?prefix=cadd"
-}

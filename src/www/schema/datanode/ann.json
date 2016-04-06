@@ -1,6 +1,0 @@
-{
-    "field_name": "ann",
-    "type": "data node",
-    "path": "snpeff/ann",
-    "data_source": "snpeff"
-}

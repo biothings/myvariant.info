@@ -1,5 +1,0 @@
-{
-    "data_source_name": "mutdb",
-    "data_source_uri": "http://www.mutdb.org/",
-    "data_fields": "http://myvariant.info/metadata/fields?prefix=mutdb"
-}

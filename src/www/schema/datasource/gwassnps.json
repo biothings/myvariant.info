@@ -1,5 +1,0 @@
-{
-    "data_source_name": "gwassnps",
-    "data_source_uri": "https://www.ebi.ac.uk/gwas/",
-    "data_fields": "http://myvariant.info/metadata/fields?prefix=gwassnps"
-}
