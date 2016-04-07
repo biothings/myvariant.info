@@ -1,0 +1,5 @@
+{
+    "data_source_name": "dbnsfp",
+    "data_source_uri": "https://sites.google.com/site/jpopgen/dbNSFP",
+    "data_fields": "http://myvariant.info/metadata/fields?prefix=dbnsfp"
+}

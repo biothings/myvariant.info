@@ -1,0 +1,6 @@
+{
+    "field_name": "gene",
+    "type": "data node",
+    "path": ["cadd/gene", "clinvar/gene", "dbsnp/gene", "evs/gene"],
+    "data_source": ["cadd", "clinvar", "dbsnp", "evs"]
+}

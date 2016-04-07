@@ -1,0 +1,5 @@
+{
+    "data_source_name": "emv",
+    "data_source_uri": "http://geneticslab.emory.edu/emvclass/emvclass.php",
+    "data_fields": "http://myvariant.info/metadata/fields?prefix=emv"
+}
