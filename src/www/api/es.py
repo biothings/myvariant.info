@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import re
+import json
 from biothings.www.api.es import ESQuery
 from settings import MyVariantSettings
 
@@ -9,12 +11,13 @@ class ESQuery(ESQuery):
         super( ESQuery, self ).__init__()
         self._jsonld = False    
         self._hg38 = False
+        self._context = json.loads(open(myvariant_settings.jsonld_context_path, 'r').read()) 
 
     def _get_genome_position_fields(self, hg38=False):
         if hg38:
-            return myvariant_settings.hg38_fields()
+            return myvariant_settings.hg38_fields
         else:
-            return myvariant_settings.hg19_fields()
+            return myvariant_settings.hg19_fields
 
     def _parse_interval_query(self, q):
         interval_pattern = r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*'
@@ -35,7 +38,7 @@ class ESQuery(ESQuery):
                         r['query'] = None
                     return r
 
-    def build_interval_query(self, chr, gstart, gend, rquery, hg38, **kwargs):
+    def build_interval_query(self, chr, gstart, gend, rquery, hg38):
         """ Build an interval query - called by the ESQuery.query method. """
         if chr.lower().startswith('chr'):
             chr = chr[3:]
@@ -74,12 +77,6 @@ class ESQuery(ESQuery):
         if rquery:
             _query["query"]["bool"]["must"] = {"query_string": {"query": rquery}}
         return _query
-
-    def get_mapping_meta(self):
-        """return the current _meta field."""
-        m = self._es.indices.get_mapping(index=self._index, doc_type=self._doc_type)
-        m = m[self._index]['mappings'][self._doc_type]
-        return m.get('_meta', {})
 
     def _insert_jsonld(self, k):
         ''' Insert the jsonld links into this document.  Called by _get_variantdoc. '''
@@ -120,3 +117,18 @@ class ESQuery(ESQuery):
     def _use_hg19(self):
         self._hg38 = False
 
+    def _get_options(self, options, kwargs):
+        options.jsonld = kwargs.pop('jsonld', False)
+        self._jsonld = options.jsonld
+        return options
+
+    def _build_query(self, q, kwargs):
+        # overriding to implement interval query
+        interval_query = self._parse_interval_query(q)
+        if interval_query:
+            return self.build_interval_query(chr=interval_query["chr"],
+                                              gstart=interval_query["gstart"],
+                                              gend=interval_query["gend"],
+                                              rquery=interval_query["query"],
+                                              hg38=self._hg38)
+        return {"query":{"query_string":{"query":q}}}

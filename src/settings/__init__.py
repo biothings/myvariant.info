@@ -10,20 +10,28 @@ class MyVariantSettings(BiothingSettings):
     @property
     def hg38_fields(self):
         try:
-            self._return_var('HG38_FIELDS')
+            return self._return_var('HG38_FIELDS')
         except:
             return HG38_FIELDS
 
     @property
     def hg19_fields(self):
         try:
-            self._return_var('HG19_FIELDS')
+            return self._return_var('HG19_FIELDS')
         except:
             return HG19_FIELDS
 
     @property
     def chrom_fields(self):
         try:
-            self._return_var('CHROM_FIELDS')
+            return self._return_var('CHROM_FIELDS')
         except:
             return CHROM_FIELDS
+
+    @property
+    def jsonld_context_path(self):
+        try:
+            return self._return_var('JSONLD_CONTEXT_PATH')
+        except:
+            print("JSONLD_CONTEXT_PATH was not found in your config file.  No context file loaded.")
+            return {}

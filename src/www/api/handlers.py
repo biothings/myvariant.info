@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 from biothings.www.api.handlers import MetaDataHandler, BiothingHandler, QueryHandler, StatusHandler, FieldsHandler
 from settings import MyVariantSettings
 from www.api.es import ESQuery
