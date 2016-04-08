@@ -255,8 +255,8 @@ def test_metadata():
 
 
 def test_query_facets():
-    pass
-
+    res = json_ok(get_ok(api + '/query?q=cadd.gene.gene_id:ENSG00000113368&facets=cadd.polyphen.cat&size=0'))
+    assert 'facets' in res and 'cadd.polyphen.cat' in res['facets']
 
 def test_unicode():
     s = '基因'
