@@ -9,9 +9,7 @@ myvariant_settings = MyVariantSettings()
 class ESQuery(ESQuery):
     def __init__(self):
         super( ESQuery, self ).__init__()
-        self._jsonld = False    
         self._hg38 = False
-        self._context = json.loads(open(myvariant_settings.jsonld_context_path, 'r').read()) 
 
     def _get_genome_position_fields(self, hg38=False):
         if hg38:
@@ -78,37 +76,9 @@ class ESQuery(ESQuery):
             _query["query"]["bool"]["must"] = {"query_string": {"query": rquery}}
         return _query
 
-    def _insert_jsonld(self, k):
-        ''' Insert the jsonld links into this document.  Called by _get_variantdoc. '''
-        # get the context
-        context = self._context
-
-        # set the root
-        k.update(context['root'])
-
-        for key in context:
-            if key != 'root':
-                keys = key.split('/')
-                try:
-                    doc = find_doc(k, keys)
-                    if type(doc) == list:
-                        for _d in doc:
-                            _d.update(context[key])
-                    elif type(doc) == dict:
-                        doc.update(context[key])
-                    else:
-                        continue
-                        #print('error')
-                except:
-                    continue
-                    #print('keyerror')
-        return k
-
     def _modify_biothingdoc(self, doc, options):
         if 'cadd' in doc:
             doc['cadd']['_license'] = 'http://goo.gl/bkpNhq'
-        if self._jsonld:
-            doc = self._insert_jsonld(doc)
         return doc
 
     def _use_hg38(self):
@@ -116,11 +86,6 @@ class ESQuery(ESQuery):
 
     def _use_hg19(self):
         self._hg38 = False
-
-    def _get_options(self, options, kwargs):
-        options.jsonld = kwargs.pop('jsonld', False)
-        self._jsonld = options.jsonld
-        return options
 
     def _build_query(self, q, kwargs):
         # overriding to implement interval query

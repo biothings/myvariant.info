@@ -10,7 +10,6 @@ myvariant_settings = MyVariantSettings()
 class VariantHandler(BiothingHandler):
     ''' This class is for the /variant endpoint. '''
     esq = ESQuery()
-    boolean_parameters = set(['raw', 'rawquery', 'fetch_all', 'explain', 'jsonld'])
 
     def _examine_kwargs(self, action, kwargs):
         # subclassed to add redirection, assembly, etc
@@ -30,7 +29,6 @@ class VariantHandler(BiothingHandler):
 class QueryHandler(QueryHandler):
     ''' This class is for the /query endpoint. '''
     esq = ESQuery()
-    boolean_parameters = set(['raw', 'rawquery', 'fetch_all', 'explain', 'jsonld'])
 
     def _examine_kwargs(self, action, kwargs):
         self.esq._use_hg19()

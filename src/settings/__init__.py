@@ -27,11 +27,3 @@ class MyVariantSettings(BiothingSettings):
             return self._return_var('CHROM_FIELDS')
         except:
             return CHROM_FIELDS
-
-    @property
-    def jsonld_context_path(self):
-        try:
-            return self._return_var('JSONLD_CONTEXT_PATH')
-        except:
-            print("JSONLD_CONTEXT_PATH was not found in your config file.  No context file loaded.")
-            return {}
