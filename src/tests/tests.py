@@ -191,8 +191,16 @@ def test_query_interval():
 
 
 def test_query_size():
-    # TODO
-    pass
+    # TODO: port other tests (refactor to biothing.api ?)
+    
+    res = json_ok(get_ok(api + '/query?q=*'))
+    eq_(len(res['hits']), 10) # default
+    res = json_ok(get_ok(api + '/query?q=*&size=1000'))
+    eq_(len(res['hits']), 1000)
+    res = json_ok(get_ok(api + '/query?q=*&size=1001'))
+    eq_(len(res['hits']), 1000)
+    res = json_ok(get_ok(api + '/query?q=*&size=2000'))
+    eq_(len(res['hits']), 1000)
 
 
 def test_variant():
