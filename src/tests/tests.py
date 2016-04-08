@@ -374,3 +374,9 @@ def test_HGVS_redirect():
     eq_(res2, res3)
     eq_(res3, res4)
     eq_(res["_id"], 'chr11:g.66397320A>G')
+
+def test_status_endpoint():
+    get_ok(host + '/status')
+    # (testing failing status would require actually loading tornado app from there 
+    #  and deal with config params...)
+
