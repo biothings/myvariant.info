@@ -41,18 +41,16 @@ class StatusHandler(StatusHandler):
     ''' This class is for the /status endpoint. '''
     esq = ESQuery()
 
+
 class FieldsHandler(FieldsHandler):
     ''' This class is for the /metadata/fields endpoint. '''
     esq = ESQuery()
+
 
 class MetaDataHandler(MetaDataHandler):
     ''' This class is for the /metadata endpoint. '''
     esq = ESQuery()
     disable_caching = True
-
-    def get(self):
-        _meta = self.esq.get_mapping_meta()
-        self.return_json(_meta)
 
 
 def return_applist():
