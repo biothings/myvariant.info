@@ -13,7 +13,7 @@ import json
 import sys
 import os
 from nose.tools import ok_, eq_
-import variant_list
+#import variant_list
 
 try:
     import msgpack

@@ -45,7 +45,7 @@ QUERY_POST_DATA = []
 
 # This is a sample ID that will have non-ascii characters injected into it to test non-ascii 
 # handling on the annotation endpoint
-ANNOTATION_NON_ASCII_ID = ''
+ANNOTATION_NON_ASCII_ID = 'chr6:g.152708291G>A'
 
 # -----------------------------------------------------------------------------------
 

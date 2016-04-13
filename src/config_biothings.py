@@ -49,6 +49,6 @@ API_VERSION = 'v1'
 # TODO Fill in a status id here
 STATUS_CHECK_ID = 'chr1:g.218631822G>A'
 # Path to a file containing a json object with information about elasticsearch fields
-FIELD_NOTES_PATH = 'context/myvariant_field_table_notes.json'
+FIELD_NOTES_PATH = 'www/context/myvariant_field_table_notes.json'
 JSONLD_CONTEXT_PATH = 'www/context/context.json'
 NOSETEST_SETTINGS = 'tests.nosetest_config'
