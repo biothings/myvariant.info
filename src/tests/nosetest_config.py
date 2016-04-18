@@ -1,6 +1,7 @@
 ###################################################################################
 # Nosetest settings
 ###################################################################################
+from tests import variant_list
 
 # This is the name of the environment variable to load for testing
 HOST_ENVAR_NAME = 'MV_HOST'
@@ -21,15 +22,22 @@ ANNOTATION_OBJECT_EXPECTED_ATTRIBUTE_LIST = ['_id', '_version', 'cadd', 'clinvar
 
 # This is a list of IDs (& options) to test a GET to the annotation endpoint
 ANNOTATION_GET_IDS = ['chr6:g.152708291G>A', 
+                      'chr6:g.152708291G>A?fields=cadd&callback=mycallback', 
                       'chr6:g.152708291G>A?fields=cadd,clinvar.hg19,clinvar.hg38,exac.ac.ac', 
                       'chr6:g.152708291G>A?jsonld=true',
-                      'chr6:g.152708291G>A?fields=cadd,clinvar.hg19,clinvar.hg38,exac.ac.ac&jsonld=true'] 
+                      'chr6:g.152708291G>A?fields=cadd,clinvar.hg19,clinvar.hg38,exac.ac.ac&jsonld=true'
+                     ] 
 
 # -----------------------------------------------------------------------------------
 
 # This is a list of dictionaries to test a POST to the annotation endpoint
 
-ANNOTATION_POST_DATA = []
+ANNOTATION_POST_DATA = [{'ids': 'chr16:g.28883241A>G'},
+                        {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G'},
+                        {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'fields': 'dbsnp'},
+                        {'ids': variant_list.VARIANT_POST_LIST},
+                        {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'jsonld': 'true'}
+                        ]
 
 # -----------------------------------------------------------------------------------
 
@@ -43,22 +51,15 @@ QUERY_POST_DATA = []
 
 # -----------------------------------------------------------------------------------
 
-# This is a sample ID that will have non-ascii characters injected into it to test non-ascii 
-# handling on the annotation endpoint
-ANNOTATION_NON_ASCII_ID = 'chr6:g.152708291G>A'
-
-# -----------------------------------------------------------------------------------
-
-# This is a sample query that will have non-ascii characters injected into it to test
-# non-ascii handling on the query endpoint
-QUERY_NON_ASCII = ''
-
-# -----------------------------------------------------------------------------------
-
-# This is a sample query to test the callback function
-QUERY_CALLBACK_TEST = ''
-
-# -----------------------------------------------------------------------------------
-
 # This is a sample query to test the query size cap.  This query should be one that has more than 1000 total hits.
-QUERY_SIZE_TEST = ''
+QUERY_SIZE_TEST = 'clinvar.chrom:"22"'
+
+# -----------------------------------------------------------------------------------
+
+# This is the minimum number of unique field keys (from /metadata/fields)
+MINIMUM_NUMBER_OF_ACCEPTABLE_FIELDS = 480
+
+# -----------------------------------------------------------------------------------
+
+# This is the minimum number of unique field keys (from /metadata/fields)
+TEST_FIELDS_GET_FIELDS_ENDPOINT = ['cadd', 'dbnsfp', 'dbsnp', 'wellderly', 'clinvar']
