@@ -1,9 +1,9 @@
-DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP3.0b2c_variant.chr*'
+DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP3.1b2c_variant.chr*'
 
 __METADATA__ = {
     "src_name": 'dbNSFP',
     "src_url": 'https://sites.google.com/site/jpopgen/dbNSFP',
-    "version": '3.0',
+    "version": '3.1',
     "field": 'dbnsfp'
 }
 
@@ -73,6 +73,9 @@ def get_mapping():
                             "type": "string"
                         },
                         "codonpos": {
+                            "type": "integer"
+                        },
+                        "codon_degeneracy": {
                             "type": "integer"
                         }
                     }
@@ -555,6 +558,16 @@ def get_mapping():
                         # },
                         "trait": {
                             "type": "string"        # can contain |, FIXME
+                        }
+                    }
+                },
+                "gtex": {
+                    "properties": {
+                        "gene": {
+                            "type": "string"
+                        },
+                        "tissue": {
+                            "type": "string"
                         }
                     }
                 }
