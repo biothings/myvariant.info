@@ -42,7 +42,13 @@ ANNOTATION_POST_DATA = [{'ids': 'chr16:g.28883241A>G'},
 # -----------------------------------------------------------------------------------
 
 # This is a list of query strings (& options to test a GET to the query endpoint
-QUERY_GETS = []
+QUERY_GETS = ['rs58991260',
+              '_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen',
+              'clinvar.chrom:"10"&fields=clinvar&callback=mycallback',
+              #'clinvar.chrom:"10"&fields=clinvar&fetch_all=true',
+              'clinvar.chrom:"10"&fields=clinvar&facets=clinvar.chrom',
+              'clinvar.chrom:"10"&fields=clinvar&size=2000']
+              
 
 # -----------------------------------------------------------------------------------
 
@@ -63,3 +69,8 @@ MINIMUM_NUMBER_OF_ACCEPTABLE_FIELDS = 480
 
 # This is the minimum number of unique field keys (from /metadata/fields)
 TEST_FIELDS_GET_FIELDS_ENDPOINT = ['cadd', 'dbnsfp', 'dbsnp', 'wellderly', 'clinvar']
+
+# -----------------------------------------------------------------------------------
+
+# Any additional fields added for check_fields subset test
+CHECK_FIELDS_SUBSET_ADDITIONAL_FIELDS = ['cadd._license']
