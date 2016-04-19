@@ -2,15 +2,11 @@
 import re
 from biothings.www.api.handlers import MetaDataHandler, BiothingHandler, QueryHandler, StatusHandler, FieldsHandler
 from settings import MyVariantSettings
-from www.api.es import ESQuery
-#import config
 
 myvariant_settings = MyVariantSettings()
 
 class VariantHandler(BiothingHandler):
     ''' This class is for the /variant endpoint. '''
-    esq = ESQuery()
-
     def _examine_kwargs(self, action, kwargs):
         # subclassed to add redirection, assembly, etc
         if action == 'GET':
@@ -28,7 +24,6 @@ class VariantHandler(BiothingHandler):
 
 class QueryHandler(QueryHandler):
     ''' This class is for the /query endpoint. '''
-    esq = ESQuery()
 
     def _examine_kwargs(self, action, kwargs):
         self.esq._use_hg19()
@@ -39,17 +34,12 @@ class QueryHandler(QueryHandler):
 
 class StatusHandler(StatusHandler):
     ''' This class is for the /status endpoint. '''
-    esq = ESQuery()
-
 
 class FieldsHandler(FieldsHandler):
     ''' This class is for the /metadata/fields endpoint. '''
-    esq = ESQuery()
-
 
 class MetaDataHandler(MetaDataHandler):
     ''' This class is for the /metadata endpoint. '''
-    esq = ESQuery()
     disable_caching = True
 
 
