@@ -13,6 +13,7 @@ ALLOWED_OPTIONS = ['_source', 'start', 'from_', 'size',
                    'sort', 'explain', 'version', 'facets', 'fetch_all']
 ES_SCROLL_TIME = '1m'
 ES_SCROLL_SIZE = 1000
+ES_QUERY_MODULE = 'www.api.es'
 
 # *****************************************************************************
 # myvariant.info specific settings

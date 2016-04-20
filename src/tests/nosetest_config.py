@@ -45,9 +45,11 @@ ANNOTATION_POST_DATA = [{'ids': 'chr16:g.28883241A>G'},
 QUERY_GETS = ['rs58991260',
               '_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen',
               'clinvar.chrom:"10"&fields=clinvar&callback=mycallback',
-              #'clinvar.chrom:"10"&fields=clinvar&fetch_all=true',
+              'clinvar.chrom:"10"&fields=clinvar&fetch_all=true',
               'clinvar.chrom:"10"&fields=clinvar&facets=clinvar.chrom',
-              'clinvar.chrom:"10"&fields=clinvar&size=2000']
+              'clinvar.chrom:"10"&fields=clinvar&size=2000',
+              'clinvar.chrom:"10"&fields=clinvar&jsonld=true'
+              ]
               
 
 # -----------------------------------------------------------------------------------
