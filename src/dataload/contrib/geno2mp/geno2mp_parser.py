@@ -8,8 +8,6 @@ def _map_line_to_json(item):
     ref = item.REF
     info = item.INFO
     hpo_count=item.INFO['HPO_CT']
-    for i in range(0, len(item.ALT)):
-        item.ALT[i] = str(item.ALT[i])
     for alt in item.ALT:
         alt = str(alt)
         (HGVS, var_type) = get_hgvs_from_vcf(chrom, chromStart, ref, alt, mutant_type=True)
