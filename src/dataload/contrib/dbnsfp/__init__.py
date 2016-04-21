@@ -1,9 +1,9 @@
-DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP3.1b2c_variant.chr*'
+DBNSFP_INPUT_FILE = '/opt/myvariant.info/load_archive/dbnsfp/dbNSFP3.0b2c_variant.chr*'
 
 __METADATA__ = {
     "src_name": 'dbNSFP',
     "src_url": 'https://sites.google.com/site/jpopgen/dbNSFP',
-    "version": '3.1',
+    "version": '3.0',
     "field": 'dbnsfp'
 }
 
@@ -14,7 +14,8 @@ def get_mapping():
             "properties": {
                 "rsid": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
+                    "include_in_all": True
                 },
                 "chrom": {
                     "type": "string",
@@ -82,7 +83,8 @@ def get_mapping():
                 },
                 "genename": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
+                    "include_in_all": True
                 },
                 "uniprot": {
                     "properties": {
@@ -551,7 +553,8 @@ def get_mapping():
                 "clinvar": {
                     "properties": {
                         "rs": {
-                            "type": "string"
+                            "type": "string",
+                            "include_in_all": True
                         },
                         # "clinsig": {
                         #     "type": "integer"     # can contain |, like 5|5, FIXME
