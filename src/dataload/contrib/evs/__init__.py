@@ -69,11 +69,13 @@ def get_mapping():
                     "properties": {
                         "coding": {
                             "type": "string",
-                            "analyzer": "string_lowercase"
+                            "analyzer": "string_lowercase",
+                            "include_in_all": True
                         },
                         "protein": {
                             "type": "string",
-                            "analyzer": "string_lowercase"
+                            "analyzer": "string_lowercase",
+                            "include_in_all": True
                         }
                     }
                 },
