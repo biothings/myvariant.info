@@ -58,7 +58,8 @@ def get_mapping():
                 # },
                 "gene": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
+                    "include_in_all": True
                 },
                 "coding_impact": {
                     "type": "string",
