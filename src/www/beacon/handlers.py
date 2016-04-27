@@ -1,110 +1,73 @@
 from www.helper import BaseHandler
 from www.api.es import ESQuery
-
-
-class WellderlyBeaconHandler(BaseHandler):
-    esq = ESQuery()
-
-    def get(self):
-        chrom = self.get_argument('chrom', None)
-        pos = self.get_argument('pos', None)
-        allele = self.get_argument('allele', None)
-        ref = self.get_argument('ref', None)
-
-        if chrom and pos and allele:
-            q = 'wellderly.chrom:"{}" AND wellderly.pos:{} AND wellderly.alt:{}'
-            q = q.format(chrom, pos, allele)
-            if ref:
-                q += ' AND wellderly.ref:{}'.format(ref)
-            res = self.esq.query(q, fields=None)
-            if res and res.get('total') >= 1:
-                # out = {'exist': True}
-                out = 'YES'
-            else:
-                # out = {'exist': False}
-                out = 'NO'
-        else:
-            # out = {'success': False, 'error': "Missing required parameters."}
-            out = 'NULL'
-        #self.return_json(out)
-        self.write(out)
-
-
-class WellderlyBeaconHandler_v2(BaseHandler):
-    esq = ESQuery()
-    
-    def get(self):
-        chrom = self.get_argument('chrom', None)
-        pos = self.get_argument('pos', None)
-        allele = self.get_argument('allele', None)
-        assembly = self.get_argument('assembly', default='GRCh37')
-                
-        #Initialize Output
-        out = {'exists':False, 'metadata':None}        
-
-        # check if assembly is in GRCh37 or GRCh38
-        if chrom and pos and allele and assembly in ['GRCh37', 'GRCh38']:
-            q = 'wellderly.chrom:"{}" AND wellderly.pos:{} AND wellderly.alt:{}'
-            q = q.format(chrom, pos, allele)
-            res = self.esq.query(q)
-            if res and res.get('total') > 0:
-                out['exists'] = True
-                if len(res.get('hits')) == 1:
-                    out['metadata'] = res.get('hits')[0]['wellderly']
-                else:
-                    out['metadata'] = [hit['wellderly'] for hit in res.get('hits')]            
-        self.return_json(out)
-
-                
-class dbSNPBeaconHandler(BaseHandler):
-    esq = ESQuery()
-    
-    def get(self):
-        chrom = self.get_argument('chrom', None)
-        pos = self.get_argument('pos', None)
-        allele = self.get_argument('allele', None)
-        assembly = self.get_argument('assembly', default='GRCh37')
-                
-        #Initialize Output
-        out = {'exists':False, 'metadata':None}        
-
-        # check if assembly is in GRCh37 or GRCh38
-        if chrom and pos and allele and assembly in ['GRCh37', 'GRCh38']:
-            q = 'dbsnp.chrom:"{}" AND dbsnp.hg19.start:{} AND dbsnp.alt:{}'
-            q = q.format(chrom, pos, allele)
-            res = self.esq.query(q)
-            if res and res.get('total') > 0:
-                out['exists'] = True
-                if len(res.get('hits')) == 1:
-                    out['metadata'] = res.get('hits')[0]['dbsnp']
-                else:
-                    out['metadata'] = [hit['dbsnp'] for hit in res.get('hits')]
-            
-        self.return_json(out)
+import json
 
 class BeaconHandler(BaseHandler):
     esq = ESQuery()
     
-    def get(self):
-        
+    # TODO make the post modular
+    def post(self, src = None):
+        data = json.loads(self.request.body.decode('utf-8'))
+
+        chrom = data['genome.chrom']
+        pos = data['genome.position']
+        allele = data['genome.allele']
+        assembly = data['genome.assembly']
+
+        out = self.get_output(chrom, pos, allele, assembly, src)
+
+        #Return the JSON response
+        self.return_json(out)
+
+    def get(self, src=None):
+       
         chrom = self.get_argument('chrom', None)
         pos = self.get_argument('pos', None)
         allele = self.get_argument('allele', None)
         assembly = self.get_argument('assembly', default='GRCh37')
-                
-        #Initialize Output
-        out = {'exists':False, 'metadata':None}        
 
-        # check if assembly is in GRCh37 or GRCh38
-        if chrom and pos and allele and assembly in ['GRCh37', 'GRCh38']:
-            q = 'chr{}:{}'
-            q = q.format(chrom, pos)
-            res = self.esq.query(q)
-            #Check that the apprpriate allele is in the hit 
-            if res and res.get('total') > 0:
-                out = self.verify_hits(res.get('hits'), out, allele)
+        out = self.get_output(chrom, pos, allele, assembly, src)
+
+        #Return the JSON response
         self.return_json(out)
 
+    def get_output(self, chrom, pos, allele, assembly, src):             
+        #Initialize Sources and Output
+        pos_dbs = ['wellderly', 'exac', 'cadd'] #cadd not working (no alt)
+        hg19_dbs = ['dbnsfp','dbsnp','clinvar','evs','mutdb','cosmic','docm']
+        out = {'exists':False, 'metadata':None}        
+
+        # check if enough infomation and assembly is correct and format query
+        if chrom and pos and allele and assembly in ['GRCh37', 'GRCh38']:
+            q = ''
+            if src in pos_dbs+hg19_dbs:
+                q += src + '.chrom:"{}" AND '
+                if src in pos_dbs:
+                    q += src + '.pos:{} AND '
+                elif src in hg19_dbs:
+                    q += src + '.hg19.start:{} AND '
+                q += src + '.alt:{}'
+            else:
+                q = 'chr{}:{}'
+            q = q.format(chrom, pos, allele)
+
+            # perform query and format result
+            res = self.esq.query(q)
+            if res and res.get('total') > 0:
+                if src in pos_dbs+hg19_dbs:
+                    out = self.format_output_src(res, src, out)
+                else:
+                    out = self.verify_hits(res.get('hits'), out, allele)
+        return(out)
+
+    def format_output_src(self, res, src, out):
+        out['exists'] = True
+        if len(res.get('hits')) == 1:
+            out['metadata'] = res.get('hits')[0][src]
+        else:
+            out['metadata'] = [hit[src] for hit in res.get('hits')]
+        return out
+    
     # TODO How to incorparte this logic into the search itself?
     def verify_hits(self, hits, out, allele):
         for hit in hits:
@@ -116,9 +79,8 @@ class BeaconHandler(BaseHandler):
                         return out
         return out
 
+
 APP_LIST = [
     (r"/?", BeaconHandler),
-    (r"/wellderly/?", WellderlyBeaconHandler),
-    (r"/wellderly2/?", WellderlyBeaconHandler_v2),
-    (r"/dbsnp/?", dbSNPBeaconHandler),
+    (r"/(.+)/?", BeaconHandler),
 ]
