@@ -283,7 +283,7 @@ class ESQuery():
         options['kwargs'].update(scroll_options)
         qbdr = ESQueryBuilder(**options.kwargs)
         if interval_query:
-            _query = qbdr.build_interval_query(chr=interval_query["chr"],
+            _query = qbdr.build_interval_query(chrom=interval_query["chr"],
                                                gstart=interval_query["gstart"],
                                                gend=interval_query["gend"],
                                                rquery=interval_query["query"],
@@ -327,8 +327,8 @@ class ESQuery():
             return _facets
 
     def _parse_interval_query(self, q):
-        interval_pattern = r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*'
-        single_pattern = r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>\w+):(?P<gend>(?P<gstart>[0-9,]+))\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*'
+        interval_pattern = r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>[1-9xXyYmM][0-9tT]?):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*'
+        single_pattern = r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>[1-9xXyYmM][0-9tT]?):(?P<gend>(?P<gstart>[0-9,]+))\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*'
         patterns = [interval_pattern, single_pattern]
         if q:
             for pattern in patterns:
@@ -427,10 +427,10 @@ class ESQueryBuilder:
             _query['facets'] = facets
         return _query
 
-    def build_interval_query(self, chr, gstart, gend, rquery, hg38, **kwargs):
+    def build_interval_query(self, chrom, gstart, gend, rquery, hg38, **kwargs):
         """ Build an interval query - called by the ESQuery.query method. """
-        if chr.lower().startswith('chr'):
-            chr = chr[3:]
+        if chrom.lower().startswith('chr'):
+            chrom = chrom[3:]
 
         # ES 1.x query
         #_query = {
@@ -474,7 +474,7 @@ class ESQueryBuilder:
                             "must": [{
                                 "bool": {
                                     "should": [{
-                                        "term": {field: chr.lower()}
+                                        "term": {field: chrom.upper()}
                                     } for field in self._get_chrom_fields()]
                                 }
                             }, {
