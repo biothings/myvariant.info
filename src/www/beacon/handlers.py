@@ -5,7 +5,6 @@ import json
 class BeaconHandler(BaseHandler):
     esq = ESQuery()
     
-    # TODO make the post modular
     def post(self, src = None):
         data = json.loads(self.request.body.decode('utf-8'))
 
@@ -19,6 +18,7 @@ class BeaconHandler(BaseHandler):
         #Return the JSON response
         self.return_json(out)
 
+
     def get(self, src=None):
        
         chrom = self.get_argument('chrom', None)
@@ -31,11 +31,12 @@ class BeaconHandler(BaseHandler):
         #Return the JSON response
         self.return_json(out)
 
+
     def get_output(self, chrom, pos, allele, assembly, src):             
         #Initialize Sources and Output
         pos_dbs = ['wellderly', 'exac', 'cadd'] #cadd not working (no alt)
         hg19_dbs = ['dbnsfp','dbsnp','clinvar','evs','mutdb','cosmic','docm']
-        out = {'exists':False, 'metadata':None}        
+        out = {'exists':False} 
 
         # check if enough infomation and assembly is correct and format query
         if chrom and pos and allele and assembly in ['GRCh37', 'GRCh38']:
@@ -60,6 +61,7 @@ class BeaconHandler(BaseHandler):
                     out = self.verify_hits(res.get('hits'), out, allele)
         return(out)
 
+
     def format_output_src(self, res, src, out):
         out['exists'] = True
         if len(res.get('hits')) == 1:
@@ -67,12 +69,13 @@ class BeaconHandler(BaseHandler):
         else:
             out['metadata'] = [hit[src] for hit in res.get('hits')]
         return out
-    
-    # TODO How to incorparte this logic into the search itself?
+
+
+    # TODO Enventually incorparte this logic into the search itself
     def verify_hits(self, hits, out, allele):
         for hit in hits:
             for key in hit.keys():
-                if not key.startswith('_') and 'alt' in hit[key].keys():
+                if not key.startswith('_') and isinstance(hit[key], dict) and 'alt' in hit[key].keys():
                     if hit[key]['alt'] == allele:
                         out['exists'] = True
                         out['metadata'] = {k:hit[k] for k in hit.keys() if not k.startswith('_')}
