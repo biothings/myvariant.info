@@ -11,10 +11,10 @@ def get_mapping():
             "properties": {
                 "chrom": {
                     "type": "string",
-		    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase"
                 },
                 "pos": {
-                    "type": "long"
+                    "type": "integer"
                 },
                 "ref": {
                     "type": "string",
@@ -41,7 +41,7 @@ def get_mapping():
                 },
                 "ac": {
                     "properties": {
-                        "ac": {
+                        "ac_all": {
                             "type": "integer"
                         },
                         "ac_afr": {
@@ -75,7 +75,7 @@ def get_mapping():
                 },
                 "an": {
                     "properties": {
-                        "an": {
+                        "an_all": {
                             "type": "integer"
                         },
                         "an_afr": {
@@ -176,17 +176,13 @@ def get_mapping():
                     "type": "float"
                 },
                 "mq": {
-                    "properties": {
-                        "mq": {
-                            "type": "float"
-                        },
-                        "mq0": {
-                            "type": "integer"
-                        },
-                        "mqranksum": {
-                            "type": "float"
-                        }
-                    }
+                    "type": "float"
+                },
+                "mq0": {
+                    "type": "integer"
+                },
+                "mqranksum": {
+                    "type": "float"
                 },
                 "ncc": {
                     "type": "long"
