@@ -498,58 +498,6 @@ def get_mapping():
                         }
                     }
                 },
-                "exac": {
-                    "properties": {
-                        "ac": {
-                            "type": "integer"
-                        },
-                        "af": {
-                            "type": "float"
-                        },
-                        "adj_ac": {
-                            "type": "integer"
-                        },
-                        "adj_af": {
-                            "type": "float"
-                        },
-                        "afr_ac": {
-                            "type": "integer"
-                        },
-                        "afr_af": {
-                            "type": "float"
-                        },
-                        "amr_ac": {
-                            "type": "integer"
-                        },
-                        "amr_af": {
-                            "type": "float"
-                        },
-                        "eas_ac": {
-                            "type": "integer"
-                        },
-                        "eas_af": {
-                            "type": "float"
-                        },
-                        "fin_ac": {
-                            "type": "integer"
-                        },
-                        "fin_af": {
-                            "type": "float"
-                        },
-                        "nfe_ac": {
-                            "type": "integer"
-                        },
-                        "nfe_af": {
-                            "type": "float"
-                        },
-                        "sas_ac": {
-                            "type": "integer"
-                        },
-                        "sas_af": {
-                            "type": "float"
-                        }
-                    }
-                },
                 "clinvar": {
                     "properties": {
                         "rs": {
