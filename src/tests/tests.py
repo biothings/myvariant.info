@@ -22,9 +22,9 @@ except ImportError:
 
 host = os.getenv("MV_HOST")
 if not host:
-    #host = 'http://localhost:8000'
+    host = 'http://localhost:8000'
     #host = 'http://dev.myvariant.info:8000'
-    host = 'http://myvariant.info'
+    #host = 'http://myvariant.info'
 
 api = host + '/v1'
 sys.stderr.write('URL base: {}\n'.format(api))
@@ -114,6 +114,7 @@ def teardown_func():
 # Test functions                                            #
 #############################################################
 #@with_setup(setup_func, teardown_func)
+"""
 def test_main():
     #/
     get_ok(host)
@@ -374,3 +375,31 @@ def test_HGVS_redirect():
     eq_(res2, res3)
     eq_(res3, res4)
     eq_(res["_id"], 'chr11:g.66397320A>G')
+"""
+def test_beacon_get():
+    res = json_ok(get_ok(host + '/beacon/wellderly?chrom=12&pos=328665&allele=G'))
+    res2 = json_ok(get_ok(host + '/beacon/dbsnp?chrom=12&pos=328665&allele=G'))
+    res3 = json_ok(get_ok(host + '/beacon?chrom=12&pos=328665&allele=G'))    
+    res4 = json_ok(get_ok(host + '/beacon/wellderly?chrom=12&pos=328665&allele=T'))    
+    
+    ok_(res['exists'])
+    ok_(res2['exists'])
+    ok_(res3['exists'])
+    ok_(not res4['exists'])
+
+def test_beacon_post():
+    q = {"genome.chrom" : 12, "genome.position": 328665, 
+         "genome.allele" : "G", "genome.assembly" : "GRCh37" }
+    
+    res = json_ok(post_ok(host + '/beacon/wellderly', q))
+    res2 = json_ok(post_ok(host + '/beacon/dbsnp', q))    
+    res3 = json_ok(post_ok(host + '/beacon', q))
+
+    q['genome.allele'] = "T"    
+    
+    res4 = json_ok(post_ok(host + '/beacon/wellderly', q))
+    
+    ok_(res['exists'])
+    ok_(res2['exists'])
+    ok_(res3['exists'])    
+    ok_(not res4['exists'])    

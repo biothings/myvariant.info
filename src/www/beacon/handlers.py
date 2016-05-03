@@ -1,17 +1,15 @@
 from www.helper import BaseHandler
 from www.api.es import ESQuery
-import json
 
 class BeaconHandler(BaseHandler):
     esq = ESQuery()
-    
-    def post(self, src = None):
-        data = json.loads(self.request.body.decode('utf-8'))
 
-        chrom = data['genome.chrom']
-        pos = data['genome.position']
-        allele = data['genome.allele']
-        assembly = data['genome.assembly']
+    def post(self, src = None):
+
+        chrom = self.get_argument('genome.chrom', None)
+        pos = self.get_argument('genome.position', None)
+        allele = self.get_argument('genome.allele', None)
+        assembly = self.get_argument('genome.assembly', default='GRCh37')
 
         out = self.get_output(chrom, pos, allele, assembly, src)
 
