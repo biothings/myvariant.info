@@ -22,9 +22,9 @@ except ImportError:
 
 host = os.getenv("MV_HOST")
 if not host:
-    host = 'http://localhost:8000'
+    #host = 'http://localhost:8000'
     #host = 'http://dev.myvariant.info:8000'
-    #host = 'http://myvariant.info'
+    host = 'http://myvariant.info'
 
 api = host + '/v1'
 sys.stderr.write('URL base: {}\n'.format(api))
@@ -114,7 +114,6 @@ def teardown_func():
 # Test functions                                            #
 #############################################################
 #@with_setup(setup_func, teardown_func)
-"""
 def test_main():
     #/
     get_ok(host)
@@ -375,7 +374,7 @@ def test_HGVS_redirect():
     eq_(res2, res3)
     eq_(res3, res4)
     eq_(res["_id"], 'chr11:g.66397320A>G')
-"""
+
 def test_beacon_get():
     res = json_ok(get_ok(host + '/beacon/wellderly?chrom=12&pos=328665&allele=G'))
     res2 = json_ok(get_ok(host + '/beacon/dbsnp?chrom=12&pos=328665&allele=G'))
