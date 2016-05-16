@@ -3,7 +3,7 @@
 # Elasticsearch variables
 # *****************************************************************************
 # elasticsearch server transport url
-ES_HOST = 'localhost:9200'
+ES_HOST = 'su07:9200'
 # elasticsearch index name
 ES_INDEX_NAME = 'myvariant_current'
 # elasticsearch document type

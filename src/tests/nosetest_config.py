@@ -55,12 +55,10 @@ QUERY_GETS = ['rs58991260',
 # -----------------------------------------------------------------------------------
 
 # This is a list of dictionaries to test a POST to the query endpoint
-QUERY_POST_DATA = []
-
-# -----------------------------------------------------------------------------------
-
-# This is a sample query to test the query size cap.  This query should be one that has more than 1000 total hits.
-QUERY_SIZE_TEST = 'clinvar.chrom:"22"'
+QUERY_POST_DATA = [{'q': 'rs58991260', 'scopes': 'dbsnp.rsid'},
+                   {'q': 'rs58991260', 'scopes': 'dbsnp.rsid', 'fields': 'dbsnp'},
+                   {'q': 'rs58991260,rs2500', 'scopes': 'dbsnp.rsid', 'fields': 'dbsnp', 'jsonld': 'true'} 
+                  ]
 
 # -----------------------------------------------------------------------------------
 
