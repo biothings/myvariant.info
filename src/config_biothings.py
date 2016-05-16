@@ -9,7 +9,7 @@ ES_INDEX_NAME = 'myvariant_current'
 # elasticsearch document type
 ES_DOC_TYPE = 'variant'
 # Only these options are passed to the elasticsearch query from kwargs
-ALLOWED_OPTIONS = ['_source', 'start', 'from_', 'size',
+ALLOWED_OPTIONS = ['_source', 'start', 'from_', 'size', 'fields',
                    'sort', 'explain', 'version', 'facets', 'fetch_all']
 ES_SCROLL_TIME = '1m'
 ES_SCROLL_SIZE = 1000
