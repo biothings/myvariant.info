@@ -3,6 +3,15 @@
 ###################################################################################
 from tests import variant_list
 
+# biothings specific options - these should be identical to the production server 
+# you are testing for...  For example, JSONLD_CONTEXT_PATH should point to a file
+# with contents identical to the file pointed to by JSONLD_CONTEXT_PATH on the 
+# production server (if your intention is to test the production server).
+JSONLD_CONTEXT_PATH = "../www/context/context.json"
+API_VERSION = "v1"
+QUERY_ENDPOINT = "query"
+ANNOTATION_ENDPOINT = "variant"
+
 # This is the name of the environment variable to load for testing
 HOST_ENVAR_NAME = 'MV_HOST'
 # This is the URL of the production server, if the above envar can't be loaded, nosetest defaults to this
