@@ -7,7 +7,7 @@ src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 if src_path not in sys.path:
     sys.path.append(src_path)
 
-from biothings.www.index_base import main
+from biothings.www.index_base import main, get_app
 from www.api.handlers import return_applist
 
 if __name__ == '__main__':
