@@ -7,7 +7,7 @@ from tests import variant_list
 # you are testing for...  For example, JSONLD_CONTEXT_PATH should point to a file
 # with contents identical to the file pointed to by JSONLD_CONTEXT_PATH on the 
 # production server (if your intention is to test the production server).
-JSONLD_CONTEXT_PATH = "../www/context/context.json"
+JSONLD_CONTEXT_URL = "http://myvariant.info/context/context.json"
 API_VERSION = "v1"
 QUERY_ENDPOINT = "query"
 ANNOTATION_ENDPOINT = "variant"
