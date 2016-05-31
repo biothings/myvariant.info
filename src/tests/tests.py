@@ -61,9 +61,7 @@ def encode_dict(d):
 
 class MyVariantTest(BiothingTestHelperMixin):
 
-    host = os.getenv("MV_HOST")
-    if not host:
-        host = 'http://myvariant.info'
+    host = os.getenv("MV_HOST","")
     host = host.rstrip('/')
     api = host + '/v1'
     h = httplib2.Http()
@@ -86,9 +84,10 @@ class MyVariantTest(BiothingTestHelperMixin):
         self.has_hits('rs58991260')
         self.has_hits('chr1:69000-70000')
         self.has_hits('dbsnp.vartype:snp')
-        self.has_hits('_exists_:dbnsfp')
+        # Too slow
+        ##self.has_hits('_exists_:dbnsfp')
         self.has_hits('dbnsfp.genename:BTK')
-        self.has_hits('_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen')
+        ##self.has_hits('_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen')
 
         con = self.get_ok(self.api + '/query?q=rs58991260&callback=mycallback')
         ok_(con.startswith('mycallback('.encode('utf-8')))
@@ -199,8 +198,9 @@ class MyVariantTest(BiothingTestHelperMixin):
             eq_(set(_g), set(['_id', '_score', 'query', 'dbsnp']))
 
         # Test a large variant post
-        res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': VARIANT_POST_LIST}))
-        eq_(len(res), 999)
+        ## too slow
+        #res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': VARIANT_POST_LIST}))
+        #eq_(len(res), 999)
 
 
     def test_metadata(self):
@@ -272,11 +272,12 @@ class MyVariantTest(BiothingTestHelperMixin):
         ok_(res, res2)
 
 
-    def test_licenses(self):
-        # cadd license
-        res = self.json_ok(self.get_ok(self.api + '/query?q=_exists_:cadd&size=1&fields=cadd'))
-        assert '_license' in res['hits'][0]['cadd']
-        assert res['hits'][0]['cadd']['_license']
+    ## Too slow
+    #def test_licenses(self):
+    #    # cadd license
+    #    res = self.json_ok(self.get_ok(self.api + '/query?q=_exists_:cadd&size=1&fields=cadd'))
+    #    assert '_license' in res['hits'][0]['cadd']
+    #    assert res['hits'][0]['cadd']['_license']
 
 
     def test_jsonld(self):
