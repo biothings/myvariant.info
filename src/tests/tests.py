@@ -19,7 +19,7 @@ from tornado.testing import AsyncHTTPTestCase
 from .variant_list import VARIANT_POST_LIST
 from biothings.tests.test_helper import BiothingTestHelperMixin, _d, TornadoRequestHelper
 import www.index as index
-import config
+#import config
 
 
 try:
