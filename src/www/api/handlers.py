@@ -15,22 +15,11 @@ class VariantHandler(BiothingHandler):
                 de = m.group('delim')
                 if de and de != ':g.':
                     self.redirect(':g.'.join(self.request.uri.split(de)), permanent=True)
-        # default to hg19 assembly
-        self.esq._use_hg19()
-        if kwargs.pop('assembly', 'hg19').lower() == 'hg38':
-            self.esq._use_hg38()
         return None
 
 
 class QueryHandler(QueryHandler):
     ''' This class is for the /query endpoint. '''
-
-    def _examine_kwargs(self, action, kwargs):
-        self.esq._use_hg19()
-        if kwargs.pop('assembly', 'hg19').lower() == 'hg38':
-            self.esq._use_hg38()
-        return None    
-
 
 class StatusHandler(StatusHandler):
     ''' This class is for the /status endpoint. '''
