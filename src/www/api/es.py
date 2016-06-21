@@ -45,6 +45,7 @@ class ESQuery(ESQuery):
         options = dotdict()
         this_assembly = kwargs.pop('assembly', myvariant_settings.default_assembly).lower()
         options.assembly = this_assembly if this_assembly in myvariant_settings.supported_assemblies else myvariant_settings.default_assembly
+        options.chromosome = kwargs.pop('chromosome', False)
         for key in set(kwargs.keys()):
             del(kwargs[key])
         kwargs = {}
@@ -66,12 +67,21 @@ class ESQuery(ESQuery):
         return self._es.search(index=self.index_name(options.assembly), 
                 doc_type=self._doc_type, body=q, **kwargs)
 
-    def _get_mapping(self, **kwargs):
-        # for /metadata
-        options = kwargs.pop('options', {})
-        kwargs['index'] = self.index_name(options.assembly)
-        print(kwargs)
-        return self._es.indices.get_mapping(**kwargs)
+    def get_chromosome_aggs(self, **kwargs):
+        kwargs.update({"body": {"query": {"match_all": {}}, "aggs": {"chromosomes": {"terms": {"field": "chrom", "size": 50}}}}})
+        r = self._es.search(**kwargs)
+        return r.get('aggregations', {})
+
+    def get_mapping_meta(self, **kwargs):
+        ''' get metadata, overridden from biothings to add chromosome aggs.'''
+        options = self._get_cleaned_metadata_options(kwargs)
+        m = self._es.indices.get_mapping(index=self.index_name(options.assembly), doc_type=self._doc_type,
+                **kwargs)
+        m = m[list(m.keys())[0]]['mappings'][self._doc_type]
+        r = m.get('_meta', {})
+        if options.chromosome:
+            r.update(self.get_chromosome_aggs(index=self.index_name(options.assembly), doc_type=self._doc_type))
+        return r
 
     def _get_fields(self, **kwargs):
         # for /metadata/fields
