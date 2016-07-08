@@ -111,24 +111,17 @@ class ESQueryBuilder(ESQueryBuilder):
                 "bool": {
                     "filter": {
                         "bool": {
-                            "must": [{
-                                "bool": {
-                                    "should": [{
-                                        "term": {field: chr.lower()}
-                                    } for field in myvariant_settings.chrom_fields]
-                                }
-                            }, {
-                                "bool": {
-                                    "must": [
-                                                {
-                                                    "range": {options.assembly + ".start": {"lte": gend}}
-                                                },
-                                                {
-                                                    "range": {options.assembly + ".end": {"gte": gstart}}
-                                                }
-                                            ]
+                            "must": [
+                                        {
+                                            "term": {"chrom": chr.lower()}    
+                                        },
+                                        {
+                                            "range": {options.assembly + ".start": {"lte": gend}}
+                                        },
+                                        {
+                                            "range": {options.assembly + ".end": {"gte": gstart}}
                                         }
-                            }]
+                                    ]
                         }
                     }
                 }
