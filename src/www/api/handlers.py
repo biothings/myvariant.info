@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+from tornado.web import RequestHandler
 from biothings.www.api.handlers import MetaDataHandler, BiothingHandler, QueryHandler, StatusHandler, FieldsHandler
 from settings import MyVariantSettings
 
@@ -17,6 +18,11 @@ class VariantHandler(BiothingHandler):
                     self.redirect(':g.'.join(self.request.uri.split(de)), permanent=True)
         return None
 
+class DemoHandler(RequestHandler):
+    ''' For the /demo page. '''
+    def get(self):
+        with open('../../docs/demo/index.html', 'r') as demo_file:
+            self.write(demo_file.read())
 
 class QueryHandler(QueryHandler):
     ''' This class is for the /query endpoint. '''
@@ -37,6 +43,7 @@ def return_applist():
         (r"/status", StatusHandler),
         (r"/metadata", MetaDataHandler),
         (r"/metadata/fields", FieldsHandler),
+        (r"/demo/?$", DemoHandler),
     ]
     if myvariant_settings._api_version:
         ret += [
