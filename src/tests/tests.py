@@ -316,7 +316,7 @@ class MyVariantTest(BiothingTestHelperMixin):
 
     def test_genome_assembly(self):
         res = self.json_ok(self.get_ok(self.api + '/query?q=clinvar.ref:C%20AND%20chr11:56319006%20AND%20clinvar.alt:A&assembly=hg38'))
-        eq_(res["hits"][0]["_id"], "chr11:g.56086482C>A")
+        eq_(res["hits"][0]["_id"], "chr11:g.56319006C>A")
 
     def test_HGVS_redirect(self):
         res = self.json_ok(self.get_ok(self.api + '/variant/chr11:66397320A>G'))
