@@ -5,7 +5,7 @@
 # elasticsearch server transport url
 ES_HOST = 'localhost:9200'
 # default elasticsearch index name
-ES_INDEX_NAME = 'myvariant_current_201511'
+ES_INDEX_NAME = 'myvariant_current'
 # elasticsearch document type
 ES_DOC_TYPE = 'variant'
 # Only these options are passed to the elasticsearch query from kwargs
@@ -22,7 +22,7 @@ HG38_FIELDS = ['clinvar.hg38', 'dbnsfp.hg38', 'evs.hg38']
 HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19', 'dbsnp.hg19', 'docm.hg19', 'evs.hg19', 'grasp.hg19'] #, 'mutdb.hg19', 'wellderly.hg19']
 CHROM_FIELDS = ['cadd.chrom', 'clinvar.chrom', 'cosmic.chrom', 'dbnsfp.chrom', 'dbsnp.chrom', 'docm.chrom',
                 'evs.chrom', 'exac.chrom']#, 'mutdb.chrom', 'wellderly.chrom']
-ES_INDEX_BASE = 'myvariant_current_201605'
+ES_INDEX_BASE = 'myvariant_current_201607'
 DEFAULT_ASSEMBLY = 'hg19'
 SUPPORTED_ASSEMBLIES = ['hg19', 'hg38']
 
