@@ -6,8 +6,6 @@
 tornado==4.2.1
 elasticsearch>=2.0.0,<3.0.0
 
-# patched pyga for python 3
-git+https://github.com/cyrus0824/py-ga-mob.git#egg=pyga
 # biothings
 git+https://github.com/SuLab/biothings.api.git#egg=biothings
 
