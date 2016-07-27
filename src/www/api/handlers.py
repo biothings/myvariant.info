@@ -36,7 +36,7 @@ class FieldsHandler(FieldsHandler):
 class MetaDataHandler(MetaDataHandler):
     ''' This class is for the /metadata endpoint. '''
     disable_caching = True
-    boolean_parameters = set(['chromosome', 'debug'])
+    boolean_parameters = set(['chromosome', 'dev'])
 
 def return_applist():
     ret = [
