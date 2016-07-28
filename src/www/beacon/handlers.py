@@ -1,89 +1,129 @@
-from www.helper import BaseHandler
+import sys
+from biothings.www.helper import BaseHandler
 from www.api.es import ESQuery
-import json
+
 
 class BeaconHandler(BaseHandler):
     esq = ESQuery()
-    
-    def post(self, src = None):
-        data = json.loads(self.request.body.decode('utf-8'))
+    # Initialize Assembly and Datasets
+    assembly_keys = {'NCBI36':'hg18', 'GRCh37':'hg19', 'GRCh38':'hg38'}
+    pos_dbs = ['exac', 'cadd'] # These are hg19 ONLY
+    assembly_dbs = ['dbnsfp','dbsnp','clinvar','evs','mutdb','cosmic','docm','wellderly']
 
-        chrom = data['genome.chrom']
-        pos = data['genome.position']
-        allele = data['genome.allele']
-        assembly = data['genome.assembly']
-
-        out = self.get_output(chrom, pos, allele, assembly, src)
-
-        #Return the JSON response
-        self.return_json(out)
-
+    def post(self, src=None):
+        self.recieve_data()
 
     def get(self, src=None):
-       
-        chrom = self.get_argument('chrom', None)
-        pos = self.get_argument('pos', None)
-        allele = self.get_argument('allele', None)
-        assembly = self.get_argument('assembly', default='GRCh37')
+        self.recieve_data()
 
-        out = self.get_output(chrom, pos, allele, assembly, src)
+    def recieve_data(self):
+        chrom = self.get_argument('referenceName', None)
+        start = self.get_argument('start', None)
+        ref = self.get_argument('referenceBases', None)
+        alt = self.get_argument('alternateBases', None)
+        assembly = self.get_argument('assemblyId', None)
+        datasets = self.get_arguments('datasetIds', strip=False)
+        include_datasets = self.get_argument('includeDatasetResponses', None)
+
+        # Prep request for return
+        allele_request = {'referenceName':chrom, 'start':start, 'referenceBases':ref,
+                         'alternateBases':alt, 'assemblyId': assembly, 'datsetIds': datasets,
+                         'includeDatasetResponses': include_datasets}
+
+        if len(datasets) < 1:
+            datasets = self.pos_dbs+self.assembly_dbs
+        try:
+            dataset_responses = []
+            for dataset in datasets:
+                dataset_responses.append(self.query_dataset(chrom, start, ref, alt, assembly, dataset))
+            exists = any([response['exists'] for response in dataset_responses])
+            out = {'exists':exists, 'alleleRequest': allele_request}
+            if include_datasets:
+                out['alleleDatasetRespone'] = dataset_responses
+        except NameError as e:
+            out = {'`error`':'{}'.format(e), 'alleleRequest': allele_request}
+        except TypeError as e:
+            out = {'`error`':'{}'.format(e), 'alleleRequest': allele_request}
+        except AttributeError as e:
+            out = {'`error`':'{}'.format(e), 'alleleRequest': allele_request}
+        except:
+            e = sys.exc_info()[0]
+            out = {'`error`':'{}'.format(e), 'alleleRequest': allele_request}
 
         #Return the JSON response
         self.return_json(out)
 
 
-    def get_output(self, chrom, pos, allele, assembly, src):             
-        #Initialize Sources and Output
-        pos_dbs = ['wellderly', 'exac', 'cadd'] #cadd not working (no alt)
-        hg19_dbs = ['dbnsfp','dbsnp','clinvar','evs','mutdb','cosmic','docm']
-        out = {'exists':False} 
+    def query_dataset(self, chrom, start, ref, alt, assembly, dataset):
+        # Initialzie output
+        out = {'datasetId': dataset, 'exists':False}
+        q_type = 'snp'
 
-        # check if enough infomation and assembly is correct and format query
-        if chrom and pos and allele and assembly in ['GRCh37', 'GRCh38']:
-            q = ''
-            if src in pos_dbs+hg19_dbs:
-                q += src + '.chrom:"{}" AND '
-                if src in pos_dbs:
-                    q += src + '.pos:{} AND '
-                elif src in hg19_dbs:
-                    q += src + '.hg19.start:{} AND '
-                q += src + '.alt:{}'
-            else:
-                q = 'chr{}:{}'
-            q = q.format(chrom, pos, allele)
+        # verify information and build query string
+        if dataset in self.pos_dbs+self.assembly_dbs:
+            if chrom and start and alt and assembly in self.assembly_keys:
+                assembly = self.assembly_keys[assembly]  #get hg assembly notation
+                if alt[:3] == 'DEL': # syntax: "alternateBases": "DEL85689"
+                    length = alt[3:]
+                    q = self.del_dup_query(chrom, start, length, assembly, dataset)
+                    q_type = 'del'
+                elif alt[:3] == 'DUP': # "alternateBases": "DUP85689"
+                    length = alt[3:]
+                    q = self.del_dup_query(chrom, start, length, assembly, dataset)
+                    q_type = 'dup'
+                elif ref and alt:
+                    q = self.snp_query(chrom, start, ref, alt, assembly, dataset)
 
-            # perform query and format result
-            res = self.esq.query(q)
-            if res and res.get('total') > 0:
-                if src in pos_dbs+hg19_dbs:
-                    out = self.format_output_src(res, src, out)
-                else:
-                    out = self.verify_hits(res.get('hits'), out, allele)
-        return(out)
+                # perform query and format result
+                res = self.esq.query(q, fields=dataset, dotfield=1)
+                if res and res.get('total') > 0:
+                    out = self.format_output(res, out, q_type)
+        return out
 
 
-    def format_output_src(self, res, src, out):
-        out['exists'] = True
-        if len(res.get('hits')) == 1:
-            out['metadata'] = res.get('hits')[0][src]
+    def snp_query(self, chrom, start, ref, alt, assembly, dataset):
+        q = dataset + '.chrom:"{}" AND '.format(chrom)
+        if dataset in self.pos_dbs and assembly == 'hg19':
+            q += dataset + '.pos:{} AND '.format(start)
+        elif dataset in self.assembly_dbs:
+            q += dataset + '.{}.start:{} AND '.format(assembly, start)
         else:
-            out['metadata'] = [hit[src] for hit in res.get('hits')]
+            return ''
+        q += dataset + '.ref:{} AND '.format(ref)
+        q += dataset + '.alt:{} AND '.format(alt)
+        q += '_exists_:{}'.format(dataset)
+
+        return q
+
+    # Querying for deletions and duplcations can be done with same syntax
+    # issue then comes in resolving is this query a deletion or a duplication
+    # can just perform the query and test afterward
+    def del_dup_query(self, chrom, start, length, assembly, dataset):
+        end = int(start)+int(length)-1
+        q = dataset + '.chrom:"{}" AND '.format(chrom)
+        if dataset in self.pos_dbs and assembly == 'hg19':
+            q += 'hg19.start:{} AND '.format(start)
+            q += 'hg19.end:{} AND '.format(end)
+        elif dataset in self.assembly_dbs:
+            q += dataset + '.{}.start:{} AND '.format(assembly, start)
+            q += dataset + '.{}.end:{} AND '.format(assembly, end)
+        else:
+            return ''
+        q += '_exists_:{}'.format(dataset)
+
+        print(chrom, start, length, str(end), assembly, dataset, q)
+
+        return q
+
+
+    def format_output(self, res, out, q_type):
+        if q_type in ['dup', 'del']:
+            hits = [hit for hit in res.get('hits') if q_type in hit['_id']]
+        else:
+            hits = res.get('hits')
+        if len(hits) == 1:
+            out['exists'] = True
+            out['info'] = {k:v for k,v in hits[0].items() if not k.startswith('_')}
+        else:
+            out['info'] = [hit for hit in hits]
         return out
-
-
-    # TODO Enventually incorparte this logic into the search itself
-    def verify_hits(self, hits, out, allele):
-        for hit in hits:
-            for key in hit.keys():
-                if not key.startswith('_') and isinstance(hit[key], dict) and 'alt' in hit[key].keys():
-                    if hit[key]['alt'] == allele:
-                        out['exists'] = True
-                        out['metadata'] = {k:hit[k] for k in hit.keys() if not k.startswith('_')}
-                        return out
-        return out
-
-
-APP_LIST = [
-    (r"/?", BeaconHandler),
-    (r"/(.+)/?", BeaconHandler),
-]
