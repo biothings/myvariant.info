@@ -41,18 +41,20 @@ class ESSyncer():
                     '_op_type': 'update',
                     '_index': self._index,
                     '_type': self._doc_type,
-                    "_id": _id,
+                    '_id': _id,
                     'doc': self._src[collection].find_one({'_id': _id})
                 }
                 cnt_update += 1
             # case two: this id not exists in current index, then create a new one
             else:
+		_doc = self._src[collection].find_one({'_id': _id})
+		_doc.pop('_id')
                 es_info = {
                     '_op_type': 'create',
                     '_index': self._index,
                     '_type': self._doc_type,
                     "_id": _id,
-                    '_source': self._src[collection].find_one({'_id': _id})
+                    '_source': _doc
                 }
                 cnt_create += 1
             yield es_info
@@ -66,8 +68,9 @@ class ESSyncer():
             # get doc from index based on id
             if self._esi.exists(_id):
                 doc = self._esi.get_variant(_id)['_source']
+                doc.pop('_id')
                 # case one: only exist target field, or target field/snpeff/vcf, then we need to delete this item
-                if set(doc) == set([field]) or set(doc) == set([field, 'snpeff', 'vcf']):
+                if set(doc) == set([field]) or set(doc) == set([field, 'snpeff', 'vcf']) or set(doc) == set([field, 'snpeff', 'vcf', 'hg19']):
                     es_info = {
                         '_op_type': 'delete',
                         '_index': self._index,
@@ -83,7 +86,7 @@ class ESSyncer():
                         '_op_type': 'update',
                         '_index': self._index,
                         '_type': self._doc_type,
-                        "_id": _id,
+                        '_id': _id,
                         "script": 'ctx._source.remove("{}")'.format(field)
                     }
                     cnt_update += 1
