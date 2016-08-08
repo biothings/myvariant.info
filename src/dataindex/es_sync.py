@@ -70,7 +70,11 @@ class ESSyncer():
                 doc = self._esi.get_variant(_id)['_source']
                 doc.pop('_id')
                 # case one: only exist target field, or target field/snpeff/vcf, then we need to delete this item
+<<<<<<< HEAD
+                if set(doc) - set([field, 'snpeff', 'vcf', 'hg19']) == set([]):
+=======
                 if set(doc) == set([field]) or set(doc) == set([field, 'snpeff', 'vcf']) or set(doc) == set([field, 'snpeff', 'vcf', 'hg19']):
+>>>>>>> 47816ed51195e785ca8a2f44c5aa389337a52170
                     es_info = {
                         '_op_type': 'delete',
                         '_index': self._index,
