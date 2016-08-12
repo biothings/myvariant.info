@@ -3,7 +3,7 @@ import re
 from tornado.web import RequestHandler
 from biothings.www.api.handlers import MetaDataHandler, BiothingHandler, QueryHandler, StatusHandler, FieldsHandler
 from settings import MyVariantSettings
-from www.beacon.handlers import BeaconHandler
+from www.beacon.handlers import BeaconHandler, BeaconInfoHandler
 
 myvariant_settings = MyVariantSettings()
 
@@ -46,6 +46,7 @@ def return_applist():
         (r"/metadata/fields", FieldsHandler),
         (r"/demo/?$", DemoHandler),
         (r"/beacon/query?", BeaconHandler),
+        (r"/beacon/info", BeaconInfoHandler)
     ]
     if myvariant_settings._api_version:
         ret += [
