@@ -3,7 +3,7 @@ import re
 from tornado.web import RequestHandler
 from biothings.www.api.handlers import MetaDataHandler, BiothingHandler, QueryHandler, StatusHandler, FieldsHandler
 from settings import MyVariantSettings
-from www.beacon.handlers import BeaconHandler
+from www.beacon.handlers import BeaconHandler, BeaconInfoHandler
 
 myvariant_settings = MyVariantSettings()
 
@@ -37,7 +37,7 @@ class FieldsHandler(FieldsHandler):
 class MetaDataHandler(MetaDataHandler):
     ''' This class is for the /metadata endpoint. '''
     disable_caching = True
-    boolean_parameters = set(['chromosome', 'debug'])
+    boolean_parameters = set(['chromosome', 'dev'])
 
 def return_applist():
     ret = [
@@ -46,6 +46,7 @@ def return_applist():
         (r"/metadata/fields", FieldsHandler),
         (r"/demo/?$", DemoHandler),
         (r"/beacon/query?", BeaconHandler),
+        (r"/beacon/info", BeaconInfoHandler)
     ]
     if myvariant_settings._api_version:
         ret += [

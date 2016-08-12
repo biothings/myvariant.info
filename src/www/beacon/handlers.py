@@ -64,16 +64,16 @@ class BeaconHandler(BaseHandler):
             if chrom and start and alt and assembly in self.assembly_keys:
                 assembly = self.assembly_keys[assembly]  #get hg assembly notation
                 if alt[:3] == 'DEL': # syntax: "alternateBases": "DEL85689"
-                    length = alt[3:]
-                    q = self.del_dup_query(chrom, start, length, assembly, dataset)
                     q_type = 'del'
+                    ref = ''
                 elif alt[:3] == 'DUP': # "alternateBases": "DUP85689"
-                    length = alt[3:]
-                    q = self.del_dup_query(chrom, start, length, assembly, dataset)
                     q_type = 'dup'
-                elif ref and alt:
-                    q = self.snp_query(chrom, start, ref, alt, assembly, dataset)
+                    ref = ''
+                elif not ref:
+                    q_type = 'ins'
+                    ref = ''
 
+                q = self.format_query_string(q_type, chrom, start, ref, alt, assembly, dataset)
                 # perform query and format result
                 res = self.esq.query(q, fields=dataset, dotfield=1)
                 if res and res.get('total') > 0:
@@ -81,37 +81,31 @@ class BeaconHandler(BaseHandler):
         return out
 
 
-    def snp_query(self, chrom, start, ref, alt, assembly, dataset):
+    def format_query_string(self, q_type, chrom, start, ref, alt, assembly, dataset):
+        # Initialize some variables specific to Deletions and Duplicatoins
+        # Querying for deletions and duplcations can be done with same syntax
+        # issue then comes in resolving query result deletion or a duplication
+        # will perform query using same logic, and verify afterward
+        del_dup = ['del', 'dup']
+        if q_type in del_dup:
+            length = alt[3:]
+            end = int(start)+int(length)-1
+
         q = dataset + '.chrom:"{}" AND '.format(chrom)
         if dataset in self.pos_dbs and assembly == 'hg19':
             q += dataset + '.pos:{} AND '.format(start)
+            if q_type in del_dup:
+                q += 'hg19.end:{} AND '.format(end)
         elif dataset in self.assembly_dbs:
             q += dataset + '.{}.start:{} AND '.format(assembly, start)
+            if q_type in del_dup:
+                q += dataset + '.{}.end:{} AND '.format(assembly, end)
         else:
             return ''
-        q += dataset + '.ref:{} AND '.format(ref)
-        q += dataset + '.alt:{} AND '.format(alt)
+        if not q_type in del_dup:
+            q += dataset + '.ref:{} AND '.format(ref)
+            q += dataset + '.alt:{} AND '.format(alt)
         q += '_exists_:{}'.format(dataset)
-
-        return q
-
-    # Querying for deletions and duplcations can be done with same syntax
-    # issue then comes in resolving is this query a deletion or a duplication
-    # can just perform the query and test afterward
-    def del_dup_query(self, chrom, start, length, assembly, dataset):
-        end = int(start)+int(length)-1
-        q = dataset + '.chrom:"{}" AND '.format(chrom)
-        if dataset in self.pos_dbs and assembly == 'hg19':
-            q += 'hg19.start:{} AND '.format(start)
-            q += 'hg19.end:{} AND '.format(end)
-        elif dataset in self.assembly_dbs:
-            q += dataset + '.{}.start:{} AND '.format(assembly, start)
-            q += dataset + '.{}.end:{} AND '.format(assembly, end)
-        else:
-            return ''
-        q += '_exists_:{}'.format(dataset)
-
-        print(chrom, start, length, str(end), assembly, dataset, q)
 
         return q
 
@@ -127,3 +121,60 @@ class BeaconHandler(BaseHandler):
         else:
             out['info'] = [hit for hit in hits]
         return out
+
+
+class BeaconInfoHandler(BaseHandler):
+    # Use esq to grab metadata on myvariant.info
+    esq = ESQuery()
+    meta = esq.get_mapping_meta()
+
+    # Access Mapping Data for later use to determine assemblyID
+    m = esq._get_mapping(index = esq._index, doc_type=esq._doc_type, options=esq._get_cleaned_metadata_options({}))
+    m = m[list(m.keys())[0]]['mappings'][esq._doc_type]['properties']
+
+    # Current list of datasets in myvariant.info
+    dataset_names = ['dbnsfp', 'dbsnp', 'clinvar', 'evs', 'cadd', 'mutdb', 'cosmic', 'docm', 'wellderly', 'exac']
+
+
+    def get(self):
+        self.get_beacon_info()
+
+    def post(self):
+        self.get_beacon_info()
+
+    def get_beacon_info(self):
+        # Boilerplate Beacon Info
+        out = {'id': 'myvariant.info', 'apiVersion': 'v1', 'BeaconOrganization': 'TSRI',
+               'welcomeUrl': 'http://www.myvariant.info'}
+
+        # Loop through datasets to generate info
+        datasets = []
+        for dataset in self.dataset_names:
+            datasets.append(self.get_dataset_info(dataset))
+        out['datasets'] = datasets
+
+        # Return info
+        self.return_json(out)
+
+
+    def get_dataset_info(self, dataset):
+        #Get Basic Dataset info
+        out = {'id': dataset}
+        out['version'] = self.meta['src_version'].get(dataset, None)
+        out['variantCount'] = self.meta['stats'].get(dataset, None)
+
+        # Determine assemblies supported by dataset
+        assemblies = []
+        dataset_keys = self.m[dataset]['properties'].keys()
+
+        if 'hg18' in dataset_keys:
+            assemblies.append('NCBI36')
+        if 'hg19' in dataset_keys or dataset in ['exac', 'cadd']:
+            assemblies.append('GRCh37')
+        if 'hg38' in dataset_keys:
+            assemblies.append('GRCh38')
+
+        out['assemblyId'] = assemblies
+
+        return out
+
