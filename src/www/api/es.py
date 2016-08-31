@@ -34,6 +34,13 @@ class ESQuery(ESQuery):
     def _modify_biothingdoc(self, doc, options):
         if 'cadd' in doc:
             doc['cadd']['_license'] = 'http://goo.gl/bkpNhq'
+        if 'dbnsfp' in doc:
+            if 'polyphen2' in doc['dbnsfp']:
+                doc['dbnsfp']['polyphen2']['_license'] = 'http://goo.gl/6Cz4Ae'
+            if 'vest3' in doc['dbnsfp']:
+                doc['dbnsfp']['vest3']['_license'] = 'http://goo.gl/jTko4F'
+            if 'dann' in doc['dbnsfp']:
+                doc['dbnsfp']['dann']['_license'] = 'https://goo.gl/IeLhCq'
         return doc
 
     def _get_options(self, options, kwargs):
