@@ -2,14 +2,16 @@
 Utils to compare two list of variant documents
 '''
 from __future__ import print_function
+import os
 import jsonpatch
 import time
 import os.path
-from utils.common import timesofar, get_timestamp
+from utils.common import dump, timesofar, get_timestamp
 from utils.backend import GeneDocMongoDBBackend, GeneDocESBackend
 from utils.mongo import get_src_db
 from utils.es import ESIndexer
 from utils import jsondiff
+from biothings.utils.mongo import doc_feeder
 
 
 def apply_patch(doc, patch):
@@ -106,6 +108,21 @@ def _diff_doc_inner_worker2(b1, b2, ids, fastdiff=False):
     return _updates
 
 
+def _diff_parallel_worker(old_collection_name, new_collection_name, common_ids):
+    b1 = get_backend(old_collection_name, 'mongodb')
+    b2 = get_backend(new_collection_name, 'mongodb')
+    _updates = []
+    for doc1, doc2 in two_docs_iterator(b1, b2, common_ids):
+        assert doc1['_id'] == doc2['_id'], repr((common_ids, len(common_ids)))
+        _patch = jsondiff.make(doc1, doc2)
+        if _patch:
+            _diff = {}
+            _diff['patch'] = _patch
+            _diff['_id'] = doc1['_id']
+            _updates.append(_diff)
+    return _updates
+
+
 def diff_collections(b1, b2, use_parallel=True, step=10000):
     """
     b1, b2 are one of supported backend class in databuild.backend.
@@ -165,6 +182,75 @@ def diff_collections(b1, b2, use_parallel=True, step=10000):
                'source': b2.target_collection.name,
                'timestamp': get_timestamp()}
     return changes
+
+
+def diff_collections2(b1, b2, result_dir, use_parallel=True, step=10000):
+    '''
+    b2 is new collection, b1 is old collection
+    '''
+    if use_parallel:
+        import multiprocessing
+        from functools import partial
+    DATA_FOLDER = result_dir
+    data_new = doc_feeder(b2.target_collection, step=step, inbatch=True, fields={'_id': 1})
+    data_old = doc_feeder(b1.target_collection, step=step, inbatch=True, fields={'_id': 1})
+    cnt = 0
+    cnt_update = 0
+    cnt_add = 0
+    cnt_delete = 0
+    _timestamp = get_timestamp()
+    if not os.path.exists(DATA_FOLDER):
+        os.mkdir(DATA_FOLDER)
+    for batch in data_new:
+        cnt += 1
+        id_list_new = [doc['_id'] for doc in batch]
+        ids_common = [doc['_id'] for doc in b1.target_collection.find({'_id': {'$in': id_list_new}}, {'_id': 1})]
+        id_in_new = list(set(id_list_new) - set(ids_common))
+        _updates = []
+        if len(ids_common) > 0:
+            if use_parallel:
+                step = len(ids_common)/multiprocessing.cpu_count()
+                task_list = [ids_common[i:i+step] for i in range(0, len(ids_common), step)]
+                pool = multiprocessing.Pool()
+                partial_worker = partial(_diff_parallel_worker, b1.target_collection.name, b2.target_collection.name)
+                results = pool.map(partial_worker, task_list)
+                pool.close()
+                pool.join()
+                for result in results:
+                    _updates += result
+            else:
+                _updates = _diff_doc_inner_worker2(b1, b2, list(ids_common))
+        file_name = DATA_FOLDER + '/' + str(cnt) + '.pyobj'
+        _result = {'add': id_in_new,
+                   'update': _updates,
+                   'delete': [],
+                   'source': b2.target_collection.name,
+                   'timestamp': _timestamp}
+        if len(_updates) != 0 or len(id_in_new) != 0:
+            dump(_result, file_name)
+            print("(Updated: {}, Added: {})".format(len(_updates), len(id_in_new)), end='')
+            cnt_update += len(_updates)
+            cnt_add += len(id_in_new)
+    print("Finished calculating diff for the new collection. Total number of docs updated: {}, added: {}".format(cnt_update, cnt_add))
+    print("="*100)
+    for _batch in data_old:
+        cnt += 1
+        id_list_old = [_doc['_id'] for _doc in _batch]
+        ids_common = [doc['_id'] for doc in b2.target_collection.find({'_id': {'$in': id_list_old}}, {'_id': 1})]
+        id_in_old = list(set(id_list_old)-set(ids_common))
+        _result = {'delete': id_in_old,
+                   'add': [],
+                   'update': [],
+                   'source': b2.target_collection.name,
+                   'timestamp': _timestamp}
+        file_name = DATA_FOLDER + '/' + str(cnt) + '.pyobj'
+        if len(id_in_old) != 0:
+            dump(_result, file_name)
+            print("(Deleted: {})".format(len(id_in_old)), end='')
+            cnt_delete += len(id_in_old)
+    print("Finished calculating diff for the old collection. Total number of docs deleted: {}".format(cnt_delete))
+    print("="*100)
+    print("Summary: (Updated: {}, Added: {}, Deleted: {})".format(cnt_update, cnt_add, cnt_delete))
 
 
 def get_backend(target_name, bk_type, **kwargs):
