@@ -26,12 +26,14 @@ DATA_SRC_PORT = 27017
 DATA_SRC_DATABASE = 'variantdoc'
 DATA_SRC_MASTER_COLLECTION = 'src_master'   #for metadata of each src collections
 DATA_SRC_DUMP_COLLECTION = 'src_dump'       #for src data download information
-TA_SRC_BUILD_COLLECTION = 'src_build'       #for src data build information
+DATA_SRC_BUILD_COLLECTION = 'src_build'       #for src data build information
 
 DATA_SERVER_USERNAME = ''
 DATA_SERVER_PASSWORD = ''
 
 HG19_DATAFILE = '/path/to/hg19_bit_p13.pyobj'
+
+DATA_ARCHIVE_ROOT = '/path/to/archive/directory'
 
 ###############################
 # For www module only         #
