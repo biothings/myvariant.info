@@ -5,7 +5,7 @@ import subprocess
 
 from utils.dataload import unlist, dict_sweep
 from utils.validate import bit_to_nuc
-from utils.common import loadobj
+from biothings.utils.common import loadobj
 from utils.hgvs import get_hgvs_from_vcf
 from config import HG19_DATAFILE
 

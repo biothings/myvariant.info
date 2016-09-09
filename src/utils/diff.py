@@ -6,9 +6,9 @@ import os
 import jsonpatch
 import time
 import os.path
-from utils.common import dump, timesofar, get_timestamp
+from biothings.utils.common import dump, timesofar, get_timestamp
 from utils.backend import GeneDocMongoDBBackend, GeneDocESBackend
-from utils.mongo import get_src_db
+from biothings.utils.mongo import get_src_db
 from utils.es import ESIndexer
 from utils import jsondiff
 from biothings.utils.mongo import doc_feeder

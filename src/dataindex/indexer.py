@@ -7,7 +7,7 @@ import time
 from .mapping import get_mapping
 import config
 import utils.es
-import utils.mongo
+import biothings.utils.mongo
 
 
 es_host = config.ES_HOST
@@ -278,7 +278,7 @@ def clone_index(createidx=False, test=True):
     if test:
         return
     from utils.es import ESIndexer
-    from utils.common import iter_n
+    from biothings.utils.common import iter_n
 
     new_idx = 'myvariant_current_3'
     step = 10000

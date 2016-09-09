@@ -5,7 +5,7 @@ from elasticsearch import Elasticsearch, NotFoundError
 from elasticsearch import helpers
 
 import config
-from utils.common import iter_n, timesofar, ask
+from biothings.utils.common import iter_n, timesofar, ask
 from dataindex.mapping import get_mapping
 
 # setup ES logging

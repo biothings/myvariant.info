@@ -10,7 +10,7 @@ import re
 import glob
 import os.path
 
-from utils.common import anyfile
+from biothings.utils.common import anyfile
 from utils.dataload import rec_handler
 
 assembly_d = {

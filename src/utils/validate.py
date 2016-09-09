@@ -5,8 +5,8 @@ import time
 
 from bitarray import bitarray
 
-from utils.common import loadobj, is_str, open_anyfile, timesofar
-from utils.mongo import get_src_db, doc_feeder
+from biothings.utils.common import loadobj, is_str, open_anyfile, timesofar
+from biothings.utils.mongo import get_src_db, doc_feeder
 from config import HG19_DATAFILE
 
 

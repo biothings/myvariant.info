@@ -6,7 +6,7 @@ except:
     pass
 import requests
 
-from utils.common import loadobj, is_float
+from biothings.utils.common import loadobj, is_float
 
 
 def load_data(step=1000, offset=0, gwas_data_local=None):

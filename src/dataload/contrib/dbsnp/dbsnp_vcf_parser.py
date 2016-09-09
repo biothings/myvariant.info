@@ -11,7 +11,7 @@ import time
 
 from vcf import Reader
 
-from utils.common import timesofar
+from biothings.utils.common import timesofar
 
 # the key name for the pos in var_doc
 POS_KEY = 'hg19'

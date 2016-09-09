@@ -1,8 +1,8 @@
 from __future__ import print_function
 import time
 import datetime
-from utils.common import get_timestamp, get_random_string, timesofar
-from utils.mongo import get_src_db, get_src_master
+from biothings.utils.common import get_timestamp, get_random_string, timesofar
+from biothings.utils.mongo import get_src_db, get_src_master
 
 
 def load_source(collection_name, src_module=None, src_data=None, inbatch=True, new_collection=True, step=1000):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pymongo
 import time
-from utils.common import timesofar
+from biothings.utils.common import timesofar
 
 
 # split ";" separated fields into comma separated lists, strip.

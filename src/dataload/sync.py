@@ -1,5 +1,5 @@
-from utils.mongo import get_src_db
-from utils.common import loadobj
+from biothings.utils.mongo import get_src_db
+from biothings.utils.common import loadobj
 
 
 class MongoSync():
