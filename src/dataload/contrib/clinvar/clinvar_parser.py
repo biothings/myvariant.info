@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# DO NOT USE THIS SCRIPT, USE THE XML PARSER INSTEAD
 import csv
 import re
 from itertools import imap, groupby

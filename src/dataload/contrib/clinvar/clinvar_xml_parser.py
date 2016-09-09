@@ -1,8 +1,44 @@
-# Generated Mon Mar 30 11:14:08 2015 by generateDS.py version 2.15a.
-# Command line:
-#   /home/cwu/opt/devpy/bin/generateDS.py -o\
-# "clinvar.py" -s "clinvarsubs.py" /home/cwu/Desktop/clinvar_public.xsd
-import clinvar1
+# a python lib is generated on the fly, in data folder
+# adjust path
+
+
+import sys, os, glob
+from config import DATA_ARCHIVE_ROOT, logger as logging
+from biothings.utils.mongo import get_data_folder
+DATA_FOLDER = get_data_folder("clinvar")
+GLOB_PATTERN = "ClinVarFullRelease_*.xml.gz"
+
+sys.path.insert(0,DATA_FOLDER)
+
+try:
+    import clinvar
+except ImportError:
+    # ok, generate xml parser
+    orig_path = os.getcwd()
+    try:
+        os.chdir(DATA_FOLDER)
+        logging.info("Generate XM parser")
+        ret = os.system('''generateDS.py -f -o "clinvar_tmp.py" -s "clinvarsubs.py" clinvar_public.xsd''')
+        if ret != 0:
+            logging.error("Unable to generate parser, return code: %s" % ret)
+            raise
+        try:
+            py = open("clinvar_tmp.py").read()
+            # convert py2 to py3 (though they claim it support both versions)
+            py = py.replace("from StringIO import StringIO","from io import StringIO")
+            fout = open("clinvar.py","w")
+            fout.write(py)
+            fout.close()
+            os.unlink("clinvar_tmp.py")
+        except Exception as e:
+            logging.error("Cannot convert to py3...")
+    finally:
+        os.chdir(orig_path)
+    # now try again
+    import clinvar
+
+logging.info("Found generated clinvar module: %s" % clinvar)
+
 from itertools import groupby
 
 from utils.dataload import unlist, dict_sweep, \
@@ -15,7 +51,7 @@ def merge_rcv_accession(generator):
         groups.append(list(group))
 
     # get the number of groups, and uniquekeys
-    print "number of groups: ", len(groups), "\n"
+    logging.info("number of groups: %s" % len(groups))
 
     # loop through each item, if item number >1, merge rcv accession number
     for item in groups:
@@ -215,10 +251,10 @@ def _map_line_to_json(cp):
                 hgvs_id = hgvs_coding
                 coding_hgvs_only = True
             else:
-                print "couldn't find any id", rcv_accession
+                logging.warn("couldn't find any id %s" % rcv_accession)
                 return
         else:
-            print 'no measure.attribute', rcv_accession
+            logging.debug('no measure.attribute %s' % rcv_accession)
             return
         for key in HGVS:
             HGVS[key].sort()
@@ -306,22 +342,25 @@ def rcv_feeder(input_file):
     # the first two line of clinvar_xml is not useful information
     cv_data = rec_handler(input_file, block_end='</ClinVarSet>\n',
                           skip=2, include_block_end=True)
-    print input_file
     for record in cv_data:
         # some exceptions
         if record.startswith('\n</ReleaseSet>'):
             continue
         try:
-            record_parsed = clinvar1.parseString(record, silence=1)
+            record_parsed = clinvar.parseString(record, silence=1)
         except:
-            print(record)
+            logging.debug(record)
             raise
         for record_mapped in _map_line_to_json(record_parsed):
             yield record_mapped
 
-def load_data(input_file):
+def load_data():
+    files = glob.glob(os.path.join(DATA_FOLDER,GLOB_PATTERN))
+    assert len(files) == 1, "Expecting only one file matching '%s', got: %s" % (GLOB_PATTERN,files)
+    input_file = files[0]
     data_generator = rcv_feeder(input_file)
     data_list = list(data_generator)
+    # TODO: why do we sort this list ? this prevent from using yield/iterator
     data_list_sorted = sorted(data_list, key=lambda k: k['_id'])
     data_merge_rcv = merge_rcv_accession(data_list_sorted)
     return data_merge_rcv

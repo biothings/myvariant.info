@@ -3,9 +3,9 @@ import os.path
 import sys
 import time
 from ftplib import FTP
-from utils.common import ask, timesofar, LogPrint, safewfile
-from utils.mongo import get_src_dump
-from config import DATA_ARCHIVE_ROOT
+from biothings.utils.common import ask, timesofar, LogPrint, safewfile
+from biothings.utils.mongo import get_src_dump
+from config import DATA_ARCHIVE_ROOT, logger as logging
 
 
 timestamp = time.strftime('%Y%m%d')
@@ -14,24 +14,28 @@ FTP_SERVER = 'ftp.ncbi.nlm.nih.gov'
 DATAFILE_PATH = 'pub/clinvar/xml'
 
 
-def download_ftp_file(no_confirm=False):
+def wget_file(url,destdir,filename=None):
     orig_path = os.getcwd()
-    newest_file = get_newest_release()[0]
     try:
-        os.chdir(DATA_FOLDER)
-        print('Downloading "%s"...' % newest_file)
-        url = 'ftp://{}/{}/{}'.format(FTP_SERVER, DATAFILE_PATH, newest_file)
-        cmdline = 'wget %s -O %s' % (url, newest_file)
-        # cmdline = 'axel -a -n 5 %s' % url   #faster than wget using 5 connections
+        os.chdir(destdir)
+        filename = filename or url.split("/")[-1]
+        logging.info('Downloading "%s"...' % filename)
+        cmdline = 'wget %s -O %s' % (url, filename)
         return_code = os.system(cmdline)
         if return_code == 0:
-            print("Success.")
+            logging.info("Success.")
         else:
-            print("Failed with return code (%s)." % return_code)
-        print("="*50)
+            logging.error("Failed with return code (%s)." % return_code)
     finally:
         os.chdir(orig_path)
 
+def download_ftp_file(no_confirm=False):
+    newest_file = get_newest_release()[0]
+    url = 'ftp://{}/{}/{}'.format(FTP_SERVER, DATAFILE_PATH, newest_file)
+    wget_file(url,DATA_FOLDER)
+    url = 'ftp://{}/{}/../{}'.format(FTP_SERVER, DATAFILE_PATH, 'clinvar_public.xsd')
+    wget_file(url,DATA_FOLDER)
+    logging.info("="*50)
 
 # get the newest version name for ClinVar database
 def get_newest_release():
@@ -61,13 +65,24 @@ def main():
     no_confirm = True   # set it to True for running this script automatically without intervention.
     src_dump = get_src_dump()
     (file_name, release) = get_newest_release()
-    doc = src_dump.find_one({'_id': 'clinvar'})
-    if new_release_available(doc['release']):
-        data_file = os.path.join(doc['data_folder'], file_name)
-        if os.path.exists(data_file):
-            print("No newer file found. Abort now.")
-            return
 
+    doc = src_dump.find_one({'_id': 'clinvar'})
+    data_file = doc and os.path.join(doc.get('data_folder',""), file_name)
+    if data_file:
+        logging.debug("Found data_file '%s'" % data_file)
+
+    need_dump = False
+    if not doc:
+        logging.info("No previous dump found, initiate")
+        need_dump = True
+    elif not os.path.exists(data_file):
+        logging.info("No files found in '%s'" % doc.get('data_folder',""))
+        need_dump = True
+    elif new_release_available(doc['release']):
+        logging.info("New release available")
+        need_dump = True
+
+    if need_dump:
         if not os.path.exists(DATA_FOLDER):
             os.makedirs(DATA_FOLDER)
         else:
@@ -98,3 +113,9 @@ def main():
             'pending_to_upload': True    # a flag to trigger data uploading
         }
         src_dump.update({'_id': 'clinvar'}, {'$set': _updates})
+
+    else:
+        logging.info("No dump needed")
+
+if __name__ == "__main__":
+    main()
