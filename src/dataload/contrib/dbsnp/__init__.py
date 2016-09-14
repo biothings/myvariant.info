@@ -8,12 +8,12 @@ __METADATA__ = {
     ],
     "src_name": 'dbSNP',
     "src_url": 'http://www.ncbi.nlm.nih.gov/SNP/',
-    "version": '144',
+    "version": '147',
     "field": "dbsnp"
 }
 
 
-infile = "/home/kevinxin/dbsnp/00-All.vcf.gz"
+infile = "/opt/myvariant.info/load_archive/dbsnp/hg38/20160413/All_20160407.vcf.gz"
 
 
 def load_data():
