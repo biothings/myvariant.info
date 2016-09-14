@@ -5,8 +5,7 @@ from elasticsearch import Elasticsearch, NotFoundError
 from elasticsearch import helpers
 
 import config
-from utils.common import iter_n, timesofar, ask
-from utils.mongo import get_src_dump
+from utils.common import iter_n, timesofar, ask, dump
 from dataindex.mapping import get_mapping
 
 # setup ES logging
@@ -74,7 +73,7 @@ class ESIndexer():
         self.number_of_shards = config.ES_NUMBER_OF_SHARDS      # set number_of_shards when create_index
         self.step = step  # the bulk size when doing bulk operation.
         self.s = None   # optionally, can specify number of records to skip,
-                        # useful to continue indexing after an error.
+# useful to continue indexing after an error.
 
     def check(self):
         '''print out ES server info for verification.'''
@@ -171,7 +170,7 @@ class ESIndexer():
             })
             return doc
         actions = (_get_bulk(doc) for doc in docs)
-        return helpers.bulk(self._es, actions, chunk_size=step)
+        return helpers.bulk(self._es, actions, raise_on_error=False, chunk_size=step)
 
     def delete_doc(self, id):
         '''delete a doc from the index based on passed id.'''
@@ -353,6 +352,8 @@ class ESIndexer():
                 res = self.index_bulk(src_docs)
             if len(res[1]) > 0:
                 print("Error: {} docs failed indexing.".format(len(res[1])))
+                file_name = collection + '_es_error.pyobj'
+                dump(res, file_name)
             return res[0]
         else:
             cnt = 0
@@ -557,7 +558,7 @@ def reindex(old_index, new_index, s):
         print('{} documents inserted'.format(curr_done))
 
 
-def get_metadata_stats(index):
+def get_metadata(index):
     m = get_mapping()
     data_src = m['variant']['properties'].keys()
     stats = {}
@@ -568,17 +569,3 @@ def get_metadata_stats(index):
     for _src in data_src:
         stats[_src] = t.count_src(_src)[_src]
     return stats
-
-
-def get_metadata(index):
-    '''
-    return metadata information for count stats and release time
-    '''
-    stats = get_metadata_stats(index)
-    src_dump = get_src_dump()
-    release = {}
-    for _doc in src_dump.find():
-        release[_doc['_id']] = _doc['release']
-    timestamp = time.strftime('%Y%m%d')
-    info = {"src_version": release, "stats": stats, "timestamp": timestamp}
-    return info
