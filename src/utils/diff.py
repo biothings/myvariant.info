@@ -5,11 +5,12 @@ from __future__ import print_function
 import jsonpatch
 import time
 import os.path
-from utils.common import timesofar, get_timestamp
+from utils.common import dump, timesofar, get_timestamp
 from utils.backend import GeneDocMongoDBBackend, GeneDocESBackend
 from utils.mongo import get_src_db
 from utils.es import ESIndexer
 from utils import jsondiff
+from biothings.utils.mongo import doc_feeder
 
 
 def apply_patch(doc, patch):
@@ -166,8 +167,47 @@ def diff_collections(b1, b2, use_parallel=True, step=10000):
                'timestamp': get_timestamp()}
     return changes
 
-
-def get_backend(target_name, bk_type, **kwargs):
+ get_backend(target_name, bk_type, **kwargs):
+ns2(b1, b2, result_dir, step=10000):
+    '''
+    b2 is new collection, b1 is old collection
+    '''
+    data_new = doc_feeder(b2.target_collection, step=step, inbatch=True, fields=[])
+    data_old = doc_feeder(b1.target_collection, step=step, inbatch=True, fields=[])
+    cnt= 0
+    for _batch in data_new:
+        cnt += 1
+        id_list_new = [_doc['_id'] for _doc in _batch]
+        docs_common = b1.target_collection.find({'_id': {'$in': id_list_new}}, projection=[])
+        ids_common = [_doc['_id'] for _doc in docs_common]
+        id_in_new = list(set(id_list_new) - set(ids_common))
+        _updates = []
+        if len(ids_common) > 0:
+            _updates = _diff_doc_inner_worker2(b1, b2, list(ids_common))
+        file_name = result_dir + '/' + str(cnt) + '.pyobj'
+        _result = {
+                   'add': id_in_new,
+                   'update': _updates,
+                   'delete': [],
+                   'source': b2.target_collection.name,
+                   'timestamp': get_timestamp()}
+        dump(_result, file_name)
+        print ("Updated: {}, added: {}".format(count(_updates), count(id_in_new)), end='')
+    for _batch in data_old:
+        cnt += 1
+        id_list_old = [_doc['_id'] for _doc in _batch]
+        docs_common = b2.target_collection.find({'_id': {'$in': id_list_old}}, projection=[])
+        ids_common = [_doc['_id'] for _doc in docs_common]
+        id_in_old = list(set(id_list_old)-set(ids_common)）
+        file_name = result_dir + '/' + str(cnt) + '.pyobj'
+        _result = {
+                   'delete': id_in_old,
+                   'add': [],
+                   'update': [],
+                   'source': b2.target_collection.name,
+                   'timestamp': get_timestamp()}
+        dump(_result, file_name)
+        print("Deleted: {}".format(count(id_in_old)), end='')
     '''Return a backend instance for given target_name and backend type.
         currently support MongoDB and ES backend.
     '''
