@@ -1,4 +1,3 @@
-
 __METADATA__ = {
     "src_name": 'Wellderly',
     "src_url": 'http://www.stsiweb.org/wellderly/',
@@ -77,3 +76,4 @@ def get_mapping():
         }
     }
     return mapping
+
