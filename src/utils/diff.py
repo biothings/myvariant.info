@@ -209,7 +209,7 @@ def diff_collections2(b1, b2, result_dir, use_parallel=True, step=10000):
         _updates = []
         if len(ids_common) > 0:
             if use_parallel:
-                step = len(ids_common)/multiprocessing.cpu_count()
+                step = int(len(ids_common)/multiprocessing.cpu_count())
                 task_list = [ids_common[i:i+step] for i in range(0, len(ids_common), step)]
                 pool = multiprocessing.Pool()
                 partial_worker = partial(_diff_parallel_worker, b1.target_collection.name, b2.target_collection.name)
