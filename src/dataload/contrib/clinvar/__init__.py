@@ -3,7 +3,7 @@ from dataload.contrib.clinvar.clinvar_dump import main
 __METADATA__ = {
     "src_name": 'clinvar',
     "src_url": 'ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/xml/',
-    "release": '2016-03',
+    "release": '2016-07',
     "field": 'clinvar'
 }
 
@@ -201,3 +201,4 @@ def get_mapping():
         }
     }
     return mapping
+
