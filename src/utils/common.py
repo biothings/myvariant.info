@@ -240,15 +240,17 @@ def open_compressed_file(filename):
     return fobj
 
 
-def dump(obj, filename, bin=2, compress='gzip'):
+def dump(obj, filename, bin=2, compress='gzip', verbose=False):
     '''Saves a compressed object to disk
        binary protocol 2 is compatible with py2, 3 and 4 are for py3
     '''
-    print('Dumping into "%s"...' % filename, end='')
+    if verbose:
+        print('Dumping into "%s"...' % filename, end='')
     out_f = get_compressed_outfile(filename, compress=compress)
     pickle.dump(obj, out_f, protocol=bin)
     out_f.close()
-    print('Done. [%s]' % os.stat(filename).st_size)
+    if verbose:
+        print('Done. [%s]' % os.stat(filename).st_size)
 
 
 def dump2gridfs(object, filename, db, bin=2):
@@ -401,4 +403,27 @@ def safewfile(filename, prompt=True, default='C', mode='w'):
         filename = addsuffix(filename, '_' + str(suffix))
         suffix += 1
     return open(filename, mode), filename
+
+
+def find_doc(k,keys):
+    ''' Used by jsonld insertion in www.api.es._insert_jsonld '''
+    n = len(keys)
+    for i in range(n):
+        # if k is a dictionary, then directly get its value
+        if type(k) == dict:
+            k = k[keys[i]]
+        # if k is a list, then loop through k
+        elif type(k) == list:
+            tmp = []
+            for item in k:
+                try:
+                    if type(item[keys[i]]) == dict:
+                        tmp.append(item[keys[i]])
+                    elif type(item[keys[i]]) == list:
+                        for _item in item[keys[i]]:
+                            tmp.append(_item)
+                except:
+                    continue
+            k = tmp
+    return k
 
