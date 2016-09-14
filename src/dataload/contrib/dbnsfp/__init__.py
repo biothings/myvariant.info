@@ -236,6 +236,22 @@ def get_mapping():
                         }
                     }
                 },
+                "vest3": {
+                    "properties": {
+                        "score": {
+                            "type": "float"
+                        },
+                        "rankscore": {
+                            "type": "float"
+                        },
+                        "transcriptid": {
+                            "type": "string"
+                        },
+                        "transcriptvar": {
+                            "type": "string"
+                        }
+                    }
+                },
                 "fathmm-mkl": {
                     "properties": {
                         "coding_score": {
@@ -251,6 +267,39 @@ def get_mapping():
                         "coding_group": {
                             "type": "string",
                             "analyzer": "string_lowercase"
+                        }
+                    }
+                },
+                "eigen": {
+                    "properties": {
+                        "raw": {
+                            "type": "float"
+                        },
+                        "phred": {
+                            "type": "float"
+                        },
+                        "raw_rankscore": {
+                            "type": "float"
+                        }
+                    }
+                },
+                "eigen-pc": {
+                    "properties": {
+                        "raw": {
+                            "type": "float"
+                        },
+                        "raw_rankscore": {
+                            "type": "float"
+                        }
+                    }
+                },
+                "genocanyon": {
+                    "properties": {
+                        "score": {
+                            "type": "float"
+                        },
+                        "rankscore": {
+                            "type": "float"
                         }
                     }
                 },
@@ -282,6 +331,16 @@ def get_mapping():
                 },
                 "reliability_index": {
                     "type": "integer"
+                },
+                "dann": {
+                    "properties": {
+                        "score": {
+                            "type": "float"
+                        },
+                        "rankscore": {
+                            "type": "float"
+                        }
+                    }
                 },
                 "gerp++": {
                     "properties": {
@@ -350,7 +409,7 @@ def get_mapping():
                 },
                 "phylo": {
                     "properties": {
-                        "p7way": {
+                        "p100way": {
                             "properties": {
                                 "vertebrate": {
                                     "type": "float"
@@ -374,7 +433,7 @@ def get_mapping():
                 },
                 "phastcons": {
                     "properties": {
-                        "7way": {
+                        "100way": {
                             "properties": {
                                 "vertebrate": {
                                     "type": "float"
@@ -460,6 +519,156 @@ def get_mapping():
                         "sas_ac": {
                             "type": "integer"
                         },
+                    }
+                },
+                "exac": {
+                    "properties": {
+                        "ac": {
+                            "type": "integer"
+                        },
+                        "af": {
+                            "type": "float"
+                        },
+                        "adj_af": {
+                            "type": "float"
+                        },
+                        "adj_ac": {
+                            "type": "integer"
+                        },
+                        "afr_ac": {
+                            "type": "integer"
+                        },
+                        "afr_af": {
+                            "type": "float"
+                        },
+                        "amr_ac": {
+                            "type": "integer"
+                        },
+                        "amr_af": {
+                            "type": "float"
+                        },
+                        "eas_af": {
+                            "type": "float"
+                        },
+                        "eas_ac": {
+                            "type": "integer"
+                        },
+                        "fin_ac": {
+                            "type": "integer"
+                        },
+                        "fin_af": {
+                            "type": "float"
+                        },
+                        "nfe_ac": {
+                            "type": "integer"
+                        },
+                        "nfe_af": {
+                            "type": "float"
+                        },
+                        "sas_af": {
+                            "type": "float"
+                        },
+                        "sas_ac": {
+                            "type": "integer"
+                        },
+                    }
+                },
+                "exac_nontcga": {
+                    "properties": {
+                        "ac": {
+                            "type": "integer"
+                        },
+                        "af": {
+                            "type": "float"
+                        },
+                        "adj_af": {
+                            "type": "float"
+                        },
+                        "adj_ac": {
+                            "type": "integer"
+                        },
+                        "afr_ac": {
+                            "type": "integer"
+                        },
+                        "afr_af": {
+                            "type": "float"
+                        },
+                        "amr_ac": {
+                            "type": "integer"
+                        },
+                        "amr_af": {
+                            "type": "float"
+                        },
+                        "eas_af": {
+                            "type": "float"
+                        },
+                        "eas_ac": {
+                            "type": "integer"
+                        },
+                        "fin_ac": {
+                            "type": "integer"
+                        },
+                        "fin_af": {
+                            "type": "float"
+                        },
+                        "nfe_ac": {
+                            "type": "integer"
+                        },
+                        "nfe_af": {
+                            "type": "float"
+                        },
+                        "sas_af": {
+                            "type": "float"
+                        },
+                        "sas_ac": {
+                            "type": "integer"
+                        },
+                    }
+                },
+                "exac_nonpsych": {
+                    "properties": {
+                        "ac": {
+                            "type": "integer"
+                        },
+                        "af": {
+                            "type": "float"
+                        },
+                        "adj_af": {
+                            "type": "float"
+                        },
+                        "adj_ac": {
+                            "type": "integer"
+                        },
+                        "afr_ac": {
+                            "type": "integer"
+                        },
+                        "afr_af": {
+                            "type": "float"
+                        },
+                        "amr_ac": {
+                            "type": "integer"
+                        },
+                        "amr_af": {
+                            "type": "float"
+                        },
+                        "eas_af": {
+                            "type": "float"
+                        },
+                        "eas_ac": {
+                            "type": "integer"
+                        },
+                        "fin_ac": {
+                            "type": "integer"
+                        },
+                        "fin_af": {
+                            "type": "float"
+                        },
+                        "nfe_ac": {
+                            "type": "integer"
+                        },
+                        "nfe_af": {
+                            "type": "float"
+                        }
                     }
                 },
                 "twinsuk": {
