@@ -33,6 +33,9 @@ SUPPORTED_ASSEMBLIES = ['hg19', 'hg38']
 # For dataload module only    #
 ###############################
 
+# webserver to show hub status
+DATA_WWW_ROOT_URL = "http://localhost:8000"
+
 # defautlt number_of_shards when create a new index
 ES_NUMBER_OF_SHARDS = 20
 
@@ -50,6 +53,12 @@ DATA_SERVER_PASSWORD = ''
 HG19_DATAFILE = '/path/to/hg19_bit_p13.pyobj'
 
 DATA_ARCHIVE_ROOT = '/path/to/archive/directory'
+
+# fill with "token", "roomid" and "from" keys
+# to broadcast message to a Hipchat room
+HIPCHAT_CONFIG = { "token" : "", "roomid" : "", "from" : "" }
+
+
 
 ###############################
 # For www module only         #

@@ -1,20 +1,13 @@
-from dataload.contrib.clinvar.clinvar_dump import main
-# -*- coding: utf-8 -*-
+
 __METADATA__ = {
-    "src_name": 'clinvar',
-    "src_url": 'ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/xml/',
-    "release": '2015-11',
-    "field": 'clinvar'
+    "__collection__": 'clinvar',
 }
 
 # -*- coding: utf-8 -*-
+from .clinvar_dump import main as download
+from .clinvar_xml_parser import load_data
 
-
-def download():
-    return main()
-
-
-def get_mapping():
+def get_mapping(self=None):
     mapping = {
         "clinvar": {
             "properties": {

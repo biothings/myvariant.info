@@ -3,6 +3,8 @@ import os.path
 import sys
 import time
 from ftplib import FTP
+import biothings, config
+biothings.config_for_app(config)
 from biothings.utils.common import ask, timesofar, LogPrint, safewfile
 from biothings.utils.mongo import get_src_dump
 from config import DATA_ARCHIVE_ROOT, logger as logging

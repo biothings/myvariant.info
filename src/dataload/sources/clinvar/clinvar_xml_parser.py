@@ -2,8 +2,15 @@
 # adjust path
 
 
+__metadata__ = {
+    '__collection__': 'clinvar',
+}
+
+
 import sys, os, glob
 from config import DATA_ARCHIVE_ROOT, logger as logging
+import biothings, config
+biothings.config_for_app(config)
 from biothings.utils.mongo import get_data_folder
 DATA_FOLDER = get_data_folder("clinvar")
 GLOB_PATTERN = "ClinVarFullRelease_*.xml.gz"
@@ -354,7 +361,8 @@ def rcv_feeder(input_file):
         for record_mapped in _map_line_to_json(record_parsed):
             yield record_mapped
 
-def load_data():
+# TODO: get rid of that "self" here (see bt.dataload.__init__ to understand why and how it's used)
+def load_data(self=None):
     files = glob.glob(os.path.join(DATA_FOLDER,GLOB_PATTERN))
     assert len(files) == 1, "Expecting only one file matching '%s', got: %s" % (GLOB_PATTERN,files)
     input_file = files[0]
@@ -364,3 +372,6 @@ def load_data():
     data_list_sorted = sorted(data_list, key=lambda k: k['_id'])
     data_merge_rcv = merge_rcv_accession(data_list_sorted)
     return data_merge_rcv
+
+if __name__ == "__main__":
+    load_data()
