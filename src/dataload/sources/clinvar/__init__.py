@@ -1,5 +1,5 @@
 
-__METADATA__ = {
+__metadata__ = {
     "__collection__": 'clinvar',
 }
 
