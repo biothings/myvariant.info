@@ -17,39 +17,40 @@ GLOB_PATTERN = "ClinVarFullRelease_*.xml.gz"
 
 sys.path.insert(0,DATA_FOLDER)
 
-try:
-    import clinvar
-except ImportError:
-    # ok, generate xml parser
-    orig_path = os.getcwd()
-    try:
-        os.chdir(DATA_FOLDER)
-        logging.info("Generate XM parser")
-        ret = os.system('''generateDS.py -f -o "clinvar_tmp.py" -s "clinvarsubs.py" clinvar_public.xsd''')
-        if ret != 0:
-            logging.error("Unable to generate parser, return code: %s" % ret)
-            raise
-        try:
-            py = open("clinvar_tmp.py").read()
-            # convert py2 to py3 (though they claim it support both versions)
-            py = py.replace("from StringIO import StringIO","from io import StringIO")
-            fout = open("clinvar.py","w")
-            fout.write(py)
-            fout.close()
-            os.unlink("clinvar_tmp.py")
-        except Exception as e:
-            logging.error("Cannot convert to py3...")
-    finally:
-        os.chdir(orig_path)
-    # now try again
-    import clinvar
-
-logging.info("Found generated clinvar module: %s" % clinvar)
-
 from itertools import groupby
 
 from utils.dataload import unlist, dict_sweep, \
     value_convert, rec_handler
+
+def generate_clinvar_lib():
+    try:
+        import clinvar
+    except ImportError:
+        # ok, generate xml parser
+        orig_path = os.getcwd()
+        try:
+            os.chdir(DATA_FOLDER)
+            logging.info("Generate XM parser")
+            ret = os.system('''generateDS.py -f -o "clinvar_tmp.py" -s "clinvarsubs.py" clinvar_public.xsd''')
+            if ret != 0:
+                logging.error("Unable to generate parser, return code: %s" % ret)
+                raise
+            try:
+                py = open("clinvar_tmp.py").read()
+                # convert py2 to py3 (though they claim it support both versions)
+                py = py.replace("from StringIO import StringIO","from io import StringIO")
+                fout = open("clinvar.py","w")
+                fout.write(py)
+                fout.close()
+                os.unlink("clinvar_tmp.py")
+            except Exception as e:
+                logging.error("Cannot convert to py3...")
+        finally:
+            os.chdir(orig_path)
+        # now try again
+        import clinvar
+
+    logging.info("Found generated clinvar module: %s" % clinvar)
 
 
 def merge_rcv_accession(generator):
@@ -363,6 +364,7 @@ def rcv_feeder(input_file):
 
 # TODO: get rid of that "self" here (see bt.dataload.__init__ to understand why and how it's used)
 def load_data(self=None):
+    generate_clinvar_lib()
     files = glob.glob(os.path.join(DATA_FOLDER,GLOB_PATTERN))
     assert len(files) == 1, "Expecting only one file matching '%s', got: %s" % (GLOB_PATTERN,files)
     input_file = files[0]
