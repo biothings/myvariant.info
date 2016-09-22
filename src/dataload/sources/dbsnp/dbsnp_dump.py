@@ -34,15 +34,16 @@ class DBSNPDumper(FTPDumper):
     def create_todump_list(self, force=False):
         latest_remote_dirs = self.find_latest_human_dirs()
         for one_dir in latest_remote_dirs:
-            rel_path = os.path.join(one_dir,self.FILE_PATH)
-            new_localfile = os.path.join(self.new_data_folder,rel_path)
-            try:
-                current_localfile = os.path.join(self.current_data_folder,rel_path)
-            except TypeError:
-                # current data folder doesn't even exist
-                current_localfile = new_localfile
-            if force or not os.path.exists(current_localfile) or self.remote_is_better(rel_path, current_localfile):
-                self.to_dump.append({"remote":rel_path, "local":new_localfile})
+            for filename in [self.FILE_PATH, self.FILE_PATH + ".tbi"]:
+                rel_path = os.path.join(one_dir, filename)
+                new_localfile = os.path.join(self.new_data_folder,rel_path)
+                try:
+                    current_localfile = os.path.join(self.current_data_folder,rel_path)
+                except TypeError:
+                    # current data folder doesn't even exist
+                    current_localfile = new_localfile
+                if force or not os.path.exists(current_localfile) or self.remote_is_better(rel_path, current_localfile):
+                    self.to_dump.append({"remote":rel_path, "local":new_localfile})
 
 def main():
     dumper = DBSNPDumper()

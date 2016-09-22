@@ -22,9 +22,13 @@ from itertools import groupby
 from utils.dataload import unlist, dict_sweep, \
     value_convert, rec_handler
 
+clinvar = None
+
 def generate_clinvar_lib():
     try:
-        import clinvar
+        import clinvar as clinvar_mod
+        global clinvar
+        clinvar = clinvar_mod
     except ImportError:
         # ok, generate xml parser
         orig_path = os.getcwd()
