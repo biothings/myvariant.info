@@ -146,3 +146,4 @@ def get_mapping():
         }
     }
     return mapping
+
