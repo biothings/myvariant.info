@@ -8,7 +8,6 @@ import config
 from elasticsearch.helpers import bulk
 from utils.es import ESIndexer, get_es
 from biothings.utils.mongo import get_src_db
-#from utils.diff import apply_patch, diff_collections, get_backend
 from utils.diff_update import apply_patch, diff_collections, get_backend
 from biothings.utils.common import loadobj, get_random_string, timesofar
 from dataload import load_source
