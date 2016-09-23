@@ -79,7 +79,7 @@ def merge_rcv_accession(generator):
             yield item[0]
 
 
-def _map_line_to_json(cp):
+def _map_line_to_json(cp, hg19):
     try:
         clinical_significance = cp.ReferenceClinVarAssertion.\
             ClinicalSignificance.Description
@@ -137,8 +137,8 @@ def _map_line_to_json(cp):
             continue
         allele_id = Measure.ID
         chrom = None
-        chromStart = None
-        chromEnd = None
+        chromStart_19 = None
+        chromEnd_19 = None
         chromStart_38 = None
         chromEnd_38 = None
         ref = None
@@ -148,8 +148,8 @@ def _map_line_to_json(cp):
                 # In this version, only accept information concerning GRCh37
                 if 'GRCh37' in SequenceLocation.Assembly:
                     chrom = SequenceLocation.Chr
-                    chromStart = SequenceLocation.start
-                    chromEnd = SequenceLocation.stop
+                    chromStart_19 = SequenceLocation.start
+                    chromEnd_19 = SequenceLocation.stop
                     ref = SequenceLocation.referenceAllele
                     alt = SequenceLocation.alternateAllele
                 if 'GRCh38' in SequenceLocation.Assembly:
@@ -182,6 +182,12 @@ def _map_line_to_json(cp):
         HGVS = {'genomic': [], 'coding': [], 'non-coding': [], 'protein': []}
         coding_hgvs_only = None
         hgvs_id = None
+        if hg19:
+            chromStart = chromStart_19
+            chromEnd = chromEnd_19
+        else:
+            chromStart = chromStart_38
+            chromEnd = chromEnd_38
         # hgvs_not_validated = None
         if Measure.AttributeSet:
             # 'copy number loss' or 'gain' have format different\
@@ -256,9 +262,8 @@ def _map_line_to_json(cp):
                                       (chrom, chromStart, chromEnd, dup_ref)
             elif variation_type == 'copy number loss' or\
                     variation_type == 'copy number gain':
-                if hgvs_genome:
-                    hgvs_id = "chr" + hgvs_genome.split('.')[1] +\
-                              hgvs_genome.split('.')[2]
+                if hgvs_genome and chrom:
+                    hgvs_id = "chr" + chrom + ":" + hgvs_genome.split('.')[2]
             elif hgvs_coding:
                 hgvs_id = hgvs_coding
                 coding_hgvs_only = True
@@ -305,8 +310,8 @@ def _map_line_to_json(cp):
                         "dbvar": dbvar,
                         "hg19":
                             {
-                                "start": chromStart,
-                                "end": chromEnd
+                                "start": chromStart_19,
+                                "end": chromEnd_19
                             },
                         "hg38":
                             {
@@ -350,7 +355,7 @@ def _map_line_to_json(cp):
             yield obj
 
 
-def rcv_feeder(input_file):
+def rcv_feeder(input_file, hg19):
     # the first two line of clinvar_xml is not useful information
     cv_data = rec_handler(input_file, block_end='</ClinVarSet>\n',
                           skip=2, include_block_end=True)
@@ -363,16 +368,16 @@ def rcv_feeder(input_file):
         except:
             logging.debug(record)
             raise
-        for record_mapped in _map_line_to_json(record_parsed):
+        for record_mapped in _map_line_to_json(record_parsed, hg19):
             yield record_mapped
 
 # TODO: get rid of that "self" here (see bt.dataload.__init__ to understand why and how it's used)
-def load_data(self=None):
+def load_data(self=None, hg19=True):
     generate_clinvar_lib()
     files = glob.glob(os.path.join(DATA_FOLDER,GLOB_PATTERN))
     assert len(files) == 1, "Expecting only one file matching '%s', got: %s" % (GLOB_PATTERN,files)
     input_file = files[0]
-    data_generator = rcv_feeder(input_file)
+    data_generator = rcv_feeder(input_file, hg19)
     data_list = list(data_generator)
     # TODO: why do we sort this list ? this prevent from using yield/iterator
     data_list_sorted = sorted(data_list, key=lambda k: k['_id'])

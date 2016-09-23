@@ -53,6 +53,8 @@ class VCFConstruct:
     def snp_vcf_constructer(self, hgvs):
         '''construct a VCF file based on chr, pos, ref, alt information'''
         chrom = hgvs[0]
+        if chrom == 'MT':
+            chrom = 'M'
         pos = hgvs[1]
         ref = hgvs[2]
         alt = hgvs[3]
@@ -73,6 +75,8 @@ class VCFConstruct:
             nuc_chr = bit_to_nuc(nuc_chr_bit)
             ref += nuc_chr
         alt = ref[0]
+        if chrom == 'MT':
+            chrom = 'M'
         vcf = str(chrom) + '\t' + str(pos) + '\t' + '.' + '\t' + ref + '\t' + alt + '\t.\t.\t.\n'
         return vcf
 
@@ -87,6 +91,8 @@ class VCFConstruct:
         ref = bit_to_nuc(nuc_chr_bit)
         alt = hgvs[3]
         alt = ref + alt
+        if chrom == 'MT':
+            chrom = 'M'
         vcf = str(chrom) + '\t' + str(pos) + '\t' + '.' + '\t' + ref + '\t' + alt + '\t.\t.\t.\n'
         return vcf
 
@@ -104,6 +110,8 @@ class VCFConstruct:
             nuc_chr = bit_to_nuc(nuc_chr_bit)
             ref += nuc_chr
         alt = hgvs[3]
+        if chrom == 'MT':
+            chrom = 'M'
         vcf = str(chrom) + '\t' + str(pos) + '\t' + '.' + '\t' + ref + '\t' + alt + '\t.\t.\t.\n'
         return vcf
 
@@ -122,7 +130,7 @@ class VCFConstruct:
                     print(item)
                     continue
                 snpeff_valid_id.append(item)
-            elif item.endswith('del'):
+            elif item.endswith('del') and '_' in item:
                 hgvs_info = self.del_hgvs_id_parser(item)
                 try:
                     vcf_stdin += self.del_vcf_constructor(hgvs_info)
@@ -150,7 +158,11 @@ class VCFConstruct:
                 print('beyond current capacity')
         proc = subprocess.Popen(SNPEFF_CMD, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = proc.communicate(vcf_stdin)
-        assert stderr == '', stderr
+        try:
+            assert stderr == '', stderr
+        except:
+            print(stderr)
+
         vcf_stdout_raw = stdout.split('\n')
         for vcf_line in vcf_stdout_raw:
             if vcf_line.startswith('#'):
@@ -166,7 +178,6 @@ class VCFConstruct:
                     if len(item.split('|')) > 1:
                         (effect, putative_impact, gene_name, gene_id, feature_type, feature_id) = item.split('|')[1:7]
                         (transcript_biotype, exon, hgvs_coding, hgvs_protein, cdna, cds, protein, distance_to_feature) = item.split('|')[7:15]
-                        print(effect)
                         if cdna:
                             (cdna_position, cdna_len) = cdna.split('/')
                         else:
@@ -190,15 +201,15 @@ class VCFConstruct:
                         ann.append({
                             "effect": effect,
                             "putative_impact": putative_impact,
-                            "genename": gene_name,
+                            "gene_name": gene_name,
                             "gene_id": gene_id,
                             "feature_type": feature_type,
                             "feature_id": feature_id,
                             "transcript_biotype": transcript_biotype,
                             "rank": rank,
                             "total": total,
-                            "hgvs.c": hgvs_coding,
-                            "hgvs.p": hgvs_protein,
+                            "hgvs_c": hgvs_coding,
+                            "hgvs_p": hgvs_protein,
                             "cdna": {
                                 "position": cdna_position,
                                 "length": cdna_len
@@ -213,7 +224,6 @@ class VCFConstruct:
                             },
                             "distance_to_feature": distance_to_feature
                         })
-                        print(ann)
                 # not all annotations include lof & nmd information. Set them to 'None' as default
                 lof = None
                 nmd = None
@@ -229,13 +239,13 @@ class VCFConstruct:
                     (id_nmd, name_nmd, nt_nmd, pt_nmd) = nmd_info.split('|')
                     lof = {
                         "gene_id": id_lof,
-                        "genename": name_lof,
+                        "gene_name": name_lof,
                         "number_of_transcripts_in_gene": nt_lof,
                         "percent_of_transcripts_affected": pt_lof
                     }
                     nmd = {
                         "gene_id": id_nmd,
-                        "genename": name_nmd,
+                        "gene_name": name_nmd,
                         "number_of_transcripts_in_gene": nt_nmd,
                         "percent_of_transcripts_affected": pt_nmd
                     }
@@ -247,7 +257,7 @@ class VCFConstruct:
                         (id_lof, name_lof, nt_lof, pt_lof) = lof_info.split('|')
                         lof = {
                             "gene_id": id_lof,
-                            "genename": name_lof,
+                            "gene_name": name_lof,
                             "number_of_transcripts_in_gene": nt_lof,
                             "percent_of_transcripts_affected": pt_lof
                         }
@@ -256,23 +266,25 @@ class VCFConstruct:
                         (id_nmd, name_nmd, nt_nmd, pt_nmd) = nmd_info.split('|')
                         nmd = {
                             "gene_id": id_nmd,
-                            "genename": name_nmd,
+                            "gene_name": name_nmd,
                             "number_of_transcripts_in_gene": nt_nmd,
                             "percent_of_transcripts_affected": pt_nmd
                         }
                 (chrom, pos, _id, ref, alt) = ann_info.split('\t')[0:5]
+                if chrom == 'M':
+                    chrom = 'MT'
                 hgvs_id = get_hgvs_from_vcf(chrom, pos, ref, alt)
                 one_snp_json = {
-                    "id": hgvs_id,
+                    "_id": hgvs_id,
                     "snpeff": {
                         "ann": ann,
                         "lof": lof,
-                        "nmd": nmd,
-                        "vcf": {
-                            "position": pos,
-                            "ref": ref,
-                            "alt": alt
-                        }
+                        "nmd": nmd
+                    },
+                    "vcf": {
+                        "position": pos,
+                        "ref": ref,
+                        "alt": alt
                     }
                 }
                 snpeff_json = dict_sweep(unlist(one_snp_json), vals=['', None])

@@ -94,15 +94,17 @@ def open_compressed_file(filename):
     return fobj
 
 
-def dump(obj, filename, bin=2, compress='gzip'):
+def dump(obj, filename, bin=2, compress='gzip', verbose=False):
     '''Saves a compressed object to disk
        binary protocol 2 is compatible with py2, 3 and 4 are for py3
     '''
-    print('Dumping into "%s"...' % filename, end='')
+    if verbose:
+        print('Dumping into "%s"...' % filename, end='')
     out_f = get_compressed_outfile(filename, compress=compress)
     pickle.dump(obj, out_f, protocol=bin)
     out_f.close()
-    print('Done. [%s]' % os.stat(filename).st_size)
+    if verbose:
+        print('Done. [%s]' % os.stat(filename).st_size)
 
 
 def dump2gridfs(object, filename, db, bin=2):

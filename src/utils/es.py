@@ -5,7 +5,7 @@ from elasticsearch import Elasticsearch, NotFoundError
 from elasticsearch import helpers
 
 import config
-from biothings.utils.common import iter_n, timesofar, ask
+from biothings.utils.common import iter_n, timesofar, ask, dump
 from dataindex.mapping import get_mapping
 
 # setup ES logging
@@ -73,7 +73,7 @@ class ESIndexer():
         self.number_of_shards = config.ES_NUMBER_OF_SHARDS      # set number_of_shards when create_index
         self.step = step  # the bulk size when doing bulk operation.
         self.s = None   # optionally, can specify number of records to skip,
-                        # useful to continue indexing after an error.
+# useful to continue indexing after an error.
 
     def check(self):
         '''print out ES server info for verification.'''
@@ -170,7 +170,7 @@ class ESIndexer():
             })
             return doc
         actions = (_get_bulk(doc) for doc in docs)
-        return helpers.bulk(self._es, actions, chunk_size=step)
+        return helpers.bulk(self._es, actions, raise_on_error=False, chunk_size=step)
 
     def delete_doc(self, id):
         '''delete a doc from the index based on passed id.'''
@@ -352,6 +352,8 @@ class ESIndexer():
                 res = self.index_bulk(src_docs)
             if len(res[1]) > 0:
                 print("Error: {} docs failed indexing.".format(len(res[1])))
+                file_name = collection + '_es_error.pyobj'
+                dump(res, file_name)
             return res[0]
         else:
             cnt = 0

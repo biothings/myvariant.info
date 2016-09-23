@@ -148,7 +148,7 @@ def _index_doc_batch(doc_batch, index_name, doc_type, update=True, bulk_size=100
                 "update": {
                     "_index": index_name,
                     "_type": doc_type,
-                    "_id": doc['_id']
+                    "_id": doc.pop('_id')
                 }
             })
             _li.append({'doc': doc, 'doc_as_upsert': True})
@@ -157,7 +157,7 @@ def _index_doc_batch(doc_batch, index_name, doc_type, update=True, bulk_size=100
                 "index": {
                     "_index": index_name,
                     "_type": doc_type,
-                    "_id": doc['_id']
+                    "_id": doc.pop('_id')
                 }
             })
             _li.append(doc)
