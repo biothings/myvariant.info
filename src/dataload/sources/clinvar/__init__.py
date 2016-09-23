@@ -5,7 +5,6 @@ __metadata__ = {
 
 # -*- coding: utf-8 -*-
 from .clinvar_dump import main as download
-from .clinvar_xml_parser import load_data
 
 def get_mapping(self=None):
     mapping = {

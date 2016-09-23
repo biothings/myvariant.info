@@ -2,11 +2,6 @@
 # adjust path
 
 
-__metadata__ = {
-    '__collection__': 'clinvar',
-}
-
-
 import sys, os, glob
 from config import DATA_ARCHIVE_ROOT, logger as logging
 import biothings, config
