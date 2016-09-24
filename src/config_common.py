@@ -64,4 +64,4 @@ DATA_TARGET_MASTER_COLLECTION = 'db_master'
 
 # time in seconds for dispatcher to check new jobs
 DISPATCHER_SLEEP_TIME = 1
-SOURCE_UPLOADER_CLASS = "biothings.dataload.uploader.SourceUploader"
+SOURCE_UPLOADER_CLASS = "dataload.MyVariantSourceUploader"
