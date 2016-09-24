@@ -1,6 +1,6 @@
 import vcf
 
-from utils.dataload import dict_sweep, unlist, value_convert
+from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
 from utils.hgvs import get_hgvs_from_vcf
 
 
@@ -109,7 +109,7 @@ def _map_line_to_json(item):
                 "culprit": info['culprit']
             }
         }
-        obj = (dict_sweep(unlist(value_convert(one_snp_json)), [None]))
+        obj = (dict_sweep(unlist(value_convert_to_number(one_snp_json)), [None]))
         yield obj
 
 

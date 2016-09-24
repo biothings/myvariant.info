@@ -3,7 +3,7 @@ import pysam
 import dbm
 from itertools import groupby
 from itertools import imap
-from utils.dataload import dict_sweep, unlist, value_convert, merge_duplicate_rows
+from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number, merge_duplicate_rows
 from utils.hgvs import get_hgvs_from_vcf
 # tabix file links from CADD http://cadd.gs.washington.edu/download
 
@@ -183,7 +183,7 @@ def _map_line_to_json(fields):
         }
     }
 
-    obj = dict_sweep(unlist(value_convert(one_snp_json)), ["NA"])
+    obj = dict_sweep(unlist(value_convert_to_number(one_snp_json)), ["NA"])
     yield obj
 
 

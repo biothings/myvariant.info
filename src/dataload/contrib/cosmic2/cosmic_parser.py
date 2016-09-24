@@ -3,7 +3,7 @@ import csv
 import re
 from itertools import imap, groupby, ifilter
 import operator
-from utils.dataload import dict_sweep, value_convert, merge_duplicate_rows
+from biothings.utils.dataload import dict_sweep, value_convert_to_number, merge_duplicate_rows
 
 
 VALID_COLUMN_NO = 29 + 1
@@ -87,7 +87,7 @@ def _map_line_to_json(fields):
                 "pubmed": fields[22]  # Pubmed_PMID
             }
         }
-    return dict_sweep(value_convert(one_snp_json), vals=[""])
+    return dict_sweep(value_convert_to_number(one_snp_json), vals=[""])
 
 
 # open file, parse, pass to json mapper

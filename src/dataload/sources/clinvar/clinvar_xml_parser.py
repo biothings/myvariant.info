@@ -14,8 +14,7 @@ sys.path.insert(0,DATA_FOLDER)
 
 from itertools import groupby
 
-from utils.dataload import unlist, dict_sweep, \
-    value_convert, rec_handler
+from biothings.utils.dataload import unlist, dict_sweep, value_convert_to_number, rec_handler
 
 clinvar = None
 
@@ -344,7 +343,7 @@ def _map_line_to_json(cp, hg19):
                         "alt": alt
                     }
             }
-            obj = (dict_sweep(unlist(value_convert(one_snp_json,
+            obj = (dict_sweep(unlist(value_convert_to_number(one_snp_json,
                                                    ['chrom', 'omim', 'id', 'orphanet', 'gene',
                                                     'rettbase_(cdkl5)', 'cosmic', 'dbrbc'])), [None, '', 'None']))
             yield obj

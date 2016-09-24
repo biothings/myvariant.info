@@ -7,7 +7,7 @@ try:
 except ImportError:
     pass
 
-from utils.dataload import dict_sweep, list_split, unlist, value_convert, merge_duplicate_rows
+from biothings.utils.dataload import dict_sweep, list_split, unlist, value_convert_to_number, merge_duplicate_rows
 
 
 VALID_COLUMN_NO = 70
@@ -113,7 +113,7 @@ def _map_line_to_json(fields):
                     'eqtl_meth_metab_study': fields[69]
                 }
             }
-        return list_split(dict_sweep(unlist(value_convert(one_snp_json)), [""]), ",")
+        return list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), [""]), ",")
 
 ''' replace None indices with '''
 

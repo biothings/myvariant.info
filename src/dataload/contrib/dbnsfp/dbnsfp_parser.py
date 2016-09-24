@@ -1,6 +1,6 @@
 import csv
 import glob
-from utils.dataload import list_split, dict_sweep, unlist, value_convert
+from biothings.utils.dataload import list_split, dict_sweep, unlist, value_convert_to_number
 
 
 VALID_COLUMN_NO = 132
@@ -318,7 +318,7 @@ def _map_line_to_json(fields, version):
         }
     }
 
-    one_snp_json = list_split(dict_sweep(unlist(value_convert(one_snp_json)), vals=["."]), ";")
+    one_snp_json = list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=["."]), ";")
     one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"])
     return one_snp_json
 

@@ -7,8 +7,7 @@ import os
 
 import vcf
 
-from utils.dataload import unlist, dict_sweep, \
-    value_convert, merge_duplicate_rows
+from biothings.utils.dataload import unlist, dict_sweep, value_convert_to_number, merge_duplicate_rows
 
 ''' vcf file for clinvar downloaded from
 ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/
@@ -143,7 +142,7 @@ def _map_line_to_json(fields):
                 "clinvar_id": fields[24]
             }
         }
-    return dict_sweep(unlist(value_convert(one_snp_json)), vals=["-"])
+    return dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=["-"])
 
 
 # open file, parse, pass to json mapper

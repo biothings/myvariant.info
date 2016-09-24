@@ -35,7 +35,7 @@ def dict_sweep(d):
 
 
 # convert string numbers into integers or floats
-def value_convert(d):
+def my_value_convert(d):
     for key, val in d.items():
         try:
             d[key] = int(val)
@@ -45,7 +45,7 @@ def value_convert(d):
             except (ValueError, TypeError):
                 pass
         if isinstance(val, dict):
-            value_convert(val)
+            my_value_convert(val)
         elif isinstance(val, list):
             try:
                 d[key] = [int(x) for x in val]
@@ -134,7 +134,7 @@ def _map_line_to_json(fields):
             }
     }
 
-    one_snp_json = list_split(dict_sweep(unlist(value_convert(one_snp_json))))
+    one_snp_json = list_split(dict_sweep(unlist(my_value_convert(one_snp_json))))
     one_snp_json["gonl"]["chrom"] = str(one_snp_json["gonl"]["chrom"])
     return one_snp_json
 

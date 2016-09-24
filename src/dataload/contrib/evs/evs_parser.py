@@ -5,7 +5,7 @@ try:
     import itertools.imap as map
 except ImportError:
     pass
-from utils.dataload import dict_sweep, value_convert, merge_duplicate_rows
+from biothings.utils.dataload import dict_sweep, value_convert_to_number, merge_duplicate_rows
 from utils.hgvs import get_hgvs_from_vcf
 from utils.hgvs import get_pos_start_end
 
@@ -126,7 +126,7 @@ def _map_line_to_json(fields):
                     }
             }
         }
-    return dict_sweep(value_convert(one_snp_json), vals=["NA", "none", "unknown"])
+    return dict_sweep(value_convert_to_number(one_snp_json), vals=["NA", "none", "unknown"])
 
 
 # open file, parse, pass to json mapper

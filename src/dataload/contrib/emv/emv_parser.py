@@ -11,7 +11,7 @@ try:
 except ImportError:
     pass
 
-from utils.dataload import dict_sweep, value_convert, unlist, merge_duplicate_rows
+from biothings.utils.dataload import dict_sweep, value_convert_to_number, unlist, merge_duplicate_rows
 
 #  merge EMV file with genomic ID file
 # def file_merge(emv_file, id_file):
@@ -48,7 +48,7 @@ def _map_line_to_json(fields):
         }
     }
 
-    return unlist(dict_sweep(value_convert(one_snp_json), vals=[""]))
+    return unlist(dict_sweep(value_convert_to_number(one_snp_json), vals=[""]))
 
 
 # open file, parse, pass to json mapper
