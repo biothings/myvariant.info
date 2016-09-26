@@ -14,6 +14,8 @@ from vcf import Reader
 
 from biothings.utils.common import timesofar
 from biothings.utils.mongo import get_data_folder
+from config import logger as logging
+
 DATA_FOLDER = get_data_folder("dbsnp")
 GLOB_PATTERN = "human_9606_*_GRCh*/VCF/00-All.vcf.gz"
 
@@ -183,13 +185,13 @@ def parse_vcf(vcf_infile, compressed=True, verbose=True, by_id=True, **tabix_par
                         yield _doc
                         cnt_2 += 1
                         if verbose:
-                            print(_doc['rsid'], '\t', _doc['_id'])
+                            logging.info("%s\t%s" % (_doc['rsid'], _doc['_id']))
 
                 else:
                     yield doc
                     cnt_2 += 1
                     if verbose:
-                        print(doc['rsid'], '\t', doc['_id'])
+                        logging.info("%s\t%s" % (doc['rsid'], doc['_id']))
             else:
                 cnt_3 += 1
         else:
@@ -198,20 +200,24 @@ def parse_vcf(vcf_infile, compressed=True, verbose=True, by_id=True, **tabix_par
                 yield doc
                 cnt_2 += 1
                 if verbose:
-                    print(doc['rsid'], '\t', doc['_id'])
+                    logging.info("%s\t%s" % (doc['rsid'], doc['_id']))
             else:
                 cnt_3 += 1
         cnt_1 += 1
-    print("Done. [{}]".format(timesofar(t0)))
-    print("Total rs: {}; total docs: {}; skipped rs: {}".format(cnt_1, cnt_2, cnt_3))
+    logging.info("Done. [{}]".format(timesofar(t0)))
+    logging.info("Total rs: {}; total docs: {}; skipped rs: {}".format(cnt_1, cnt_2, cnt_3))
+
 
 def load_data(self=None):
+    global logging
+    logging = getattr(self,"logger",logging)
+
     files = glob.glob(os.path.join(DATA_FOLDER,GLOB_PATTERN))
     chrom_list = [str(i) for i in range(1, 23)] + ['X', 'Y', 'MT']
     for infile in files:
-        print("Parsing %s" % infile)
+        logging.info("Parsing %s" % infile)
         for chrom in chrom_list:
-            print("Processing chr{}...".format(chrom))
+            logging.info("Processing chr{}...".format(chrom))
             snpdoc_iter = parse_vcf(infile, compressed=True, verbose=False, by_id=True, reference=chrom)
             for doc in snpdoc_iter:
                 _doc = {'dbsnp': doc}
