@@ -3,10 +3,11 @@ import os.path
 import sys
 import time
 from ftplib import FTP
+
 import biothings, config
 biothings.config_for_app(config)
 
-from config import DATA_ARCHIVE_ROOT, logger as logging
+from config import DATA_ARCHIVE_ROOT
 from biothings.dataload.dumper import FTPDumper
 
 
@@ -30,10 +31,10 @@ class ClinvarDumper(FTPDumper):
     def new_release_available(self):
         current_release = self.src_doc.get("release")
         if not current_release or self.newest_release > current_release:
-            logging.info("New release '%s' found" % self.newest_release)
+            self.logger.info("New release '%s' found" % self.newest_release)
             return True
         else:
-            logging.debug("No new release found")
+            self.logger.debug("No new release found")
             return False
 
     def create_todump_list(self, force=False):

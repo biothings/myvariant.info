@@ -367,6 +367,11 @@ def rcv_feeder(input_file, hg19):
 
 # TODO: get rid of that "self" here (see bt.dataload.__init__ to understand why and how it's used)
 def load_data(self=None, hg19=True):
+
+    # try to get logger from uploader
+    global logging
+    logging = getattr(self,"logger",logging)
+
     generate_clinvar_lib()
     files = glob.glob(os.path.join(DATA_FOLDER,GLOB_PATTERN))
     assert len(files) == 1, "Expecting only one file matching '%s', got: %s" % (GLOB_PATTERN,files)
