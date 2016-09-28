@@ -1,7 +1,8 @@
 from .dbsnp_vcf_parser import parse_vcf
 
 __metadata__ = {
-    "__collection__": 'dbsnp',
+    "name": 'dbsnp',
+    'uploader' : 'biothings.dataload.uploader.NoBatchIgnoreDuplicatedSourceUploader',
 }
 
 

@@ -1,6 +1,7 @@
 
 __metadata__ = {
-    "__collection__": 'clinvar_hg19',
+    "name" : "clinvar_hg19",
+    "main_source" : "clinvar"
 }
 
 from .clinvar_xml_parser import load_data as load_common

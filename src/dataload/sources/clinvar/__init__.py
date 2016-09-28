@@ -1,7 +1,11 @@
-
 __metadata__ = {
-    "__collection__": 'clinvar',
-}
+    "clinvar" : [
+            {"name" : "clinvar_hg19",
+             "main_source" : "clinvar"},
+            {"name" : "clinvar_hg19",
+             "main_source" : "clinvar"},
+        ]
+    }
 
 # -*- coding: utf-8 -*-
 from .clinvar_dump import main as download
