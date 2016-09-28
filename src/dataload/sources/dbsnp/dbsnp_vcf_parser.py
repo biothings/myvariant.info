@@ -13,10 +13,8 @@ import glob
 from vcf import Reader
 
 from biothings.utils.common import timesofar
-from biothings.utils.mongo import get_data_folder
 from config import logger as logging
 
-DATA_FOLDER = get_data_folder("dbsnp")
 GLOB_PATTERN = "human_9606_*_GRCh*/VCF/00-All.vcf.gz"
 
 # the key name for the pos in var_doc
@@ -208,11 +206,11 @@ def parse_vcf(vcf_infile, compressed=True, verbose=True, by_id=True, **tabix_par
     logging.info("Total rs: {}; total docs: {}; skipped rs: {}".format(cnt_1, cnt_2, cnt_3))
 
 
-def load_data(self=None):
+def load_data(self=None,data_folder=None):
     global logging
     logging = getattr(self,"logger",logging)
 
-    files = glob.glob(os.path.join(DATA_FOLDER,GLOB_PATTERN))
+    files = glob.glob(os.path.join(data_folder,GLOB_PATTERN))
     chrom_list = [str(i) for i in range(1, 23)] + ['X', 'Y', 'MT']
     for infile in files:
         logging.info("Parsing %s" % infile)
@@ -225,3 +223,7 @@ def load_data(self=None):
                 del doc['_id']
                 yield _doc
 
+if __name__ == "__main__":
+    from biothings.utils.mongo import get_data_folder
+    data_folder = get_data_folder("dbsnp")
+    load_data(data_folder=data_folder)

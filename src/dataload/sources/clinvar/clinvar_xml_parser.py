@@ -6,11 +6,8 @@ import sys, os, glob
 from config import DATA_ARCHIVE_ROOT, logger as logging
 import biothings, config
 biothings.config_for_app(config)
-from biothings.utils.mongo import get_data_folder
-DATA_FOLDER = get_data_folder("clinvar")
 GLOB_PATTERN = "ClinVarFullRelease_*.xml.gz"
 
-sys.path.insert(0,DATA_FOLDER)
 
 from itertools import groupby
 
@@ -18,7 +15,8 @@ from biothings.utils.dataload import unlist, dict_sweep, value_convert_to_number
 
 clinvar = None
 
-def generate_clinvar_lib():
+def generate_clinvar_lib(data_folder):
+    sys.path.insert(0,data_folder)
     try:
         import clinvar as clinvar_mod
         global clinvar
@@ -27,7 +25,7 @@ def generate_clinvar_lib():
         # ok, generate xml parser
         orig_path = os.getcwd()
         try:
-            os.chdir(DATA_FOLDER)
+            os.chdir(data_folder)
             logging.info("Generate XM parser")
             ret = os.system('''generateDS.py -f -o "clinvar_tmp.py" -s "clinvarsubs.py" clinvar_public.xsd''')
             if ret != 0:
@@ -366,14 +364,14 @@ def rcv_feeder(input_file, hg19):
             yield record_mapped
 
 # TODO: get rid of that "self" here (see bt.dataload.__init__ to understand why and how it's used)
-def load_data(self=None, hg19=True):
+def load_data(self=None, hg19=True, data_folder=None):
 
     # try to get logger from uploader
     global logging
     logging = getattr(self,"logger",logging)
 
-    generate_clinvar_lib()
-    files = glob.glob(os.path.join(DATA_FOLDER,GLOB_PATTERN))
+    generate_clinvar_lib(data_folder)
+    files = glob.glob(os.path.join(data_folder,GLOB_PATTERN))
     assert len(files) == 1, "Expecting only one file matching '%s', got: %s" % (GLOB_PATTERN,files)
     input_file = files[0]
     data_generator = rcv_feeder(input_file, hg19)
@@ -384,4 +382,6 @@ def load_data(self=None, hg19=True):
     return data_merge_rcv
 
 if __name__ == "__main__":
-    load_data()
+    from biothings.utils.mongo import get_data_folder
+    data_folder = get_data_folder("clinvar")
+    load_data(data_folder=data_folder)
