@@ -2,7 +2,6 @@ import os
 import os.path
 import sys
 import time
-from ftplib import FTP
 
 import biothings, config
 biothings.config_for_app(config)
@@ -39,14 +38,19 @@ class ClinvarDumper(FTPDumper):
 
     def create_todump_list(self, force=False):
         self.get_newest_info()
-        localfile = os.path.join(self.current_data_folder,os.path.basename(self.newest_file))
-        if force or not os.path.exists(localfile) or self.remote_is_better(self.newest_file,localfile) or self.new_release_available():
+        new_localfile = os.path.join(self.new_data_folder,os.path.basename(self.newest_file))
+        try:
+            current_localfile = os.path.join(self.current_data_folder,os.path.basename(self.newest_file))
+        except TypeError:
+            # current data folder doesn't even exist
+            current_localfile = new_localfile
+        if force or not os.path.exists(current_localfile) or self.remote_is_better(self.newest_file,current_localfile) or self.new_release_available():
             # register new release (will be stored in backend)
             self.release = self.newest_release
-            self.to_dump.append({"remote": self.newest_file,"local":localfile})
+            self.to_dump.append({"remote": self.newest_file,"local":new_localfile})
             # schema
             xsd = "clinvar_public.xsd"
-            localxsdfile = os.path.join(self.current_data_folder,xsd)
+            localxsdfile = os.path.join(self.new_data_folder,xsd)
             self.to_dump.append({"remote": "../%s" % xsd, "local":localxsdfile})
 
 def main():
