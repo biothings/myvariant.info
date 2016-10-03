@@ -12,7 +12,7 @@ def get_mapping():
                             "type": "string",
                             "analyzer": "string_lowercase"
                         },
-                        "gene_name": {
+                        "genename": {
                             "type": "string",
                             "analyzer": "string_lowercase"
                         },
@@ -33,10 +33,10 @@ def get_mapping():
                             "analyzer": "string_lowercase"
                         },
                         "rank": {
-                            "type": "long"
+                            "type": "integer"
                         },
                         "total": {
-                            "type": "long"
+                            "type": "integer"
                         },
                         "hgvs_c": {
                             "type": "string",
@@ -49,35 +49,35 @@ def get_mapping():
                         "cdna": {
                             "properties": {
                                 "position": {
-                                    "type": "long"
+                                    "type": "integer"
                                 },
                                 "length": {
-                                    "type": "long"
+                                    "type": "integer"
                                 }
                             }
                         },
                         "cds": {
                             "properties": {
                                 "position": {
-                                    "type": "long"
+                                    "type": "integer"
                                 },
                                 "length": {
-                                    "type": "long"
+                                    "type": "integer"
                                 }
                             }
                         },
                         "protein": {
                             "properties": {
                                 "position": {
-                                    "type": "long"
+                                    "type": "integer"
                                 },
                                 "length": {
-                                    "type": "long"
+                                    "type": "integer"
                                 }
                             }
                         },
                         "distance_to_feature": {
-                            "type": "long"
+                            "type": "integer"
                         }
                     }
                 },
@@ -87,7 +87,7 @@ def get_mapping():
                             "type": "string",
                             "analyzer": "string_lowercase"
                         },
-                        "gene_name": {
+                        "genename": {
                             "type": "string",
                             "analyzer": "string_lowercase"
                         },
@@ -105,7 +105,7 @@ def get_mapping():
                             "type": "string",
                             "analyzer": "string_lowercase"
                         },
-                        "gene_name": {
+                        "genename": {
                             "type": "string",
                             "analyzer": "string_lowercase"
                         },
@@ -130,7 +130,17 @@ def get_mapping():
                     "analyzer": "string_lowercase"
                 },
                 "position": {
-                    "type": "long"
+                    "type": "integer"
+                }
+            }
+        },
+        "hg19": {
+            "properties": {
+                "start": {
+                    "type": "integer"
+                },
+                "end": {
+                    "type": "integer"
                 }
             }
         }

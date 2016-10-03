@@ -3,7 +3,7 @@ from dataload.contrib.clinvar.clinvar_dump import main
 __METADATA__ = {
     "src_name": 'clinvar',
     "src_url": 'ftp://ftp.ncbi.nlm.nih.gov/pub/clinvar/xml/',
-    "release": '2015-11',
+    "release": '2016-07',
     "field": 'clinvar'
 }
 
@@ -62,7 +62,8 @@ def get_mapping():
                     "properties": {
                         "symbol": {
                             "type": "string",
-                            "analyzer": "string_lowercase"
+                            "analyzer": "string_lowercase",
+                            "include_in_all": True
                         },
                         "id": {
                             "type": "long"
@@ -75,15 +76,17 @@ def get_mapping():
                 },
                 "rsid": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
+                    "include_in_all": True
                 },
                 "rcv": {
-                    "type": "nested",
-                    "include_in_parent": True,     # NOTE: this is not available in ES 2.x
+                    #"type": "nested",
+                    #"include_in_parent": True,     # NOTE: this is not available in ES 2.x
                     "properties": {
                         "accession": {
                             "type": "string",
-                            "analyzer": "string_lowercase"
+                            "analyzer": "string_lowercase",
+                            "include_in_all": True
                         },
                         "clinical_significance": {
                             "type": "string"
@@ -159,7 +162,6 @@ def get_mapping():
                 "variant_id": {
                     "type": "integer"
                 },
-
                 "coding_hgvs_only": {
                     "type": "boolean"
                 },
@@ -170,8 +172,33 @@ def get_mapping():
                 "alt": {
                     "type": "string",
                     "analyzer": "string_lowercase"
+                },
+                "HGVS": {
+                    "properties": {
+                        "genomic": {
+                            "type": "string",
+                            "analyzer": "string_lowercase",
+                            "include_in_all": True
+                        },
+                        "coding": {
+                            "type": "string",
+                            "analyzer": "string_lowercase",
+                            "include_in_all": True
+                        },
+                        "non-coding": {
+                            "type": "string",
+                            "analyzer": "string_lowercase",
+                            "include_in_all": True
+                        },
+                        "protein": {
+                            "type": "string",
+                            "analyzer": "string_lowercase",
+                            "include_in_all": True
+                        }
+                    }
                 }
             }
         }
     }
     return mapping
+
