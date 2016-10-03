@@ -330,11 +330,14 @@ def list2dict(a_list, keyitem, alwayslist=False):
             _dict[key] = current_value
     return _dict
 
+
 def get_random_string():
     return base64.b64encode(os.urandom(6), random.sample(string.letters, 2))
 
+
 def get_timestamp():
     return time.strftime('%Y%m%d')
+
 
 class LogPrint:
     def __init__(self, log_f, log=1, timestamp=0):
@@ -375,6 +378,15 @@ class LogPrint:
         return self.log_f.fileno()
 
 
+def addsuffix(filename, suffix, noext=False):
+    '''Add suffix in front of ".extension", so keeping the same extension.
+       if noext is True, remove extension from the filename.'''
+    if noext:
+        return os.path.splitext(filename)[0] + suffix
+    else:
+        return suffix.join(os.path.splitext(filename))
+
+
 def safewfile(filename, prompt=True, default='C', mode='w'):
     '''return a file handle in 'w' mode,use alternative name if same name exist.
        if prompt == 1, ask for overwriting,appending or changing name,
@@ -403,7 +415,7 @@ def safewfile(filename, prompt=True, default='C', mode='w'):
     return open(filename, mode), filename
 
 
-def find_doc(k,keys):
+def find_doc(k, keys):
     ''' Used by jsonld insertion in www.api.es._insert_jsonld '''
     n = len(keys)
     for i in range(n):
@@ -424,4 +436,3 @@ def find_doc(k,keys):
                     continue
             k = tmp
     return k
-
