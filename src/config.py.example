@@ -50,9 +50,11 @@ DATA_TARGET_DATABASE = 'variantdoc'
 DATA_SERVER_USERNAME = ''
 DATA_SERVER_PASSWORD = ''
 
+
 HG19_DATAFILE = '/path/to/hg19_bit_p13.pyobj'
 
 DATA_ARCHIVE_ROOT = '/path/to/archive/directory'
+LOG_FOLDER = os.path.join(DATA_ARCHIVE_ROOT,'logs')
 
 # fill with "token", "roomid" and "from" keys
 # to broadcast message to a Hipchat room
