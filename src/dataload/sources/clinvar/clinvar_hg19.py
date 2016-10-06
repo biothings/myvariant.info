@@ -3,7 +3,7 @@ from .clinvar_xml_parser import load_data as load_common
 from . import get_mapping
 import biothings.dataload.uploader as uploader
 
-class ClinvarHG38Uploader(uploader.BaseSourceUploader):
+class ClinvarHG19Uploader(uploader.BaseSourceUploader):
 
     name = "clinvar_hg19"
     main_source = "clinvar"
@@ -14,8 +14,4 @@ class ClinvarHG38Uploader(uploader.BaseSourceUploader):
 
     def get_mapping(self):
         return get_mapping()
-
-
-def load_data(self):
-    return load_common(self,hg19=True)
 
