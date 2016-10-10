@@ -9,7 +9,7 @@ from utils.hgvs import get_hgvs_from_vcf
 
 # number of fields/annotations
 VALID_COLUMN_NO = 116
-
+cadd_file_path = '/opt/myvariant.info/load_archive/cadd/whole_genome_SNVs_inclAnno.tsv.gz'
 
 # convert one snp to json
 def _map_line_to_json(fields):
@@ -188,18 +188,10 @@ def _map_line_to_json(fields):
 
 
 def load_data(contig):
-    tabix = pysam.Tabixfile('/home/kevinxin/cadd/whole_genome_SNVs_inclAnno.tsv.gz')
+    tabix = pysam.Tabixfile(cadd_file_path)
     data = fetch_generator(tabix, contig)
     for doc in data:
         yield doc
-
-def load_data(contig):
-    tabix = pysam.Tabixfile(whole_genome)
-    fetch = tabix.fetch(contig)
-    for row in fetch:
-        anno = row.split('\t')
-        if 'CodingTranscript' in anno[9]:
-            yield _map_line_to_json(anno)
 
 def fetch_generator(tabix, contig):
     dbfile_path = 'home/kevinxin/cadd/' + 'cadd_id' + contig
