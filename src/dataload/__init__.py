@@ -9,5 +9,6 @@ __sources_dict__ = [
         'dataload.sources.wellderly',
         'dataload.sources.snpedia',
         'dataload.sources.mutdb',
+        'dataload.sources.gwassnps',
     ]
 
