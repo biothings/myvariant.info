@@ -1,4 +1,5 @@
 *.pyc
+*.swp
 whole_genome_SNVs_inclAnno.tsv.gz.tbi
 whole_genome_SNVs.tsv.gz.tbi
 src/config.py
