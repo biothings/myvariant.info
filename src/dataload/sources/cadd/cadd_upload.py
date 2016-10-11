@@ -10,6 +10,7 @@ class CADDUploader(uploader.BaseSourceUploader):
         self.logger.info("Load data from folder '%s'" % data_folder)
         return load_data(data_folder)
 
+    @classmethod
     def get_mapping(self):
         mapping = {
             "cadd": {
@@ -553,4 +554,5 @@ class CADDUploader(uploader.BaseSourceUploader):
             }
         }
         return mapping
+
 

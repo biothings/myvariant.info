@@ -12,6 +12,7 @@ class ClinvarHG19Uploader(uploader.BaseSourceUploader):
         self.logger.info("Load data from folder '%s'" % data_folder)
         return load_common(self,hg19=True,data_folder=data_folder)
 
+    @classmethod
     def get_mapping(self):
         return get_mapping()
 
@@ -25,5 +26,6 @@ class ClinvarHG38Uploader(uploader.BaseSourceUploader):
         self.logger.info("Load data from folder '%s'" % data_folder)
         return load_common(self,hg19=False,data_folder=data_folder)
 
+    @classmethod
     def get_mapping(self):
         return get_mapping()
