@@ -1,15 +1,13 @@
-from __future__ import print_function
 import pysam
 import dbm
 from itertools import groupby
-from itertools import imap
-from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number, merge_duplicate_rows
+from biothings.utils.dataload import dict_sweep, unlist, value_convert, merge_duplicate_rows
 from utils.hgvs import get_hgvs_from_vcf
 # tabix file links from CADD http://cadd.gs.washington.edu/download
 
 # number of fields/annotations
 VALID_COLUMN_NO = 116
-
+cadd_file_path = '/opt/myvariant.info/load_archive/cadd/whole_genome_SNVs_inclAnno.tsv.gz'
 
 # convert one snp to json
 def _map_line_to_json(fields):
@@ -183,23 +181,16 @@ def _map_line_to_json(fields):
         }
     }
 
-    obj = dict_sweep(unlist(value_convert_to_number(one_snp_json)), ["NA"])
+    obj = dict_sweep(unlist(value_convert(one_snp_json)), ["NA"])
     yield obj
 
 
-def load_data(contig):
-    tabix = pysam.Tabixfile('/home/kevinxin/cadd/whole_genome_SNVs_inclAnno.tsv.gz')
+def load_contig(contig):
+    """contig is #chrm, from 1 to 23, X and Y"""
+    tabix = pysam.Tabixfile(cadd_file_path)
     data = fetch_generator(tabix, contig)
     for doc in data:
         yield doc
-
-def load_data(contig):
-    tabix = pysam.Tabixfile(whole_genome)
-    fetch = tabix.fetch(contig)
-    for row in fetch:
-        anno = row.split('\t')
-        if 'CodingTranscript' in anno[9]:
-            yield _map_line_to_json(anno)
 
 def fetch_generator(tabix, contig):
     dbfile_path = 'home/kevinxin/cadd/' + 'cadd_id' + contig
@@ -208,11 +199,16 @@ def fetch_generator(tabix, contig):
     set_ids = set(ids)
     print(len(ids))
     fetch = tabix.fetch(contig)
-    rows = imap(lambda x: x.split('\t'), fetch)
+    rows = map(lambda x: x.split('\t'), fetch)
 #   looking for annotype as 'codingtranscript', 'noncodingtranscript'
     annos = (row for row in rows if "CodingTranscript" in row[9] or
              get_hgvs_from_vcf(row[0], row[1], row[2], row[4]) in set_ids)
-    json_rows = imap(_map_line_to_json, annos)
+    json_rows = map(_map_line_to_json, annos)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
+
+def load_data(data_folder):
+    for contig in [i for i in range(1,24)] + ["X","Y"]:
+        load_contig(config)
+
