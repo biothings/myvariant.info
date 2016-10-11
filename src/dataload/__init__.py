@@ -5,6 +5,6 @@ __sources_dict__ = [
             ],
         },
         #'dataload.sources.dbsnp',
-        #'dataload.sources.cosmic',
+        'dataload.sources.cosmic',
     ]
 
