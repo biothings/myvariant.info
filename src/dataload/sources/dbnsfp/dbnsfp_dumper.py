@@ -3,15 +3,23 @@ import os.path
 import sys
 import time
 import re
+import requests
+from ftplib import FTP
+from bs4 import BeautifulSoup
 
 import biothings, config
 biothings.config_for_app(config)
 
 from config import DATA_ARCHIVE_ROOT
-from biothings.dataload.dumper import FTPDumper
+from biothings.dataload.dumper import GoogleDriveDumper
 
 
-class DBNSFPDumper(FTPDumper):
+class DBNSFPDumper(GoogleDriveDumper):
+    '''
+    Mixed dumper (use FTP and HTTP/GoogleDrive) to dump dbNSFP:
+    - FTP: to get the latest version
+    - HTTP: to actually get the data (because their FTP server is sooo slow)
+    '''
 
     SRC_NAME = "dbnsfp"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
@@ -23,7 +31,9 @@ class DBNSFPDumper(FTPDumper):
     RELEASE_PAT = "dbNSFPv(\d+\.\d+a)\.zip" # "a" is for academic, not "c"ommercial
 
     def get_newest_info(self):
-        releases = self.client.nlst()
+        ftp = FTP('dbnsfp.softgenetics.com')
+        ftp.login('dbnsfp','dbnsfp')
+        releases = ftp.nlst()
         # get rid of readme files
         pat = re.compile(self.RELEASE_PAT)
         releases = [x for x in releases if pat.match(x)]
@@ -42,6 +52,27 @@ class DBNSFPDumper(FTPDumper):
             self.logger.debug("No new release found")
             return False
 
+    def get_drive_url(self,ftpname):
+        # ok, so let's get the main page data. in this page there are links for both
+        # FTP and Google Drive. We're assuming here that just after FTP link, there's
+        # the corresponding one for Drive (parse will ensure we downloaded the correct
+        # version, and also the correct licensed one - academic only)
+        res = requests.get("https://sites.google.com/site/jpopgen/dbNSFP")
+        html = BeautifulSoup(res.text,"html.parser")
+        ftplink = html.findAll(attrs={"href":re.compile(ftpname)})
+        if ftplink:
+            ftplink = ftplink.pop()
+        else:
+            raise DumperException("Can't find a FTP link for '%s'" % ftpname)
+        # let's cross fingers here...
+        drivelink = ftplink.findNextSibling()
+        href = drivelink.get("href")
+        if href:
+            return href
+        else:
+            raise DumperException("Can't find a href in drive link element: %s" % drivelink)
+
+
     def create_todump_list(self, force=False):
         self.get_newest_info()
         new_localfile = os.path.join(self.new_data_folder,os.path.basename(self.newest_file))
@@ -50,10 +81,11 @@ class DBNSFPDumper(FTPDumper):
         except TypeError:
             # current data folder doesn't even exist
             current_localfile = new_localfile
-        if force or not os.path.exists(current_localfile) or self.remote_is_better(self.newest_file,current_localfile) or self.new_release_available():
+        if force or not os.path.exists(current_localfile) or self.new_release_available():
             # register new release (will be stored in backend)
             self.release = self.newest_release
-            self.to_dump.append({"remote": self.newest_file,"local":new_localfile})
+            remote = self.get_drive_url(self.newest_file)
+            self.to_dump.append({"remote": remote,"local":new_localfile})
 
 def main():
     dumper = DBNSFPDumper()
