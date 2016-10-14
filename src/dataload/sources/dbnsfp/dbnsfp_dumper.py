@@ -6,12 +6,14 @@ import re
 import requests
 from ftplib import FTP
 from bs4 import BeautifulSoup
+import zipfile
 
 import biothings, config
 biothings.config_for_app(config)
 
 from config import DATA_ARCHIVE_ROOT
-from biothings.dataload.dumper import GoogleDriveDumper
+from biothings.dataload.dumper import GoogleDriveDumper, DumperException
+from biothings.utils.common import unzipall
 
 
 class DBNSFPDumper(GoogleDriveDumper):
@@ -23,11 +25,6 @@ class DBNSFPDumper(GoogleDriveDumper):
 
     SRC_NAME = "dbnsfp"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
-    FTP_HOST = 'dbnsfp.softgenetics.com'
-    CWD_DIR = '/'
-    FTP_USER = 'dbnsfp'
-    FTP_PASSWD = 'dbnsfp'
-
     RELEASE_PAT = "dbNSFPv(\d+\.\d+a)\.zip" # "a" is for academic, not "c"ommercial
 
     def get_newest_info(self):
@@ -86,6 +83,29 @@ class DBNSFPDumper(GoogleDriveDumper):
             self.release = self.newest_release
             remote = self.get_drive_url(self.newest_file)
             self.to_dump.append({"remote": remote,"local":new_localfile})
+
+    def post_download(self,remote,local):
+        filename = os.path.basename(local)
+        if not self.newest_release in filename:
+            raise DumperException("Weird, filename is wrong ('%s')" % filename)
+        # make sure we downloaded to correct one, and that it's the academic version
+        zf = zipfile.ZipFile(local)
+        readme = None
+        for f in zf.filelist:
+            if "readme" in f.filename:
+                readme = f
+                break
+        if not readme:
+            raise DumperException("Can't find a readme in the archive (I was checking version/license)")
+        if not self.newest_release in readme.filename:
+            raise DumperException("Version in readme filename ('%s') doesn't match expected version %s" % (readme.filename, self.newest_release))
+        assert self.newest_release.endswith("a"), "Release '%s' isn't academic version (how possible ?)" % self.newest_release
+        # good to go...
+
+    def post_dump(self):
+        self.logger.info("Unzipping files in '%s'" % self.new_data_folder)
+        unzipall(self.new_data_folder)
+
 
 def main():
     dumper = DBNSFPDumper()
