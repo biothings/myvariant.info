@@ -428,11 +428,21 @@ def data_generator(input_file, version):
         yield previous_row
     open_file.close()
 
+def load_data_file(input_file=None,version=None):
+    print("procrssing %s" % input_file)
+    data = data_generator(input_file, version=version)
+    for one_snp_json in data:
+        yield one_snp_json
+
 
 # load path and find files, pass to data_generator
 def load_data(path_glob, version='hg19'):
+    #import lazymap
+    #args = [(e,version) for e in glob.glob(path_glob)]
+    #print(args)
+    #return lazymap.pool_imap_unordered(load_data_file,args,procs=2)
     for input_file in sorted(glob.glob(path_glob)):
-        print(input_file)
-        data = data_generator(input_file, version=version)
-        for one_snp_json in data:
-            yield one_snp_json
+        return load_data_file(input_file,version)
+
+
+

@@ -3,7 +3,7 @@ import os
 from .dbnsfp_parser import load_data as load_common
 import biothings.dataload.uploader as uploader
 
-class DBNSFPBaseUploader(uploader.NoBatchIgnoreDuplicatedSourceUploader):
+class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader):
 
     GLOB_PATTERN = "dbNSFP*_variant.chr*"
 
