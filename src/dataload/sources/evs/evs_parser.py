@@ -1,11 +1,11 @@
 import csv
 import glob
+import os
 from itertools import islice, groupby
-try:
-    import itertools.imap as map
-except ImportError:
-    pass
-from biothings.utils.dataload import dict_sweep, value_convert_to_number, merge_duplicate_rows
+
+from biothings.utils.dataload import dict_sweep, value_convert_to_number,\
+                                     merge_duplicate_rows
+
 from utils.hgvs import get_hgvs_from_vcf
 from utils.hgvs import get_pos_start_end
 
@@ -146,8 +146,7 @@ def data_generator(input_file):
 
 # load path and find files, pass to data_generator
 def load_data(path):
-    for input_file in sorted(glob.glob(path)):
-        print(input_file)
+    for input_file in sorted(glob.glob(os.path.join(path,"*.txt"))):
         data = data_generator(input_file)
         for one_snp_json in data:
             yield one_snp_json
