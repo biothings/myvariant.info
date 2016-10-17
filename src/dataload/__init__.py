@@ -7,6 +7,9 @@ __sources_dict__ = [
         # manually-updated
         'dataload.sources.cadd',
         'dataload.sources.grasp',
+        'dataload.sources.emv',
+        'dataload.sources.evs',
+        'dataload.sources.geno2mp',
 
         # dead-resources
         'dataload.sources.cosmic',
