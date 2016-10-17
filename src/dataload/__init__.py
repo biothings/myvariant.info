@@ -5,7 +5,8 @@ __sources_dict__ = [
         #'dataload.sources.dbsnp',
         'dataload.sources.dbnsfp',
         # manually-updated
-        #'dataload.sources.cadd',
+        'dataload.sources.cadd',
+        'dataload.sources.grasp',
 
         # dead-resources
         'dataload.sources.cosmic',

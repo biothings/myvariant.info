@@ -1,12 +1,6 @@
 import csv
 import requests
 from itertools import groupby
-try:
-    import itertools.imap as map
-    import itertools.ifilter as filter
-except ImportError:
-    pass
-
 from biothings.utils.dataload import dict_sweep, list_split, unlist, value_convert_to_number, merge_duplicate_rows
 
 
@@ -131,11 +125,11 @@ def row_generator(db_row):
 
 # open file, parse, pass to json mapper
 def load_data(input_file):
-    open_file = open('%s.tsv' % input_file)
+    open_file = open(input_file)
     open_file = csv.reader(open_file, delimiter="\t")
-    open_file.next()
+    next(open_file)
     grasp = map(row_generator, open_file)
-    grasp = ifilter(lambda row: row[58] != "", grasp)
+    grasp = filter(lambda row: row[58] != "", grasp)
     json_rows = map(_map_line_to_json, grasp)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
