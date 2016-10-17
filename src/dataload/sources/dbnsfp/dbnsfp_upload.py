@@ -1,11 +1,22 @@
 import os
+import glob
 
-from .dbnsfp_parser import load_data as load_common
+from .dbnsfp_parser import load_data_file as load_common
 import biothings.dataload.uploader as uploader
 
 class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader):
 
     GLOB_PATTERN = "dbNSFP*_variant.chr*"
+
+    @classmethod
+    def create(klass, db_conn, data_root, *args, **kwargs):
+        instances = []
+        dummy = klass(db_conn, data_root, *args, **kwargs)
+        for input_file in glob.glob(os.path.join(dummy.data_folder,klass.GLOB_PATTERN)):
+            obj = klass(db_conn, data_root, *args, **kwargs)
+            obj.input_file = input_file
+            instances.append(obj)
+        return instances
 
     @classmethod
     def get_mapping(klass):
@@ -743,7 +754,7 @@ class DBNSFPHG38Uploader(DBNSFPBaseUploader):
 
     def load_data(self,data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)
-        return load_common(os.path.join(data_folder,self.GLOB_PATTERN),version='hg38')
+        return load_common(self.input_file,version='hg38')
 
 
 class DBNSFPHG19Uploader(DBNSFPBaseUploader):
@@ -753,5 +764,5 @@ class DBNSFPHG19Uploader(DBNSFPBaseUploader):
 
     def load_data(self,data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)
-        return load_common(os.path.join(data_folder,self.GLOB_PATTERN),version='hg19')
+        return load_common(self.input_file,version='hg19')
 
