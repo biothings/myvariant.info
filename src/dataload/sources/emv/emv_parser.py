@@ -2,14 +2,6 @@ import os
 import re
 import csv
 from itertools import groupby
-try:
-    import itertools.imap as map
-except ImportError:
-    pass
-try:
-    import itertools.ifilter as filter
-except ImportError:
-    pass
 
 from biothings.utils.dataload import dict_sweep, value_convert_to_number, unlist, merge_duplicate_rows
 
@@ -54,11 +46,12 @@ def _map_line_to_json(fields):
 # open file, parse, pass to json mapper
 def data_generator(input_file):
     # sort by the first column (hgvs id returned from Mutalyzer)
+    # TODO: use some python there...
     os.system("sort -k1 -n %s > %s.sorted" % (input_file, input_file))
     open_file = open("%s.sorted" % (input_file))
     emv = csv.reader(open_file, delimiter=",")
     # Skip header
-    emv.next()
+    next(emv)
     emv = filter(lambda x: x[0], emv)
     json_rows = map(_map_line_to_json, emv)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
