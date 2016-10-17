@@ -11,7 +11,7 @@ class CADDUploader(uploader.BaseSourceUploader):
         return load_data(data_folder)
 
     @classmethod
-    def get_mapping(self):
+    def get_mapping(klass):
         mapping = {
             "cadd": {
                 "properties": {

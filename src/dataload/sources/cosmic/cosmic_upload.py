@@ -5,7 +5,7 @@ class CosmicUploader(uploader.DummySourceUploader):
     name = "cosmic"
 
     @classmethod
-    def get_mapping(self):
+    def get_mapping(klass):
         mapping = {
             "cosmic": {
                 "properties": {

@@ -6,7 +6,7 @@ class SnpediaUploader(uploader.DummySourceUploader):
     name = "snpedia"
 
     @classmethod
-    def get_mapping(self):
+    def get_mapping(klass):
         mapping = {
             "snpedia": {
                 "properties": {

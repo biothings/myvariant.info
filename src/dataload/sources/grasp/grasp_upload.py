@@ -26,7 +26,7 @@ class GraspUploader(uploader.BaseSourceUploader):
 
 
     @classmethod
-    def get_mapping():
+    def get_mapping(klass):
         mapping = {
             "grasp": {
                 "properties": {
