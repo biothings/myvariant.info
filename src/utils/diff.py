@@ -1,8 +1,6 @@
-'''
-Utils to compare two list of variant documents
-'''
 from __future__ import print_function
 import os
+from biothings.utils.mongo import doc_feeder
 import jsonpatch
 import time
 import os.path
@@ -11,7 +9,6 @@ from utils.backend import GeneDocMongoDBBackend, GeneDocESBackend
 from biothings.utils.mongo import get_src_db
 from utils.es import ESIndexer
 from utils import jsondiff
-from biothings.utils.mongo import doc_feeder
 
 
 def apply_patch(doc, patch):
@@ -38,20 +35,23 @@ def diff_doc(doc_1, doc_2, exclude_attrs=['_timestamp']):
         return diff_d
 
 
-def two_docs_iterator(b1, b2, id_list, step=10000):
+def two_docs_iterator(b1, b2, id_list, step=10000, verbose=False):
     t0 = time.time()
     n = len(id_list)
     for i in range(0, n, step):
         t1 = time.time()
-        print("Processing %d-%d documents..." % (i + 1, min(i + step, n)))
+        if verbose:
+            print("Processing %d-%d documents..." % (i + 1, min(i + step, n)))
         _ids = id_list[i:i+step]
         iter1 = b1.mget_from_ids(_ids, asiter=True)
         iter2 = b2.mget_from_ids(_ids, asiter=True)
         for doc1, doc2 in zip(iter1, iter2):
             yield doc1, doc2
-        print('Done.[%.1f%%,%s]' % (i*100./n, timesofar(t1)))
-    print("="*20)
-    print('Finished.[total time: %s]' % timesofar(t0))
+        if verbose:
+            print('Done.[%.1f%%,%s]' % (i*100./n, timesofar(t1)))
+    if verbose:
+        print("="*20)
+        print('Finished.[total time: %s]' % timesofar(t0))
 
 
 def _diff_doc_worker(args):
@@ -97,7 +97,7 @@ def _diff_doc_inner_worker2(b1, b2, ids, fastdiff=False):
         assert doc1['_id'] == doc2['_id'], repr((ids, len(ids)))
         if fastdiff:
             if doc1 != doc2:
-                _updates.append({'_id': doc1['_id']})
+                _updates.append(doc1['_id'])
         else:
             _patch = jsondiff.make(doc1, doc2)
             if _patch:
@@ -105,21 +105,6 @@ def _diff_doc_inner_worker2(b1, b2, ids, fastdiff=False):
                 _diff['patch'] = _patch
                 _diff['_id'] = doc1['_id']
                 _updates.append(_diff)
-    return _updates
-
-
-def _diff_parallel_worker(old_collection_name, new_collection_name, common_ids):
-    b1 = get_backend(old_collection_name, 'mongodb')
-    b2 = get_backend(new_collection_name, 'mongodb')
-    _updates = []
-    for doc1, doc2 in two_docs_iterator(b1, b2, common_ids):
-        assert doc1['_id'] == doc2['_id'], repr((common_ids, len(common_ids)))
-        _patch = jsondiff.make(doc1, doc2)
-        if _patch:
-            _diff = {}
-            _diff['patch'] = _patch
-            _diff['_id'] = doc1['_id']
-            _updates.append(_diff)
     return _updates
 
 
@@ -184,48 +169,47 @@ def diff_collections(b1, b2, use_parallel=True, step=10000):
     return changes
 
 
-def diff_collections2(b1, b2, result_dir, use_parallel=True, step=10000):
+def get_backend(target_name, bk_type, **kwargs):
+    '''Return a backend instance for given target_name and backend type.
+        currently support MongoDB and ES backend.
+    '''
+    if bk_type == 'mongodb':
+        return GeneDocMongoDBBackend(target_name)
+    elif bk_type == 'es':
+        esi = ESIndexer(target_name, **kwargs)
+        return GeneDocESBackend(esi)
+
+
+def diff_collections2(b1, b2, result_dir, step=10000):
     '''
     b2 is new collection, b1 is old collection
     '''
-    if use_parallel:
-        import multiprocessing
-        from functools import partial
-    DATA_FOLDER = result_dir
-    data_new = doc_feeder(b2.target_collection, step=step, inbatch=True, fields={'_id': 1})
-    data_old = doc_feeder(b1.target_collection, step=step, inbatch=True, fields={'_id': 1})
+    DIFFFILE_PATH = '/home/kevinxin/diff_result/'
+    DATA_FOLDER = os.path.join(DIFFFILE_PATH, result_dir)
+    if not os.path.exists(DATA_FOLDER):
+        os.mkdir(DATA_FOLDER)
+    data_new = doc_feeder(b2.target_collection, step=step, inbatch=True, fields=[])
+    data_old = doc_feeder(b1.target_collection, step=step, inbatch=True, fields=[])
     cnt = 0
     cnt_update = 0
     cnt_add = 0
     cnt_delete = 0
-    _timestamp = get_timestamp()
-    if not os.path.exists(DATA_FOLDER):
-        os.mkdir(DATA_FOLDER)
-    for batch in data_new:
+
+    for _batch in data_new:
         cnt += 1
-        id_list_new = [doc['_id'] for doc in batch]
-        ids_common = [doc['_id'] for doc in b1.target_collection.find({'_id': {'$in': id_list_new}}, {'_id': 1})]
+        id_list_new = [_doc['_id'] for _doc in _batch]
+        docs_common = b1.target_collection.find({'_id': {'$in': id_list_new}}, projection=[])
+        ids_common = [_doc['_id'] for _doc in docs_common]
         id_in_new = list(set(id_list_new) - set(ids_common))
         _updates = []
         if len(ids_common) > 0:
-            if use_parallel:
-                step = len(ids_common)/multiprocessing.cpu_count()
-                task_list = [ids_common[i:i+step] for i in range(0, len(ids_common), step)]
-                pool = multiprocessing.Pool()
-                partial_worker = partial(_diff_parallel_worker, b1.target_collection.name, b2.target_collection.name)
-                results = pool.map(partial_worker, task_list)
-                pool.close()
-                pool.join()
-                for result in results:
-                    _updates += result
-            else:
-                _updates = _diff_doc_inner_worker2(b1, b2, list(ids_common))
+            _updates = _diff_doc_inner_worker2(b1, b2, list(ids_common), fastdiff=True)
         file_name = DATA_FOLDER + '/' + str(cnt) + '.pyobj'
         _result = {'add': id_in_new,
                    'update': _updates,
                    'delete': [],
                    'source': b2.target_collection.name,
-                   'timestamp': _timestamp}
+                   'timestamp': get_timestamp()}
         if len(_updates) != 0 or len(id_in_new) != 0:
             dump(_result, file_name)
             print("(Updated: {}, Added: {})".format(len(_updates), len(id_in_new)), end='')
@@ -236,14 +220,15 @@ def diff_collections2(b1, b2, result_dir, use_parallel=True, step=10000):
     for _batch in data_old:
         cnt += 1
         id_list_old = [_doc['_id'] for _doc in _batch]
-        ids_common = [doc['_id'] for doc in b2.target_collection.find({'_id': {'$in': id_list_old}}, {'_id': 1})]
+        docs_common = b2.target_collection.find({'_id': {'$in': id_list_old}}, projection=[])
+        ids_common = [_doc['_id'] for _doc in docs_common]
         id_in_old = list(set(id_list_old)-set(ids_common))
+        file_name = DATA_FOLDER + '/' + str(cnt) + '.pyobj'
         _result = {'delete': id_in_old,
                    'add': [],
                    'update': [],
                    'source': b2.target_collection.name,
-                   'timestamp': _timestamp}
-        file_name = DATA_FOLDER + '/' + str(cnt) + '.pyobj'
+                   'timestamp': get_timestamp()}
         if len(id_in_old) != 0:
             dump(_result, file_name)
             print("(Deleted: {})".format(len(id_in_old)), end='')
@@ -251,16 +236,3 @@ def diff_collections2(b1, b2, result_dir, use_parallel=True, step=10000):
     print("Finished calculating diff for the old collection. Total number of docs deleted: {}".format(cnt_delete))
     print("="*100)
     print("Summary: (Updated: {}, Added: {}, Deleted: {})".format(cnt_update, cnt_add, cnt_delete))
-
-
-def get_backend(target_name, bk_type, **kwargs):
-    '''Return a backend instance for given target_name and backend type.
-        currently support MongoDB and ES backend.
-    '''
-    if bk_type == 'mongodb':
-        target_db = get_src_db()
-        target_col = target_db[target_name]
-        return GeneDocMongoDBBackend(target_col)
-    elif bk_type == 'es':
-        esi = ESIndexer(target_name, **kwargs)
-        return GeneDocESBackend(esi)

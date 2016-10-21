@@ -34,7 +34,7 @@ From the discussion of the hackathon, we decided a strategy summarized as below:
   
 ##### User contributions of variant annotations
 
-  User contribution is vital, given the scale of avaialble (also increasing) resources. The simple rule we defined above makes the merging new annotation resource very easy, essentially writing a JSON importer. And the sophisticated query-engine we built can save users effort to build their own infrastructure, which provides the incentive for them to contribute.
+  User contribution is vital, given the scale of available (also increasing) resources. The simple rule we defined above makes the merging new annotation resource very easy, essentially writing a JSON importer. And the sophisticated query-engine we built can save users effort to build their own infrastructure, which provides the incentive for them to contribute.
   
   Also note that it's not neccesary the data-provider can write the importer, anyone who finds a useful resource can do that as well (of course, check to make sure the data release license allows that)
 
