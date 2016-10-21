@@ -3,16 +3,15 @@
 
 
 import sys, os, glob
+from itertools import groupby
+
 from config import DATA_ARCHIVE_ROOT, logger as logging
 import biothings, config
 biothings.config_for_app(config)
+from biothings.utils.dataload import unlist, dict_sweep, \
+                                     value_convert_to_number, rec_handler
+
 GLOB_PATTERN = "ClinVarFullRelease_*.xml.gz"
-
-
-from itertools import groupby
-
-from biothings.utils.dataload import unlist, dict_sweep, value_convert_to_number, rec_handler
-
 clinvar = None
 
 def generate_clinvar_lib(data_folder):
@@ -95,28 +94,30 @@ def _map_line_to_json(cp, hg19):
         origin = cp.ReferenceClinVarAssertion.ObservedIn[0].Sample.Origin
     except:
         origin = None
-    trait = cp.ReferenceClinVarAssertion.TraitSet.Trait[0]
-    synonyms = []
-    conditions_name = ''
-    for name in trait.Name:
-        if name.ElementValue.Type == 'Alternate':
-            synonyms.append(name.ElementValue.get_valueOf_())
-        if name.ElementValue.Type == 'Preferred':
-            conditions_name += name.ElementValue.get_valueOf_()
-    identifiers = {}
-    for item in trait.XRef:
-        if item.DB == 'Human Phenotype Ontology':
-            key = 'Human_Phenotype_Ontology'
-        else:
-            key = item.DB
-        identifiers[key.lower()] = item.ID
-    for symbol in trait.Symbol:
-        if symbol.ElementValue.Type == 'Preferred':
-            conditions_name += ' (' + symbol.ElementValue.get_valueOf_() + ')'
-    age_of_onset = ''
-    for _set in trait.AttributeSet:
-        if _set.Attribute.Type == 'age of onset':
-            age_of_onset = _set.Attribute.get_valueOf_()
+    conditions = []
+    for _trait in cp.ReferenceClinVarAssertion.TraitSet.Trait:
+        synonyms = []
+        conditions_name = ''
+        for name in _trait.Name:
+            if name.ElementValue.Type == 'Alternate':
+                synonyms.append(name.ElementValue.get_valueOf_())
+            if name.ElementValue.Type == 'Preferred':
+                conditions_name += name.ElementValue.get_valueOf_()
+        identifiers = {}
+        for item in _trait.XRef:
+            if item.DB == 'Human Phenotype Ontology':
+                key = 'Human_Phenotype_Ontology'
+            else:
+                key = item.DB
+            identifiers[key.lower()] = item.ID
+        for symbol in _trait.Symbol:
+            if symbol.ElementValue.Type == 'Preferred':
+                conditions_name += ' (' + symbol.ElementValue.get_valueOf_() + ')'
+        age_of_onset = ''
+        for _set in _trait.AttributeSet:
+            if _set.Attribute.Type == 'age of onset':
+                age_of_onset = _set.Attribute.get_valueOf_()
+        conditions.append({"name": conditions_name, "synonyms": synonyms, "identifiers": identifiers, "age_of_onset": age_of_onset})
 
     # MeasureSet.Measure return a list, there might be multiple
     # Measure under one MeasureSet
@@ -230,14 +231,18 @@ def _map_line_to_json(cp, hg19):
                 # Duplication' might not hava explicit alt information, \
                 # so we will parse from hgvs_genome
                 elif variation_type == 'Indel':
+                # RCV000156073, NC_000010.10:g.112581638_112581639delinsG
                     if hgvs_genome:
                         indel_position = hgvs_genome.find('del')
                         indel_alt = hgvs_genome[indel_position+3:]
                         hgvs_id = "chr%s:g.%s_%sdel%s" % \
                                   (chrom, chromStart, chromEnd, indel_alt)
                 elif variation_type == 'Deletion':
-                    hgvs_id = "chr%s:g.%s_%sdel" % \
-                              (chrom, chromStart, chromEnd)
+                    if chromStart == chromEnd:
+                        # RCV000048406, chr17:g.41243547del
+                        hgvs_id = "chr%s:g.%sdel" % (chrom, chromStart)
+                    else:
+                        hgvs_id = "chr%s:g.%s_%sdel" % (chrom, chromStart, chromEnd)
                 elif variation_type == 'Insertion':
                     if hgvs_genome:
                         ins_position = hgvs_genome.find('ins')
@@ -325,13 +330,7 @@ def _map_line_to_json(cp, hg19):
                                 "last_evaluated": str(last_evaluated),
                                 "preferred_name": name,
                                 "origin": origin,
-                                "conditions":
-                                    {
-                                        "name": conditions_name,
-                                        "synonyms": synonyms,
-                                        "identifiers": identifiers,
-                                        "age_of_onset": age_of_onset
-                                }
+                                "conditions": conditions
                             },
                         "rsid": rsid,
                         "cytogenic": cytogenic,
