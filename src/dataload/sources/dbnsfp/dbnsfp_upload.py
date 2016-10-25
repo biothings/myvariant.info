@@ -9,11 +9,12 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader):
     GLOB_PATTERN = "dbNSFP*_variant.chr*"
 
     @classmethod
-    def create(klass, db_conn, data_root, *args, **kwargs):
+    def create(klass, db_conn_info, data_root, *args, **kwargs):
         instances = []
-        dummy = klass(db_conn, data_root, *args, **kwargs)
+        dummy = klass(db_conn_info, data_root, *args, **kwargs)
+        dummy.prepare()
         for input_file in glob.glob(os.path.join(dummy.data_folder,klass.GLOB_PATTERN)):
-            obj = klass(db_conn, data_root, *args, **kwargs)
+            obj = klass(db_conn_info, data_root, *args, **kwargs)
             obj.input_file = input_file
             instances.append(obj)
         return instances
@@ -747,11 +748,13 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader):
         }
         return mapping
 
+
 class DBNSFPHG38Uploader(DBNSFPBaseUploader):
 
     name = "dbnsfp_hg38"
     main_source = "dbnsfp"
 
+    @uploader.ensure_prepared
     def load_data(self,data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)
         return load_common(self.input_file,version='hg38')
@@ -762,6 +765,7 @@ class DBNSFPHG19Uploader(DBNSFPBaseUploader):
     name = "dbnsfp_hg19"
     main_source = "dbnsfp"
 
+    @uploader.ensure_prepared
     def load_data(self,data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)
         return load_common(self.input_file,version='hg19')

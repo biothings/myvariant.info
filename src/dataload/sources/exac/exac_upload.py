@@ -439,6 +439,7 @@ class ExacUploader(ExacBaseUploader):
     name = "exac"
     main_source= "exac"
 
+    @uploader.ensure_prepared
     def load_data(self,data_folder):
         content = glob.glob(os.path.join(data_folder,"ExAC.r*.gz"))
         if len(content) != 1:
@@ -452,6 +453,7 @@ class ExacNonTCGAUploader(ExacBaseUploader):
     name = "exac_nontcga"
     main_source= "exac"
 
+    @uploader.ensure_prepared
     def load_data(self,data_folder):
         content = glob.glob(os.path.join(data_folder,"ExAC_nonTCGA.r*.gz"))
         if len(content) != 1:

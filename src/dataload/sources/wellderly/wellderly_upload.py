@@ -14,8 +14,8 @@ class WellderlyFactoryUploader(uploader.DummySourceUploader):
         "wellderly_cg9","wellderly_cgX","wellderly_cgY","wellderly_cgY1"]
 
     @classmethod
-    def create(klass, db_conn, data_root, *args, **kwargs):
-        return [klass(db_conn, data_root, collection_name=c,*args,*kwargs) for c in klass.split_collections]
+    def create(klass, db_conn_info, data_root, *args, **kwargs):
+        return [klass(db_conn_info, data_root, collection_name=c,*args,*kwargs) for c in klass.split_collections]
 
     @classmethod
     def get_mapping(klass):

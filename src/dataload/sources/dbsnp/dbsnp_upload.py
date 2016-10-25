@@ -3,10 +3,11 @@ from .dbsnp_dump import main as download
 from .dbsnp_vcf_parser import load_data
 import biothings.dataload.uploader as uploader
 
-class DBSNPUploader(uploader.NoBatchIgnoreDuplicatedSourceUploader):
+class DBSNPUploader(uploader.IgnoreDuplicatedSourceUploader):
 
     name = "dbsnp"
 
+    @uploader.ensure_prepared
     def load_data(self,data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)
         return load_data(data_folder=data_folder)
