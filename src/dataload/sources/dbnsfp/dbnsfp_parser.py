@@ -429,7 +429,6 @@ def data_generator(input_file, version):
     open_file.close()
 
 def load_data_file(input_file=None,version=None):
-    print("procrssing %s" % input_file)
     data = data_generator(input_file, version=version)
     for one_snp_json in data:
         yield one_snp_json
@@ -440,6 +439,4 @@ def load_data(path_glob, version='hg19'):
     todo = sorted(glob.glob(path_glob))
     for input_file in sorted(glob.glob(path_glob)):
         return load_data_file(input_file,version)
-
-
 

@@ -21,5 +21,5 @@ requests==2.8.1
 mongokit>=0.9.1.1
 pymongo>=3.2
 bitarray==0.8.1    # used in utils.validate module
-
 git+https://github.com/olivierverdier/dispatch.git#egg=dispatcher
+asyncssh

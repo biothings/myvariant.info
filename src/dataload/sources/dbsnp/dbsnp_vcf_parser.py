@@ -207,7 +207,7 @@ def parse_vcf(vcf_infile, compressed=True, verbose=True, by_id=True, **tabix_par
 
 def load_data(input_file,chrom):
     global logging
-
+    logging = logging.getLogger("dbsnp_upload")
     logging.info("Processing chr{}...".format(chrom))
     snpdoc_iter = parse_vcf(input_file, compressed=True, verbose=False, by_id=True, reference=chrom)
     for doc in snpdoc_iter:
