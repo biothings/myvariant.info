@@ -265,7 +265,7 @@ def _map_line_to_json(cp, hg19):
                 hgvs_id = hgvs_coding
                 coding_hgvs_only = True
             else:
-                logging.warn("couldn't find any id %s" % rcv_accession)
+                #logging.warn("couldn't find any id %s" % rcv_accession)
                 return
         else:
             logging.debug('no measure.attribute %s' % rcv_accession)

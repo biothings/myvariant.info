@@ -1,23 +1,16 @@
-import os
+import os, sys
 import glob
+import asyncio
+import concurrent.futures
+import logging
 
 from .dbnsfp_parser import load_data_file as load_common
 import biothings.dataload.uploader as uploader
+from biothings.dataload.storage import IgnoreDuplicatedStorage
 
-class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader):
+class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,uploader.ParallelizedSourceUploader):
 
     GLOB_PATTERN = "dbNSFP*_variant.chr*"
-
-    @classmethod
-    def create(klass, db_conn_info, data_root, *args, **kwargs):
-        instances = []
-        dummy = klass(db_conn_info, data_root, *args, **kwargs)
-        dummy.prepare()
-        for input_file in glob.glob(os.path.join(dummy.data_folder,klass.GLOB_PATTERN)):
-            obj = klass(db_conn_info, data_root, *args, **kwargs)
-            obj.input_file = input_file
-            instances.append(obj)
-        return instances
 
     @classmethod
     def get_mapping(klass):
@@ -748,25 +741,27 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader):
         }
         return mapping
 
+    @uploader.ensure_prepared
+    def jobs(self):
+        # tuple(input_file,version), where version is either hg38 or hg19)
+        return map(lambda e: (e, self.__class__.hg),
+                   glob.glob(os.path.join(self.data_folder,self.__class__.GLOB_PATTERN)))
+
+    @uploader.ensure_prepared
+    def load_data(self,input_file,hg):
+        return load_common(input_file,version=hg)
+
 
 class DBNSFPHG38Uploader(DBNSFPBaseUploader):
 
     name = "dbnsfp_hg38"
     main_source = "dbnsfp"
-
-    @uploader.ensure_prepared
-    def load_data(self,data_folder):
-        self.logger.info("Load data from folder '%s'" % data_folder)
-        return load_common(self.input_file,version='hg38')
+    hg = "hg38"
 
 
 class DBNSFPHG19Uploader(DBNSFPBaseUploader):
 
     name = "dbnsfp_hg19"
     main_source = "dbnsfp"
-
-    @uploader.ensure_prepared
-    def load_data(self,data_folder):
-        self.logger.info("Load data from folder '%s'" % data_folder)
-        return load_common(self.input_file,version='hg19')
+    hg = "hg19"
 

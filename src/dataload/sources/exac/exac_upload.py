@@ -1,4 +1,4 @@
-import glob
+import glob, os
 
 from .exac_parser import load_data
 import biothings.dataload.uploader as uploader
@@ -444,6 +444,7 @@ class ExacUploader(ExacBaseUploader):
         content = glob.glob(os.path.join(data_folder,"ExAC.r*.gz"))
         if len(content) != 1:
             raise uploader.ResourceException("Expecting one single gz file, got: %s" % repr(content))
+        input_file = content.pop()
         self.logger.info("Load data from file '%s'" % input_file)
         return load_data(input_file)
 
@@ -458,5 +459,6 @@ class ExacNonTCGAUploader(ExacBaseUploader):
         content = glob.glob(os.path.join(data_folder,"ExAC_nonTCGA.r*.gz"))
         if len(content) != 1:
             raise uploader.ResourceException("Expecting one single gz file, got: %s" % repr(content))
+        input_file = content.pop()
         self.logger.info("Load data from file '%s'" % input_file)
         return load_data(input_file)

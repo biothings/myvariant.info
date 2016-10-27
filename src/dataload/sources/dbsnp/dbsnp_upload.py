@@ -1,16 +1,27 @@
+import itertools, glob, os
 
 from .dbsnp_dump import main as download
 from .dbsnp_vcf_parser import load_data
 import biothings.dataload.uploader as uploader
 
-class DBSNPUploader(uploader.IgnoreDuplicatedSourceUploader):
+class DBSNPUploader(uploader.IgnoreDuplicatedSourceUploader,
+                    uploader.ParallelizedSourceUploader):
 
     name = "dbsnp"
+    storage_class = uploader.IgnoreDuplicatedStorage
+
+    GLOB_PATTERN = "human_9606_*_GRCh*/VCF/00-All.vcf.gz"
 
     @uploader.ensure_prepared
-    def load_data(self,data_folder):
-        self.logger.info("Load data from folder '%s'" % data_folder)
-        return load_data(data_folder=data_folder)
+    def jobs(self):
+        files = glob.glob(os.path.join(self.data_folder,self.__class__.GLOB_PATTERN))
+        chrom_list = [str(i) for i in range(1, 23)] + ['X', 'Y', 'MT']
+        return list(itertools.product(files,chrom_list))
+
+    @uploader.ensure_prepared
+    def load_data(self,input_file,chrom):
+        self.logger.info("Load data from '%s' for chr %s" % (input_file,chrom))
+        return load_data(input_file,chrom)
 
     @classmethod
     def get_mapping(klass):
