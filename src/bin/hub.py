@@ -21,62 +21,80 @@ loop.set_default_executor(executor)
 import config, biothings
 biothings.config_for_app(config)
 import biothings.dataload.uploader
-manager = biothings.dataload.uploader.SourceManager(loop)
 import dataload
+manager = biothings.dataload.uploader.SourceManager(loop)
 manager.register_sources(dataload.__sources_dict__)
 
 from IPython import InteractiveShell
-shell = InteractiveShell(user_ns=globals())
 
 import io
 
 
+class MySSHServerSession(asyncssh.SSHServerSession):
+    def __init__(self):
+        self.shell = InteractiveShell(user_ns=globals())
+        self._input = ''
 
-async def handle_session(stdin, stdout, stderr):
-    stdout.write('Welcome to MyVariant hub, %s!\n\n' %
-                 stdout.channel.get_extra_info('username'))
+    def connection_made(self, chan):
+        self._chan = chan
 
-    def displayhook(obj):
-        stdout.write(repr(obj))
+        self.origout = sys.stdout
+        self.buf = io.StringIO()
+        print("redirect buf")
+        sys.stdout = self.buf
 
-    #stdin.channel.set_echo(False)
-    while True:
-        stdout.write('hub> ')
-        secret = await stdin.readline()
-        print(repr(secret))
-        origout = sys.stdout
-        origerr = sys.stderr
-        #orighook, shell.displayhook = sys.displayhook, displayhook
-        buf = io.StringIO()
-        buferr = io.StringIO()
-        sys.stdout = buf
-        sys.stderr = buferr
-        try:
-            origout.write("run %s" % repr(secret))
-            r = shell.run_code(secret)
-            origout.write("r: %s" % repr(r))
-            buf.seek(0)
-            buferr.seek(0)
+        #self.origerr = sys.stderr
+        #self.buferr = io.StringIO()
+        #sys.stderr = self.buferr
+
+    def shell_requested(self):
+        return True
+
+    def session_started(self):
+        self._chan.write('Welcome to my SSH server, %s!\n' %
+                          self._chan.get_extra_info('username'))
+        self._chan.write('hub> ')
+
+    def data_received(self, data, datatype):
+        self._input += data
+
+        lines = self._input.split('\n')
+        for line in lines[:-1]:
+            if not line:
+                continue
+            self.origout.write("run %s " % repr(line))
+            r = self.shell.run_code(line)
             if r == 1:
-                origout.write("onela")
-                shell.showtraceback()
-                stderr.write("err: %s" % buferr.read())
+                self.origout.write("Error\n")
+                etype, value, tb = self.shell._get_exc_info(None)
+                self._chan.write("Error: %s\n" % value)
             else:
-                origout.write("onici")
-                stdout.write(buf.read())
-        finally:
-            sys.stdout = origout
-            sys.stderr = origerr
-            #sys.displayhook = orighook
+                #self.origout.write(self.buf.read() + '\n')
+                self.origout.write("OK\n")
+                self.buf.seek(0)
+                self._chan.write(self.buf.read())
+                # clear buffer
+                self.buf.seek(0)
+                self.buf.truncate()
+        self._chan.write('hub> ')
 
-    stdin.channel.set_line_mode(False)
-    stdout.write('\nYour secret is safe with me! Press any key to exit...')
-    await stdin.read(1)
+        self._input = lines[-1]
 
-    stdout.write('\n')
-    stdout.channel.exit(0)
+    def eof_received(self):
+        self._chan.write('Have a good one...\n')
+        self._chan.exit(0)
+
+    def break_received(self, msec):
+        # simulate CR
+        self._chan.write('\n')
+        self.data_received("\n",None)
+
 
 class MySSHServer(asyncssh.SSHServer):
+
+    def session_requested(self):
+        return MySSHServerSession()
+
     def connection_made(self, conn):
         print('SSH connection received from %s.' %
                   conn.get_extra_info('peername')[0])
@@ -100,8 +118,7 @@ class MySSHServer(asyncssh.SSHServer):
 
 async def start_server():
     await asyncssh.create_server(MySSHServer, '', 8022,
-                                 server_host_keys=['bin/ssh_host_key'],
-                                 session_factory=handle_session)
+                                 server_host_keys=['bin/ssh_host_key'])
 
 try:
     loop.run_until_complete(start_server())
@@ -109,3 +126,5 @@ except (OSError, asyncssh.Error) as exc:
     sys.exit('Error starting server: ' + str(exc))
 
 loop.run_forever()
+
+import asyncio, asyncssh, sys
