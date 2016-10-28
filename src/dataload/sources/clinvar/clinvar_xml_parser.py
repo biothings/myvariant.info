@@ -362,12 +362,11 @@ def rcv_feeder(input_file, hg19):
         for record_mapped in _map_line_to_json(record_parsed, hg19):
             yield record_mapped
 
-# TODO: get rid of that "self" here (see bt.dataload.__init__ to understand why and how it's used)
-def load_data(self=None, hg19=True, data_folder=None):
-
+def load_data(hg19=True, data_folder=None):
     # try to get logger from uploader
+    import logging as loggingmod
     global logging
-    logging = getattr(self,"logger",logging)
+    logging = loggingmod.getLogger("clinvar_upload")
 
     generate_clinvar_lib(data_folder)
     files = glob.glob(os.path.join(data_folder,GLOB_PATTERN))
