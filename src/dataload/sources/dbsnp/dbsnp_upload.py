@@ -14,6 +14,8 @@ class DBSNPUploader(uploader.IgnoreDuplicatedSourceUploader,
 
     def jobs(self):
         files = glob.glob(os.path.join(self.data_folder,self.__class__.GLOB_PATTERN))
+        if len(files) != 2:
+            raise uploader.ResourceError("Expected 2 files, got: %s" % files)
         chrom_list = [str(i) for i in range(1, 23)] + ['X', 'Y', 'MT']
         return list(itertools.product(files,chrom_list))
 
