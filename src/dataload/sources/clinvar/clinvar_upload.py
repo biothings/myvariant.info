@@ -198,10 +198,9 @@ class ClinvarHG19Uploader(ClinvarBaseUploader):
     name = "clinvar_hg19"
     main_source = "clinvar"
 
-    @uploader.ensure_prepared
     def load_data(self,data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)
-        return load_common(None,hg19=True,data_folder=data_folder)
+        return load_common(hg19=True,data_folder=data_folder)
 
 
 class ClinvarHG38Uploader(ClinvarBaseUploader):
@@ -209,8 +208,7 @@ class ClinvarHG38Uploader(ClinvarBaseUploader):
     name = "clinvar_hg38"
     main_source = "clinvar"
 
-    @uploader.ensure_prepared
     def load_data(self,data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)
-        return load_common(None,hg19=False,data_folder=data_folder)
+        return load_common(hg19=False,data_folder=data_folder)
 

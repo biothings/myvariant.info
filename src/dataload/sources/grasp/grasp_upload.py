@@ -9,7 +9,6 @@ class GraspUploader(uploader.BaseSourceUploader):
 
     name = "grasp"
 
-    @uploader.ensure_prepared
     def load_data(self,data_folder):
         # there's one zip there, let's get the zipped filename
         zgrasp = glob.glob(os.path.join(data_folder,"*.zip"))

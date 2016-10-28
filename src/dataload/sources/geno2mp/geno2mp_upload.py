@@ -9,7 +9,6 @@ class Geno2MPUploader(uploader.BaseSourceUploader):
 
     name = "geno2mp"
 
-    @uploader.ensure_prepared
     def load_data(self,data_folder):
         # there's one vcf file there, let's get it
         input_file = glob.glob(os.path.join(data_folder,"*.vcf"))

@@ -741,13 +741,11 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,uploader.Parall
         }
         return mapping
 
-    @uploader.ensure_prepared
     def jobs(self):
         # tuple(input_file,version), where version is either hg38 or hg19)
         return map(lambda e: (e, self.__class__.hg),
                    glob.glob(os.path.join(self.data_folder,self.__class__.GLOB_PATTERN)))
 
-    @uploader.ensure_prepared
     def load_data(self,input_file,hg):
         return load_common(input_file,version=hg)
 

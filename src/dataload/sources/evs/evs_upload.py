@@ -10,7 +10,6 @@ class EVSUploader(uploader.BaseSourceUploader):
 
     name = "evs"
 
-    @uploader.ensure_prepared
     def load_data(self,data_folder):
         #self.prepare()
         self.logger.info("Load data from '%s'" % data_folder)

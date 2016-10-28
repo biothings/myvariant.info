@@ -9,7 +9,6 @@ class EMVUploader(uploader.BaseSourceUploader):
 
     name = "emv"
 
-    @uploader.ensure_prepared
     def load_data(self,data_folder):
         # there's one csv file there, let's get it
         input_file = glob.glob(os.path.join(data_folder,"EmVClass*.csv"))
