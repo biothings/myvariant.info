@@ -2,6 +2,7 @@
 
 import sys
 import os.path
+import asyncio
 
 def main(source):
 
@@ -11,9 +12,13 @@ def main(source):
     from biothings.dataload.uploader import SourceManager
     import dataload
 
-    src_manager = SourceManager()
-    src_manager.register_sources(dataload.__sources_dict__)
-    src_manager.upload_src(source)
+    loop = biothings.get_loop()
+
+    src_manager = SourceManager(loop)
+    src_manager.register_source(source)
+    jobs = src_manager.upload_src(source)
+
+    loop.run_until_complete(asyncio.wait(jobs))
 
 if __name__ == '__main__':
     # can pass "main_source" or "main_source.sub_source"
