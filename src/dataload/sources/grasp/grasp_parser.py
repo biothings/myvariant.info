@@ -125,7 +125,7 @@ def row_generator(db_row):
 
 # open file, parse, pass to json mapper
 def load_data(input_file):
-    open_file = open(input_file)
+    open_file = open(input_file,encoding="cp1252")
     open_file = csv.reader(open_file, delimiter="\t")
     next(open_file)
     grasp = map(row_generator, open_file)

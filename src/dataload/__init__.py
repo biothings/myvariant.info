@@ -4,7 +4,7 @@ __sources_dict__ = [
         'dataload.sources.clinvar',
         'dataload.sources.dbsnp',
         'dataload.sources.dbnsfp',
-        ##'dataload.sources.exac',
+        'dataload.sources.exac',
 
         ## manually-updated
         #'dataload.sources.cadd',

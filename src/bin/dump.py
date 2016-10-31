@@ -9,14 +9,14 @@ def main(source,**kwargs):
     import biothings, config
     biothings.config_for_app(config)
 
-    from biothings.dataload.uploader import SourceManager
+    from biothings.dataload.dumper import SourceManager
     import dataload
 
     loop = biothings.get_loop()
 
     src_manager = SourceManager(loop)
     src_manager.register_source(source)
-    jobs = src_manager.upload_src(source,**kwargs)
+    jobs = src_manager.dump_src(source,**kwargs)
 
     loop.run_until_complete(asyncio.wait(jobs))
 

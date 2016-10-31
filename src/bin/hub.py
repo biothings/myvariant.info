@@ -10,15 +10,22 @@ loop.set_default_executor(executor)
 import config, biothings
 biothings.config_for_app(config)
 
-import biothings.dataload.uploader as uploader
 import dataload
-manager = uploader.SourceManager(loop)
-manager.register_sources(dataload.__sources_dict__)
+import biothings.dataload.uploader as uploader
+import biothings.dataload.dumper as dumper
+umanager = uploader.SourceManager(loop)
+dmanager = dumper.SourceManager(loop)
+umanager.register_sources(dataload.__sources_dict__)
+dmanager.register_sources(dataload.__sources_dict__)
 
 COMMANDS = {
-        "upload" : manager.upload_src,
-        "upload_all": manager.upload_all,
-        "manager" : manager
+        "dm" : dmanager,
+        "dump" : dmanager.dump_src,
+        "dump_all" : dmanager.dump_all,
+        # upload commands
+        "um" : umanager,
+        "upload" : umanager.upload_src,
+        "upload_all": umanager.upload_all,
         }
 
 passwords = {

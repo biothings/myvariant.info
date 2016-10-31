@@ -28,15 +28,15 @@ class ExacDumper(FTPDumper):
         # sort items based on k
         releases = sorted(releases)
         latest_release_dir = releases[-1]
-        self.newest_release = latest_release_dir.replace("release","")
+        self.release = latest_release_dir.replace("release","")
         contents = self.client.nlst(latest_release_dir)
-        pat = re.compile(self.__class__.FILE_PATTERN % self.newest_release)
+        pat = re.compile(self.__class__.FILE_PATTERN % self.release)
         self.newest_file = [f for f in contents if pat.match(f)][-1]
 
     def new_release_available(self):
         current_release = self.src_doc.get("release")
-        if not current_release or self.newest_release > current_release:
-            self.logger.info("New release '%s' found" % self.newest_release)
+        if not current_release or self.release > current_release:
+            self.logger.info("New release '%s' found" % self.release)
             return True
         else:
             self.logger.debug("No new release found")
@@ -52,10 +52,10 @@ class ExacDumper(FTPDumper):
             current_localfile = new_localfile
         if force or not os.path.exists(current_localfile) or self.remote_is_better(self.newest_file,current_localfile) or self.new_release_available():
             # register new release (will be stored in backend)
-            self.release = self.newest_release
+            self.release = self.release
             self.to_dump.append({"remote": self.newest_file,"local":new_localfile})
             # also download nonTCGA
-            subdir = "release%s/subsets/" % self.newest_release
+            subdir = "release%s/subsets/" % self.release
             # split: b/c newest_file includes releaseX.Y.Z directory
             nontcga = re.sub("^ExAC\.","ExAC_nonTCGA.",self.newest_file.split("/")[-1])
             local_nontcga = os.path.join(self.new_data_folder,nontcga)

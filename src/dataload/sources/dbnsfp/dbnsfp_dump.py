@@ -38,12 +38,12 @@ class DBNSFPDumper(GoogleDriveDumper):
         releases = sorted(releases)
         # get the last item in the list, which is the latest version
         self.newest_file = releases[-1]
-        self.newest_release = pat.match(releases[-1]).groups()[0]
+        self.release = pat.match(releases[-1]).groups()[0]
 
     def new_release_available(self):
         current_release = self.src_doc.get("release")
-        if not current_release or self.newest_release > current_release:
-            self.logger.info("New release '%s' found" % self.newest_release)
+        if not current_release or self.release > current_release:
+            self.logger.info("New release '%s' found" % self.release)
             return True
         else:
             self.logger.debug("No new release found")
@@ -80,13 +80,13 @@ class DBNSFPDumper(GoogleDriveDumper):
             current_localfile = new_localfile
         if force or not os.path.exists(current_localfile) or self.new_release_available():
             # register new release (will be stored in backend)
-            self.release = self.newest_release
+            self.release = self.release
             remote = self.get_drive_url(self.newest_file)
             self.to_dump.append({"remote": remote,"local":new_localfile})
 
     def post_download(self,remote,local):
         filename = os.path.basename(local)
-        if not self.newest_release in filename:
+        if not self.release in filename:
             raise DumperException("Weird, filename is wrong ('%s')" % filename)
         # make sure we downloaded to correct one, and that it's the academic version
         zf = zipfile.ZipFile(local)
@@ -97,9 +97,9 @@ class DBNSFPDumper(GoogleDriveDumper):
                 break
         if not readme:
             raise DumperException("Can't find a readme in the archive (I was checking version/license)")
-        if not self.newest_release in readme.filename:
-            raise DumperException("Version in readme filename ('%s') doesn't match expected version %s" % (readme.filename, self.newest_release))
-        assert self.newest_release.endswith("a"), "Release '%s' isn't academic version (how possible ?)" % self.newest_release
+        if not self.release in readme.filename:
+            raise DumperException("Version in readme filename ('%s') doesn't match expected version %s" % (readme.filename, self.release))
+        assert self.release.endswith("a"), "Release '%s' isn't academic version (how possible ?)" % self.release
         # good to go...
 
     def post_dump(self):

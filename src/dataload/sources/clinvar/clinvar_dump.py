@@ -25,12 +25,12 @@ class ClinvarDumper(FTPDumper):
         releases = sorted(releases)
         # get the last item in the list, which is the latest version
         self.newest_file = releases[-1]
-        self.newest_release = releases[-1].split('.')[0].split('_')[1]
+        self.release = releases[-1].split('.')[0].split('_')[1]
 
     def new_release_available(self):
         current_release = self.src_doc.get("release")
-        if not current_release or self.newest_release > current_release:
-            self.logger.info("New release '%s' found" % self.newest_release)
+        if not current_release or self.release > current_release:
+            self.logger.info("New release '%s' found" % self.release)
             return True
         else:
             self.logger.debug("No new release found")
@@ -46,7 +46,6 @@ class ClinvarDumper(FTPDumper):
             current_localfile = new_localfile
         if force or not os.path.exists(current_localfile) or self.remote_is_better(self.newest_file,current_localfile) or self.new_release_available():
             # register new release (will be stored in backend)
-            self.release = self.newest_release
             self.to_dump.append({"remote": self.newest_file,"local":new_localfile})
             # schema
             xsd = "clinvar_public.xsd"
