@@ -39,7 +39,7 @@ passwords = {
 
 from biothings.utils.hub import start_server
 
-server = start_server(passwords=passwords,port=8022,commands=COMMANDS)
+server = start_server("MyVariant hub",passwords=passwords,port=8022,commands=COMMANDS)
 
 try:
     loop.run_until_complete(server)
