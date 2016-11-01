@@ -27,6 +27,8 @@ class DBNSFPDumper(GoogleDriveDumper):
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     RELEASE_PAT = "dbNSFPv(\d+\.\d+a)\.zip" # "a" is for academic, not "c"ommercial
 
+    SCHEDULE = "0 9 * * *"
+
     def get_newest_info(self):
         ftp = FTP('dbnsfp.softgenetics.com')
         ftp.login('dbnsfp','dbnsfp')

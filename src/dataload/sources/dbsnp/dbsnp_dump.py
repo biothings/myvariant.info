@@ -18,6 +18,8 @@ class DBSNPDumper(FTPDumper):
     DATAFILE_RE_PATTERN = '''human_9606_(.\d+)_GRCh\d\dp\d+'''
     FILE_PATH = 'VCF/00-All.vcf.gz'
 
+    SCHEDULE = "0 9 * * *"
+
     def find_latest_human_dirs(self):
         # list all orgs
         orgs = self.client.nlst()

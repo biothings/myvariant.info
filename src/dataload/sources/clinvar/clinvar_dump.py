@@ -17,6 +17,8 @@ class ClinvarDumper(FTPDumper):
     FTP_HOST = 'ftp.ncbi.nlm.nih.gov'
     CWD_DIR = '/pub/clinvar/xml'
 
+    SCHEDULE = "0 9 * * *"
+
     def get_newest_info(self):
         releases = self.client.nlst()
         # get rid of readme files
