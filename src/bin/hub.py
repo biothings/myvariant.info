@@ -13,10 +13,15 @@ biothings.config_for_app(config)
 import dataload
 import biothings.dataload.uploader as uploader
 import biothings.dataload.dumper as dumper
-umanager = uploader.SourceManager(loop)
-dmanager = dumper.SourceManager(loop)
+
+# will check every 10 seconds for sources to upload
+umanager = uploader.SourceManager(poll_schedule = '* * * * * */10', event_loop=loop)
 umanager.register_sources(dataload.__sources_dict__)
+umanager.poll()
+
+dmanager = dumper.SourceManager(loop)
 dmanager.register_sources(dataload.__sources_dict__)
+dmanager.schedule_all()
 
 COMMANDS = {
         "dm" : dmanager,
