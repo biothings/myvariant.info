@@ -2,10 +2,11 @@ import csv
 import requests
 from itertools import groupby
 from biothings.utils.dataload import dict_sweep, list_split, unlist, value_convert_to_number, merge_duplicate_rows
-
+import biothings.utils.mongo as mongo
 
 VALID_COLUMN_NO = 70
 
+dbsnp_col = mongo.get_src_db()["dbsnp"]
 
 def safe_str(s):
     uc = s.decode('cp1252')
@@ -21,11 +22,9 @@ def _map_line_to_json(fields):
     # load as json data
     if rsid is None:
         return
-    url = 'http://myvariant.info/v1/query?q=dbsnp.rsid:'\
-          + rsid + '&fields=_id'
-    r = requests.get(url)
-    for hits in r.json()['hits']:
-        HGVS = hits['_id']
+    docs = [d for d in dbsnp_col.find({"dbsnp.rsid":rsid})]
+    for doc in docs:
+        HGVS = doc['_id']
         one_snp_json = {
 
             "_id": HGVS,
