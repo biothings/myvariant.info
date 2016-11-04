@@ -2,8 +2,9 @@
 
 import asyncio, asyncssh, sys
 import concurrent.futures
+from functools import partial
 
-executor = concurrent.futures.ProcessPoolExecutor()
+executor = concurrent.futures.ProcessPoolExecutor(max_workers=2)
 loop = asyncio.get_event_loop()
 loop.set_default_executor(executor)
 
@@ -15,15 +16,18 @@ import biothings.dataload.uploader as uploader
 import biothings.dataload.dumper as dumper
 
 # will check every 10 seconds for sources to upload
-umanager = uploader.SourceManager(poll_schedule = '* * * * * */10', event_loop=loop)
+umanager = uploader.UploaderManager(poll_schedule = '* * * * * */10', event_loop=loop)
 umanager.register_sources(dataload.__sources_dict__)
 umanager.poll()
 
-dmanager = dumper.SourceManager(loop)
+dmanager = dumper.DumperManager(loop)
 dmanager.register_sources(dataload.__sources_dict__)
 dmanager.schedule_all()
 
+from biothings.utils.hub import schedule, top
+
 COMMANDS = {
+        # dump commands
         "dm" : dmanager,
         "dump" : dmanager.dump_src,
         "dump_all" : dmanager.dump_all,
@@ -31,6 +35,11 @@ COMMANDS = {
         "um" : umanager,
         "upload" : umanager.upload_src,
         "upload_all": umanager.upload_all,
+        # admin/advanced
+        "loop" : loop,
+        "executor" : executor,
+        "g": globals(),
+        "sch" : partial(schedule,loop),
         }
 
 passwords = {
@@ -39,7 +48,7 @@ passwords = {
 
 from biothings.utils.hub import start_server
 
-server = start_server("MyVariant hub",passwords=passwords,port=8022,commands=COMMANDS)
+server = start_server(loop, "MyVariant hub",passwords=passwords,port=8022,commands=COMMANDS)
 
 try:
     loop.run_until_complete(server)
