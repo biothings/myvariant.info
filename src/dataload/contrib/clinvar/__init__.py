@@ -173,7 +173,7 @@ def get_mapping():
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "HGVS": {
+                "hgvs": {
                     "properties": {
                         "genomic": {
                             "type": "string",
