@@ -4,7 +4,7 @@ import asyncio, asyncssh, sys
 import concurrent.futures
 from functools import partial
 
-executor = concurrent.futures.ProcessPoolExecutor(max_workers=2)
+executor = concurrent.futures.ProcessPoolExecutor()
 loop = asyncio.get_event_loop()
 loop.set_default_executor(executor)
 
@@ -14,6 +14,7 @@ biothings.config_for_app(config)
 import dataload
 import biothings.dataload.uploader as uploader
 import biothings.dataload.dumper as dumper
+import biothings.databuild.builder as builder
 
 # will check every 10 seconds for sources to upload
 umanager = uploader.UploaderManager(poll_schedule = '* * * * * */10', event_loop=loop)
@@ -23,6 +24,10 @@ umanager.poll()
 dmanager = dumper.DumperManager(loop)
 dmanager.register_sources(dataload.__sources_dict__)
 dmanager.schedule_all()
+
+bmanager = builder.BuilderManager(loop)
+bmanager.sync()
+
 
 from biothings.utils.hub import schedule, top
 
@@ -35,6 +40,9 @@ COMMANDS = {
         "um" : umanager,
         "upload" : umanager.upload_src,
         "upload_all": umanager.upload_all,
+        # building/merging
+        "bm" : bmanager,
+        "merge" : bmanager.merge,
         # admin/advanced
         "loop" : loop,
         "executor" : executor,
