@@ -110,7 +110,7 @@ class ESQuery(ESQuery):
 class ESQueryBuilder(ESQueryBuilder):
     def build_interval_query(self, chr, gstart, gend, rquery):
         """ Build an interval query - called by the ESQuery.query method. """
-        options = self._query_options.get('options', {})
+        options = self._options
         if chr.lower().startswith('chr'):
             chr = chr[3:]
         _query = {
