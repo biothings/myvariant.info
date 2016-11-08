@@ -21,11 +21,11 @@ umanager = uploader.UploaderManager(poll_schedule = '* * * * * */10', event_loop
 umanager.register_sources(dataload.__sources_dict__)
 umanager.poll()
 
-dmanager = dumper.DumperManager(loop)
+dmanager = dumper.DumperManager(event_loop=loop)
 dmanager.register_sources(dataload.__sources_dict__)
 dmanager.schedule_all()
 
-bmanager = builder.BuilderManager(loop)
+bmanager = builder.buildermanager(event_loop=loop)
 bmanager.sync()
 
 

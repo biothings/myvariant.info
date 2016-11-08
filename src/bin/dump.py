@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import sys
-import os.path
 import asyncio
 
 def main(source,**kwargs):
