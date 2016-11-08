@@ -15,6 +15,7 @@ import dataload
 import biothings.dataload.uploader as uploader
 import biothings.dataload.dumper as dumper
 import biothings.databuild.builder as builder
+from databuild.builder import MyVariantDataBuilder
 
 # will check every 10 seconds for sources to upload
 umanager = uploader.UploaderManager(poll_schedule = '* * * * * */10', event_loop=loop)
@@ -25,7 +26,7 @@ dmanager = dumper.DumperManager(event_loop=loop)
 dmanager.register_sources(dataload.__sources_dict__)
 dmanager.schedule_all()
 
-bmanager = builder.buildermanager(event_loop=loop)
+bmanager = builder.BuilderManager(builder_class=MyVariantDataBuilder,event_loop=loop)
 bmanager.sync()
 
 
