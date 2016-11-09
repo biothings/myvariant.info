@@ -15,7 +15,7 @@ __sources_dict__ = [
 
         # dead-resources
         'dataload.sources.cosmic',
-        ##'dataload.sources.wellderly',
+        'dataload.sources.wellderly',
         'dataload.sources.snpedia',
         'dataload.sources.mutdb',
         'dataload.sources.gwassnps',

@@ -4,8 +4,9 @@ import zipfile
 
 from .geno2mp_parser import load_data
 import biothings.dataload.uploader as uploader
+from dataload.uploader import SnepffPostUpdateUploader
 
-class Geno2MPUploader(uploader.BaseSourceUploader):
+class Geno2MPUploader(SnepffPostUpdateUploader):
 
     name = "geno2mp"
 

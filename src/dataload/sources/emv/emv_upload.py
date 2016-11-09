@@ -4,8 +4,9 @@ import zipfile
 
 from .emv_parser import load_data
 import biothings.dataload.uploader as uploader
+from dataload.uploader import SnepffPostUpdateUploader
 
-class EMVUploader(uploader.BaseSourceUploader):
+class EMVUploader(SnepffPostUpdateUploader):
 
     name = "emv"
 

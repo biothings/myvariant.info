@@ -1,6 +1,7 @@
 import biothings.dataload.uploader as uploader
+from dataload.uploader import SnepffPostUpdateUploader
 
-class GwassnpsUploader(uploader.DummySourceUploader):
+class GwassnpsUploader(uploader.DummySourceUploader,SnepffPostUpdateUploader):
 
     name = "gwassnps"
 

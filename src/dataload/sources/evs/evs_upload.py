@@ -4,9 +4,10 @@ import zipfile
 
 from .evs_parser import load_data
 import biothings.dataload.uploader as uploader
+from dataload.uploader import SnepffPostUpdateUploader
 
 
-class EVSUploader(uploader.BaseSourceUploader):
+class EVSUploader(SnepffPostUpdateUploader):
 
     name = "evs"
 

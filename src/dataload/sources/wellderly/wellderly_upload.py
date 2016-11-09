@@ -1,7 +1,8 @@
 
 import biothings.dataload.uploader as uploader
+from dataload.uploader import SnepffPostUpdateUploader
 
-class WellderlyFactoryUploader(uploader.DummySourceUploader):
+class WellderlyFactoryUploader(uploader.DummySourceUploader,SnepffPostUpdateUploader):
     """Data originally coming from: http://www.stsiweb.org/wellderly"""
 
     name = "wellderly"

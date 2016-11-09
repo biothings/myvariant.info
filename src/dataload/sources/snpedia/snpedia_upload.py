@@ -1,6 +1,7 @@
 import biothings.dataload.uploader as uploader
+from dataload.uploader import SnepffPostUpdateUploader
 
-class SnpediaUploader(uploader.DummySourceUploader):
+class SnpediaUploader(uploader.DummySourceUploader,SnepffPostUpdateUploader):
     """Originally downloaded from: http://www.snpedia.org/"""
 
     name = "snpedia"

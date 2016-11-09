@@ -1,7 +1,8 @@
 from .clinvar_xml_parser import load_data as load_common
 import biothings.dataload.uploader as uploader
+from dataload.uploader import SnepffPostUpdateUploader
 
-class ClinvarBaseUploader(uploader.BaseSourceUploader):
+class ClinvarBaseUploader(SnepffPostUpdateUploader):
 
     @classmethod
     def get_mapping(klass):

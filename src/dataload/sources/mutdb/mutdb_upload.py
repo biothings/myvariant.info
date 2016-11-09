@@ -1,6 +1,7 @@
 import biothings.dataload.uploader as uploader
+from dataload.uploader import SnepffPostUpdateUploader
 
-class MutDBUploader(uploader.DummySourceUploader):
+class MutDBUploader(uploader.DummySourceUploader,SnepffPostUpdateUploader):
     """Originally downloaded from: http://www.mutdb.org/"""
 
     name = "mutdb"

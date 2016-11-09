@@ -2,8 +2,9 @@ import glob, os
 
 from .exac_parser import load_data
 import biothings.dataload.uploader as uploader
+from dataload.uploader import SnepffPostUpdateUploader
 
-class ExacBaseUploader(uploader.BaseSourceUploader):
+class ExacBaseUploader(SnepffPostUpdateUploader):
 
     @classmethod
     def get_mapping(klass):

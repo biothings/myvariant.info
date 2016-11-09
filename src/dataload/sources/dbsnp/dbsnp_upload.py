@@ -3,9 +3,12 @@ import itertools, glob, os
 from .dbsnp_dump import main as download
 from .dbsnp_vcf_parser import load_data
 import biothings.dataload.uploader as uploader
+from dataload.uploader import SnepffPostUpdateUploader
+
 
 class DBSNPUploader(uploader.IgnoreDuplicatedSourceUploader,
-                    uploader.ParallelizedSourceUploader):
+                    uploader.ParallelizedSourceUploader,
+                    SnepffPostUpdateUploader):
 
     name = "dbsnp"
     storage_class = uploader.IgnoreDuplicatedStorage
@@ -24,6 +27,7 @@ class DBSNPUploader(uploader.IgnoreDuplicatedSourceUploader,
         return load_data(input_file,chrom)
 
     def post_update_data(self):
+        super(DBSNPUploader,self).post_update_data()
         self.logger.info("Indexing 'rsid'")
         # background=true or it'll lock the whole database...
         self.collection.create_index("dbsnp.rsid",background=True)
