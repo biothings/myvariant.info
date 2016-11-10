@@ -9,6 +9,7 @@ from dataload.uploader import SnepffPostUpdateUploader
 class Geno2MPUploader(SnepffPostUpdateUploader):
 
     name = "geno2mp"
+    id_type = 'observed'
 
     def load_data(self,data_folder):
         # there's one vcf file there, let's get it

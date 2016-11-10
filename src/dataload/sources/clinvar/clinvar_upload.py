@@ -4,6 +4,8 @@ from dataload.uploader import SnepffPostUpdateUploader
 
 class ClinvarBaseUploader(SnepffPostUpdateUploader):
 
+    id_type = "observed"
+
     @classmethod
     def get_mapping(klass):
         mapping = {

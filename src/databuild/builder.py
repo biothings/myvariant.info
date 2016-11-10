@@ -10,8 +10,10 @@ class MyVariantDataBuilder(builder.DataBuilder):
         total = sum(self.stats.values())
         self.logger.info("Validating...")
         target_cnt = self.target_backend.count()
+        if total == 0:
+            self.logger.warning("Nothing was inserted in target collection...")
         if target_cnt <= total:
             self.logger.info("OK [total count={} <= sum(total)={}]".format(target_cnt,total))
         else:
-            self.logger.info("Warning: total count of documents {} is greater than what was inserted/updated... {}]".format(target_cnt, total))
+            self.logger.warning("Total count of documents {} is greater than what was inserted/updated... {}]".format(target_cnt, total))
 

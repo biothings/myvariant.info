@@ -6,6 +6,8 @@ from dataload.uploader import SnepffPostUpdateUploader
 
 class ExacBaseUploader(SnepffPostUpdateUploader):
 
+    id_type = 'observed'
+
     @classmethod
     def get_mapping(klass):
         mapping = {

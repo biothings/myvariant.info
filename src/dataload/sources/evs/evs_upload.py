@@ -10,6 +10,7 @@ from dataload.uploader import SnepffPostUpdateUploader
 class EVSUploader(SnepffPostUpdateUploader):
 
     name = "evs"
+    id_type = 'observed'
 
     def load_data(self,data_folder):
         #self.prepare()

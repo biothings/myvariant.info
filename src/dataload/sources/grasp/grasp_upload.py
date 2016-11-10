@@ -9,6 +9,7 @@ from dataload.uploader import SnepffPostUpdateUploader
 class GraspUploader(SnepffPostUpdateUploader):
 
     name = "grasp"
+    id_type = 'observed'
 
     def load_data(self,data_folder):
         # there's one zip there, let's get the zipped filename

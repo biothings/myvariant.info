@@ -12,7 +12,7 @@ class DBSNPUploader(uploader.IgnoreDuplicatedSourceUploader,
 
     name = "dbsnp"
     storage_class = uploader.IgnoreDuplicatedStorage
-
+    id_type = 'observed'
     GLOB_PATTERN = "human_9606_*_GRCh*/VCF/00-All.vcf.gz"
 
     def jobs(self):

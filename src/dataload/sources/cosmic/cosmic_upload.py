@@ -3,6 +3,7 @@ from dataload.uploader import SnepffPostUpdateUploader
 
 class CosmicUploader(uploader.DummySourceUploader,SnepffPostUpdateUploader):
 
+    id_type = "observed"
     name = "cosmic"
 
     @classmethod
