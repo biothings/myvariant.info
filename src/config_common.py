@@ -66,3 +66,6 @@ DATA_TARGET_MASTER_COLLECTION = 'db_master'
 DISPATCHER_SLEEP_TIME = 1
 # storage class to be used by uploader script
 SOURCE_MANAGER_CLASS = None # use default one
+# where to store info about processes launched by the hub
+RUN_DIR = './run'
+

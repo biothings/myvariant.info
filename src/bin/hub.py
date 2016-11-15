@@ -4,12 +4,15 @@ import asyncio, asyncssh, sys
 import concurrent.futures
 from functools import partial
 
-executor = concurrent.futures.ProcessPoolExecutor()
-loop = asyncio.get_event_loop()
-loop.set_default_executor(executor)
-
 import config, biothings
 biothings.config_for_app(config)
+
+from biothings.utils.manager import JobManager
+loop = asyncio.get_event_loop()
+process_queue = concurrent.futures.ProcessPoolExecutor()
+thread_queue = concurrent.futures.ThreadPoolExecutor()
+loop.set_default_executor(process_queue)
+jmanager = JobManager(loop, process_queue, thread_queue)
 
 import dataload
 import biothings.dataload.uploader as uploader
@@ -19,23 +22,21 @@ from databuild.builder import MyVariantDataBuilder
 from databuild.mapper import TagObserved
 
 # will check every 10 seconds for sources to upload
-umanager = uploader.UploaderManager(poll_schedule = '* * * * * */10', event_loop=loop)
+umanager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=jmanager)
 umanager.register_sources(dataload.__sources_dict__)
 umanager.poll()
 
-dmanager = dumper.DumperManager(event_loop=loop)
+dmanager = dumper.DumperManager(job_manager=jmanager)
 dmanager.register_sources(dataload.__sources_dict__)
 dmanager.schedule_all()
 
 observed = TagObserved(name="observed")
 bmanager = builder.BuilderManager(
         builder_class=partial(MyVariantDataBuilder,mappers=[observed]),
-        event_loop=loop)
+        job_manager=jmanager)
 bmanager.sync()
 
-
 from biothings.utils.hub import schedule, top
-
 COMMANDS = {
         # dump commands
         "dm" : dmanager,
@@ -50,9 +51,11 @@ COMMANDS = {
         "merge" : bmanager.merge,
         # admin/advanced
         "loop" : loop,
-        "executor" : executor,
+        "pqueue" : process_queue,
+        "tqueue" : thread_queue,
         "g": globals(),
         "sch" : partial(schedule,loop),
+        "top" : partial(top),
         }
 
 passwords = {
