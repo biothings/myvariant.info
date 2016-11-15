@@ -7,11 +7,11 @@ import logging
 from .dbnsfp_parser import load_data_file as load_common
 import biothings.dataload.uploader as uploader
 from biothings.dataload.storage import IgnoreDuplicatedStorage
-from dataload.uploader import SnepffPostUpdateUploader
+from dataload.uploader import SnpeffPostUpdateUploader
 
 class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                          uploader.ParallelizedSourceUploader,
-                         SnepffPostUpdateUploader):
+                         SnpeffPostUpdateUploader):
 
     GLOB_PATTERN = "dbNSFP*_variant.chr*"
 

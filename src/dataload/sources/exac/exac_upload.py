@@ -2,9 +2,9 @@ import glob, os
 
 from .exac_parser import load_data
 import biothings.dataload.uploader as uploader
-from dataload.uploader import SnepffPostUpdateUploader
+from dataload.uploader import SnpeffPostUpdateUploader
 
-class ExacBaseUploader(SnepffPostUpdateUploader):
+class ExacBaseUploader(SnpeffPostUpdateUploader):
 
     id_type = 'observed'
 

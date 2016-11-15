@@ -1,7 +1,7 @@
 import biothings.dataload.uploader as uploader
-from dataload.uploader import SnepffPostUpdateUploader
+from dataload.uploader import SnpeffPostUpdateUploader
 
-class CosmicUploader(uploader.DummySourceUploader,SnepffPostUpdateUploader):
+class CosmicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
 
     id_type = "observed"
     name = "cosmic"

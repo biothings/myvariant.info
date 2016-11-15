@@ -4,9 +4,9 @@ import zipfile
 
 from .grasp_parser import load_data
 import biothings.dataload.uploader as uploader
-from dataload.uploader import SnepffPostUpdateUploader
+from dataload.uploader import SnpeffPostUpdateUploader
 
-class GraspUploader(SnepffPostUpdateUploader):
+class GraspUploader(SnpeffPostUpdateUploader):
 
     name = "grasp"
     id_type = 'observed'

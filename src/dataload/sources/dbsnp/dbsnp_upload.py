@@ -3,12 +3,12 @@ import itertools, glob, os
 from .dbsnp_dump import main as download
 from .dbsnp_vcf_parser import load_data
 import biothings.dataload.uploader as uploader
-from dataload.uploader import SnepffPostUpdateUploader
+from dataload.uploader import SnpeffPostUpdateUploader
 
 
 class DBSNPUploader(uploader.IgnoreDuplicatedSourceUploader,
                     uploader.ParallelizedSourceUploader,
-                    SnepffPostUpdateUploader):
+                    SnpeffPostUpdateUploader):
 
     name = "dbsnp"
     storage_class = uploader.IgnoreDuplicatedStorage

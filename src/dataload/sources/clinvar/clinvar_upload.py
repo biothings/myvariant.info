@@ -1,8 +1,8 @@
 from .clinvar_xml_parser import load_data as load_common
 import biothings.dataload.uploader as uploader
-from dataload.uploader import SnepffPostUpdateUploader
+from dataload.uploader import SnpeffPostUpdateUploader
 
-class ClinvarBaseUploader(SnepffPostUpdateUploader):
+class ClinvarBaseUploader(SnpeffPostUpdateUploader):
 
     id_type = "observed"
 

@@ -1,7 +1,7 @@
 import biothings.dataload.uploader as uploader
-from dataload.uploader import SnepffPostUpdateUploader
+from dataload.uploader import SnpeffPostUpdateUploader
 
-class DOCMUploader(uploader.DummySourceUploader,SnepffPostUpdateUploader):
+class DOCMUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
     """Originally downloaded from: http://docm.genome.wustl.edu/"""
 
     name = "docm"
