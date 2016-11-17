@@ -6,7 +6,7 @@ from dataload.uploader import SnpeffPostUpdateUploader
 
 class ExacBaseUploader(SnpeffPostUpdateUploader):
 
-    id_type = 'observed'
+    __metadata__ = {"mapper" : 'observed'}
 
     @classmethod
     def get_mapping(klass):

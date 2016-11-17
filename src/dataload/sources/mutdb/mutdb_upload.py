@@ -5,7 +5,7 @@ class MutDBUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
     """Originally downloaded from: http://www.mutdb.org/"""
 
     name = "mutdb"
-    id_type = 'observed'
+    __metadata__ = {"mapper" : 'observed'}
 
     @classmethod
     def get_mapping(klass):

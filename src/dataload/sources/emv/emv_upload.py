@@ -9,7 +9,7 @@ from dataload.uploader import SnpeffPostUpdateUploader
 class EMVUploader(SnpeffPostUpdateUploader):
 
     name = "emv"
-    id_type = 'observed'
+    __metadata__ = {"mapper" : 'observed'}
 
     def load_data(self,data_folder):
         # there's one csv file there, let's get it

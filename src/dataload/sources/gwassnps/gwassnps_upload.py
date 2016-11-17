@@ -4,7 +4,7 @@ from dataload.uploader import SnpeffPostUpdateUploader
 class GwassnpsUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
 
     name = "gwassnps"
-    id_type = 'observed'
+    __metadata__ = {"mapper" : 'observed'}
 
     @classmethod
     def get_mapping(klass):

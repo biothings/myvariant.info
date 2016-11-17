@@ -10,7 +10,7 @@ from dataload.uploader import SnpeffPostUpdateUploader
 class EVSUploader(SnpeffPostUpdateUploader):
 
     name = "evs"
-    id_type = 'observed'
+    __metadata__ = {"mapper" : 'observed'}
 
     def load_data(self,data_folder):
         #self.prepare()

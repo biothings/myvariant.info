@@ -4,8 +4,6 @@ from dataload.uploader import SnpeffPostUpdateUploader
 
 class ClinvarBaseUploader(SnpeffPostUpdateUploader):
 
-    id_type = "observed"
-
     @classmethod
     def get_mapping(klass):
         mapping = {
@@ -200,6 +198,10 @@ class ClinvarHG19Uploader(ClinvarBaseUploader):
 
     name = "clinvar_hg19"
     main_source = "clinvar"
+    __metadata__ = {
+            "mapper" : 'observed',
+            "assembly" : "hg19",
+            }
 
     def load_data(self,data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)
@@ -210,6 +212,10 @@ class ClinvarHG38Uploader(ClinvarBaseUploader):
 
     name = "clinvar_hg38"
     main_source = "clinvar"
+    __metadata__ = {
+            "mapper" : 'observed',
+            "assembly" : "hg38",
+            }
 
     def load_data(self,data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)

@@ -3,8 +3,8 @@ from dataload.uploader import SnpeffPostUpdateUploader
 
 class CosmicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
 
-    id_type = "observed"
     name = "cosmic"
+    __metadata__ = {"mapper" : 'observed'}
 
     @classmethod
     def get_mapping(klass):

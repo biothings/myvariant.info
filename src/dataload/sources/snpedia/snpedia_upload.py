@@ -5,7 +5,7 @@ class SnpediaUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
     """Originally downloaded from: http://www.snpedia.org/"""
 
     name = "snpedia"
-    id_type = 'observed'
+    __metadata__ = {"mapper" : 'observed'}
 
     @classmethod
     def get_mapping(klass):

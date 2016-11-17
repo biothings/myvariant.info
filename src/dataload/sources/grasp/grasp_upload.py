@@ -9,7 +9,7 @@ from dataload.uploader import SnpeffPostUpdateUploader
 class GraspUploader(SnpeffPostUpdateUploader):
 
     name = "grasp"
-    id_type = 'observed'
+    __metadata__ = {"mapper" : 'observed'}
 
     def load_data(self,data_folder):
         # there's one zip there, let's get the zipped filename
