@@ -6,7 +6,8 @@ class WellderlyFactoryUploader(uploader.DummySourceUploader,SnpeffPostUpdateUplo
     """Data originally coming from: http://www.stsiweb.org/wellderly"""
 
     name = "wellderly"
-    __metadata__ = {"mapper" : 'observed'}
+    __metadata__ = {"mapper" : 'observed',
+                    "assembly" : "hg19"}
     split_collections = ["wellderly_1","wellderly_3","wellderly_4","wellderly_cg1",
             "wellderly_cg10","wellderly_cg11","wellderly_cg12","wellderly_cg13",
             "wellderly_cg14","wellderly_cg15","wellderly_cg16","wellderly_cg17",

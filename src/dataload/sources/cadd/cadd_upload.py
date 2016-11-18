@@ -5,6 +5,7 @@ import biothings.dataload.uploader as uploader
 class CADDUploader(uploader.BaseSourceUploader):
 
     name = "cadd"
+    __metadata__ = {"assembly" : "hg19"}
 
     def load_data(self,data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)

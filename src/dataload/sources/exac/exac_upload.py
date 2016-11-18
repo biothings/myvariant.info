@@ -6,7 +6,8 @@ from dataload.uploader import SnpeffPostUpdateUploader
 
 class ExacBaseUploader(SnpeffPostUpdateUploader):
 
-    __metadata__ = {"mapper" : 'observed'}
+    __metadata__ = {"mapper" : 'observed',
+                    "assembly" : "hg19"}
 
     @classmethod
     def get_mapping(klass):

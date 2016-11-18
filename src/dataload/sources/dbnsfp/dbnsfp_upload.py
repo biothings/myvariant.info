@@ -757,12 +757,12 @@ class DBNSFPHG38Uploader(DBNSFPBaseUploader):
 
     name = "dbnsfp_hg38"
     main_source = "dbnsfp"
-    hg = "hg38"
+    __metadata__ = {"assembly" : "hg38"}
 
 
 class DBNSFPHG19Uploader(DBNSFPBaseUploader):
 
     name = "dbnsfp_hg19"
     main_source = "dbnsfp"
-    hg = "hg19"
+    __metadata__ = {"assembly" : "hg19"}
 

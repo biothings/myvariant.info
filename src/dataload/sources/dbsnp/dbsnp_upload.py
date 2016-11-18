@@ -12,7 +12,8 @@ class DBSNPUploader(uploader.IgnoreDuplicatedSourceUploader,
 
     name = "dbsnp"
     storage_class = uploader.IgnoreDuplicatedStorage
-    __metadata__ = {"mapper" : 'observed'}
+    __metadata__ = {"mapper" : 'observed',
+                    "assembly" : "hg19"}
     GLOB_PATTERN = "human_9606_*_GRCh*/VCF/00-All.vcf.gz"
 
     def jobs(self):

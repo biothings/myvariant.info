@@ -9,7 +9,8 @@ from dataload.uploader import SnpeffPostUpdateUploader
 class Geno2MPUploader(SnpeffPostUpdateUploader):
 
     name = "geno2mp"
-    __metadata__ = {"mapper" : 'observed'}
+    __metadata__ = {"mapper" : 'observed',
+                    "assembly" : "hg19"}
 
     def load_data(self,data_folder):
         # there's one vcf file there, let's get it

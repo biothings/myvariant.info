@@ -5,7 +5,8 @@ class DOCMUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
     """Originally downloaded from: http://docm.genome.wustl.edu/"""
 
     name = "docm"
-    __metadata__ = {"mapper" : 'observed'}
+    __metadata__ = {"mapper" : 'observed',
+                    "assembly" : "hg19"}
 
     @classmethod
     def get_mapping(klass):
