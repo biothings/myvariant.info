@@ -7,7 +7,6 @@ from bitarray import bitarray
 
 from biothings.utils.common import loadobj, is_str, open_anyfile, timesofar
 from biothings.utils.mongo import get_src_db, doc_feeder
-from config import HG19_DATAFILE
 
 
 def nuc_to_bit(sequence):
@@ -114,9 +113,9 @@ class VariantValidator:
     def __init__(self):
         self._chr_data = None
 
-    def load_chr_data(self):
+    def load_chr_data(self,genome_file):
         print("\tLoading chromosome data...", end='')
-        self._chr_data = loadobj(HG19_DATAFILE)
+        self._chr_data = loadobj(genome_file)
         print("Done.")
 
     def validate_hgvs(self, hgvs_id, verbose=False):
