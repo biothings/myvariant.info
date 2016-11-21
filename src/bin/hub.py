@@ -36,7 +36,7 @@ bmanager = builder.BuilderManager(
         job_manager=jmanager)
 bmanager.sync()
 
-from biothings.utils.hub import schedule, top, pending
+from biothings.utils.hub import schedule, top, pending, done
 
 COMMANDS = {
         # dump commands
@@ -57,7 +57,8 @@ COMMANDS = {
         "g": globals(),
         "sch" : partial(schedule,loop),
         "top" : partial(top,process_queue),
-        "pending" : pending
+        "pending" : pending,
+        "done" : done,
         }
 
 passwords = {

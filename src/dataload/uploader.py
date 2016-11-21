@@ -1,4 +1,4 @@
-import glob, os
+import glob, os, math
 
 import biothings.dataload.uploader as uploader
 from biothings.dataload.storage import IgnoreDuplicatedStorage
@@ -28,12 +28,12 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
         storage = IgnoreDuplicatedStorage(None,snpeff_class.name,self.logger)
         batch_size = 1000000
         col = self.db[self.collection_name]
-        total = col.count()
+        total = math.ceil(col.count()/batch_size)
         cnt = 0
         for doc_ids in doc_feeder(col, step=batch_size, inbatch=True, fields={'_id':1}):
             ids = [d["_id"] for d in doc_ids]
             data = parser.annotate_by_snpeff(ids)
             storage.process(data, batch_size)
-            cnt += batch_size
-            self.logger.debug("Processed %s/%s" % (cnt,total))
+            cnt += 1
+            self.logger.debug("Processed batch %s/%s [%.1f]" % (cnt,total,(cnt/total*100)))
 
