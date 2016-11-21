@@ -746,7 +746,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
 
     def jobs(self):
         # tuple(input_file,version), where version is either hg38 or hg19)
-        return map(lambda e: (e, self.__class__.hg),
+        return map(lambda e: (e, self.__class__.__metadata__["assembly"]),
                    glob.glob(os.path.join(self.data_folder,self.__class__.GLOB_PATTERN)))
 
     def load_data(self,input_file,hg):
