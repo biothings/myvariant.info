@@ -56,7 +56,7 @@ COMMANDS = {
         "tqueue" : thread_queue,
         "g": globals(),
         "sch" : partial(schedule,loop),
-        "top" : partial(top,process_queue),
+        "top" : partial(top,process_queue,thread_queue),
         "pending" : pending,
         "done" : done,
         }
