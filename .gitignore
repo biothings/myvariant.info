@@ -13,3 +13,4 @@ src/www/static/docs
 *checkpoint.ipynb
 src/config_prod.py
 src/run/*.pickle
+src/run/done/*.pickle

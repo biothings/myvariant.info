@@ -189,7 +189,6 @@ class VCFConstruct:
             else:
                 print(item)
                 print('beyond current capacity')
-        print("Running %s" % self.snpeff_cmd)
         proc = subprocess.Popen(self.snpeff_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = proc.communicate(vcf_stdin.encode())
         it = iter(snpeff_valid_id)
