@@ -4,8 +4,6 @@ LOGGER_NAME = "myvariant.hub"
 # this will affect any logging calls
 logger = logging.getLogger(LOGGER_NAME)
 logger.setLevel(logging.DEBUG)
-# log to console by default
-logger.addHandler(logging.StreamHandler())
 
 
 ALLOWED_OPTIONS = ['_source', 'start', 'from_', 'size', 'fields',

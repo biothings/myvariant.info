@@ -162,7 +162,10 @@ class SnpeffBaseUploader(uploader.NoDataSourceUploader):
 
 class SnpeffHg19Uploader(SnpeffBaseUploader):
     name = "snpeff_hg19"
+    __metadata__ = {"assembly" : "hg19"}
 
 
 class SnpeffHg38Uploader(SnpeffBaseUploader):
     name = "snpeff_hg38"
+    __metadata__ = {"assembly" : "hg38"}
+
