@@ -9,6 +9,10 @@ import config
 
 class MyVariantDataBuilder(builder.DataBuilder):
 
+    def merge(self, sources=None, target_name=None, batch_size=50000, job_manager=None):
+        # just override default batch_size or it consumes too much mem
+        return super(MyVariantDataBuilder,self).merge(sources,
+                                target_name, batch_size,job_manager)
 
     def validate_merge(self):
         # MyVariant merging either insert or updates. So we can't just count
