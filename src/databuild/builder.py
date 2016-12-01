@@ -1,7 +1,9 @@
+import math
 import asyncio
 from functools import partial
 import datetime, pickle
 
+from biothings.utils.common import iter_n
 from biothings.utils.mongo import doc_feeder
 import biothings.utils.mongo as mongo
 import biothings.databuild.builder as builder
@@ -9,10 +11,10 @@ import config
 
 class MyVariantDataBuilder(builder.DataBuilder):
 
-    def merge(self, sources=None, target_name=None, batch_size=50000, job_manager=None):
+    def merge(self, sources=None, target_name=None, batch_size=50000, job_manager=None, **kwargs):
         # just override default batch_size or it consumes too much mem
         return super(MyVariantDataBuilder,self).merge(sources,
-                                target_name, batch_size,job_manager)
+                                target_name, job_manager, batch_size=batch_size, **kwargs)
 
     def validate_merge(self):
         # MyVariant merging either insert or updates. So we can't just count
@@ -32,27 +34,40 @@ class MyVariantDataBuilder(builder.DataBuilder):
         # divide & conquer... build batches
         jobs = []
         total = self.target_backend.count()
+        btotal = math.ceil(total/batch_size) 
+        bnum = 1
         cnt = 0
         results = {"missing" : [], "disagreed" : []}
-        for doc_ids in doc_feeder(self.target_backend.target_collection,
-                                  step=batch_size, inbatch=True, fields={'_id':1}):
-            cnt += len(doc_ids)
-            pinfo = self.get_pinfo()
-            pinfo["step"] = "post-merge (chrom)"
-            pinfo["description"] = "#docs %d/%d" % (cnt,total)
-            self.logger.info("Creating post-merge job to process chrom %d/%d" % (cnt,total))
-            ids = [doc["_id"] for doc in doc_ids]
-            job = job_manager.defer_to_process(pinfo,
-                    partial(chrom_worker, self.target_backend.target_name, ids))
-            def processed(f,results):
-                try:
-                    fres = f.result()
-                    results["missing"].extend(fres["missing"])
-                    results["disagreed"].extend(fres["disagreed"])
-                except Exception as e:
-                    self.logger.error("Error in processed: %s" % e)
-            job.add_done_callback(partial(processed,results=results))
-            jobs.append(job)
+        # grab ids only, so we can get more, let's say 10 times more
+        id_batch_size = batch_size * 10
+        for big_doc_ids in doc_feeder(self.target_backend.target_collection,
+                                  step=id_batch_size, inbatch=True, fields={'_id':1}):
+            for doc_ids in iter_n(big_doc_ids,batch_size):
+                # faking non-blocking call... (but we all know doc_feeder is a blocking one...)
+                yield from asyncio.sleep(0.1)
+                cnt += len(doc_ids)
+                pinfo = self.get_pinfo()
+                pinfo["step"] = "post-merge (chrom)"
+                pinfo["description"] = "#%d/%d (%.1f%%)" % (bnum,btotal,(cnt/total*100.))
+                self.logger.info("Creating post-merge job #%d/%d to process chrom %d/%d (%.1f%%)" % \
+                        (bnum,btotal,cnt,total,(cnt/total*100.)))
+                ids = [doc["_id"] for doc in doc_ids]
+                job = job_manager.defer_to_process(pinfo,
+                        partial(chrom_worker, self.target_backend.target_name, ids))
+                def processed(f,results, batch_num):
+                    try:
+                        fres = f.result()
+                        results["missing"].extend(fres["missing"])
+                        results["disagreed"].extend(fres["disagreed"])
+                        self.logger.info("chrom batch #%d, done" % batch_num)
+                    except Exception as e:
+                        import traceback
+                        self.logger.error("chrom batch #%d, error in processed (set_chrom): %s:\n%s" % \
+                                (batch_num, e, traceback.format_exc()))
+                        raise
+                job.add_done_callback(partial(processed, results=results, batch_num=bnum))
+                jobs.append(job)
+                bnum += 1
         self.logger.info("%d jobs created for merging step" % len(jobs))
         yield from asyncio.wait(jobs)
         self.logger.info("Found %d missing 'chrom' and %d where resources disagreed" % (len(results["missing"]), len(results["disagreed"])))
