@@ -6,6 +6,7 @@ class WellderlyFactoryUploader(uploader.DummySourceUploader,SnpeffPostUpdateUplo
     """Data originally coming from: http://www.stsiweb.org/wellderly"""
 
     name = "wellderly"
+    regex_name = "wellderly_.*"    # this will be compiled as regex to match split cols
     __metadata__ = {"mapper" : 'observed',
                     "assembly" : "hg19"}
     split_collections = ["wellderly_1","wellderly_3","wellderly_4","wellderly_cg1",
