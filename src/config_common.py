@@ -2,6 +2,7 @@
 import logging
 LOGGER_NAME = "myvariant.hub"
 # this will affect any logging calls
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(LOGGER_NAME)
 logger.setLevel(logging.DEBUG)
 

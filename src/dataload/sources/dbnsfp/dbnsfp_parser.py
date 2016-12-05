@@ -410,7 +410,8 @@ def data_generator(input_file, version):
     next(db_nsfp)  # skip header
     previous_row = None
     for row in db_nsfp:
-        assert len(row) == VALID_COLUMN_NO
+        assert len(row) == VALID_COLUMN_NO, \
+            "Bad row format (expected %d, got %d): %s" % (VALID_COLUMN_NO,len(row),repr(row))
         current_row = _map_line_to_json(row, version=version)
         if previous_row and current_row:
             if current_row["_id"] == previous_row["_id"]:

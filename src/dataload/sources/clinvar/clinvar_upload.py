@@ -4,6 +4,12 @@ from dataload.uploader import SnpeffPostUpdateUploader
 
 class ClinvarBaseUploader(SnpeffPostUpdateUploader):
 
+    def get_pinfo(self):
+        pinfo = super(ClinvarBaseUploader,self).get_pinfo()
+        # clinvar parser has some memory requirements, ~1.5G
+        pinfo.setdefault("__reqs__",{})["mem"] = 1.5 * (1024**3)
+        return pinfo
+
     @classmethod
     def get_mapping(klass):
         mapping = {

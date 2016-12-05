@@ -12,7 +12,10 @@ loop = asyncio.get_event_loop()
 process_queue = concurrent.futures.ProcessPoolExecutor()#max_workers=2)
 thread_queue = concurrent.futures.ThreadPoolExecutor()
 loop.set_default_executor(process_queue)
-jmanager = JobManager(loop, process_queue, thread_queue)
+jmanager = JobManager(loop,
+                      process_queue, thread_queue,
+                      max_memory_usage="auto",
+                      )
 
 import dataload
 import biothings.dataload.uploader as uploader
