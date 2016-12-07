@@ -16,10 +16,6 @@ from biothings.utils.common import timesofar
 from config import logger as logging
 
 
-# the key name for the pos in var_doc
-POS_KEY = 'hg19'
-
-
 def get_hgvs_name(record, as_list=False):
     """construct the valid HGVS name as the _id field"""
     _id_list = []
@@ -93,7 +89,7 @@ def get_hgvs_name(record, as_list=False):
     return _id_list, _alt_list, _pos_list
 
 
-def parse_one_rec(record):
+def parse_one_rec(assembly, record):
     snp = OrderedDict()
     snp['rsid'] = record.ID
     snp['vartype'] = record.var_type
@@ -154,13 +150,13 @@ def parse_one_rec(record):
     snp['ref'] = record.REF
     _id_list, _alt_list, _pos_list = get_hgvs_name(record)
     snp['alt'] = _alt_list
-    snp[POS_KEY] = _pos_list
+    snp[assembly] = _pos_list
     snp['_id'] = _id_list
 
     return snp
 
 
-def parse_vcf(vcf_infile, compressed=True, verbose=True, by_id=True, **tabix_params):
+def parse_vcf(assembly, vcf_infile, compressed=True, verbose=True, by_id=True, **tabix_params):
     t0 = time.time()
     compressed == vcf_infile.endswith('.gz')
     vcf_r = Reader(filename=vcf_infile, compressed=compressed)
@@ -169,7 +165,7 @@ def parse_vcf(vcf_infile, compressed=True, verbose=True, by_id=True, **tabix_par
         vcf_r.reader = vcf_r._tabix.fetch(**tabix_params)
     cnt_1, cnt_2, cnt_3 = 0, 0, 0
     for rec in vcf_r:
-        doc = parse_one_rec(rec)
+        doc = parse_one_rec(assembly, rec)
         if by_id:
             # one hgvs id, one doc
             if doc['_id']:
@@ -177,7 +173,7 @@ def parse_vcf(vcf_infile, compressed=True, verbose=True, by_id=True, **tabix_par
                     for i, _id in enumerate(doc['_id']):
                         _doc = copy.copy(doc)
                         _doc['alt'] = doc['alt'][i]
-                        _doc[POS_KEY] = doc[POS_KEY][i]
+                        _doc[assembly] = doc[assembly][i]
                         _doc['_id'] = _id
                         yield _doc
                         cnt_2 += 1
@@ -205,19 +201,15 @@ def parse_vcf(vcf_infile, compressed=True, verbose=True, by_id=True, **tabix_par
     logging.info("Total rs: {}; total docs: {}; skipped rs: {}".format(cnt_1, cnt_2, cnt_3))
 
 
-def load_data(input_file,chrom):
+def load_data(assembly, input_file,chrom):
     import logging as loggingmod
     global logging
     logging = loggingmod.getLogger("dbsnp_upload")
     logging.info("Processing chr{}...".format(chrom))
-    snpdoc_iter = parse_vcf(input_file, compressed=True, verbose=False, by_id=True, reference=chrom)
+    snpdoc_iter = parse_vcf(assembly, input_file, compressed=True, verbose=False, by_id=True, reference=chrom)
     for doc in snpdoc_iter:
         _doc = {'dbsnp': doc}
         _doc['_id'] = doc['_id']
         del doc['_id']
         yield _doc
 
-if __name__ == "__main__":
-    from biothings.utils.mongo import get_data_folder
-    data_folder = get_data_folder("dbsnp")
-    load_data(data_folder=data_folder)
