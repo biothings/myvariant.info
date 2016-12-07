@@ -6,6 +6,9 @@ from utils.validate import bit_to_nuc
 from biothings.utils.common import loadobj
 from utils.hgvs import get_hgvs_from_vcf
 
+import logging
+logger = logging.getLogger("snpeff")
+
 
 class VCFConstruct:
     def __init__(self,cmd, genome):
@@ -17,13 +20,13 @@ class VCFConstruct:
         self._chr_data = None
 
     def load_chr_data(self):
-        print("\tLoading chromosome data from '%s'..." % self.genome, end='')
+        logger.info("\tLoading chromosome data from '%s'..." % self.genome, end='')
         try:
             self._chr_data = loadobj(self.genome)
         except Exception as e:
-            print(e)
+            logger.info(e)
             raise
-        print("Done.")
+        logger.info("Done.")
 
     def snp_hgvs_id_parser(self, id):
         '''get chr, pos, ref, alt from hgvs_id'''
@@ -151,7 +154,7 @@ class VCFConstruct:
                 try:
                     vcf_stdin += self.snp_vcf_constructer(hgvs_info)
                 except (TypeError, ValueError):
-                    #print(item)
+                    #logger.info(item)
                     continue
                 snpeff_valid_id.append(item)
             elif item.endswith('del') and '_' in item:
@@ -159,7 +162,7 @@ class VCFConstruct:
                 try:
                     vcf_stdin += self.del_vcf_constructor(hgvs_info)
                 except (TypeError, ValueError):
-                    #print(item)
+                    #logger.info(item)
                     continue
                 snpeff_valid_id.append(item)
             elif item.endswith('del') and '_' not in item:
@@ -167,7 +170,7 @@ class VCFConstruct:
                 try:
                     vcf_stdin += self.del_vcf_constructor1(hgvs_info)
                 except (TypeError, ValueError):
-                    #print(item)
+                    #logger.info(item)
                     continue
                 snpeff_valid_id.append(item)
             elif 'ins' in item and 'del' not in item:
@@ -175,7 +178,7 @@ class VCFConstruct:
                 try:
                     vcf_stdin += self.ins_vcf_constructor(hgvs_info)
                 except (TypeError, ValueError):
-                    #print(item)
+                    #logger.info(item)
                     continue
                 snpeff_valid_id.append(item)
             elif 'delins' in item:
@@ -183,12 +186,12 @@ class VCFConstruct:
                 try:
                     vcf_stdin += self.delins_vcf_constructor(hgvs_info)
                 except (TypeError, ValueError):
-                    #print(item)
+                    #logger.info(item)
                     continue
                 snpeff_valid_id.append(item)
             else:
-                print(item)
-                print('beyond current capacity')
+                logger.info(item)
+                logger.info('beyond current capacity')
         proc = subprocess.Popen(self.snpeff_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = proc.communicate(vcf_stdin.encode())
         it = iter(snpeff_valid_id)
@@ -309,7 +312,7 @@ class VCFConstruct:
                 try:
                     hgvs_id = get_hgvs_from_vcf(chrom, pos, ref, alt)
                 except Exception as e:
-                    print(e,file=sys.stderr)
+                    logger.info(e,file=sys.stderr)
                     next(it)
                     continue
                 one_snp_json = {
@@ -328,7 +331,7 @@ class VCFConstruct:
                 snpeff_json = dict_sweep(unlist(one_snp_json), vals=['', None])
                 orig_id = next(it)
                 if orig_id != snpeff_json["_id"]:
-                    print("Skip, hgvs IDs are different: '%s' != '%s'" % (orig_id,snpeff_json["_id"]),file=sys.stderr)
+                    logger.info("Skip, hgvs IDs are different: '%s' != '%s'" % (orig_id,snpeff_json["_id"]),file=sys.stderr)
                     continue
 
                 yield snpeff_json

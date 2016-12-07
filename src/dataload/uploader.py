@@ -5,6 +5,7 @@ import biothings.dataload.uploader as uploader
 from biothings.dataload.storage import UpsertStorage
 from biothings.utils.mongo import doc_feeder
 import biothings.utils.mongo as mongo
+from biothings.utils.common import iter_n
 
 import dataload.sources.snpeff.snpeff_upload as snpeff_upload
 import dataload.sources.snpeff.snpeff_parser as snpeff_parser
@@ -13,8 +14,16 @@ from utils.hgvs import get_pos_start_end
 
 class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
 
+    SNPEFF_BATCH_SIZE = 1000000
 
-    def do_snpeff(self, batch_size=100000):
+    def get_pinfo(self):
+        pinfo = super(SnpeffPostUpdateUploader,self).get_pinfo()
+        # mem depends in the batch size and doc size, but snpeff consumes a lot
+        # (here, asumming 1 doc will weigh 1kB)
+        pinfo.setdefault("__reqs__",{})["mem"] = (self.__class__.SNPEFF_BATCH_SIZE/100000.) * (1024**3)
+        return pinfo
+
+    def do_snpeff(self, batch_size=SNPEFF_BATCH_SIZE, force=False):
         self.logger.info("Updating snpeff information from source '%s' (collection:%s)" % (self.fullname,self.collection_name))
         # select Snpeff uploader to get collection name and src_dump _id
         version = self.__class__.__metadata__["assembly"]
@@ -33,18 +42,45 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
         col = self.db[self.collection_name]
         total = math.ceil(col.count()/batch_size)
         cnt = 0
-        for doc_ids in doc_feeder(col, step=batch_size, inbatch=True, fields={'_id':1}):
-            ids = [d["_id"] for d in doc_ids]
+        to_process = []
+
+        def process(ids):
+            self.logger.info("%d documents to annotate" % len(ids))
+            self.logger.info("%s par ex" % ids[0])
             data = parser.annotate_by_snpeff(ids)
             data = annotate_vcf(data,version)
             storage.process(data, batch_size)
+
+        for doc_ids in doc_feeder(col, step=batch_size, inbatch=True, fields={'_id':1}):
             cnt += 1
-            self.logger.debug("Processed batch %s/%s [%.1f]" % (cnt,total,(cnt/total*100)))
+            self.logger.debug("Processing batch %s/%s [%.1f]" % (cnt,total,(cnt/total*100)))
+            ids = [d["_id"] for d in doc_ids]
+            # don't re-compute annotations if already there
+            if not force:
+                for subids in iter_n(ids,10000):
+                    cur = storage.temp_collection.find({'_id' : {'$in' : subids}},{'_id':1})
+                    already_ids = [d["_id"] for d in list(cur)]
+                    newids = list(set(subids).difference(set(already_ids)))
+                    if len(subids) != len(newids):
+                        self.logger.debug("%d documents already have snpeff annotations, skip them" % \
+                                (len(subids) - len(newids)))
+                    to_process.extend(newids)
+                    self.logger.debug("Batch filled %d out of %d" % (len(to_process),batch_size))
+            else:
+                to_process = ids
+            if not len(to_process) >= batch_size:
+                # can fill more...
+                continue
+            process(to_process)
+            to_process = []
+        # for potential remainings
+        if to_process:
+            process(to_process)
 
     def post_update_data(self, steps, force, batch_size, job_manager):
         # this one will run in current thread, snpeff java prg will
         # multiprocess itself, no need to do more
-        self.do_snpeff(batch_size)
+        self.do_snpeff(force=force)
 
 
 def annotate_vcf(docs, assembly):
