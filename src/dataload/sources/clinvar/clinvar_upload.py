@@ -170,7 +170,7 @@ class ClinvarBaseUploader(SnpeffPostUpdateUploader):
                         "type": "string",
                         "analyzer": "string_lowercase"
                     },
-                    "HGVS": {
+                    "hgvs": {
                         "properties": {
                             "genomic": {
                                 "type": "string",
