@@ -97,7 +97,7 @@ def _map_line_to_json(df, version, index=0):
                 "codon_degeneracy": df.get_value(index, "codon_degeneracy"),
             },
             "genename": df.get_value(index, "genename"),
-            "uniprot": uniprot,
+            "uniprot": list(uniprot),
             "interpro_domain": df.get_value(index, "Interpro_domain"),
             "cds_strand": df.get_value(index, "cds_strand"),
             "ancestral_allele": df.get_value(index, "Ancestral_allele"),
@@ -337,7 +337,7 @@ def _map_line_to_json(df, version, index=0):
                 "trait": df.get_value(index, "clinvar_trait"),
                 "golden_stars": df.get_value(index, "clinvar_golden_stars")
             },
-            "gtex": gtex
+            "gtex": list(gtex)
         }
     }
 
