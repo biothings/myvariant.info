@@ -46,7 +46,6 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
 
         def process(ids):
             self.logger.info("%d documents to annotate" % len(ids))
-            self.logger.info("%s par ex" % ids[0])
             data = parser.annotate_by_snpeff(ids)
             data = annotate_vcf(data,version)
             storage.process(data, batch_size)
