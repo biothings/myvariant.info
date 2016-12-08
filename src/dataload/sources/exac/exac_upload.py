@@ -449,7 +449,7 @@ class ExacUploader(ExacBaseUploader):
             raise uploader.ResourceException("Expecting one single vcf file, got: %s" % repr(content))
         input_file = content.pop()
         self.logger.info("Load data from file '%s'" % input_file)
-        return load_data(input_file)
+        return load_data(self.__class__.name, input_file)
 
 
 class ExacNonTCGAUploader(ExacBaseUploader):
@@ -463,4 +463,4 @@ class ExacNonTCGAUploader(ExacBaseUploader):
             raise uploader.ResourceException("Expecting one single vcf file, got: %s" % repr(content))
         input_file = content.pop()
         self.logger.info("Load data from file '%s'" % input_file)
-        return load_data(input_file)
+        return load_data(self.__class__.name, input_file)

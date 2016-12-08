@@ -4,7 +4,7 @@ from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
 from utils.hgvs import get_hgvs_from_vcf
 
 
-def _map_line_to_json(item):
+def _map_line_to_json(doc_key, item):
     chrom = item.CHROM
     chromStart = item.POS
     ref = item.REF
@@ -42,7 +42,7 @@ def _map_line_to_json(item):
             return
         one_snp_json = {
             "_id": HGVS,
-            "exac": {
+            doc_key : {
                 "chrom": chrom,
                 "pos": chromStart,
                 "ref": ref,
@@ -117,8 +117,8 @@ def _map_line_to_json(item):
         yield obj
 
 
-def load_data(input_file):
+def load_data(doc_key,input_file):
     vcf_reader = vcf.Reader(open(input_file, 'r'))
     for record in vcf_reader:
-        for record_mapped in _map_line_to_json(record):
+        for record_mapped in _map_line_to_json(doc_key,record):
             yield record_mapped
