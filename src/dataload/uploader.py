@@ -65,13 +65,13 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
                                 (len(subids) - len(newids)))
                     to_process.extend(newids)
                     self.logger.debug("Batch filled %d out of %d" % (len(to_process),batch_size))
+                    if not (len(to_process) >= batch_size):
+                        # can fill more...
+                        continue
+                    process(to_process)
+                    to_process = []
             else:
                 to_process = ids
-            if not len(to_process) >= batch_size:
-                # can fill more...
-                continue
-            process(to_process)
-            to_process = []
         # for potential remainings
         if to_process:
             process(to_process)
