@@ -33,20 +33,21 @@ def get_dbsnp(field):
 
 
 # convert one snp to json
-def _map_line_to_json(fields):
+def _map_line_to_json(fields, version):
     chrInfo = fields[0].split(":")  # grch37
     chrom = chrInfo[0]
     chromStart = int(chrInfo[1])
-
     ma_fin_percent = fields[7].split("/")
-
     if fields[3]:
         mutation = fields[3].split(">")
         ref = mutation[0]
         alt = mutation[1]
-        HGVS = get_hgvs_from_vcf(chrom, chromStart, ref, alt)
         hg19 = get_pos_start_end(chrom, chromStart, ref, alt)
         hg38 = get_pos_start_end(chrom, int(fields[30].split(":")[1]), ref, alt)
+        if version == 'hg19':
+            HGVS = get_hgvs_from_vcf(chrom, chromStart, ref, alt)
+        elif version == 'hg38':
+            HGVS = get_hgvs_from_vcf(chrom, hg38[0], ref, alt)
 
     # load as json data
     if HGVS is None:
@@ -130,7 +131,7 @@ def _map_line_to_json(fields):
 
 
 # open file, parse, pass to json mapper
-def data_generator(input_file):
+def data_generator(input_file, version):
     open_file = open(input_file)
     evs = csv.reader(open_file, delimiter=" ")
     # Skip first 8 meta lines
@@ -139,15 +140,15 @@ def data_generator(input_file):
            len(row) == VALID_COLUMN_NO)
     # skip rows with multiple mutations
     evs = (row for row in evs if len(row[3].split(";")) == 1)
-    json_rows = map(_map_line_to_json, evs)
+    json_rows = map(_map_line_to_json, version=version, evs)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "evs") for rg in row_groups)
 
 
 # load path and find files, pass to data_generator
-def load_data(path):
+def load_data(path, version='hg19'):
     for input_file in sorted(glob.glob(path)):
         print(input_file)
-        data = data_generator(input_file)
+        data = data_generator(input_file, version=version)
         for one_snp_json in data:
             yield one_snp_json
