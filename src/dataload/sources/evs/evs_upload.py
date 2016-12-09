@@ -7,16 +7,13 @@ import biothings.dataload.uploader as uploader
 from dataload.uploader import SnpeffPostUpdateUploader
 
 
-class EVSUploader(SnpeffPostUpdateUploader):
-
-    name = "evs"
-    __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg19"}
+class EVSBaseUploader(SnpeffPostUpdateUploader):
 
     def load_data(self,data_folder):
         #self.prepare()
         self.logger.info("Load data from '%s'" % data_folder)
-        return load_data(data_folder)
+        return load_data(data_folder,
+                         self.__class__.__metadata__["assembly"])
 
     @classmethod
     def get_mapping(klass):
@@ -101,4 +98,17 @@ class EVSUploader(SnpeffPostUpdateUploader):
             }
         }
         return mapping
+
+class EVSHg19Uploader(EVSBaseUploader):
+    name = "evs_hg19"
+    main_source = "evs"
+    __metadata__ = {"mapper" : 'observed',
+                    "assembly" : "hg19"}
+
+
+class EVSHg38Uploader(EVSBaseUploader):
+    name = "evs_hg38"
+    main_source = "evs"
+    __metadata__ = {"mapper" : 'observed',
+                    "assembly" : "hg38"}
 
