@@ -4,6 +4,7 @@ import json
 from biothings.www.api.es import ESQuery, ESQueryBuilder
 from biothings.utils.common import dotdict
 from settings import MyVariantSettings
+#import logging
 
 myvariant_settings = MyVariantSettings()
 
@@ -105,12 +106,18 @@ class ESQuery(ESQuery):
                                               gstart=interval_query["gstart"],
                                               gend=interval_query["gend"],
                                               rquery=interval_query["query"])
-        return esqb.default_query(q)
+        return esqb.generate_query(q)
+
+    def _get_query_builder(self, **kwargs):
+        return ESQueryBuilder(**kwargs)
     
 class ESQueryBuilder(ESQueryBuilder):
+    def __init__(self, **query_options):
+        self._query_options = query_options
+        self._options = self._query_options.pop('options', {})
+
     def build_interval_query(self, chr, gstart, gend, rquery):
         """ Build an interval query - called by the ESQuery.query method. """
-        options = self._query_options.get('options', {})
         if chr.lower().startswith('chr'):
             chr = chr[3:]
         _query = {
@@ -123,10 +130,10 @@ class ESQueryBuilder(ESQueryBuilder):
                                             "term": {"chrom": chr.lower()}    
                                         },
                                         {
-                                            "range": {options.assembly + ".start": {"lte": gend}}
+                                            "range": {self._options.assembly + ".start": {"lte": gend}}
                                         },
                                         {
-                                            "range": {options.assembly + ".end": {"gte": gstart}}
+                                            "range": {self._options.assembly + ".end": {"gte": gstart}}
                                         }
                                     ]
                         }
@@ -136,4 +143,4 @@ class ESQueryBuilder(ESQueryBuilder):
         }
         if rquery:
             _query["query"]["bool"]["must"] = {"query_string": {"query": rquery}}
-        return _query
+        return json.loads(json.dumps(_query))
