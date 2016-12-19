@@ -6,8 +6,8 @@ __sources_dict__ = [
         'dataload.sources.dbnsfp',
         'dataload.sources.exac',
 
-        ## manually-updated
-        #'dataload.sources.cadd',
+        # manually-updated
+        'dataload.sources.cadd',
         'dataload.sources.grasp',
         'dataload.sources.emv',
         'dataload.sources.evs',

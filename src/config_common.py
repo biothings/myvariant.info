@@ -1,10 +1,20 @@
 # LOGGING #
-import logging
+import logging, os, datetime, time
+
 LOGGER_NAME = "myvariant.hub"
-# this will affect any logging calls
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(LOGGER_NAME)
-logger.setLevel(logging.DEBUG)
+def setup_default_log(log_folder):
+    # this will affect any logging calls
+    logging.basicConfig(level=logging.DEBUG)
+    logfile = os.path.join(log_folder, '%s_%s_hub.log' % (LOGGER_NAME,time.strftime("%Y%m%d",datetime.datetime.now().timetuple())))
+    fh = logging.FileHandler(logfile)
+    fh.setFormatter(logging.Formatter('%(asctime)s [%(process)d:%(threadName)s] - %(name)s - %(levelname)s -- %(message)s',datefmt="%H:%M:%S"))
+    fh.name = "logfile"
+    logger = logging.getLogger(LOGGER_NAME)
+    logger.setLevel(logging.DEBUG)
+    if not fh.name in [h.name for h in logger.handlers]:
+        logger.addHandler(fh)
+    print("ok setup%s" % logger)
+    return logger
 
 
 ALLOWED_OPTIONS = ['_source', 'start', 'from_', 'size', 'fields',

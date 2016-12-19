@@ -42,16 +42,19 @@ ES_NUMBER_OF_SHARDS = 20
 DATA_SRC_SERVER = 'localhost'
 DATA_SRC_PORT = 27017
 DATA_SRC_DATABASE = 'variantdoc_src'
+DATA_SRC_SERVER_USERNAME = ''
+DATA_SRC_SERVER_PASSWORD = ''
 
 DATA_TARGET_SERVER = 'localhost'
 DATA_TARGET_PORT = 27017
 DATA_TARGET_DATABASE = 'variantdoc'
+DATA_TARGET_SERVER_USERNAME = ''
+DATA_TARGET_SERVER_PASSWORD = ''
 
-DATA_SERVER_USERNAME = ''
-DATA_SERVER_PASSWORD = ''
 
 DATA_ARCHIVE_ROOT = '/path/to/archive/directory'
 LOG_FOLDER = os.path.join(DATA_ARCHIVE_ROOT,'logs')
+setup_default_log(LOG_FOLDER)
 
 # fill with "token", "roomid" and "from" keys
 # to broadcast message to a Hipchat room
