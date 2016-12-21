@@ -312,7 +312,7 @@ class VCFConstruct:
                 try:
                     hgvs_id = get_hgvs_from_vcf(chrom, pos, ref, alt)
                 except Exception as e:
-                    logger.info(e,file=sys.stderr)
+                    logger.info(e)
                     next(it)
                     continue
                 one_snp_json = {
@@ -331,7 +331,7 @@ class VCFConstruct:
                 snpeff_json = dict_sweep(unlist(one_snp_json), vals=['', None])
                 orig_id = next(it)
                 if orig_id != snpeff_json["_id"]:
-                    logger.info("Skip, hgvs IDs are different: '%s' != '%s'" % (orig_id,snpeff_json["_id"]),file=sys.stderr)
+                    logger.info("Skip, hgvs IDs are different: '%s' != '%s'" % (orig_id,snpeff_json["_id"]))
                     continue
 
                 yield snpeff_json
