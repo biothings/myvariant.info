@@ -9,7 +9,7 @@ biothings.config_for_app(config)
 
 from biothings.utils.manager import JobManager
 loop = asyncio.get_event_loop()
-process_queue = concurrent.futures.ProcessPoolExecutor()#max_workers=2)
+process_queue = concurrent.futures.ProcessPoolExecutor()
 thread_queue = concurrent.futures.ThreadPoolExecutor()
 loop.set_default_executor(process_queue)
 jmanager = JobManager(loop,
@@ -53,6 +53,8 @@ COMMANDS = {
         # building/merging
         "bm" : bmanager,
         "merge" : bmanager.merge,
+        # diff
+        "diff" : bmanager.diff,
         # admin/advanced
         "loop" : loop,
         "pqueue" : process_queue,

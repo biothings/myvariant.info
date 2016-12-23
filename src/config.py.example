@@ -53,6 +53,8 @@ DATA_TARGET_SERVER_PASSWORD = ''
 
 
 DATA_ARCHIVE_ROOT = '/path/to/archive/directory'
+DIFF_PATH = os.path.join(DATA_ARCHIVE_ROOT,"diff")
+
 LOG_FOLDER = os.path.join(DATA_ARCHIVE_ROOT,'logs')
 setup_default_log(LOG_FOLDER)
 
