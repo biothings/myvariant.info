@@ -4,6 +4,8 @@ import biothings.dataload.uploader as uploader
 
 class CADDUploader(uploader.BaseSourceUploader):
 
+    keep_archive = 1
+
     name = "cadd"
     __metadata__ = {"assembly" : "hg19"}
 

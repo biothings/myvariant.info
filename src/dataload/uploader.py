@@ -14,6 +14,8 @@ from utils.hgvs import get_pos_start_end
 
 class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
 
+    keep_archive = 1
+
     SNPEFF_BATCH_SIZE = 1000000
 
     def get_pinfo(self):
