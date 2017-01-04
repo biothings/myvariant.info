@@ -44,7 +44,7 @@ class MyVariantDataBuilder(builder.DataBuilder):
         self.logger.info("Fetch _ids from '%s' with batch_size=%d, and create post-merger job with batch_size=%d" % \
                 (self.target_backend.target_collection.name, id_batch_size, batch_size))
         for big_doc_ids in doc_feeder(self.target_backend.target_collection,
-                                  step=id_batch_size, inbatch=True, 
+                                  step=id_batch_size, inbatch=True,
                                   fields={'_id':1}):
             for doc_ids in iter_n(big_doc_ids,batch_size):
                 # faking non-blocking call... (but we all know doc_feeder is a blocking one...)
@@ -96,8 +96,9 @@ def get_chrom(doc):
     this_chrom = {"chrom" : None, "agreed" : False}
     # Get chrom keys here
     for k in doc:
-        if type(doc[k]) == dict and 'chrom' in doc[k]:
-                chrom_keys.add(str(doc[k]['chrom']))
+        if type(doc[k]) == dict and k in config.CHROM_FIELDS and config.CHROM_FIELDS[k] in  doc[k]:
+            chrom_field =config.CHROM_FIELDS[k]
+            chrom_keys.add(str(doc[k][chrom_field]))
     if len(chrom_keys) == 1:
         this_chrom["chrom"] = chrom_keys.pop()
         this_chrom["agreed"] = True

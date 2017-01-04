@@ -20,6 +20,7 @@ __sources_dict__ = [
         'dataload.sources.mutdb',
         'dataload.sources.gwassnps',
         'dataload.sources.docm',
+        'dataload.sources.uniprot',
 
         # generated resources
         'dataload.sources.snpeff',

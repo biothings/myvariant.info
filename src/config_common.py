@@ -78,3 +78,6 @@ SOURCE_MANAGER_CLASS = None # use default one
 # where to store info about processes launched by the hub
 RUN_DIR = './run'
 
+# define valid sources to get chrom from, and for each, name of the chrom field
+CHROM_FIELDS = {'cadd':'chrom', 'clinvar':'chrom', 'cosmic':'chrom', 'dbnsfp':'chrom',
+                'dbsnp':'chrom', 'docm':'chrom', 'evs':'chrom', 'exac':'chrom'}
