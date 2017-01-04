@@ -9,12 +9,12 @@ biothings.config_for_app(config)
 
 from biothings.utils.manager import JobManager
 loop = asyncio.get_event_loop()
-process_queue = concurrent.futures.ProcessPoolExecutor()
+process_queue = concurrent.futures.ProcessPoolExecutor(max_workers=20)
 thread_queue = concurrent.futures.ThreadPoolExecutor()
 loop.set_default_executor(process_queue)
 jmanager = JobManager(loop,
                       process_queue, thread_queue,
-                      max_memory_usage="auto",
+                      max_memory_usage=None,
                       )
 
 import dataload

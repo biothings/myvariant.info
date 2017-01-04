@@ -41,10 +41,11 @@ class MyVariantDataBuilder(builder.DataBuilder):
         # grab ids only, so we can get more and fill queue for each step
         # each round, fill the queue to make sure every cpu slots are always working
         id_batch_size = batch_size * job_manager.process_queue._max_workers * 2
-        self.logger.info("Searching for documents with missing 'chrom' field")
+        self.logger.info("Fetch _ids from '%s' with batch_size=%d, and create post-merger job with batch_size=%d" % \
+                (self.target_backend.target_collection.name, id_batch_size, batch_size))
         for big_doc_ids in doc_feeder(self.target_backend.target_collection,
                                   step=id_batch_size, inbatch=True, 
-                                  fields={'_id':1},query={"chrom" : {"$exists":False}}):
+                                  fields={'_id':1}):
             for doc_ids in iter_n(big_doc_ids,batch_size):
                 # faking non-blocking call... (but we all know doc_feeder is a blocking one...)
                 yield from asyncio.sleep(0.1)
