@@ -3,11 +3,13 @@ import glob
 import zipfile
 
 from .evs_parser import load_data
-import biothings.dataload.uploader as uploader
+import biothings.dataload.storage as storage
 from dataload.uploader import SnpeffPostUpdateUploader
 
 
 class EVSBaseUploader(SnpeffPostUpdateUploader):
+
+    storage_class = storage.IgnoreDuplicatedStorage
 
     def load_data(self,data_folder):
         #self.prepare()
