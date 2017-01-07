@@ -16,10 +16,6 @@ class StatusHandler(StatusHandler):
     ''' This class is for the /status endpoint. '''
     pass
 
-"""class FieldsHandler(FieldsHandler):
-    ''' This class is for the /metadata/fields endpoint. '''
-    pass"""
-
 class MetadataHandler(MetadataHandler):
     ''' This class is for the /metadata endpoint. '''
     pass
