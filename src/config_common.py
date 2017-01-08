@@ -3,7 +3,8 @@ from biothings.www.settings.default import *
 from www.api.query_builder import ESQueryBuilder
 from www.api.query import ESQuery
 from www.api.transform import ESResultTransformer
-from www.api.handlers import VariantHandler, QueryHandler, MetadataHandler, StatusHandler
+from www.api.handlers import VariantHandler, QueryHandler, MetadataHandler, StatusHandler, DemoHandler
+from www.beacon.handlers import BeaconHandler, BeaconInfoHandler
 
 # *****************************************************************************
 # Elasticsearch variables
@@ -12,6 +13,10 @@ from www.api.handlers import VariantHandler, QueryHandler, MetadataHandler, Stat
 ES_HOST = 'localhost:9200'
 # elasticsearch index name
 ES_INDEX = 'myvariant_current'
+# base index name - used to switch indices
+ES_INDEX_BASE = 'myvariant_current_201607'
+# Assemblies supported (must resolve to a valid ES index, along with ES_INDEX_BASE)
+SUPPORTED_ASSEMBLIES = ['hg19', 'hg38']
 # elasticsearch document type
 ES_DOC_TYPE = 'variant'
 
@@ -24,6 +29,9 @@ APP_LIST = [
     (r"/status", StatusHandler),
     (r"/metadata/?", MetadataHandler),
     (r"/metadata/fields/?", MetadataHandler),
+    (r"/demo/?$", DemoHandler),
+    (r"/beacon/query?", BeaconHandler),
+    (r"/beacon/info", BeaconInfoHandler),
     (r"/{}/variant/(.+)/?".format(API_VERSION), VariantHandler),
     (r"/{}/variant/?$".format(API_VERSION), VariantHandler),
     (r"/{}/query/?".format(API_VERSION), QueryHandler),
@@ -56,4 +64,15 @@ GA_ACTION_ANNOTATION_GET = 'variant_get'
 GA_ACTION_ANNOTATION_POST = 'variant_post'
 GA_TRACKER_URL = 'MyVariant.info'
 
-STATUS_CHECK_ID = ''
+STATUS_CHECK_ID = 'chr1:g.218631822G>A'
+
+# Allow searching by other ids with annotation endpoint
+ANNOTATION_ID_REGEX_LIST = [(re.compile(r'rs[0-9]+', re.I), 'dbsnp.rsid')]
+
+ANNOTATION_GET_ESQB_KWARGS.update({'assembly': {'type': str, 'default': 'hg19'}})
+ANNOTATION_POST_ESQB_KWARGS.update({'assembly': {'type': str, 'default': 'hg19'}})
+QUERY_GET_ESQB_KWARGS.update({'assembly': {'type': str, 'default': 'hg19'}})
+QUERY_POST_ESQB_KWARGS.update({'assembly': {'type': str, 'default': 'hg19'}})
+METADATA_GET_ESQB_KWARGS.update({'assembly': {'type': str, 'default': 'hg19'}})
+
+JSONLD_CONTEXT_PATH = 'www/context/context.json'
