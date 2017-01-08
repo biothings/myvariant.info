@@ -16,7 +16,7 @@ from nose.tools import ok_, eq_
 
 from tornado.testing import AsyncHTTPTestCase
 
-from .variant_list import VARIANT_POST_LIST
+#from tests.variant_list import VARIANT_POST_LIST
 from biothings.tests.test_helper import BiothingTestHelperMixin, _d, TornadoRequestHelper
 import www.index as index
 #import config
@@ -101,7 +101,7 @@ class MyVariantTest(BiothingTestHelperMixin):
 
     def test_query_post(self):
         #/query via post
-        self.json_ok(self.post_ok(self.api + '/query', {'q': 'rs58991260'}))
+        #self.json_ok(self.post_ok(self.api + '/query', {'q': 'rs58991260'}))
 
         res = self.json_ok(self.post_ok(self.api + '/query', {'q': 'rs58991260',
                                                'scopes': 'dbsnp.rsid'}))
@@ -189,13 +189,13 @@ class MyVariantTest(BiothingTestHelperMixin):
         res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'fields': 'dbsnp'}))
         eq_(len(res), 2)
         for _g in res:
-            eq_(set(_g), set(['_id', '_score', 'query', 'dbsnp']))
+            eq_(set(_g), set(['_id', 'query', 'dbsnp']))
 
         # TODO redo this test, doesn't test much really....
         res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'chr16:g.28883241A>G,chr11:g.66397320A>G', 'filter': 'dbsnp.chrom'}))
         eq_(len(res), 2)
         for _g in res:
-            eq_(set(_g), set(['_id', '_score', 'query', 'dbsnp']))
+            eq_(set(_g), set(['_id', 'query', 'dbsnp']))
 
         # Test a large variant post
         ## too slow
@@ -226,11 +226,11 @@ class MyVariantTest(BiothingTestHelperMixin):
         res = self.json_ok(self.get_ok(self.api + '/query?q=' + s))
         eq_(res['hits'], [])
 
-        res = self.json_ok(self.post_ok(self.api + '/query', {"q": s, "scopes": 'dbsnp'}))
+        res = self.json_ok(self.post_ok(self.api + '/query', {"q": s, "scopes": 'dbsnp.rsid'}))
         eq_(res[0]['notfound'], True)
         eq_(len(res), 1)
 
-        res = self.json_ok(self.post_ok(self.api + '/query', {"q": 'rs2500+' + s}))
+        res = self.json_ok(self.post_ok(self.api + '/query', {"q": 'rs2500+' + s, "scopes": "dbsnp.rsid"}))
         eq_(res[1]['notfound'], True)
         eq_(len(res), 2)
 
