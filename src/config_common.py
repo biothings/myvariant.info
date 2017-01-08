@@ -69,10 +69,11 @@ STATUS_CHECK_ID = 'chr1:g.218631822G>A'
 # Allow searching by other ids with annotation endpoint
 ANNOTATION_ID_REGEX_LIST = [(re.compile(r'rs[0-9]+', re.I), 'dbsnp.rsid')]
 
-ANNOTATION_GET_ESQB_KWARGS.update({'assembly': {'type': str, 'default': 'hg19'}})
-ANNOTATION_POST_ESQB_KWARGS.update({'assembly': {'type': str, 'default': 'hg19'}})
-QUERY_GET_ESQB_KWARGS.update({'assembly': {'type': str, 'default': 'hg19'}})
-QUERY_POST_ESQB_KWARGS.update({'assembly': {'type': str, 'default': 'hg19'}})
-METADATA_GET_ESQB_KWARGS.update({'assembly': {'type': str, 'default': 'hg19'}})
+ASSEMBLY_TYPEDEF = {'assembly': {'type': str, 'default': 'hg19'}}
+ANNOTATION_GET_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
+ANNOTATION_POST_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
+QUERY_GET_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
+QUERY_POST_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
+METADATA_GET_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
 
 JSONLD_CONTEXT_PATH = 'www/context/context.json'
