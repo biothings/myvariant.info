@@ -73,12 +73,13 @@ class MyVariantDataBuilder(builder.DataBuilder):
                 jobs.append(job)
                 bnum += 1
         self.logger.info("%d jobs created for merging step" % len(jobs))
-        yield from asyncio.wait(jobs)
-        self.logger.info("Found %d missing 'chrom' and %d where resources disagreed" % (len(results["missing"]), len(results["disagreed"])))
-        if results["missing"] or results["disagreed"]:
-            fn = "chrom_%s_%s.pickle" % (self.target_backend.target_name,datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
-            self.logger.info("Pickling 'chrom' discrepancies into %s" % fn)
-            pickle.dump(results,open(fn,"wb"))
+        if jobs:
+            yield from asyncio.wait(jobs)
+            self.logger.info("Found %d missing 'chrom' and %d where resources disagreed" % (len(results["missing"]), len(results["disagreed"])))
+            if results["missing"] or results["disagreed"]:
+                fn = "chrom_%s_%s.pickle" % (self.target_backend.target_name,datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
+                self.logger.info("Pickling 'chrom' discrepancies into %s" % fn)
+                pickle.dump(results,open(fn,"wb"))
 
         return results
 
