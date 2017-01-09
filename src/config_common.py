@@ -61,6 +61,9 @@ NOSETEST_SETTINGS = 'tests.nosetest_config'
 
 HOST_ENVAR_NAME = "MV_HOST"
 
+HG38_FIELDS = ['clinvar.hg38', 'dbnsfp.hg38', 'evs.hg38']
+HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19', 'dbsnp.hg19', 'docm.hg19', 'evs.hg19', 'grasp.hg19'] #, 'mutdb.hg19', 'wellderly.hg19']
+
 # ################### #
 # MYVARIANT HUB VARS  #
 # ################### #
