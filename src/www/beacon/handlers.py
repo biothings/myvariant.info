@@ -1,10 +1,10 @@
 import sys
-from biothings.www.helper import BaseHandler
-from www.api.es import ESQuery
+from biothings.www.api.es.handlers.base_handler import BaseESRequestHandler
+#from www.api.es import ESQuery
 
 
-class BeaconHandler(BaseHandler):
-    esq = ESQuery()
+class BeaconHandler(BaseESRequestHandler):
+    #esq = ESQuery()
     # Initialize Assembly and Datasets
     assembly_keys = {'NCBI36':'hg18', 'GRCh37':'hg19', 'GRCh38':'hg38'}
     pos_dbs = ['exac', 'cadd'] # These are hg19 ONLY
@@ -123,14 +123,14 @@ class BeaconHandler(BaseHandler):
         return out
 
 
-class BeaconInfoHandler(BaseHandler):
+class BeaconInfoHandler(BaseESRequestHandler):
     # Use esq to grab metadata on myvariant.info
-    esq = ESQuery()
-    meta = esq.get_mapping_meta()
+    #esq = ESQuery()
+    #meta = esq.get_mapping_meta()
 
     # Access Mapping Data for later use to determine assemblyID
-    m = esq._get_mapping(index = esq._index, doc_type=esq._doc_type, options=esq._get_cleaned_metadata_options({}))
-    m = m[list(m.keys())[0]]['mappings'][esq._doc_type]['properties']
+    #m = esq._get_mapping(index = esq._index, doc_type=esq._doc_type, options=esq._get_cleaned_metadata_options({}))
+    #m = m[list(m.keys())[0]]['mappings'][esq._doc_type]['properties']
 
     # Current list of datasets in myvariant.info
     dataset_names = ['dbnsfp', 'dbsnp', 'clinvar', 'evs', 'cadd', 'mutdb', 'cosmic', 'docm', 'wellderly', 'exac']
