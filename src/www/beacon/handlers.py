@@ -1,22 +1,22 @@
 import sys
-from biothings.www.api.es.handlers.base_handler import BaseESRequestHandler
-#from www.api.es import ESQuery
+from biothings.www.api.helper import BaseHandler
+from biothings.utils.common import dotdict
+from www.api.transform import ESResultTransformer
+import logging
 
-
-class BeaconHandler(BaseESRequestHandler):
-    #esq = ESQuery()
+class BeaconHandler(BaseHandler):
     # Initialize Assembly and Datasets
     assembly_keys = {'NCBI36':'hg18', 'GRCh37':'hg19', 'GRCh38':'hg38'}
     pos_dbs = ['exac', 'cadd'] # These are hg19 ONLY
     assembly_dbs = ['dbnsfp','dbsnp','clinvar','evs','mutdb','cosmic','docm','wellderly']
 
     def post(self, src=None):
-        self.recieve_data()
+        self.receive_data()
 
     def get(self, src=None):
-        self.recieve_data()
+        self.receive_data()
 
-    def recieve_data(self):
+    def receive_data(self):
         chrom = self.get_argument('referenceName', None)
         start = self.get_argument('start', None)
         ref = self.get_argument('referenceBases', None)
@@ -53,7 +53,6 @@ class BeaconHandler(BaseESRequestHandler):
         #Return the JSON response
         self.return_json(out)
 
-
     def query_dataset(self, chrom, start, ref, alt, assembly, dataset):
         # Initialzie output
         out = {'datasetId': dataset, 'exists':False}
@@ -74,8 +73,16 @@ class BeaconHandler(BaseESRequestHandler):
                     ref = ''
 
                 q = self.format_query_string(q_type, chrom, start, ref, alt, assembly, dataset)
+                logging.debug("q: {}".format(q))  
                 # perform query and format result
-                res = self.esq.query(q, fields=dataset, dotfield=1)
+                # for now always search against hg19 index...
+                res = self.web_settings.es_client.search(index='_'.join([self.web_settings.ES_INDEX_BASE, 'hg19']),
+                    doc_type=self.web_settings.ES_DOC_TYPE, body={"query":{"query_string":{"query":q}}}, 
+                    _source=[dataset])
+                _transformer = ESResultTransformer(options=dotdict({'dotfield': True}), host=self.request.host)
+                res = _transformer.clean_query_GET_response(res)
+                
+                #res = self.esq.query(q, fields=dataset, dotfield=1)
                 if res and res.get('total') > 0:
                     out = self.format_output(res, out, q_type)
         return out
@@ -123,7 +130,7 @@ class BeaconHandler(BaseESRequestHandler):
         return out
 
 
-class BeaconInfoHandler(BaseESRequestHandler):
+class BeaconInfoHandler(BaseHandler):
     # Use esq to grab metadata on myvariant.info
     #esq = ESQuery()
     #meta = esq.get_mapping_meta()
