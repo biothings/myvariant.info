@@ -73,7 +73,6 @@ class BeaconHandler(BaseHandler):
                     ref = ''
 
                 q = self.format_query_string(q_type, chrom, start, ref, alt, assembly, dataset)
-                logging.debug("q: {}".format(q))  
                 # perform query and format result
                 # for now always search against hg19 index...
                 res = self.web_settings.es_client.search(index='_'.join([self.web_settings.ES_INDEX_BASE, 'hg19']),
@@ -133,7 +132,13 @@ class BeaconHandler(BaseHandler):
 class BeaconInfoHandler(BaseHandler):
     # Use esq to grab metadata on myvariant.info
     #esq = ESQuery()
-    #meta = esq.get_mapping_meta()
+    def initialize(self, web_settings):
+        super(BeaconInfoHandler, self).initialize(web_settings)
+        _meta = self.web_settings.es_client.indices.get_mapping(index='_'.join([self.web_settings.ES_INDEX_BASE, 'hg19']),
+                                                        doc_type=self.web_settings.ES_DOC_TYPE)
+        self.m = _meta[list(_meta.keys())[0]]['mappings'][self.web_settings.ES_DOC_TYPE]['properties']
+        _transformer = ESResultTransformer(options=dotdict(), host=self.request.host)
+        self.meta = _transformer.clean_metadata_response(_meta)
 
     # Access Mapping Data for later use to determine assemblyID
     #m = esq._get_mapping(index = esq._index, doc_type=esq._doc_type, options=esq._get_cleaned_metadata_options({}))
