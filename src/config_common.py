@@ -13,7 +13,6 @@ def setup_default_log(log_folder):
     logger.setLevel(logging.DEBUG)
     if not fh.name in [h.name for h in logger.handlers]:
         logger.addHandler(fh)
-    print("ok setup%s" % logger)
     return logger
 
 

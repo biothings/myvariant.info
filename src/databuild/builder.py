@@ -90,6 +90,7 @@ class MyVariantDataBuilder(builder.DataBuilder):
         asyncio.set_event_loop(job_manager.loop)
         job = self.set_chrom(batch_size, job_manager)
         job = asyncio.ensure_future(job)
+        return job
 
 
 def get_chrom(doc):
