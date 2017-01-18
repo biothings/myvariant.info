@@ -10,3 +10,4 @@ docs/_build
 docs/doc_html
 src/www/static/docs
 *checkpoint.ipynb
+src/config_prod.py

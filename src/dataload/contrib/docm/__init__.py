@@ -60,10 +60,9 @@ def get_mapping():
                     "type": "string",
                     "analyzer": "string_lowercase"
                 },
-                "DOID": {
+                "doid": {
                     "type": "string",
-                    "analyzer": "string_lowercase",
-                    "index_name": "doid"
+                    "analyzer": "string_lowercase"
                 },
                 "c_position": {
                     "type": "string",

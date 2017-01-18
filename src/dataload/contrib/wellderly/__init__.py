@@ -1,4 +1,3 @@
-
 __METADATA__ = {
     "src_name": 'Wellderly',
     "src_url": 'http://www.stsiweb.org/wellderly/',
@@ -58,7 +57,8 @@ def get_mapping():
                 # },
                 "gene": {
                     "type": "string",
-                    "analyzer": "string_lowercase"
+                    "analyzer": "string_lowercase",
+                    "include_in_all": True
                 },
                 "coding_impact": {
                     "type": "string",
@@ -76,3 +76,4 @@ def get_mapping():
         }
     }
     return mapping
+

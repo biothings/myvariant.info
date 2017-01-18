@@ -81,7 +81,6 @@ class BeaconHandler(BaseHandler):
                 _transformer = ESResultTransformer(options=dotdict({'dotfield': True}), host=self.request.host)
                 res = _transformer.clean_query_GET_response(res)
                 
-                #res = self.esq.query(q, fields=dataset, dotfield=1)
                 if res and res.get('total') > 0:
                     out = self.format_output(res, out, q_type)
         return out
@@ -131,7 +130,6 @@ class BeaconHandler(BaseHandler):
 
 class BeaconInfoHandler(BaseHandler):
     # Use esq to grab metadata on myvariant.info
-    #esq = ESQuery()
     def initialize(self, web_settings):
         super(BeaconInfoHandler, self).initialize(web_settings)
         _meta = self.web_settings.es_client.indices.get_mapping(index='_'.join([self.web_settings.ES_INDEX_BASE, 'hg19']),
@@ -139,10 +137,6 @@ class BeaconInfoHandler(BaseHandler):
         self.m = _meta[list(_meta.keys())[0]]['mappings'][self.web_settings.ES_DOC_TYPE]['properties']
         _transformer = ESResultTransformer(options=dotdict(), host=self.request.host)
         self.meta = _transformer.clean_metadata_response(_meta)
-
-    # Access Mapping Data for later use to determine assemblyID
-    #m = esq._get_mapping(index = esq._index, doc_type=esq._doc_type, options=esq._get_cleaned_metadata_options({}))
-    #m = m[list(m.keys())[0]]['mappings'][esq._doc_type]['properties']
 
     # Current list of datasets in myvariant.info
     dataset_names = ['dbnsfp', 'dbsnp', 'clinvar', 'evs', 'cadd', 'mutdb', 'cosmic', 'docm', 'wellderly', 'exac']

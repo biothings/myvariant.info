@@ -2,9 +2,9 @@
 # Command line:
 #   /home/cwu/opt/devpy/bin/generateDS.py -o\
 # "clinvar.py" -s "clinvarsubs.py" /home/cwu/Desktop/clinvar_public.xsd
-import clinvar1
+import clinvar
 from itertools import groupby
-
+from utils.hgvs import get_hgvs_from_vcf
 from utils.dataload import unlist, dict_sweep, \
     value_convert, rec_handler
 
@@ -31,7 +31,7 @@ def merge_rcv_accession(generator):
             yield item[0]
 
 
-def _map_line_to_json(cp):
+def _map_line_to_json(cp, hg19):
     try:
         clinical_significance = cp.ReferenceClinVarAssertion.\
             ClinicalSignificance.Description
@@ -55,28 +55,30 @@ def _map_line_to_json(cp):
         origin = cp.ReferenceClinVarAssertion.ObservedIn[0].Sample.Origin
     except:
         origin = None
-    trait = cp.ReferenceClinVarAssertion.TraitSet.Trait[0]
-    synonyms = []
-    conditions_name = ''
-    for name in trait.Name:
-        if name.ElementValue.Type == 'Alternate':
-            synonyms.append(name.ElementValue.get_valueOf_())
-        if name.ElementValue.Type == 'Preferred':
-            conditions_name += name.ElementValue.get_valueOf_()
-    identifiers = {}
-    for item in trait.XRef:
-        if item.DB == 'Human Phenotype Ontology':
-            key = 'Human_Phenotype_Ontology'
-        else:
-            key = item.DB
-        identifiers[key.lower()] = item.ID
-    for symbol in trait.Symbol:
-        if symbol.ElementValue.Type == 'Preferred':
-            conditions_name += ' (' + symbol.ElementValue.get_valueOf_() + ')'
-    age_of_onset = ''
-    for _set in trait.AttributeSet:
-        if _set.Attribute.Type == 'age of onset':
-            age_of_onset = _set.Attribute.get_valueOf_()
+    conditions = []
+    for _trait in cp.ReferenceClinVarAssertion.TraitSet.Trait:
+        synonyms = []
+        conditions_name = ''
+        for name in _trait.Name:
+            if name.ElementValue.Type == 'Alternate':
+                synonyms.append(name.ElementValue.get_valueOf_())
+            if name.ElementValue.Type == 'Preferred':
+                conditions_name += name.ElementValue.get_valueOf_()
+        identifiers = {}
+        for item in _trait.XRef:
+            if item.DB == 'Human Phenotype Ontology':
+                key = 'Human_Phenotype_Ontology'
+            else:
+                key = item.DB
+            identifiers[key.lower()] = item.ID
+        for symbol in _trait.Symbol:
+            if symbol.ElementValue.Type == 'Preferred':
+                conditions_name += ' (' + symbol.ElementValue.get_valueOf_() + ')'
+        age_of_onset = ''
+        for _set in _trait.AttributeSet:
+            if _set.Attribute.Type == 'age of onset':
+                age_of_onset = _set.Attribute.get_valueOf_()
+        conditions.append({"name": conditions_name, "synonyms": synonyms, "identifiers": identifiers, "age_of_onset": age_of_onset})
 
     # MeasureSet.Measure return a list, there might be multiple
     # Measure under one MeasureSet
@@ -89,8 +91,8 @@ def _map_line_to_json(cp):
             continue
         allele_id = Measure.ID
         chrom = None
-        chromStart = None
-        chromEnd = None
+        chromStart_19 = None
+        chromEnd_19 = None
         chromStart_38 = None
         chromEnd_38 = None
         ref = None
@@ -100,8 +102,8 @@ def _map_line_to_json(cp):
                 # In this version, only accept information concerning GRCh37
                 if 'GRCh37' in SequenceLocation.Assembly:
                     chrom = SequenceLocation.Chr
-                    chromStart = SequenceLocation.start
-                    chromEnd = SequenceLocation.stop
+                    chromStart_19 = SequenceLocation.start
+                    chromEnd_19 = SequenceLocation.stop
                     ref = SequenceLocation.referenceAllele
                     alt = SequenceLocation.alternateAllele
                 if 'GRCh38' in SequenceLocation.Assembly:
@@ -134,6 +136,12 @@ def _map_line_to_json(cp):
         HGVS = {'genomic': [], 'coding': [], 'non-coding': [], 'protein': []}
         coding_hgvs_only = None
         hgvs_id = None
+        if hg19:
+            chromStart = chromStart_19
+            chromEnd = chromEnd_19
+        else:
+            chromStart = chromStart_38
+            chromEnd = chromEnd_38
         # hgvs_not_validated = None
         if Measure.AttributeSet:
             # 'copy number loss' or 'gain' have format different\
@@ -184,14 +192,18 @@ def _map_line_to_json(cp):
                 # Duplication' might not hava explicit alt information, \
                 # so we will parse from hgvs_genome
                 elif variation_type == 'Indel':
+                # RCV000156073, NC_000010.10:g.112581638_112581639delinsG
                     if hgvs_genome:
                         indel_position = hgvs_genome.find('del')
                         indel_alt = hgvs_genome[indel_position+3:]
                         hgvs_id = "chr%s:g.%s_%sdel%s" % \
                                   (chrom, chromStart, chromEnd, indel_alt)
                 elif variation_type == 'Deletion':
-                    hgvs_id = "chr%s:g.%s_%sdel" % \
-                              (chrom, chromStart, chromEnd)
+                    if chromStart == chromEnd:
+                        # RCV000048406, chr17:g.41243547del
+                        hgvs_id = "chr%s:g.%sdel" % (chrom, chromStart)
+                    else:
+                        hgvs_id = "chr%s:g.%s_%sdel" % (chrom, chromStart, chromEnd)
                 elif variation_type == 'Insertion':
                     if hgvs_genome:
                         ins_position = hgvs_genome.find('ins')
@@ -208,9 +220,8 @@ def _map_line_to_json(cp):
                                       (chrom, chromStart, chromEnd, dup_ref)
             elif variation_type == 'copy number loss' or\
                     variation_type == 'copy number gain':
-                if hgvs_genome:
-                    hgvs_id = "chr" + hgvs_genome.split('.')[1] +\
-                              hgvs_genome.split('.')[2]
+                if hgvs_genome and chrom:
+                    hgvs_id = "chr" + chrom + ":" + hgvs_genome.split('.')[2]
             elif hgvs_coding:
                 hgvs_id = hgvs_coding
                 coding_hgvs_only = True
@@ -257,8 +268,8 @@ def _map_line_to_json(cp):
                         "dbvar": dbvar,
                         "hg19":
                             {
-                                "start": chromStart,
-                                "end": chromEnd
+                                "start": chromStart_19,
+                                "end": chromEnd_19
                             },
                         "hg38":
                             {
@@ -280,13 +291,7 @@ def _map_line_to_json(cp):
                                 "last_evaluated": str(last_evaluated),
                                 "preferred_name": name,
                                 "origin": origin,
-                                "conditions":
-                                    {
-                                        "name": conditions_name,
-                                        "synonyms": synonyms,
-                                        "identifiers": identifiers,
-                                        "age_of_onset": age_of_onset
-                                }
+                                "conditions": conditions
                             },
                         "rsid": rsid,
                         "cytogenic": cytogenic,
@@ -302,7 +307,7 @@ def _map_line_to_json(cp):
             yield obj
 
 
-def rcv_feeder(input_file):
+def rcv_feeder(input_file, hg19):
     # the first two line of clinvar_xml is not useful information
     cv_data = rec_handler(input_file, block_end='</ClinVarSet>\n',
                           skip=2, include_block_end=True)
@@ -312,15 +317,15 @@ def rcv_feeder(input_file):
         if record.startswith('\n</ReleaseSet>'):
             continue
         try:
-            record_parsed = clinvar1.parseString(record, silence=1)
+            record_parsed = clinvar.parseString(record, silence=1)
         except:
             print(record)
             raise
-        for record_mapped in _map_line_to_json(record_parsed):
+        for record_mapped in _map_line_to_json(record_parsed, hg19):
             yield record_mapped
 
-def load_data(input_file):
-    data_generator = rcv_feeder(input_file)
+def load_data(input_file, hg19=True):
+    data_generator = rcv_feeder(input_file, hg19)
     data_list = list(data_generator)
     data_list_sorted = sorted(data_list, key=lambda k: k['_id'])
     data_merge_rcv = merge_rcv_accession(data_list_sorted)

@@ -47,7 +47,10 @@ def doc_feeder(collection, step=1000, s=None, e=None, inbatch=False, query=None,
        fields is optional parameter passed to find to restrict fields to return.
     '''
     src = get_src_db()
-    cur = src[collection].find()
+    if type(collection) == str:
+        cur = src[collection].find()
+    else:
+        cur = collection.find()
     n = cur.count()
     s = s or 0
     e = e or n
