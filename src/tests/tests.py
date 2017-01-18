@@ -189,7 +189,7 @@ class MyVariantTest(BiothingTestHelperMixin):
         res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'fields': 'dbsnp'}))
         eq_(len(res), 2)
         for _g in res:
-            eq_(set(_g), set(['_id', '_score', 'query', 'dbsnp']))
+            eq_(set(_g), set(['_id', 'query', 'dbsnp']))
 
         # TODO redo this test, doesn't test much really....
         res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'chr16:g.28883241A>G,chr11:g.66397320A>G', 'filter': 'dbsnp.chrom'}))
