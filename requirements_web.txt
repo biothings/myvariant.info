@@ -7,7 +7,7 @@ tornado==4.2.1
 elasticsearch>=2.0.0,<3.0.0
 
 # biothings
-git+https://github.com/SuLab/biothings.api.git@0e8731cb4071f01fab57f618ca1f2e9ed8cf6d20#egg=biothings
+git+https://github.com/SuLab/biothings.api.git@546f0e8f497b15f983be11b8099518ba7247e14f#egg=biothings
 
 # optional
 msgpack-python==0.4.6
