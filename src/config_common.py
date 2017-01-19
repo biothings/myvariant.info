@@ -66,6 +66,9 @@ GA_TRACKER_URL = 'MyVariant.info'
 
 STATUS_CHECK_ID = 'chr1:g.218631822G>A'
 
+# hipchat message color for this app
+HIPCHAT_MESSAGE_COLOR = 'green'
+
 # Allow searching by other ids with annotation endpoint
 ANNOTATION_ID_REGEX_LIST = [(re.compile(r'rs[0-9]+', re.I), 'dbsnp.rsid'),
                             (re.compile(r'rcv[0-9\.]+', re.I), 'clinvar.rcv.accession')]
