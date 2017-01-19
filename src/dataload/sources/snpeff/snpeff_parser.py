@@ -20,7 +20,7 @@ class VCFConstruct:
         self._chr_data = None
 
     def load_chr_data(self):
-        logger.info("\tLoading chromosome data from '%s'..." % self.genome, end='')
+        logger.info("\tLoading chromosome data from '%s'..." % self.genome)
         try:
             self._chr_data = loadobj(self.genome)
         except Exception as e:
@@ -84,7 +84,7 @@ class VCFConstruct:
         chr_bit = self._chr_data[str(chrom)]
         ref = ''
         for i in range(pos, end+1):
-            nuc_chr_bit = chr_bit[i*3-3:i*3]
+            nuc_chr_bit = chr_bit[i*4-4:i*4]
             nuc_chr = bit_to_nuc(nuc_chr_bit)
             ref += nuc_chr
         alt = ref[0]
@@ -102,7 +102,7 @@ class VCFConstruct:
         chr_bit = self._chr_data[str(chrom)]
         ref = ''
         for i in range(pos, end+1):
-            nuc_chr_bit = chr_bit[i*3-3:i*3]
+            nuc_chr_bit = chr_bit[i*4-4:i*4]
             nuc_chr = bit_to_nuc(nuc_chr_bit)
             ref += nuc_chr
         alt = ref[0]
@@ -115,7 +115,7 @@ class VCFConstruct:
         chrom = hgvs[0]
         pos = int(hgvs[1])
         chr_bit = self._chr_data[str(chrom)]
-        nuc_chr_bit = chr_bit[pos*3-3:pos*3]
+        nuc_chr_bit = chr_bit[pos*4-4:pos*4]
         ref = bit_to_nuc(nuc_chr_bit)
         alt = hgvs[3]
         alt = ref + alt
@@ -133,7 +133,7 @@ class VCFConstruct:
         chr_bit = self._chr_data[str(chrom)]
         ref = ''
         for i in range(pos, end+1):
-            nuc_chr_bit = chr_bit[i*3-3:i*3]
+            nuc_chr_bit = chr_bit[i*4-4:i*4]
             nuc_chr = bit_to_nuc(nuc_chr_bit)
             ref += nuc_chr
         alt = hgvs[3]
@@ -192,6 +192,10 @@ class VCFConstruct:
             else:
                 logger.info(item)
                 logger.info('beyond current capacity')
+        fin = open("t.vcf","w")
+        fin.write(vcf_stdin)
+        fin.close()
+        print(vcf_stdin)
         proc = subprocess.Popen(self.snpeff_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = proc.communicate(vcf_stdin.encode())
         it = iter(snpeff_valid_id)
