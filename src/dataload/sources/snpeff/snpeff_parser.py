@@ -192,10 +192,6 @@ class VCFConstruct:
             else:
                 logger.info(item)
                 logger.info('beyond current capacity')
-        fin = open("t.vcf","w")
-        fin.write(vcf_stdin)
-        fin.close()
-        print(vcf_stdin)
         proc = subprocess.Popen(self.snpeff_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = proc.communicate(vcf_stdin.encode())
         it = iter(snpeff_valid_id)
