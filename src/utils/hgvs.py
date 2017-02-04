@@ -141,13 +141,16 @@ def get_pos_start_end(chr, pos, ref, alt):
     except ValueError:
         raise ValueError("Invalid position %s" % repr(pos))
     if len(ref) == len(alt) == 1:
-        # this is a SNP
+        # end is the same as start for snp
         start = end = pos
     elif len(ref) > 1 and len(alt) == 1:
         # this is a deletion:
         assert ref[0] == alt
         start = pos + 1
         end = pos + len(ref) - 1
+        if start == end:
+            end += 1    # end is start+1 for single nt deletion     
+                        # TODO: double-check this is the right convention
     elif len(ref) == 1 and len(alt) > 1:
         # this is a insertion
         assert alt[0] == ref
