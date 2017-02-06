@@ -6,8 +6,8 @@ from utils.validate import bit_to_nuc
 from biothings.utils.common import loadobj
 from utils.hgvs import get_hgvs_from_vcf
 
-import logging
-logger = logging.getLogger("snpeff")
+from biothings import config
+logger = config.logger
 
 
 class VCFConstruct:
@@ -106,6 +106,8 @@ class VCFConstruct:
             nuc_chr = bit_to_nuc(nuc_chr_bit)
             ref += nuc_chr
         alt = ref[0]
+        if chrom == 'MT':
+            chrom = 'M'
         vcf = str(chrom) + '\t' + str(pos) + '\t' + '.' + '\t' + ref + '\t' + alt + '\t.\t.\t.\n'
         return vcf
 
@@ -149,12 +151,6 @@ class VCFConstruct:
         # extract each item from list, transform into vcf format
         snpeff_valid_id = []
         for item in varobj_list:
-            # annotations are 3kb on average, when we have N nucleotide, we have to limit
-            # the number of generated annotations, otherwise we can't store them
-            # (document is too big). 3KB * 4**5 = 3MB, we're on the safe side
-            if item.count("N") > 5:
-                logger.warning("Can't process '%s', it would produce a document too big" % item)
-                continue
             if '>' in item:
                 hgvs_info = self.snp_hgvs_id_parser(item)
                 try:
@@ -168,7 +164,6 @@ class VCFConstruct:
                 try:
                     vcf_stdin += self.del_vcf_constructor(hgvs_info)
                 except (TypeError, ValueError):
-                    #logger.info(item)
                     continue
                 snpeff_valid_id.append(item)
             elif item.endswith('del') and '_' not in item:
@@ -176,7 +171,6 @@ class VCFConstruct:
                 try:
                     vcf_stdin += self.del_vcf_constructor1(hgvs_info)
                 except (TypeError, ValueError):
-                    #logger.info(item)
                     continue
                 snpeff_valid_id.append(item)
             elif 'ins' in item and 'del' not in item:
@@ -198,6 +192,7 @@ class VCFConstruct:
             else:
                 logger.info(item)
                 logger.info('beyond current capacity')
+        logger.info("Running '%s'" % self.snpeff_cmd)
         proc = subprocess.Popen(self.snpeff_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = proc.communicate(vcf_stdin.encode())
         it = iter(snpeff_valid_id)
