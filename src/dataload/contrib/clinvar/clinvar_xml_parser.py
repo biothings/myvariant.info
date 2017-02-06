@@ -194,9 +194,13 @@ def _map_line_to_json(cp, hg19):
                 elif variation_type == 'Indel':
                 # RCV000156073, NC_000010.10:g.112581638_112581639delinsG
                     if hgvs_genome:
-                        indel_position = hgvs_genome.find('del')
+                        indel_position = hgvs_genome.find('ins')
                         indel_alt = hgvs_genome[indel_position+3:]
-                        hgvs_id = "chr%s:g.%s_%sdel%s" % \
+                        if chromStart == chromEnd:
+                            hgvs_id = "chr%s:g.%sdelin%s" % \
+                                  (chrom, chromStart, indel_alt)
+                        else:
+                            hgvs_id = "chr%s:g.%s_%sdelin%s" % \
                                   (chrom, chromStart, chromEnd, indel_alt)
                 elif variation_type == 'Deletion':
                     if chromStart == chromEnd:
