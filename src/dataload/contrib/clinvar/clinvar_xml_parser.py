@@ -192,6 +192,7 @@ def _map_line_to_json(cp, hg19):
                 # Duplication' might not hava explicit alt information, \
                 # so we will parse from hgvs_genome
                 elif variation_type == 'Indel':
+                # to_do: hgvs_genome should distinguish hg19 and hg38
                 # RCV000156073, NC_000010.10:g.112581638_112581639delinsG
                     if hgvs_genome:
                         indel_position = hgvs_genome.find('ins')
