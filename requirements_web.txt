@@ -12,6 +12,9 @@ git+https://github.com/SuLab/biothings.api.git@d3f5dc81a053b96941d8043357581e362
 # optional
 msgpack-python==0.4.6
 
+# for utils.common
+psutil
+
 # for nosetests
 nose>=1.3.7
 httplib2>=0.8
