@@ -15,10 +15,13 @@ import os
 from nose.tools import ok_, eq_
 
 from tornado.testing import AsyncHTTPTestCase
+from tornado.web import Application
 
 from .variant_list import VARIANT_POST_LIST
 from biothings.tests.test_helper import BiothingTestHelperMixin, _d, TornadoRequestHelper
-import www.index as index
+from www.settings import MyVariantWebSettings
+#import www.index as index
+
 #import config
 
 
@@ -352,8 +355,7 @@ class MyVariantTestTornadoClient(AsyncHTTPTestCase, MyVariantTest):
     def __init__(self, methodName='runTest', **kwargs):
         super(AsyncHTTPTestCase, self).__init__(methodName, **kwargs)
         self.h = TornadoRequestHelper(self)
+        self._settings = MyVariantWebSettings(config='config')
 
     def get_app(self):
-        applist = index.return_applist()
-        print(applist)
-        return index.get_app(applist)
+        return Application(self._settings.generate_app_list())
