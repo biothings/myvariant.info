@@ -2,7 +2,7 @@ import sys
 from biothings.www.api.helper import BaseHandler
 from biothings.utils.common import dotdict
 from www.api.transform import ESResultTransformer
-import logging
+#import logging
 
 class BeaconHandler(BaseHandler):
     # Initialize Assembly and Datasets
@@ -12,9 +12,13 @@ class BeaconHandler(BaseHandler):
 
     def post(self, src=None):
         self.receive_data()
+        self.ga_event_object_ret['action'] = 'beacon_post'
+        self.ga_track(self.ga_event_object_ret)
 
     def get(self, src=None):
         self.receive_data()
+        self.ga_event_object_ret['action'] = 'beacon_get'
+        self.ga_track(self.ga_event_object_ret)
 
     def receive_data(self):
         chrom = self.get_argument('referenceName', None)
@@ -144,9 +148,13 @@ class BeaconInfoHandler(BaseHandler):
 
     def get(self):
         self.get_beacon_info()
+        self.ga_event_object_ret['action'] = 'beacon_info_post'
+        self.ga_track(self.ga_event_object_ret)
 
     def post(self):
         self.get_beacon_info()
+        self.ga_event_object_ret['action'] = 'beacon_info_post'
+        self.ga_track(self.ga_event_object_ret)
 
     def get_beacon_info(self):
         # Boilerplate Beacon Info
