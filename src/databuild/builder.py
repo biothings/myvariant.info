@@ -120,6 +120,7 @@ def chrom_worker(col_name, ids):
     bob = col.initialize_unordered_bulk_op()  
     disagreed = []
     missing = []
+    at_least_one = False
     for doc in cur:
         dchrom = get_chrom(doc)
         if dchrom["chrom"] is None:
@@ -127,6 +128,9 @@ def chrom_worker(col_name, ids):
         elif dchrom["agreed"] == False:
             disagreed.append(doc["_id"])
         chrom = dchrom["chrom"]
-        bob.find({"_id": doc["_id"]}).update({"$set": {"chrom" : chrom}})
-    bob.execute()
+        if chrom:
+            bob.find({"_id": doc["_id"]}).update({"$set": {"chrom" : chrom}})
+            at_least_one = True
+    at_least_one and bob.execute()
+
     return {"missing": missing, "disagreed" : disagreed}
