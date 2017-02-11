@@ -78,7 +78,7 @@ class MyVariantDataBuilder(builder.DataBuilder):
                 bnum += 1
         self.logger.info("%d jobs created for merging step" % len(jobs))
         if jobs:
-            yield from asyncio.wait(jobs)
+            yield from asyncio.gather(*jobs)
             self.logger.info("Found %d missing 'chrom' and %d where resources disagreed" % (len(results["missing"]), len(results["disagreed"])))
             if results["missing"] or results["disagreed"]:
                 fn = "chrom_%s_%s.pickle" % (self.target_backend.target_name,datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
