@@ -144,6 +144,14 @@ class VCFConstruct:
         vcf = str(chrom) + '\t' + str(pos) + '\t' + '.' + '\t' + ref + '\t' + alt + '\t.\t.\t.\n'
         return vcf
 
+    def check_hgvs_info(self,hgvs_info):
+        if len(hgvs_info) == 4:
+            # last one should be a nucleotide
+            # TODO: restrict to [ATGC]
+            if not re.match("\D+",hgvs_info[3]):
+                logger.warning("Skipping HGVS %s" % repr(hgvs_info))
+                raise ValueError("Invalid HGVS info: %s" % repr(hgvs_info))
+
     def annotate_by_snpeff(self, varobj_list):
         '''load data'''
         # title of vcf
@@ -154,6 +162,7 @@ class VCFConstruct:
             if '>' in item:
                 hgvs_info = self.snp_hgvs_id_parser(item)
                 try:
+                    self.check_hgvs_info(hgvs_info)
                     vcf_stdin += self.snp_vcf_constructer(hgvs_info)
                 except (TypeError, ValueError):
                     #logger.info(item)
@@ -162,6 +171,7 @@ class VCFConstruct:
             elif item.endswith('del') and '_' in item:
                 hgvs_info = self.del_hgvs_id_parser(item)
                 try:
+                    self.check_hgvs_info(hgvs_info)
                     vcf_stdin += self.del_vcf_constructor(hgvs_info)
                 except (TypeError, ValueError):
                     continue
@@ -169,6 +179,7 @@ class VCFConstruct:
             elif item.endswith('del') and '_' not in item:
                 hgvs_info = self.del_hgvs_id_parser1(item)
                 try:
+                    self.check_hgvs_info(hgvs_info)
                     vcf_stdin += self.del_vcf_constructor1(hgvs_info)
                 except (TypeError, ValueError):
                     continue
@@ -176,6 +187,7 @@ class VCFConstruct:
             elif 'ins' in item and 'del' not in item:
                 hgvs_info = self.ins_hgvs_id_parser(item)
                 try:
+                    self.check_hgvs_info(hgvs_info)
                     vcf_stdin += self.ins_vcf_constructor(hgvs_info)
                 except (TypeError, ValueError):
                     #logger.info(item)
@@ -184,6 +196,7 @@ class VCFConstruct:
             elif 'delins' in item:
                 hgvs_info = self.delins_hgvs_id_parser(item)
                 try:
+                    self.check_hgvs_info(hgvs_info)
                     vcf_stdin += self.delins_vcf_constructor(hgvs_info)
                 except (TypeError, ValueError):
                     #logger.info(item)
