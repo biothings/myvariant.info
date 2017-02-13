@@ -1,4 +1,4 @@
-import re, os, sys
+import re, os, sys, pickle, datetime
 import subprocess
 
 from biothings.utils.dataload import unlist, dict_sweep
@@ -147,10 +147,11 @@ class VCFConstruct:
     def check_hgvs_info(self,hgvs_info):
         if len(hgvs_info) == 4:
             # last one should be a nucleotide
-            # TODO: restrict to [ATGC]
-            if not re.match("\D+",hgvs_info[3]):
+            if not re.match("[ATGC]",hgvs_info[3]):
                 logger.warning("Skipping HGVS %s" % repr(hgvs_info))
-                raise ValueError("Invalid HGVS info: %s" % repr(hgvs_info))
+                raise ValueError("Invalid nucleotide in HGVS info: %s" % repr(hgvs_info))
+        if hgvs_info[0] in ['None',None]:
+            raise ValueError("Invalid chromosome in HGVS info: %s" % repr(hgvs_info))
 
     def annotate_by_snpeff(self, varobj_list):
         '''load data'''
@@ -210,7 +211,11 @@ class VCFConstruct:
         (stdout, stderr) = proc.communicate(vcf_stdin.encode())
         it = iter(snpeff_valid_id)
         if stderr.decode() != '':
-            raise Exception("Something went wrong while generating snpeff annotation:\n%s" % stderr)
+            fn = "snpeff_err_%s.pickle" % datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            pickle.dump({"valid_ids":snpeff_valid_id,
+                         "vcf_stdin":vcf_stdin.splitlines(),
+                         "stderr": stderr.decode()},open(fn,"wb"))
+            raise Exception("Something went wrong while generating snpeff annotation (see dump %s for more):\n%s" % (fn,stderr.decode()))
 
         strout = stdout.decode()
         vcf_stdout_raw = strout.split('\n')
