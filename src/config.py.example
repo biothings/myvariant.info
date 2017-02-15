@@ -1,45 +1,73 @@
+from config_common import *
+
 import os.path
 
 SRC_PATH = os.path.split(os.path.abspath(__file__))[0]
 
-
-######################################
-# For both dataload and www modules  #
-######################################
-
+# *****************************************************************************
+# Elasticsearch variables
+# *****************************************************************************
+# elasticsearch server transport url
 ES_HOST = 'localhost:9200'
+# default elasticsearch index name
 ES_INDEX_NAME = 'myvariant_current'
+# elasticsearch document type
 ES_DOC_TYPE = 'variant'
+# Only these options are passed to the elasticsearch query from kwargs
+ES_SCROLL_TIME = '1m'
+ES_SCROLL_SIZE = 1000
 
-ES_QUERY_MODULE = "www.api.es"
+# *****************************************************************************
+# myvariant.info specific settings
+# *****************************************************************************
+HG38_FIELDS = ['clinvar.hg38', 'dbnsfp.hg38', 'evs.hg38']
+HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19', 'dbsnp.hg19', 'docm.hg19', 'evs.hg19', 'grasp.hg19'] #, 'mutdb.hg19', 'wellderly.hg19']
+CHROM_FIELDS = ['cadd.chrom', 'clinvar.chrom', 'cosmic.chrom', 'dbnsfp.chrom', 'dbsnp.chrom', 'docm.chrom',
+                'evs.chrom', 'exac.chrom']#, 'mutdb.chrom', 'wellderly.chrom']
+ES_INDEX_BASE = 'myvariant_current_201607'
+DEFAULT_ASSEMBLY = 'hg19'
+SUPPORTED_ASSEMBLIES = ['hg19', 'hg38']
 
 
 ###############################
 # For dataload module only    #
 ###############################
 
+# webserver to show hub status
+DATA_WWW_ROOT_URL = "http://localhost:8000"
+
 # defautlt number_of_shards when create a new index
 ES_NUMBER_OF_SHARDS = 20
 
 DATA_SRC_SERVER = 'localhost'
 DATA_SRC_PORT = 27017
-DATA_SRC_DATABASE = 'variantdoc'
-DATA_SRC_MASTER_COLLECTION = 'src_master'   #for metadata of each src collections
-DATA_SRC_DUMP_COLLECTION = 'src_dump'       #for src data download information
-TA_SRC_BUILD_COLLECTION = 'src_build'       #for src data build information
+DATA_SRC_DATABASE = 'variantdoc_src'
+DATA_SRC_SERVER_USERNAME = ''
+DATA_SRC_SERVER_PASSWORD = ''
 
-DATA_SERVER_USERNAME = ''
-DATA_SERVER_PASSWORD = ''
+DATA_TARGET_SERVER = 'localhost'
+DATA_TARGET_PORT = 27017
+DATA_TARGET_DATABASE = 'variantdoc'
+DATA_TARGET_SERVER_USERNAME = ''
+DATA_TARGET_SERVER_PASSWORD = ''
 
-HG19_DATAFILE = '/path/to/hg19_bit_p13.pyobj'
+
+DATA_ARCHIVE_ROOT = '/path/to/archive/directory'
+DIFF_PATH = os.path.join(DATA_ARCHIVE_ROOT,"diff")
+
+LOG_FOLDER = os.path.join(DATA_ARCHIVE_ROOT,'logs')
+setup_default_log(LOG_FOLDER)
+
+# fill with "token", "roomid" and "from" keys
+# to broadcast message to a Hipchat room
+HIPCHAT_CONFIG = { "token" : "", "roomid" : "", "from" : "" }
+
+
 
 ###############################
 # For www module only         #
 ###############################
-FIELD_NOTES_PATH = os.path.join(SRC_PATH, 'www/context/myvariant_field_table_notes.json')
-JSONLD_CONTEXT_PATH = os.path.join(SRC_PATH, 'www/context/context.json')
 GA_ACCOUNT = ''
 RUN_IN_PROD = False    # set to True in prod server
 INCLUDE_DOCS = not RUN_IN_PROD
 
-STATUS_CHECK_ID = 'chr1:g.218631822G>A'

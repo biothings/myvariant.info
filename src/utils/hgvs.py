@@ -136,6 +136,10 @@ def get_hgvs_from_vcf(chr, pos, ref, alt, mutant_type=None):
 
 def get_pos_start_end(chr, pos, ref, alt):
     '''get start,end tuple from VCF-style "chr, pos, ref, alt" data.'''
+    try:
+        pos = int(pos)
+    except ValueError:
+        raise ValueError("Invalid position %s" % repr(pos))
     if len(ref) == len(alt) == 1:
         # end is the same as start for snp
         start = end = pos
