@@ -6,7 +6,7 @@ import biothings.utils.mongo as mongo
 
 VALID_COLUMN_NO = 70
 
-dbsnp_col = mongo.get_src_db()["dbsnp"]
+dbsnp_col = mongo.get_src_db()["dbsnp_hg19"]
 
 def safe_str(s):
     uc = s.decode('cp1252')
@@ -132,4 +132,5 @@ def load_data(input_file):
     json_rows = map(_map_line_to_json, grasp)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-    return (merge_duplicate_rows(rg, "grasp") for rg in row_groups)
+    for row in (merge_duplicate_rows(rg, "grasp") for rg in row_groups):
+        yield row
