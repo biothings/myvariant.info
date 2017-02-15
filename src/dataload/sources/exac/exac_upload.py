@@ -446,7 +446,7 @@ class ExacUploader(ExacBaseUploader):
     def load_data(self,data_folder):
         content = glob.glob(os.path.join(data_folder,"ExAC.r*.vcf"))
         if len(content) != 1:
-            raise uploader.ResourceException("Expecting one single vcf file, got: %s" % repr(content))
+            raise uploader.ResourceError("Expecting one single vcf file, got: %s" % repr(content))
         input_file = content.pop()
         self.logger.info("Load data from file '%s'" % input_file)
         return load_data(self.__class__.name, input_file)
@@ -460,7 +460,7 @@ class ExacNonTCGAUploader(ExacBaseUploader):
     def load_data(self,data_folder):
         content = glob.glob(os.path.join(data_folder,"ExAC_nonTCGA.r*.vcf"))
         if len(content) != 1:
-            raise uploader.ResourceException("Expecting one single vcf file, got: %s" % repr(content))
+            raise uploader.ResourceError("Expecting one single vcf file, got: %s" % repr(content))
         input_file = content.pop()
         self.logger.info("Load data from file '%s'" % input_file)
         return load_data(self.__class__.name, input_file)
