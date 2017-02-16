@@ -14,7 +14,7 @@ thread_queue = concurrent.futures.ThreadPoolExecutor()
 loop.set_default_executor(process_queue)
 jmanager = JobManager(loop,
                       process_queue, thread_queue,
-                      max_memory_usage=None,
+                      max_memory_usage=20*1024**3, # 20GiB
                       )
 
 import dataload
@@ -72,7 +72,7 @@ passwords = {
 
 from biothings.utils.hub import start_server
 
-server = start_server(loop, "MyVariant hub",passwords=passwords,port=8022,commands=COMMANDS)
+server = start_server(loop, "MyVariant hub",passwords=passwords,port=config.SSH_HUB_PORT,commands=COMMANDS)
 
 try:
     loop.run_until_complete(server)

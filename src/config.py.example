@@ -51,12 +51,13 @@ DATA_TARGET_DATABASE = 'variantdoc'
 DATA_TARGET_SERVER_USERNAME = ''
 DATA_TARGET_SERVER_PASSWORD = ''
 
+SSH_HUB_PORT = 18022
 
 DATA_ARCHIVE_ROOT = '/path/to/archive/directory'
 DIFF_PATH = os.path.join(DATA_ARCHIVE_ROOT,"diff")
 
 LOG_FOLDER = os.path.join(DATA_ARCHIVE_ROOT,'logs')
-setup_default_log(LOG_FOLDER)
+logger  =setup_default_log("hub",LOG_FOLDER)
 
 # fill with "token", "roomid" and "from" keys
 # to broadcast message to a Hipchat room
