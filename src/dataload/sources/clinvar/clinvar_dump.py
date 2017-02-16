@@ -6,7 +6,7 @@ import time
 import biothings, config
 biothings.config_for_app(config)
 
-from config import DATA_ARCHIVE_ROOT
+from config import DATA_ARCHIVE_ROOT, logger as logging
 from biothings.dataload.dumper import FTPDumper
 
 
@@ -53,6 +53,39 @@ class ClinvarDumper(FTPDumper):
             xsd = "clinvar_public.xsd"
             localxsdfile = os.path.join(self.new_data_folder,xsd)
             self.to_dump.append({"remote": "../%s" % xsd, "local":localxsdfile})
+
+    def post_dump(self):
+        generate_clinvar_lib(self.new_data_folder)
+        
+
+def generate_clinvar_lib(data_folder):
+    orig_path = os.getcwd()
+    try:
+        os.chdir(data_folder)
+        logging.info("Generate XM parser")
+        ret = os.system('''generateDS.py -f -o "clinvar_tmp.py" -s "clinvarsubs.py" clinvar_public.xsd''')
+        if ret != 0:
+            logging.error("Unable to generate parser, return code: %s" % ret)
+            raise
+        try:
+            py = open("clinvar_tmp.py").read()
+            # convert py2 to py3 (though they claim it support both versions)
+            py = py.replace("from StringIO import StringIO","from io import StringIO")
+            fout = open("clinvar.py","w")
+            fout.write(py)
+            fout.close()
+            os.unlink("clinvar_tmp.py")
+            # can we import it ?
+            import clinvar
+        except Exception as e:
+            logging.error("Cannot convert to py3...")
+    finally:
+        os.chdir(orig_path)
+
+    logging.info("Found generated clinvar module: %s" % clinvar)
+
+
+
 
 def main():
     dumper = ClinvarDumper()

@@ -14,39 +14,11 @@ from biothings.utils.dataload import unlist, dict_sweep, \
 GLOB_PATTERN = "ClinVarFullRelease_*.xml.gz"
 clinvar = None
 
-def generate_clinvar_lib(data_folder):
+def import_clinvar_lib(data_folder):
     sys.path.insert(0,data_folder)
-    try:
-        import clinvar as clinvar_mod
-        global clinvar
-        clinvar = clinvar_mod
-    except ImportError:
-        # ok, generate xml parser
-        orig_path = os.getcwd()
-        try:
-            os.chdir(data_folder)
-            logging.info("Generate XM parser")
-            ret = os.system('''generateDS.py -f -o "clinvar_tmp.py" -s "clinvarsubs.py" clinvar_public.xsd''')
-            if ret != 0:
-                logging.error("Unable to generate parser, return code: %s" % ret)
-                raise
-            try:
-                py = open("clinvar_tmp.py").read()
-                # convert py2 to py3 (though they claim it support both versions)
-                py = py.replace("from StringIO import StringIO","from io import StringIO")
-                fout = open("clinvar.py","w")
-                fout.write(py)
-                fout.close()
-                os.unlink("clinvar_tmp.py")
-            except Exception as e:
-                logging.error("Cannot convert to py3...")
-        finally:
-            os.chdir(orig_path)
-        # now try again
-        import clinvar
-
-    logging.info("Found generated clinvar module: %s" % clinvar)
-
+    import clinvar as clinvar_mod
+    global clinvar
+    clinvar = clinvar_mod
 
 def merge_rcv_accession(generator):
     groups = []
@@ -373,7 +345,7 @@ def load_data(hg19=True, data_folder=None):
     global logging
     logging = loggingmod.getLogger("clinvar_upload")
 
-    generate_clinvar_lib(data_folder)
+    import_clinvar_lib(data_folder)
     files = glob.glob(os.path.join(data_folder,GLOB_PATTERN))
     assert len(files) == 1, "Expecting only one file matching '%s', got: %s" % (GLOB_PATTERN,files)
     input_file = files[0]
