@@ -58,7 +58,7 @@ def _map_line_to_json(fields, version):
         "_id": HGVS,
         "evs":
             {
-                "chrom": chrom,
+                "chrom": str(chrom),
                 "hg19":
                     {
                         "start": hg19[0],
