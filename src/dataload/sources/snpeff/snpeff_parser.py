@@ -10,12 +10,8 @@ from biothings import config
 logger = config.logger
 
 
-class VCFConstruct:
-    def __init__(self,cmd, genome):
-        if type(cmd) == str:
-            self.snpeff_cmd = cmd.split()
-        else:
-            self.snpeff_cmd = cmd
+class VCFConstruct(object):
+    def __init__(self, genome):
         self.genome = genome
         self._chr_data = None
 
@@ -36,14 +32,14 @@ class VCFConstruct:
             r = mat.groups()
             return r
 
-    def del_hgvs_id_parser(self, id):
+    def del_hgvs_id_parser_interval(self, id):
         pat = 'chr(\w+):g\.(\d+)\_(\d+)del'
         mat = re.match(pat, id)
         if mat:
             r = mat.groups()
             return r
 
-    def del_hgvs_id_parser1(self, id):
+    def del_hgvs_id_parser(self, id):
         pat = 'chr(\w+):g\.(\d+)del'
         mat = re.match(pat, id)
         if mat:
@@ -64,7 +60,7 @@ class VCFConstruct:
             r = mat.groups()
             return r
 
-    def snp_vcf_constructer(self, hgvs):
+    def snp_vcf_constructor(self, hgvs):
         '''construct a VCF file based on chr, pos, ref, alt information'''
         chrom = hgvs[0]
         if chrom == 'MT':
@@ -72,7 +68,7 @@ class VCFConstruct:
         pos = hgvs[1]
         ref = hgvs[2]
         alt = hgvs[3]
-        vcf = str(chrom) + '\t' + str(pos) + '\t' + '.' + '\t' + ref + '\t' + alt + '\t.\t.\t.\n'
+        vcf = {"chrom": str(chrom), "pos": str(pos), "ref": ref, "alt": alt}
         return vcf
 
     def del_vcf_constructor(self, hgvs):
@@ -80,7 +76,11 @@ class VCFConstruct:
             self.load_chr_data()
         chrom = hgvs[0]
         pos = int(hgvs[1]) - 1
-        end = int(hgvs[2])
+        # len=2 was a single del, len=3 was internval del
+        if len(hgvs) == 2:
+            end = int(hgvs[1])
+        else:
+            end = int(hgvs[2])
         chr_bit = self._chr_data[str(chrom)]
         ref = ''
         for i in range(pos, end+1):
@@ -90,25 +90,7 @@ class VCFConstruct:
         alt = ref[0]
         if chrom == 'MT':
             chrom = 'M'
-        vcf = str(chrom) + '\t' + str(pos) + '\t' + '.' + '\t' + ref + '\t' + alt + '\t.\t.\t.\n'
-        return vcf
-
-    def del_vcf_constructor1(self, hgvs):
-        if self._chr_data is None:
-            self.load_chr_data()
-        chrom = hgvs[0]
-        pos = int(hgvs[1]) - 1
-        end = int(hgvs[1])
-        chr_bit = self._chr_data[str(chrom)]
-        ref = ''
-        for i in range(pos, end+1):
-            nuc_chr_bit = chr_bit[i*4-4:i*4]
-            nuc_chr = bit_to_nuc(nuc_chr_bit)
-            ref += nuc_chr
-        alt = ref[0]
-        if chrom == 'MT':
-            chrom = 'M'
-        vcf = str(chrom) + '\t' + str(pos) + '\t' + '.' + '\t' + ref + '\t' + alt + '\t.\t.\t.\n'
+        vcf = {"chrom": str(chrom), "pos": str(pos), "ref": ref, "alt": alt}
         return vcf
 
     def ins_vcf_constructor(self, hgvs):
@@ -123,7 +105,7 @@ class VCFConstruct:
         alt = ref + alt
         if chrom == 'MT':
             chrom = 'M'
-        vcf = str(chrom) + '\t' + str(pos) + '\t' + '.' + '\t' + ref + '\t' + alt + '\t.\t.\t.\n'
+        vcf = {"chrom": str(chrom), "pos": str(pos), "ref": ref, "alt": alt}
         return vcf
 
     def delins_vcf_constructor(self, hgvs):
@@ -141,91 +123,116 @@ class VCFConstruct:
         alt = hgvs[3]
         if chrom == 'MT':
             chrom = 'M'
-        vcf = str(chrom) + '\t' + str(pos) + '\t' + '.' + '\t' + ref + '\t' + alt + '\t.\t.\t.\n'
+        vcf = {"chrom": str(chrom), "pos": str(pos), "ref": ref, "alt": alt}
         return vcf
 
+    def build_vcfs(self, hgvs_ids):
+        '''load data'''
+        # extract each hgvs_id from list, transform into vcf format
+        hgvs_vcfs = {}
+        for hgvs_id in hgvs_ids:
+            if '>' in hgvs_id:
+                hgvs_info = self.snp_hgvs_id_parser(hgvs_id)
+                if not hgvs_info:
+                    continue
+                vcf = self.snp_vcf_constructor(hgvs_info)
+                hgvs_vcfs[hgvs_id] = {"_id" : hgvs_id, "vcf" : vcf}
+
+            elif hgvs_id.endswith('del') and '_' in hgvs_id:
+                hgvs_info = self.del_hgvs_id_parser_interval(hgvs_id)
+                if not hgvs_info:
+                    continue
+                vcf = self.del_vcf_constructor(hgvs_info)
+                hgvs_vcfs[hgvs_id] = {"_id" : hgvs_id, "vcf" : vcf}
+
+            elif hgvs_id.endswith('del') and '_' not in hgvs_id:
+                hgvs_info = self.del_hgvs_id_parser(hgvs_id)
+                if not hgvs_info:
+                    continue
+                vcf = self.del_vcf_constructor(hgvs_info)
+                hgvs_vcfs[hgvs_id] = {"_id" : hgvs_id, "vcf" : vcf}
+
+            elif 'ins' in hgvs_id and 'del' not in hgvs_id:
+                hgvs_info = self.ins_hgvs_id_parser(hgvs_id)
+                if not hgvs_info:
+                    continue
+                vcf = self.ins_vcf_constructor(hgvs_info)
+                hgvs_vcfs[hgvs_id] = {"_id" : hgvs_id, "vcf" : vcf}
+
+            elif 'delins' in hgvs_id:
+                hgvs_info = self.delins_hgvs_id_parser(hgvs_id)
+                if not hgvs_info:
+                    continue
+                vcf = self.delins_vcf_constructor(hgvs_info)
+                hgvs_vcfs[hgvs_id] = {"_id" : hgvs_id, "vcf" : vcf}
+
+            else:
+                logger.info('%s: beyond current capacity, skip it' % hgvs_id)
+                continue
+
+        return hgvs_vcfs
+
+
+class SnpeffAnnotator(object):
+
+    def __init__(self,cmd):
+        if type(cmd) == str:
+            self.snpeff_cmd = cmd.split()
+        else:
+            self.snpeff_cmd = cmd
+
     def check_hgvs_info(self,hgvs_info):
-        if len(hgvs_info) == 4:
-            # last one should be a nucleotide
-            if not re.match("[ATGC]",hgvs_info[3]):
-                logger.warning("Skipping HGVS %s" % repr(hgvs_info))
-                raise ValueError("Invalid nucleotide in HGVS info: %s" % repr(hgvs_info))
-        if hgvs_info[0] in ['None',None]:
+        # last one should be a nucleotide
+        if not re.match("[ATGC]",hgvs_info["alt"]):
+            raise ValueError("Invalid nucleotide in HGVS info: %s" % repr(hgvs_info))
+        if hgvs_info["chrom"] in ['None',None]:
             raise ValueError("Invalid chromosome in HGVS info: %s" % repr(hgvs_info))
 
-    def annotate_by_snpeff(self, varobj_list):
-        '''load data'''
+
+    def annotate(self,hgvs_vcfs):
+        """hgvs_vcfs: list of {"vcf": {}, "_id": ""}"""
+
         # title of vcf
-        vcf_stdin = '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n'
-        # extract each item from list, transform into vcf format
-        snpeff_valid_id = []
-        for item in varobj_list:
-            if '>' in item:
-                hgvs_info = self.snp_hgvs_id_parser(item)
-                try:
-                    self.check_hgvs_info(hgvs_info)
-                    vcf_stdin += self.snp_vcf_constructer(hgvs_info)
-                except (TypeError, ValueError):
-                    #logger.info(item)
-                    continue
-                snpeff_valid_id.append(item)
-            elif item.endswith('del') and '_' in item:
-                hgvs_info = self.del_hgvs_id_parser(item)
-                try:
-                    self.check_hgvs_info(hgvs_info)
-                    vcf_stdin += self.del_vcf_constructor(hgvs_info)
-                except (TypeError, ValueError):
-                    continue
-                snpeff_valid_id.append(item)
-            elif item.endswith('del') and '_' not in item:
-                hgvs_info = self.del_hgvs_id_parser1(item)
-                try:
-                    self.check_hgvs_info(hgvs_info)
-                    vcf_stdin += self.del_vcf_constructor1(hgvs_info)
-                except (TypeError, ValueError):
-                    continue
-                snpeff_valid_id.append(item)
-            elif 'ins' in item and 'del' not in item:
-                hgvs_info = self.ins_hgvs_id_parser(item)
-                try:
-                    self.check_hgvs_info(hgvs_info)
-                    vcf_stdin += self.ins_vcf_constructor(hgvs_info)
-                except (TypeError, ValueError):
-                    #logger.info(item)
-                    continue
-                snpeff_valid_id.append(item)
-            elif 'delins' in item:
-                hgvs_info = self.delins_hgvs_id_parser(item)
-                try:
-                    self.check_hgvs_info(hgvs_info)
-                    vcf_stdin += self.delins_vcf_constructor(hgvs_info)
-                except (TypeError, ValueError):
-                    #logger.info(item)
-                    continue
-                snpeff_valid_id.append(item)
-            else:
-                logger.info(item)
-                logger.info('beyond current capacity')
+        vcf_stdin = ['#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO']
         logger.info("Running '%s'" % self.snpeff_cmd)
+        for hgvs_id in hgvs_vcfs:
+            vcf = hgvs_vcfs[hgvs_id]["vcf"]
+            try:
+                self.check_hgvs_info(vcf)
+            except (TypeError, ValueError) as e:
+                logger.warning("Skipping HGVS %s: %s" % (repr(hgvs_vcfs[hgvs_id]),e))
+                continue
+            # add hgvs ID at the end so we can match for sure which annotations correspond to which ID 
+            # instead of rebuild it from VCF info (they can be different)
+            # this comment will be at the first position in the result line
+            vcf_stdin.append(str(vcf["chrom"]) + '\t' + str(vcf["pos"]) + '\t' + '.' + '\t' + vcf["ref"] + '\t' + vcf["alt"] + '\t.\t.\t.' + "\t# hgvs:" + hgvs_id)
+
         proc = subprocess.Popen(self.snpeff_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (stdout, stderr) = proc.communicate(vcf_stdin.encode())
-        it = iter(snpeff_valid_id)
+        (stdout, stderr) = proc.communicate("\n".join(vcf_stdin).encode())
         if stderr.decode() != '':
             fn = "snpeff_err_%s.pickle" % datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            pickle.dump({"valid_ids":snpeff_valid_id,
-                         "vcf_stdin":vcf_stdin.splitlines(),
-                         "stderr": stderr.decode()},open(fn,"wb"))
+            pickle.dump({"input" : hgvs_vcfs,
+                         "vcf_stdin" : vcf_stdin,
+                         "stderr" : stderr.decode()},open(fn,"wb"))
             raise Exception("Something went wrong while generating snpeff annotation (see dump %s for more):\n%s" % (fn,stderr.decode()))
 
         strout = stdout.decode()
-        vcf_stdout_raw = strout.split('\n')
+        vcf_stdout_raw = strout.splitlines()
         for vcf_line in vcf_stdout_raw:
             if vcf_line.startswith('#'):
                 continue
             elif vcf_line == '':
                 continue
             else:
-                # assume the first item is 'ANN'
+                fromi = vcf_line.index("#")
+                str_id = vcf_line[fromi:]
+                hgvs_info = str_id.replace("#","").strip().split(":")
+                # extract HGVS
+                assert hgvs_info[0] == "hgvs", "Can't find HGVS ID in VCF line '%s'" % repr(vcf_line)
+                hgvs_id = ":".join(hgvs_info[1:])
+                # -1: remove the tab char also, before #
+                vcf_line = vcf_line[:fromi-1]
+                # assume the following item is 'ANN'
                 ann_info = vcf_line.split(';')[0]
                 ann = []
                 # Multiple annotations per VCF line
@@ -326,14 +333,6 @@ class VCFConstruct:
                             "percent_of_transcripts_affected": pt_nmd
                         }
                 (chrom, pos, _id, ref, alt) = ann_info.split('\t')[0:5]
-                if chrom == 'M':
-                    chrom = 'MT'
-                try:
-                    hgvs_id = get_hgvs_from_vcf(chrom, pos, ref, alt)
-                except Exception as e:
-                    logger.info(e)
-                    next(it)
-                    continue
                 one_snp_json = {
                     "_id": hgvs_id,
                     "snpeff": {
@@ -341,16 +340,7 @@ class VCFConstruct:
                         "lof": lof,
                         "nmd": nmd,
                     },
-                    "vcf": {
-                        "position": pos,
-                        "ref": ref,
-                        "alt": alt
-                    }
                 }
                 snpeff_json = dict_sweep(unlist(one_snp_json), vals=['', None])
-                orig_id = next(it)
-                if orig_id != snpeff_json["_id"]:
-                    logger.info("Skip, hgvs IDs are different: '%s' != '%s'" % (orig_id,snpeff_json["_id"]))
-                    continue
 
                 yield snpeff_json

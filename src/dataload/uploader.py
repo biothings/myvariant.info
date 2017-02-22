@@ -6,6 +6,7 @@ from biothings.dataload.storage import UpsertStorage
 from biothings.utils.mongo import doc_feeder
 import biothings.utils.mongo as mongo
 from biothings.utils.common import iter_n
+from biothings.utils.dataload import dict_attrmerge
 
 import dataload.sources.snpeff.snpeff_upload as snpeff_upload
 import dataload.sources.snpeff.snpeff_parser as snpeff_parser
@@ -39,7 +40,8 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
         genomes = glob.glob(os.path.join(snpeff_dir,"..","data","%s_genome.*" % version))
         assert len(genomes) == 1, "Expected only one genome files for '%s', got: %s" % (version,genomes)
         genome = genomes[0]
-        parser = snpeff_parser.VCFConstruct(cmd,genome)
+        annotator = snpeff_parser.SnpeffAnnotator(cmd)
+        vcf_builder = snpeff_parser.VCFConstruct(genome)
         storage = UpsertStorage(None,snpeff_class.name,self.logger)
         col = self.db[self.collection_name]
         total = math.ceil(col.count()/batch_size)
@@ -48,8 +50,12 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
 
         def process(ids):
             self.logger.info("%d documents to annotate" % len(ids))
-            data = parser.annotate_by_snpeff(ids)
-            data = annotate_vcf(data,version)
+            hgvs_vcfs = vcf_builder.build_vcfs(ids)
+            # merge "vcf" and snpeff annotations keys when possible
+            # (it no snpeff data, we keep 'vcf' data)
+            for annot in annotator.annotate(hgvs_vcfs):
+                hgvs_vcfs[annot["_id"]].update(annot)
+            data = annotate_start_end(hgvs_vcfs,version)
             storage.process(data, batch_size)
 
         for doc_ids in doc_feeder(col, step=batch_size, inbatch=True, fields={'_id':1}):
@@ -84,9 +90,10 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
         self.do_snpeff(force=force)
 
 
-def annotate_vcf(docs, assembly):
-    for doc in docs:
+def annotate_start_end(hgvs_vcfs, assembly):
+    for hgvs_id in hgvs_vcfs:
         st,end = None,None
+        doc = hgvs_vcfs[hgvs_id]
         if 'vcf' in doc:
             try:
                 st, end = get_pos_start_end(
