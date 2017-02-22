@@ -12,6 +12,7 @@ import dataload.sources.snpeff.snpeff_upload as snpeff_upload
 import dataload.sources.snpeff.snpeff_parser as snpeff_parser
 
 from utils.hgvs import get_pos_start_end
+from config import MAX_REF_ALT_LEN
 
 class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
 
@@ -54,7 +55,15 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
             # merge "vcf" and snpeff annotations keys when possible
             # (it no snpeff data, we keep 'vcf' data)
             for annot in annotator.annotate(hgvs_vcfs):
+                vcf = hgvs_vcfs[annot["_id"]]
+                # trim if sequence is to big
+                for k in ["alt","ref"]:
+                    if len(vcf["vcf"][k]) > MAX_REF_ALT_LEN:
+                        msg = "...(trimmed)"
+                        vcf["vcf"][k] = vcf["vcf"][k][:MAX_REF_ALT_LEN - len(msg)] + msg
+                hgvs_vcfs[annot["_id"]] = vcf
                 hgvs_vcfs[annot["_id"]].update(annot)
+
             data = annotate_start_end(hgvs_vcfs,version)
             storage.process(data, batch_size)
 

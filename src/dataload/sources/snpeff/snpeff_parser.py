@@ -11,6 +11,7 @@ logger = config.logger
 
 
 class VCFConstruct(object):
+
     def __init__(self, genome):
         self.genome = genome
         self._chr_data = None

@@ -108,3 +108,5 @@ CHROM_FIELDS = {'cadd':'chrom', 'clinvar':'chrom', 'cosmic':'chrom', 'dbnsfp':'c
 HG38_FIELDS = ['clinvar.hg38', 'dbnsfp.hg38', 'evs.hg38']
 HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19', 'dbsnp.hg19', 'docm.hg19', 'evs.hg19', 'grasp.hg19']
 
+# Max length for vcf.alt and vcf.ref fields (must be less than 32k, ElasticSearch limit)
+MAX_REF_ALT_LEN = 1000
