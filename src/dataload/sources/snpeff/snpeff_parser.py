@@ -69,7 +69,7 @@ class VCFConstruct(object):
         pos = hgvs[1]
         ref = hgvs[2]
         alt = hgvs[3]
-        vcf = {"chrom": str(chrom), "pos": str(pos), "ref": ref, "alt": alt}
+        vcf = {"chrom": str(chrom), "position": str(pos), "ref": ref, "alt": alt}
         return vcf
 
     def del_vcf_constructor(self, hgvs):
@@ -91,7 +91,7 @@ class VCFConstruct(object):
         alt = ref[0]
         if chrom == 'MT':
             chrom = 'M'
-        vcf = {"chrom": str(chrom), "pos": str(pos), "ref": ref, "alt": alt}
+        vcf = {"chrom": str(chrom), "position": str(pos), "ref": ref, "alt": alt}
         return vcf
 
     def ins_vcf_constructor(self, hgvs):
@@ -106,7 +106,7 @@ class VCFConstruct(object):
         alt = ref + alt
         if chrom == 'MT':
             chrom = 'M'
-        vcf = {"chrom": str(chrom), "pos": str(pos), "ref": ref, "alt": alt}
+        vcf = {"chrom": str(chrom), "position": str(pos), "ref": ref, "alt": alt}
         return vcf
 
     def delins_vcf_constructor(self, hgvs):
@@ -124,7 +124,7 @@ class VCFConstruct(object):
         alt = hgvs[3]
         if chrom == 'MT':
             chrom = 'M'
-        vcf = {"chrom": str(chrom), "pos": str(pos), "ref": ref, "alt": alt}
+        vcf = {"chrom": str(chrom), "position": str(pos), "ref": ref, "alt": alt}
         return vcf
 
     def build_vcfs(self, hgvs_ids):
@@ -206,7 +206,7 @@ class SnpeffAnnotator(object):
             # add hgvs ID at the end so we can match for sure which annotations correspond to which ID 
             # instead of rebuild it from VCF info (they can be different)
             # this comment will be at the first position in the result line
-            vcf_stdin.append(str(vcf["chrom"]) + '\t' + str(vcf["pos"]) + '\t' + '.' + '\t' + vcf["ref"] + '\t' + vcf["alt"] + '\t.\t.\t.' + "\t# hgvs:" + hgvs_id)
+            vcf_stdin.append(str(vcf["chrom"]) + '\t' + str(vcf["position"]) + '\t' + '.' + '\t' + vcf["ref"] + '\t' + vcf["alt"] + '\t.\t.\t.' + "\t# hgvs:" + hgvs_id)
 
         proc = subprocess.Popen(self.snpeff_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = proc.communicate("\n".join(vcf_stdin).encode())

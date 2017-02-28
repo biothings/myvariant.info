@@ -110,3 +110,8 @@ HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19', 'dbsnp.hg19', 'docm
 
 # Max length for vcf.alt and vcf.ref fields (must be less than 32k, ElasticSearch limit)
 MAX_REF_ALT_LEN = 1000
+
+# reporting diff results, number of IDs to consider (to avoid too much mem usage)
+MAX_REPORTED_IDS = 10000
+# for diff updates, number of IDs randomly picked as examples when rendering the report
+MAX_RANDOMLY_PICKED = 10
