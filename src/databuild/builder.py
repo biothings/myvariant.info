@@ -93,8 +93,8 @@ class MyVariantDataBuilder(builder.DataBuilder):
         # is called in defer_to_thread)
         asyncio.set_event_loop(job_manager.loop)
         job = self.set_chrom(batch_size, job_manager)
-        job = asyncio.ensure_future(job)
-        return job
+        task = asyncio.ensure_future(job)
+        return task
 
 
 def get_chrom(doc):
