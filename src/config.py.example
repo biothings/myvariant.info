@@ -59,6 +59,17 @@ DIFF_PATH = os.path.join(DATA_ARCHIVE_ROOT,"diff")
 LOG_FOLDER = os.path.join(DATA_ARCHIVE_ROOT,'logs')
 logger  =setup_default_log("hub",LOG_FOLDER)
 
+# How much memory hub is allowed to use:
+# - "auto", let hub decides (will use 50%-60% of available RAM)
+# - None: no limit
+# - otherwise specify a number in GiB
+HUB_MAX_MEM_USAGE = None
+
+# Max numbers of processe workers in the hub (process queue)
+# - None: will use as many workers as cpu cores
+# - otherwise specify a number
+HUB_MAX_WORKERS = None
+
 # fill with "token", "roomid" and "from" keys
 # to broadcast message to a Hipchat room
 HIPCHAT_CONFIG = { "token" : "", "roomid" : "", "from" : "" }
