@@ -69,3 +69,8 @@ RUN_DIR = './run'
 # define valid sources to get chrom from, and for each, name of the chrom field
 CHROM_FIELDS = {'cadd':'chrom', 'clinvar':'chrom', 'cosmic':'chrom', 'dbnsfp':'chrom',
                 'dbsnp':'chrom', 'docm':'chrom', 'evs':'chrom', 'exac':'chrom'}
+
+# reporting diff results, number of IDs to consider (to avoid too much mem usage)
+MAX_REPORTED_IDS = 1000
+# for diff updates, number of IDs randomly picked as examples when rendering the report
+MAX_RANDOMLY_PICKED = 10
