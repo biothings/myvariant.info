@@ -104,6 +104,8 @@ def annotate_start_end(hgvs_vcfs, assembly):
         st,end = None,None
         doc = hgvs_vcfs[hgvs_id]
         if 'vcf' in doc:
+            # remove chrom, not needed
+            doc['vcf'].pop('chrom',None)
             try:
                 st, end = get_pos_start_end(
                                 chr=None, # not even used in func
