@@ -186,9 +186,8 @@ class SnpeffAnnotator(object):
         # last one should be a nucleotide
         if not re.match("[ATGC]",hgvs_info["alt"]):
             raise ValueError("Invalid nucleotide in HGVS info: %s" % repr(hgvs_info))
-        if hgvs_info["chrom"] in ['None',None]:
+        if not hgvs_info["chrom"] in [str(i) for i in range(1,23)] + ["X","Y","M"]:
             raise ValueError("Invalid chromosome in HGVS info: %s" % repr(hgvs_info))
-
 
     def annotate(self,hgvs_vcfs):
         """hgvs_vcfs: list of {"vcf": {}, "_id": ""}"""
