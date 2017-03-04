@@ -26,7 +26,7 @@ class ExacDumper(FTPDumper):
         # so we need to parse directory names
         releases = self.client.nlst()
         # get rid of files
-        releases = [x for x in releases if x.startswith('release')]
+        releases = [x for x in releases if x.startswith('release0')]
         # sort items based on k
         releases = sorted(releases)
         latest_release_dir = releases[-1]

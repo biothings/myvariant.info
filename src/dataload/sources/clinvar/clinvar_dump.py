@@ -59,6 +59,7 @@ class ClinvarDumper(FTPDumper):
         
 
 def generate_clinvar_lib(data_folder):
+    sys.path.insert(0,data_folder)
     orig_path = os.getcwd()
     try:
         os.chdir(data_folder)
@@ -77,14 +78,12 @@ def generate_clinvar_lib(data_folder):
             os.unlink("clinvar_tmp.py")
             # can we import it ?
             import clinvar
+            logging.info("Found generated clinvar module: %s" % clinvar)
         except Exception as e:
-            logging.error("Cannot convert to py3...")
+            logging.error("Cannot convert to py3: %s" % e)
+            raise
     finally:
         os.chdir(orig_path)
-
-    logging.info("Found generated clinvar module: %s" % clinvar)
-
-
 
 
 def main():
