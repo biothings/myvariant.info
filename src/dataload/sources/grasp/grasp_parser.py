@@ -1,12 +1,12 @@
 import csv
 import requests
 from itertools import groupby
+from functools import partial
 from biothings.utils.dataload import dict_sweep, list_split, unlist, value_convert_to_number, merge_duplicate_rows
 import biothings.utils.mongo as mongo
 
 VALID_COLUMN_NO = 70
 
-dbsnp_col = mongo.get_src_db()["dbsnp_hg19"]
 
 def safe_str(s):
     uc = s.decode('cp1252')
@@ -15,7 +15,7 @@ def safe_str(s):
 
 
 # convert one snp to json
-def _map_line_to_json(fields):
+def _map_line_to_json(fields,dbsnp_col):
     assert len(fields) == VALID_COLUMN_NO
     rsid = fields[8]
 
@@ -124,12 +124,16 @@ def row_generator(db_row):
 
 # open file, parse, pass to json mapper
 def load_data(input_file):
+    src_db = mongo.get_src_db()
+    if not "dbsnp_hg19" in src_db.collection_names():
+        raise ValueError("'dbsnp_hg19' collection is missing, run dbsnp uploader first")
+    dbsnp_col = src_db["dbsnp_hg19"]
     open_file = open(input_file,encoding="cp1252")
     open_file = csv.reader(open_file, delimiter="\t")
     next(open_file)
     grasp = map(row_generator, open_file)
     grasp = filter(lambda row: row[58] != "", grasp)
-    json_rows = map(_map_line_to_json, grasp)
+    json_rows = map(partial(_map_line_to_json,dbsnp_col=dbsnp_col), grasp)
     json_rows = (row for row in json_rows if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     for row in (merge_duplicate_rows(rg, "grasp") for rg in row_groups):

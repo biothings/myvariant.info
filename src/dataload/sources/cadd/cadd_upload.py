@@ -1,8 +1,9 @@
 
 from .cadd_parser import load_data
+import biothings.dataload.uploader as uploader
 from dataload.uploader import SnpeffPostUpdateUploader
 
-class CADDUploader(SnpeffPostUpdateUploader):
+class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
 
     keep_archive = 1
 
