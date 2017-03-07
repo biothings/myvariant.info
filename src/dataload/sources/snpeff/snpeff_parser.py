@@ -85,9 +85,13 @@ class VCFConstruct(object):
         chr_bit = self._chr_data[str(chrom)]
         ref = ''
         for i in range(pos, end+1):
-            nuc_chr_bit = chr_bit[i*4-4:i*4]
-            nuc_chr = bit_to_nuc(nuc_chr_bit)
-            ref += nuc_chr
+            try:
+                nuc_chr_bit = chr_bit[i*4-4:i*4]
+                nuc_chr = bit_to_nuc(nuc_chr_bit)
+                ref += nuc_chr
+            except Exception as e:
+                logger.warning("Couldn't extract nucleotide from bits with HGVS %s: %s" % (repr(hgvs),e))
+                return None
         alt = ref[0]
         if chrom == 'MT':
             chrom = 'M'
@@ -101,7 +105,11 @@ class VCFConstruct(object):
         pos = int(hgvs[1])
         chr_bit = self._chr_data[str(chrom)]
         nuc_chr_bit = chr_bit[pos*4-4:pos*4]
-        ref = bit_to_nuc(nuc_chr_bit)
+        try:
+            ref = bit_to_nuc(nuc_chr_bit)
+        except Exception as e:
+            logger.warning("Couldn't extract nucleotide from bits with HGVS %s: %s" % (repr(hgvs),e))
+            return None
         alt = hgvs[3]
         alt = ref + alt
         if chrom == 'MT':
@@ -118,9 +126,13 @@ class VCFConstruct(object):
         chr_bit = self._chr_data[str(chrom)]
         ref = ''
         for i in range(pos, end+1):
-            nuc_chr_bit = chr_bit[i*4-4:i*4]
-            nuc_chr = bit_to_nuc(nuc_chr_bit)
-            ref += nuc_chr
+            try:
+                nuc_chr_bit = chr_bit[i*4-4:i*4]
+                nuc_chr = bit_to_nuc(nuc_chr_bit)
+                ref += nuc_chr
+            except Exception as e:
+                logger.warning("Couldn't extract nucleotide from bits with HGVS %s: %s" % (repr(hgvs),e))
+                return None
         alt = hgvs[3]
         if chrom == 'MT':
             chrom = 'M'
@@ -137,6 +149,8 @@ class VCFConstruct(object):
                 if not hgvs_info:
                     continue
                 vcf = self.snp_vcf_constructor(hgvs_info)
+                if not vcf:
+                    continue
                 hgvs_vcfs[hgvs_id] = {"_id" : hgvs_id, "vcf" : vcf}
 
             elif hgvs_id.endswith('del') and '_' in hgvs_id:
@@ -144,6 +158,8 @@ class VCFConstruct(object):
                 if not hgvs_info:
                     continue
                 vcf = self.del_vcf_constructor(hgvs_info)
+                if not vcf:
+                    continue
                 hgvs_vcfs[hgvs_id] = {"_id" : hgvs_id, "vcf" : vcf}
 
             elif hgvs_id.endswith('del') and '_' not in hgvs_id:
@@ -151,6 +167,8 @@ class VCFConstruct(object):
                 if not hgvs_info:
                     continue
                 vcf = self.del_vcf_constructor(hgvs_info)
+                if not vcf:
+                    continue
                 hgvs_vcfs[hgvs_id] = {"_id" : hgvs_id, "vcf" : vcf}
 
             elif 'ins' in hgvs_id and 'del' not in hgvs_id:
@@ -158,6 +176,8 @@ class VCFConstruct(object):
                 if not hgvs_info:
                     continue
                 vcf = self.ins_vcf_constructor(hgvs_info)
+                if not vcf:
+                    continue
                 hgvs_vcfs[hgvs_id] = {"_id" : hgvs_id, "vcf" : vcf}
 
             elif 'delins' in hgvs_id:
@@ -165,6 +185,8 @@ class VCFConstruct(object):
                 if not hgvs_info:
                     continue
                 vcf = self.delins_vcf_constructor(hgvs_info)
+                if not vcf:
+                    continue
                 hgvs_vcfs[hgvs_id] = {"_id" : hgvs_id, "vcf" : vcf}
 
             else:
