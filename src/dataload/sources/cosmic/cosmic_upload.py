@@ -12,36 +12,41 @@ class CosmicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
         mapping = {
             "cosmic": {
                 "properties": {
+                    "chrom": {
+                        "type": "string",
+                        "analyzer": "string_lowercase"
+                    },
+                    "hg19": {
+                        "properties": {
+                            "start": {
+                                "type": "long"
+                            },
+                            "end": {
+                                "type": "long"
+                            }
+                        }
+                    },
                     "tumor_site": {
                         "type": "string"
                     },
-                    # "tomour_site": {
-                    #     "type": "string"
-                    # }
-                    "mut_freq": {
-                        "type": "double"    # actual values are string type
+                    "cosmic_id": {
+                        "type": "string",
+                        "analyzer": "string_lowercase"
                     },
                     "mut_nt": {
                         "type": "string",
                         "analyzer": "string_lowercase"
                     },
-                    "allele1": {
+                    "mut_freq": {
+                        "type": "float"
+                    },
+                    "ref": {
                         "type": "string",
                         "analyzer": "string_lowercase"
                     },
-                    "allele2": {
+                    "alt": {
                         "type": "string",
                         "analyzer": "string_lowercase"
-                    },
-                    "chrom": {
-                        "type": "string",
-                        "analyzer": "string_lowercase"
-                    },
-                    "chromStart": {
-                        "type": "long"
-                    },
-                    "chromEnd": {
-                        "type": "long"
                     }
                 }
             }
