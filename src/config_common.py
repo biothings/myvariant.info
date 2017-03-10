@@ -25,6 +25,8 @@ ES_INDEX_BASE = 'myvariant_current_201607'
 SUPPORTED_ASSEMBLIES = ['hg19', 'hg38']
 # elasticsearch document type
 ES_DOC_TYPE = 'variant'
+# defautlt number_of_shards when create a new index
+ES_NUMBER_OF_SHARDS = 20
 
 API_VERSION = 'v1'
 
