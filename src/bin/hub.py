@@ -25,6 +25,7 @@ import biothings.databuild.builder as builder
 import biothings.dataindex.indexer as indexer
 from databuild.builder import MyVariantDataBuilder
 from databuild.mapper import TagObserved
+from dataindex.indexer import VariantIndexer
 
 # will check every 10 seconds for sources to upload
 umanager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=jmanager)
@@ -41,7 +42,7 @@ bmanager = builder.BuilderManager(
         job_manager=jmanager)
 bmanager.sync()
 
-pindexer = partial(indexer.Indexer,host=config.ES_HOST)
+pindexer = partial(VariantIndexer,host=config.ES_HOST)
 imanager = indexer.IndexerManager(pindexer=pindexer,
         job_manager=jmanager)
 imanager.sync()
