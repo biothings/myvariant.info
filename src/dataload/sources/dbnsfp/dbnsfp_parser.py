@@ -8,7 +8,6 @@ VALID_COLUMN_NO = 187
 '''this parser is for dbNSFP v3.3a beta2 downloaded from
 https://sites.google.com/site/jpopgen/dbNSFP'''
 
-
 # convert one snp to json
 def _map_line_to_json(df, version, index=0):
     # specific variable treatment
@@ -60,11 +59,22 @@ def _map_line_to_json(df, version, index=0):
     metasvm_score = df["MetaSVM_score"].split(';')
     fathmm_score = df["FATHMM_score"].split(';')
     metalr_score = df["MetaLR_score"].split(';')
-    modify_score_list = [provean_score, sift_score, hdiv_score, hvar_score, lrt_score,
-                         m_cap_score, mutationtaster_score, mutationassessor_score,
-                         vest3_score, metasvm_score, fathmm_score, metalr_score]
-    for _score in modify_score_list:
-        [None if item == '.' else item for item in _score]
+
+    # normalize scores
+    def norm(arr):
+        return [None if item == '.' else item for item in arr]
+    provean_score = norm(provean_score)
+    sift_score = norm(sift_score)
+    hdiv_score = norm(hdiv_score)
+    hvar_score = norm(hvar_score)
+    lrt_score = norm(lrt_score)
+    m_cap_score = norm(m_cap_score)
+    mutationtaster_score = norm(mutationtaster_score)
+    mutationassessor_score = norm(mutationassessor_score)
+    vest3_score = norm(vest3_score)
+    metasvm_score = norm(metasvm_score)
+    fathmm_score = norm(fathmm_score)
+    metalr_score = norm(metalr_score)
 
 # load as json data
     one_snp_json = {
