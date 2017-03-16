@@ -4,7 +4,7 @@ import subprocess
 from biothings.utils.dataload import unlist, dict_sweep
 from utils.validate import bit_to_nuc
 from biothings.utils.common import loadobj
-from utils.hgvs import get_hgvs_from_vcf
+from utils.hgvs import get_hgvs_from_vcf, trim_delseq_from_hgvs
 
 from biothings import config
 logger = config.logger
@@ -292,7 +292,7 @@ class SnpeffAnnotator(object):
                             "transcript_biotype": transcript_biotype,
                             "rank": rank,
                             "total": total,
-                            "hgvs_c": hgvs_coding,
+                            "hgvs_c": trim_delseq_from_hgvs(hgvs_coding), # trim long sequence
                             "hgvs_p": hgvs_protein,
                             "cdna": {
                                 "position": cdna_position,

@@ -3,7 +3,7 @@ from functools import partial
 
 import biothings.dataload.uploader as uploader
 from biothings.dataload.storage import UpsertStorage
-from biothings.utils.mongo import doc_feeder
+from biothings.utils.mongo import doc_feeder, id_feeder
 import biothings.utils.mongo as mongo
 from biothings.utils.common import iter_n
 from biothings.utils.dataload import dict_attrmerge
@@ -36,7 +36,8 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
         snpeff_doc = self.src_dump.find_one({"_id" : snpeff_main_source})
         assert snpeff_doc, "No snpeff information found, has it been dumped & uploaded ?"
         snpeff_dir = snpeff_doc["data_folder"]
-        cmd = "java -Xmx4g -jar %s/snpEff/snpEff.jar %s" % (snpeff_dir,version)
+        # -q: when there's an update, there's a message on stderr....
+        cmd = "java -Xmx4g -jar %s/snpEff/snpEff.jar -q %s" % (snpeff_dir,version)
         # genome files are in "data_folder"/../data
         genomes = glob.glob(os.path.join(snpeff_dir,"..","data","%s_genome.*" % version))
         assert len(genomes) == 1, "Expected only one genome files for '%s', got: %s" % (version,genomes)
@@ -55,22 +56,22 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
             # merge "vcf" and snpeff annotations keys when possible
             # (it no snpeff data, we keep 'vcf' data)
             for annot in annotator.annotate(hgvs_vcfs):
-                vcf = hgvs_vcfs[annot["_id"]]
-                # trim if sequence is to big
+                hgvs_vcfs[annot["_id"]].update(annot)
+            # trim if sequence is to big
+            for _id in hgvs_vcfs:
+                vcf = hgvs_vcfs[_id]
                 for k in ["alt","ref"]:
                     if len(vcf["vcf"][k]) > MAX_REF_ALT_LEN:
                         msg = "...(trimmed)"
                         vcf["vcf"][k] = vcf["vcf"][k][:MAX_REF_ALT_LEN - len(msg)] + msg
                 hgvs_vcfs[annot["_id"]] = vcf
-                hgvs_vcfs[annot["_id"]].update(annot)
 
             data = annotate_start_end(hgvs_vcfs,version)
             storage.process(data, batch_size)
 
-        for doc_ids in doc_feeder(col, step=batch_size, inbatch=True, fields={'_id':1}):
+        for ids in id_feeder(col, batch_size=batch_size):
             cnt += 1
             self.logger.debug("Processing batch %s/%s [%.1f]" % (cnt,total,(cnt/total*100)))
-            ids = [d["_id"] for d in doc_ids]
             # don't re-compute annotations if already there
             if not force:
                 for subids in iter_n(ids,10000):
