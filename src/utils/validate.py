@@ -5,47 +5,58 @@ import time
 
 from bitarray import bitarray
 
-from utils.common import loadobj, is_str, open_anyfile, timesofar
-from utils.mongo import get_src_db, doc_feeder
-from config import HG19_DATAFILE
+from biothings.utils.common import loadobj, is_str, open_anyfile, timesofar
+from biothings.utils.mongo import get_src_db, doc_feeder
 
 
 def nuc_to_bit(sequence):
     '''encode nucleotide into bit form'''
-    code = {'A': bitarray('001'),
-            'C': bitarray('010'),
-            'G': bitarray('011'),
-            'T': bitarray('100'),
-            'g': bitarray('011'),
-            't': bitarray('100'),
-            'a': bitarray('001'),
-            'c': bitarray('010'),
-            'N': bitarray('101'),
-            'M': bitarray('110'),
-            'R': bitarray('111')}
+    code = {'Y': bitarray('0000'),
+            'A': bitarray('0001'),
+            'C': bitarray('0010'),
+            'G': bitarray('0011'),
+            'T': bitarray('0100'),
+            'g': bitarray('0011'),
+            't': bitarray('0100'),
+            'a': bitarray('0001'),
+            'c': bitarray('0010'),
+            'N': bitarray('0101'),
+            'M': bitarray('0110'),
+            'R': bitarray('0111'),
+            'W': bitarray('1000'),
+            'K': bitarray('1001'),
+            'n': bitarray('0101'),
+            }
+    #assert sequence in code, "%s" % repr(sequence)
     seq_bit = bitarray()
-    seq_bit.encode(code, sequence)
+    try:
+        seq_bit.encode(code, sequence)
+    except ValueError:
+        print("%s" % repr(sequence))
+        raise
     return(seq_bit)
 
 
 def bit_to_nuc(sequence):
     '''encode bit form to nucleotide'''
-    if sequence == bitarray('001'):
+    if sequence == bitarray('0001'):
         nuc = 'A'
-    elif sequence == bitarray('010'):
+    elif sequence == bitarray('0010'):
         nuc = 'C'
-    elif sequence == bitarray('011'):
+    elif sequence == bitarray('0011'):
         nuc = 'G'
-    elif sequence == bitarray('100'):
+    elif sequence == bitarray('0100'):
         nuc = 'T'
-    elif sequence == bitarray('110'):
+    elif sequence == bitarray('0110'):
         nuc = 'M'
-    elif sequence == bitarray('101'):
+    elif sequence == bitarray('0101'):
         nuc = 'N'
-    elif sequence == bitarray('111'):
+    elif sequence == bitarray('0111'):
         nuc = 'R'
+    elif sequence == bitarray('1000'):
+        nuc = 'W'
     else:
-        raise ValueError("Cannot decode input bits.")
+        raise ValueError("Cannot decode input bits: %s" % repr(sequence))
     return nuc
 
 
@@ -114,9 +125,9 @@ class VariantValidator:
     def __init__(self):
         self._chr_data = None
 
-    def load_chr_data(self):
+    def load_chr_data(self,genome_file):
         print("\tLoading chromosome data...", end='')
-        self._chr_data = loadobj(HG19_DATAFILE)
+        self._chr_data = loadobj(genome_file)
         print("Done.")
 
     def validate_hgvs(self, hgvs_id, verbose=False):

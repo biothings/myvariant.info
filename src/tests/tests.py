@@ -15,10 +15,13 @@ import os
 from nose.tools import ok_, eq_
 
 from tornado.testing import AsyncHTTPTestCase
+from tornado.web import Application
 
 from .variant_list import VARIANT_POST_LIST
 from biothings.tests.test_helper import BiothingTestHelperMixin, _d, TornadoRequestHelper
-import www.index as index
+from www.settings import MyVariantWebSettings
+#import www.index as index
+
 #import config
 
 
@@ -189,13 +192,13 @@ class MyVariantTest(BiothingTestHelperMixin):
         res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'fields': 'dbsnp'}))
         eq_(len(res), 2)
         for _g in res:
-            eq_(set(_g), set(['_id', '_score', 'query', 'dbsnp']))
+            eq_(set(_g), set(['_id', 'query', 'dbsnp']))
 
         # TODO redo this test, doesn't test much really....
         res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'chr16:g.28883241A>G,chr11:g.66397320A>G', 'filter': 'dbsnp.chrom'}))
         eq_(len(res), 2)
         for _g in res:
-            eq_(set(_g), set(['_id', '_score', 'query', 'dbsnp']))
+            eq_(set(_g), set(['_id', 'query', 'dbsnp']))
 
         # Test a large variant post
         ## too slow
@@ -273,12 +276,22 @@ class MyVariantTest(BiothingTestHelperMixin):
 
 
     ## Too slow
-    #def test_licenses(self):
-    #    # cadd license
-    #    res = self.json_ok(self.get_ok(self.api + '/query?q=_exists_:cadd&size=1&fields=cadd'))
-    #    assert '_license' in res['hits'][0]['cadd']
-    #    assert res['hits'][0]['cadd']['_license']
+    def test_licenses(self):
+        # cadd license
+        res = self.json_ok(self.get_ok(self.api + '/variant/chr17:g.61949543G>A?fields=cadd'))
+        assert '_license' in res['cadd']
+        assert res['cadd']['_license']
+        
+        # dbnsfp licenses
+        res = self.json_ok(self.get_ok(self.api + '/variant/chr1:g.69109T>G?fields=dbnsfp'))
+        assert 'dann' in res['dbnsfp'] and '_license' in res['dbnsfp']['dann']
+        assert res['dbnsfp']['dann']['_license']
+        
+        assert 'vest3' in res['dbnsfp'] and '_license' in res['dbnsfp']['vest3']
+        assert res['dbnsfp']['vest3']['_license']
 
+        assert 'polyphen2' in res['dbnsfp'] and '_license' in res['dbnsfp']['polyphen2']
+        assert res['dbnsfp']['polyphen2']['_license']
 
     def test_jsonld(self):
         res = self.json_ok(self.get_ok(self.api + '/variant/chr11:g.66397320A>G?jsonld=true'))
@@ -342,8 +355,7 @@ class MyVariantTestTornadoClient(AsyncHTTPTestCase, MyVariantTest):
     def __init__(self, methodName='runTest', **kwargs):
         super(AsyncHTTPTestCase, self).__init__(methodName, **kwargs)
         self.h = TornadoRequestHelper(self)
+        self._settings = MyVariantWebSettings(config='config')
 
     def get_app(self):
-        applist = index.return_applist()
-        print(applist)
-        return index.get_app(applist)
+        return Application(self._settings.generate_app_list())

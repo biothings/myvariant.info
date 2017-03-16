@@ -1,65 +1,64 @@
 # -*- coding: utf-8 -*-
-import re
+from biothings.www.api.es.handlers import BiothingHandler
+from biothings.www.api.es.handlers import MetadataHandler
+from biothings.www.api.es.handlers import QueryHandler
+from biothings.www.api.es.handlers import StatusHandler
 from tornado.web import RequestHandler
-from biothings.www.api.handlers import MetaDataHandler, BiothingHandler, QueryHandler, StatusHandler, FieldsHandler
-from settings import MyVariantSettings
-from www.beacon.handlers import BeaconHandler, BeaconInfoHandler
+from re import search
 
-myvariant_settings = MyVariantSettings()
+class CommonHandlerMixin(object):
+    def _sanitize_assembly(self, kwargs):
+        if self._should_sanitize('assembly', kwargs):
+            if kwargs['assembly'].lower() not in self.web_settings.SUPPORTED_ASSEMBLIES:
+                kwargs['assembly'] = self.esqb_kwargs['assembly']['default']
+            else:
+                kwargs['assembly'] = kwargs['assembly'].lower()
+        return kwargs
+    
+    def _get_es_index(self, options):
+        return '_'.join([self.web_settings.ES_INDEX_BASE, options.esqb_kwargs.assembly])
 
-class VariantHandler(BiothingHandler):
+class VariantHandler(CommonHandlerMixin, BiothingHandler):
     ''' This class is for the /variant endpoint. '''
-    def _examine_kwargs(self, action, kwargs):
-        # subclassed to add redirection, assembly, etc
-        if action == 'GET':
-            m = re.search('chr.{1,2}(?P<delim>:[g\.]{0,2})\d+', self.request.uri)
-            if m:
-                de = m.group('delim')
-                if de and de != ':g.':
-                    self.redirect(':g.'.join(self.request.uri.split(de)), permanent=True)
-        return None
+    # overridden to sanitize assembly param
+    def _sanitize_params(self, kwargs):
+        kwargs = super(VariantHandler, self)._sanitize_params(kwargs)
+        kwargs = self._sanitize_assembly(kwargs)
+        return kwargs
 
-class DemoHandler(RequestHandler):
-    ''' For the /demo page. '''
-    def get(self):
-        with open('../../docs/demo/index.html', 'r') as demo_file:
-            self.write(demo_file.read())
+    # redirect improperly formatted hgvs ids
+    def _regex_redirect(self, bid):
+        m = search('chr.{1,2}(?P<delim>:[g\.]{0,2})\d+', self.request.uri)
+        if m:
+            de = m.group('delim')
+            if de and de != ':g.':
+                self.redirect(':g.'.join(self.request.uri.split(de)), permanent=True)
 
-class QueryHandler(QueryHandler):
+class QueryHandler(CommonHandlerMixin, QueryHandler):
     ''' This class is for the /query endpoint. '''
+    # overridden to sanitize assembly param
+    def _sanitize_params(self, kwargs):
+        kwargs = super(QueryHandler, self)._sanitize_params(kwargs)
+        kwargs = self._sanitize_assembly(kwargs)
+        return kwargs
 
 class StatusHandler(StatusHandler):
     ''' This class is for the /status endpoint. '''
+    pass
 
-class FieldsHandler(FieldsHandler):
-    ''' This class is for the /metadata/fields endpoint. '''
-
-class MetaDataHandler(MetaDataHandler):
+class MetadataHandler(CommonHandlerMixin, MetadataHandler):
     ''' This class is for the /metadata endpoint. '''
-    disable_caching = True
-    boolean_parameters = set(['chromosome', 'dev'])
+    # overridden to sanitize assembly param
+    def _sanitize_params(self, kwargs):
+        kwargs = super(MetadataHandler, self)._sanitize_params(kwargs)
+        kwargs = self._sanitize_assembly(kwargs)
+        return kwargs
 
-def return_applist():
-    ret = [
-        (r"/status", StatusHandler),
-        (r"/metadata", MetaDataHandler),
-        (r"/metadata/fields", FieldsHandler),
-        (r"/demo/?$", DemoHandler),
-        (r"/beacon/query?", BeaconHandler),
-        (r"/beacon/info", BeaconInfoHandler)
-    ]
-    if myvariant_settings._api_version:
-        ret += [
-            (r"/" + myvariant_settings._api_version + "/metadata", MetaDataHandler),
-            (r"/" + myvariant_settings._api_version + "/metadata/fields", FieldsHandler),
-            (r"/" + myvariant_settings._api_version + "/variant/(.+)/?", VariantHandler),
-            (r"/" + myvariant_settings._api_version + "/variant/?$", VariantHandler),
-            (r"/" + myvariant_settings._api_version + "/query/?", QueryHandler),
-        ]
-    else:
-        ret += [
-            (r"/variant/(.+)/?", VariantHandler),
-            (r"/variant/?$", VariantHandler),
-            (r"/query/?", QueryHandler),
-        ]
-    return ret
+class DemoHandler(RequestHandler):
+    ''' For the /demo page. '''
+    def initialize(self, web_settings):
+        self.web_settings = web_settings
+
+    def get(self):
+        with open('../docs/demo/index.html', 'r') as demo_file:
+            self.write(demo_file.read())
