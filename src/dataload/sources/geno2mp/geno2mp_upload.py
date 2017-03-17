@@ -24,4 +24,14 @@ class Geno2MPUploader(SnpeffPostUpdateUploader):
 
     @classmethod
     def get_mapping(klass):
-        mapping = {}
+        mapping = {
+            "geno2mp": {
+                "properties": {
+                    "hpo_count": {
+                        "type": "integer",
+                    },
+                }
+            }
+        }
+        return mapping
+
