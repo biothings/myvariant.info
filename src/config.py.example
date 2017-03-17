@@ -53,9 +53,13 @@ DATA_TARGET_SERVER_PASSWORD = ''
 
 SSH_HUB_PORT = 18022
 
+# where to store datasource files
 DATA_ARCHIVE_ROOT = '/path/to/archive/directory'
+# diff files
 DIFF_PATH = os.path.join(DATA_ARCHIVE_ROOT,"diff")
-
+# cached data (it None, caches won't be used at all)
+CACHE_FOLDER = os.path.join(DATA_ARCHIVE_ROOT,'cache')
+# hub logs
 LOG_FOLDER = os.path.join(DATA_ARCHIVE_ROOT,'logs')
 logger  =setup_default_log("hub",LOG_FOLDER)
 
