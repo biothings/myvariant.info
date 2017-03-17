@@ -42,7 +42,7 @@ bmanager = builder.BuilderManager(
         job_manager=jmanager)
 bmanager.sync()
 
-pindexer = partial(VariantIndexer,host=config.ES_HOST)
+pindexer = partial(VariantIndexer,es_host=config.ES_HOST)
 imanager = indexer.IndexerManager(pindexer=pindexer,
         job_manager=jmanager)
 imanager.sync()
