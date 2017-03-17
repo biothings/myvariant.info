@@ -49,13 +49,13 @@ class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                     "gmaf": {
                         "type": "float"
                     },
-                    "hg19": {
+                    klass.__metadata__["assembly"]: {
                         "properties": {
                             "end": {
-                                "type": "long"
+                                "type": "integer"
                             },
                             "start": {
-                                "type": "long"
+                                "type": "integer"
                             }
                         }
                     },

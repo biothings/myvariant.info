@@ -37,10 +37,10 @@ class WellderlyFactoryUploader(uploader.DummySourceUploader,SnpeffPostUpdateUplo
                     "hg19": {
                         "properties": {
                             "start": {
-                                "type": "long"
+                                "type": "integer"
                             },
                             "end": {
-                                "type": "long"
+                                "type": "integer"
                             }
                         }
                     },
