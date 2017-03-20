@@ -117,3 +117,6 @@ MAX_REF_ALT_LEN = 1000
 MAX_REPORTED_IDS = 1000
 # for diff updates, number of IDs randomly picked as examples when rendering the report
 MAX_RANDOMLY_PICKED = 10
+
+# ES s3 repository to use snapshot/restore (must be pre-configured in ES)
+SNAPSHOT_REPOSITORY = "variant_repository"

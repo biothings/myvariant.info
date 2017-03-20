@@ -14,3 +14,6 @@ class VariantIndexer(indexer.Indexer):
             'type': 'string'}
 
         return mapping
+
+    def get_index_creation_settings(self):
+        return {"codec" : "best_compression"}

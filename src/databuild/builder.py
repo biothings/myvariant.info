@@ -4,7 +4,7 @@ from functools import partial
 import datetime, pickle
 
 from biothings.utils.common import iter_n
-from biothings.utils.mongo import doc_feeder
+from biothings.utils.mongo import id_feeder
 import biothings.utils.mongo as mongo
 import biothings.databuild.builder as builder
 import config
@@ -47,11 +47,8 @@ class MyVariantDataBuilder(builder.DataBuilder):
         id_batch_size = batch_size * job_manager.process_queue._max_workers * 2
         self.logger.info("Fetch _ids from '%s' with batch_size=%d, and create post-merger job with batch_size=%d" % \
                 (self.target_backend.target_collection.name, id_batch_size, batch_size))
-        for big_doc_ids in doc_feeder(self.target_backend.target_collection,
-                                  step=id_batch_size, inbatch=True,
-                                  fields={'_id':1}):
+        for big_doc_ids in id_feeder(self.target_backend.target_collection, batch_size=id_batch_size):
             for doc_ids in iter_n(big_doc_ids,batch_size):
-                # faking non-blocking call... (but we all know doc_feeder is a blocking one...)
                 yield from asyncio.sleep(0.1)
                 cnt += len(doc_ids)
                 pinfo = self.get_pinfo()
