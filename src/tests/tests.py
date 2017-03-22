@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 '''
 Nose tests
-run as "nosetests tests"
-    or "nosetests tests:test_main"
+Need to run under src folder as:
+
+    nosetests tests.tests
+    nosetests tests.tests -vv
+
+    # to run a single test
+    nosetests tests.tests:MyVariantTestTornadoClient.test_status_endpoint -vv
+
+    # to run using an alternative myvariant api server
+    MV_HOST="http://localhost:9000";nosetests tests.tests.MyVariantTest -vv
+
 '''
 import httplib2
-try:
-    from urllib.parse import urlencode
-except ImportError:
-    from urllib import urlencode
-import json
 import sys
 import os
 from nose.tools import ok_, eq_
@@ -18,48 +22,8 @@ from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
 
 from .variant_list import VARIANT_POST_LIST
-from biothings.tests.test_helper import BiothingTestHelperMixin, _d, TornadoRequestHelper
+from biothings.tests.test_helper import BiothingTestHelperMixin, TornadoRequestHelper
 from www.settings import MyVariantWebSettings
-#import www.index as index
-
-#import config
-
-
-try:
-    import msgpack
-except ImportError:
-    sys.stderr.write("Warning: msgpack is not available.")
-
-#h = httplib2.Http(disable_ssl_certificate_validation=True)
-_d = json.loads    # shorthand for json decode
-_e = json.dumps    # shorthand for json encode
-
-
-#############################################################
-# Hepler functions                                          #
-#############################################################
-def encode_dict(d):
-    '''urllib.urlencode (python 2.x) cannot take unicode string.
-       encode as utf-8 first to get it around.
-    '''
-    if sys.version_info.major >= 3:
-        # no need to do anything
-        return d
-    else:
-        def smart_encode(s):
-            return s.encode('utf-8') if isinstance(s, unicode) else s   # noqa
-
-        return dict([(key, smart_encode(val)) for key, val in d.items()])
-
-
-#############################################################
-# Test functions                                            #
-#############################################################
-#@with_setup(setup_func, teardown_func)
-## static files aren't served by Tornado
-##def test_main():
-##    #/
-##    self.get_ok(host)
 
 
 class MyVariantTest(BiothingTestHelperMixin):
@@ -67,6 +31,10 @@ class MyVariantTest(BiothingTestHelperMixin):
     host = os.getenv("MV_HOST", "")
     host = host.rstrip('/')
     api = host + '/v1'
+    if host:
+        sys.stderr.write("Testing on host: {}...\n".format(api))
+    else:
+        sys.stderr.write("Testing on build-in server: {}...\n".format(api))
     h = httplib2.Http()
 
     def test_variant_object(self):
@@ -113,19 +81,19 @@ class MyVariantTest(BiothingTestHelperMixin):
         self.json_ok(self.post_ok(self.api + '/query', {'q': 'rs58991260'}))
 
         res = self.json_ok(self.post_ok(self.api + '/query', {'q': 'rs58991260',
-                                               'scopes': 'dbsnp.rsid'}))
+                                                              'scopes': 'dbsnp.rsid'}))
         eq_(len(res), 1)
         eq_(res[0]['_id'], 'chr1:g.218631822G>A')
 
         res = self.json_ok(self.post_ok(self.api + '/query', {'q': 'rs58991260,rs2500',
-                                               'scopes': 'dbsnp.rsid'}))
+                                                              'scopes': 'dbsnp.rsid'}))
         eq_(len(res), 2)
         eq_(res[0]['_id'], 'chr1:g.218631822G>A')
         eq_(res[1]['_id'], 'chr11:g.66397320A>G')
 
         res = self.json_ok(self.post_ok(self.api + '/query', {'q': 'rs58991260',
-                                               'scopes': 'dbsnp.rsid',
-                                               'fields': 'dbsnp.chrom,dbsnp.alleles'}))
+                                                              'scopes': 'dbsnp.rsid',
+                                                              'fields': 'dbsnp.chrom,dbsnp.alleles'}))
         assert len(res) == 1, (res, len(res))
         res = self.json_ok(self.post_ok(self.api + '/query', {}), checkerror=False)
         assert 'error' in res, res
@@ -137,13 +105,11 @@ class MyVariantTest(BiothingTestHelperMixin):
         #eq_(res[0]['_id'], 'chr1:g.218631822G>A')
         #eq_(res[1]['_id'], 'chr11:g.66397320A>G')
 
-
     def test_query_interval(self):
         self.has_hits('chr1:10000-100000', morethan=30000)
         self.has_hits('chr11:45891937')
         self.has_hits('chr11:45891937&assembly=hg19')
         self.has_hits('chr6:128883143&assembly=hg38')
-
 
     def test_query_size(self):
         # TODO: port other tests (refactor to biothing.self.api ?)
@@ -156,7 +122,6 @@ class MyVariantTest(BiothingTestHelperMixin):
         eq_(len(res['hits']), 1000)
         res = self.json_ok(self.get_ok(self.api + '/query?q=t*&size=2000'))
         eq_(len(res['hits']), 1000)
-
 
     def test_variant(self):
         # TODO
@@ -185,7 +150,6 @@ class MyVariantTest(BiothingTestHelperMixin):
         self.get_404(self.api + '/variant')
         self.get_404(self.api + '/variant/')
 
-
     def test_variant_post(self):
         res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'chr16:g.28883241A>G'}))
         eq_(len(res), 1)
@@ -208,14 +172,12 @@ class MyVariantTest(BiothingTestHelperMixin):
             eq_(set(_g), set(['_id', 'query', 'dbsnp']))
 
         # Test a large variant post
-        ## too slow
-        #res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': VARIANT_POST_LIST}))
-        #eq_(len(res), 999)
-
+        # # too slow
+        # res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': VARIANT_POST_LIST}))
+        # eq_(len(res), 999)
 
     def test_metadata(self):
         self.get_ok(self.api + '/metadata')
-
 
     def test_query_facets(self):
         res = self.json_ok(self.get_ok(self.api + '/query?q=cadd.gene.gene_id:ENSG00000113368&facets=cadd.polyphen.cat&size=0'))
@@ -244,7 +206,6 @@ class MyVariantTest(BiothingTestHelperMixin):
         eq_(res[1]['notfound'], True)
         eq_(len(res), 2)
 
-
     def test_get_fields(self):
         res = self.json_ok(self.get_ok(self.api + '/metadata/fields'))
         # Check to see if there are enough keys
@@ -257,16 +218,15 @@ class MyVariantTest(BiothingTestHelperMixin):
         assert 'wellderly' in res
         assert 'clinvar' in res
 
-
     def test_fetch_all(self):
-        res = self.json_ok(self.get_ok(self.api + '/query?q=_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen&fetch_all=TRUE'))
+        q = '_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen&fetch_all=TRUE'
+        res = self.json_ok(self.get_ok(self.api + '/query?q=' + q))
         assert '_scroll_id' in res
 
         # get one set of results
         res2 = self.json_ok(self.get_ok(self.api + '/query?scroll_id=' + res['_scroll_id']))
         assert 'hits' in res2
         ok_(len(res2['hits']) == 1000)
-
 
     def test_msgpack(self):
         res = self.json_ok(self.get_ok(self.api + '/variant/chr11:g.66397320A>G'))
@@ -281,8 +241,7 @@ class MyVariantTest(BiothingTestHelperMixin):
         res2 = self.msgpack_ok(self.get_ok(self.api + '/metadata?msgpack=true'))
         ok_(res, res2)
 
-
-    ## Too slow
+    # Too slow
     def test_licenses(self):
         # cadd license
         res = self.json_ok(self.get_ok(self.api + '/variant/chr17:g.61949543G>A?fields=cadd'))
@@ -326,14 +285,13 @@ class MyVariantTest(BiothingTestHelperMixin):
 
         # Check query post with jsonld
         res = self.json_ok(self.post_ok(self.api + '/query', {'q': 'rs58991260,rs2500',
-                                               'scopes': 'dbsnp.rsid',
-                                               'jsonld': 'true'}))
+                                                              'scopes': 'dbsnp.rsid',
+                                                              'jsonld': 'true'}))
 
         assert len(res) == 2
         assert '@context' in res[0] and '@context' in res[1]
         assert 'snpeff' in res[1] and '@context' in res[1]['snpeff']
         assert 'ann' in res[1]['snpeff'] and '@context' in res[1]['snpeff']['ann'][0]
-
 
     def test_genome_assembly(self):
         res = self.json_ok(self.get_ok(self.api + '/query?q=clinvar.ref:C%20AND%20chr11:56319006%20AND%20clinvar.alt:A&assembly=hg38'))
