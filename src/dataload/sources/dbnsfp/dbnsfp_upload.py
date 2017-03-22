@@ -32,30 +32,30 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                     "hg18": {
                         "properties": {
                             "start": {
-                                "type": "long"
+                                "type": "integer"
                             },
                             "end": {
-                                "type": "long"
+                                "type": "integer"
                             }
                         }
                     },
                     "hg19": {
                         "properties": {
                             "start": {
-                                "type": "long"
+                                "type": "integer"
                             },
                             "end": {
-                                "type": "long"
+                                "type": "integer"
                             }
                         }
                     },
                     "hg38": {
                         "properties": {
                             "start": {
-                                "type": "long"
+                                "type": "integer"
                             },
                             "end": {
-                                "type": "long"
+                                "type": "integer"
                             }
                         }
                     },

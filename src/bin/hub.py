@@ -34,7 +34,7 @@ umanager.poll()
 
 dmanager = dumper.DumperManager(job_manager=jmanager)
 dmanager.register_sources(dataload.__sources_dict__)
-#dmanager.schedule_all()
+dmanager.schedule_all()
 
 observed = TagObserved(name="observed")
 bmanager = builder.BuilderManager(

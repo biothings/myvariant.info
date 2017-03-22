@@ -19,10 +19,10 @@ class CosmicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                     "hg19": {
                         "properties": {
                             "start": {
-                                "type": "long"
+                                "type": "integer"
                             },
                             "end": {
-                                "type": "long"
+                                "type": "integer"
                             }
                         }
                     },

@@ -15,7 +15,7 @@ class DBSNPDumper(FTPDumper):
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     FTP_HOST = 'ftp.ncbi.nlm.nih.gov'
     CWD_DIR = '/snp/organisms'
-    DATADIR_RE_PATTERN = '''human_9606_(.\d+)_GRCh\d\dp\d+'''
+    DATADIR_RE_PATTERN = '''human_9606_b(\d+)_GRCh\d\dp\d+'''
     FILE_RE = 'All_\d{8}.vcf.gz'
 
     SCHEDULE = "0 9 * * *"

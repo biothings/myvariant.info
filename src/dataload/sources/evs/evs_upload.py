@@ -28,20 +28,20 @@ class EVSBaseUploader(SnpeffPostUpdateUploader):
                     "hg19": {
                         "properties": {
                             "start": {
-                                "type": "long"
+                                "type": "integer"
                             },
                             "end": {
-                                "type": "long"
+                                "type": "integer"
                             }
                         }
                     },
                     "hg38": {
                         "properties": {
                             "start": {
-                                "type": "long"
+                                "type": "integer"
                             },
                             "end": {
-                                "type": "long"
+                                "type": "integer"
                             }
                         }
                     },

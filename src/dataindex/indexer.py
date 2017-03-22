@@ -12,6 +12,9 @@ class VariantIndexer(indexer.Indexer):
             'analyzer': 'string_lowercase',
             'include_in_all': False,
             'type': 'string'}
+        mapping["properties"]["observed"] = {
+            "type": "boolean",
+            'include_in_all': False}
 
         return mapping
 

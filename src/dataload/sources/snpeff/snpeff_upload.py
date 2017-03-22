@@ -146,7 +146,7 @@ class SnpeffBaseUploader(uploader.NoDataSourceUploader):
                     }
                 }
             },
-            "hg19": {
+            klass.__metadata__["assembly"]: {
                 "properties": {
                     "start": {
                         "type": "integer"
