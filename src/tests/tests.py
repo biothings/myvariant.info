@@ -64,7 +64,7 @@ def encode_dict(d):
 
 class MyVariantTest(BiothingTestHelperMixin):
 
-    host = os.getenv("MV_HOST","")
+    host = os.getenv("MV_HOST", "")
     host = host.rstrip('/')
     api = host + '/v1'
     h = httplib2.Http()
@@ -78,19 +78,25 @@ class MyVariantTest(BiothingTestHelperMixin):
 
         # test for specific databases
 
-    def has_hits(self,q):
+    def has_hits(self, q, morethan=0):
         d = self.json_ok(self.get_ok(self.api + '/query?q='+q))
-        ok_(d.get('total', 0) > 0 and len(d.get('hits', [])) > 0)
+        ok_(d.get('total', 0) > morethan and len(d.get('hits', [])) > 0)
+        ok_('_id' in d['hits'][0])
 
     def test_query(self):
         #public query self.api at /query via get
         self.has_hits('rs58991260')
-        self.has_hits('chr1:69000-70000')
+        self.has_hits('rcv000149017')
+        self.has_hits('RCV000149017')
+        self.has_hits('BTK', morethan=8000)
+
+        self.has_hits('chr1:69000-70000', morethan=2000)
         self.has_hits('dbsnp.vartype:snp')
         # Too slow
         ##self.has_hits('_exists_:dbnsfp')
-        self.has_hits('dbnsfp.genename:BTK')
-        ##self.has_hits('_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen')
+        self.has_hits('dbnsfp.genename:BTK', morethan=5000)
+        self.has_hits('snpeff.ann.genename:BTK', morethan=8000)
+        self.has_hits('_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen')
 
         con = self.get_ok(self.api + '/query?q=rs58991260&callback=mycallback')
         ok_(con.startswith('mycallback('.encode('utf-8')))
@@ -133,16 +139,17 @@ class MyVariantTest(BiothingTestHelperMixin):
 
 
     def test_query_interval(self):
-        res = self.json_ok(self.get_ok(self.api + '/query?q=chr1:10000-100000'))
-        ok_(len(res['hits']) > 1)
-        ok_('_id' in res['hits'][0])
+        self.has_hits('chr1:10000-100000', morethan=30000)
+        self.has_hits('chr11:45891937')
+        self.has_hits('chr11:45891937&assembly=hg19')
+        self.has_hits('chr6:128883143&assembly=hg38')
 
 
     def test_query_size(self):
         # TODO: port other tests (refactor to biothing.self.api ?)
-        
+
         res = self.json_ok(self.get_ok(self.api + '/query?q=t*'))
-        eq_(len(res['hits']), 10) # default
+        eq_(len(res['hits']), 10)    # default
         res = self.json_ok(self.get_ok(self.api + '/query?q=t*&size=1000'))
         eq_(len(res['hits']), 1000)
         res = self.json_ok(self.get_ok(self.api + '/query?q=t*&size=1001'))
@@ -281,12 +288,12 @@ class MyVariantTest(BiothingTestHelperMixin):
         res = self.json_ok(self.get_ok(self.api + '/variant/chr17:g.61949543G>A?fields=cadd'))
         assert '_license' in res['cadd']
         assert res['cadd']['_license']
-        
+
         # dbnsfp licenses
         res = self.json_ok(self.get_ok(self.api + '/variant/chr1:g.69109T>G?fields=dbnsfp'))
         assert 'dann' in res['dbnsfp'] and '_license' in res['dbnsfp']['dann']
         assert res['dbnsfp']['dann']['_license']
-        
+
         assert 'vest3' in res['dbnsfp'] and '_license' in res['dbnsfp']['vest3']
         assert res['dbnsfp']['vest3']['_license']
 
@@ -345,7 +352,7 @@ class MyVariantTest(BiothingTestHelperMixin):
 
     def test_status_endpoint(self):
         self.get_ok(self.host + '/status')
-        # (testing failing status would require actually loading tornado app from there 
+        # (testing failing status would require actually loading tornado app from there
         #  and deal with config params...)
 
 
