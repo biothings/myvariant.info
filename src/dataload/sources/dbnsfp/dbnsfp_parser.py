@@ -360,7 +360,7 @@ def data_generator(input_file, version):
     open_file = open(input_file)
     db_nsfp = csv.reader(open_file, delimiter="\t")
     index = next(db_nsfp)
-    assert len(index) == VALID_COLUMN_NO
+    assert len(index) == VALID_COLUMN_NO, "Expecting %s columns, but got %s" % (VALID_COLUMN_NO,len(index))
     previous_row = None
     for row in db_nsfp:
         df = dict(zip(index,row))
