@@ -234,15 +234,6 @@ class LogPrint:
         return self.log_f.fileno()
 
 
-def addsuffix(filename, suffix, noext=False):
-    '''Add suffix in front of ".extension", so keeping the same extension.
-       if noext is True, remove extension from the filename.'''
-    if noext:
-        return os.path.splitext(filename)[0] + suffix
-    else:
-        return suffix.join(os.path.splitext(filename))
-
-
 def safewfile(filename, prompt=True, default='C', mode='w'):
     '''return a file handle in 'w' mode,use alternative name if same name exist.
        if prompt == 1, ask for overwriting,appending or changing name,
