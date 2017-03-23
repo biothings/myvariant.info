@@ -14,7 +14,7 @@ ES_HOST = 'localhost:9200'
 # elasticsearch index name
 ES_INDEX = 'myvariant_current'
 # base index name - used to switch indices
-ES_INDEX_BASE = 'myvariant_current_201607'
+ES_INDEX_BASE = 'myvariant_current'
 # Assemblies supported (must resolve to a valid ES index, along with ES_INDEX_BASE)
 SUPPORTED_ASSEMBLIES = ['hg19', 'hg38']
 # elasticsearch document type
