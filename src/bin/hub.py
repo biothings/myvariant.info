@@ -13,7 +13,7 @@ process_queue = concurrent.futures.ProcessPoolExecutor(max_workers=config.HUB_MA
 thread_queue = concurrent.futures.ThreadPoolExecutor()
 loop.set_default_executor(process_queue)
 max_mem = type(config.HUB_MAX_MEM_USAGE) == int and config.HUB_MAX_MEM_USAGE * 1024**3 or config.HUB_MAX_MEM_USAGE
-jmanager = JobManager(loop,
+job_manager = JobManager(loop,
                       process_queue, thread_queue,
                       max_memory_usage=max_mem,
                       )
@@ -22,30 +22,34 @@ import dataload
 import biothings.dataload.uploader as uploader
 import biothings.dataload.dumper as dumper
 import biothings.databuild.builder as builder
+import biothings.databuild.differ as differ
 import biothings.dataindex.indexer as indexer
 from databuild.builder import MyVariantDataBuilder
 from databuild.mapper import TagObserved
 from dataindex.indexer import VariantIndexer
 
 # will check every 10 seconds for sources to upload
-umanager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=jmanager)
-umanager.register_sources(dataload.__sources_dict__)
-umanager.poll()
+upload_manager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=job_manager)
+upload_manager.register_sources(dataload.__sources_dict__)
+upload_manager.poll()
 
-dmanager = dumper.DumperManager(job_manager=jmanager)
+dmanager = dumper.DumperManager(job_manager=job_manager)
 dmanager.register_sources(dataload.__sources_dict__)
 dmanager.schedule_all()
 
 observed = TagObserved(name="observed")
-bmanager = builder.BuilderManager(
+build_manager = builder.BuilderManager(
         builder_class=partial(MyVariantDataBuilder,mappers=[observed]),
-        job_manager=jmanager)
-bmanager.sync()
+        job_manager=job_manager)
+build_manager.sync()
+
+differ_manager = differ.DifferManager(job_manager=job_manager)
+differ_manager.sync()
 
 pindexer = partial(VariantIndexer,es_host=config.ES_HOST)
-imanager = indexer.IndexerManager(pindexer=pindexer,
-        job_manager=jmanager)
-imanager.sync()
+index_manager = indexer.IndexerManager(pindexer=pindexer,
+        job_manager=job_manager)
+index_manager.sync()
 
 from biothings.utils.hub import schedule, top, pending, done
 
@@ -55,17 +59,19 @@ COMMANDS = {
         "dump" : dmanager.dump_src,
         "dump_all" : dmanager.dump_all,
         # upload commands
-        "um" : umanager,
-        "upload" : umanager.upload_src,
-        "upload_all": umanager.upload_all,
+        "um" : upload_manager,
+        "upload" : upload_manager.upload_src,
+        "upload_all": upload_manager.upload_all,
         # building/merging
-        "bm" : bmanager,
-        "merge" : bmanager.merge,
+        "bm" : build_manager,
+        "merge" : build_manager.merge,
         # diff
-        "diff" : bmanager.diff,
+        "dim" : differ_manager,
+        "diff" : partial(differ_manager.diff,"jsondiff"),
+        "report": differ_manager.diff_report,
         # indexing commands
-        "im" : imanager,
-        "index" : imanager.index,
+        "im" : index_manager,
+        "index" : index_manager.index,
         # admin/advanced
         "loop" : loop,
         "pqueue" : process_queue,
