@@ -51,6 +51,25 @@ index_manager = indexer.IndexerManager(pindexer=pindexer,
         job_manager=job_manager)
 index_manager.sync()
 
+import biothings.utils.mongo as mongo
+def snpeff(build_name=None,sources=[]):
+    """Shortcut to run snpeff on all sources given a build_name
+    or a list of source names
+    will process sources one by one"""
+    if build_name:
+        sources = mongo.get_source_fullnames(build_manager.list_sources(build_name))
+    else:
+        sources = mongo.get_source_fullnames(sources)
+    config.logger.info("Sequentially running snpeff on %s" % repr(sources))
+    @asyncio.coroutine
+    def do(srcs):
+        for src in srcs:
+            config.logger.info("Running snpeff on '%s'" % src)
+            job = upload_manager.upload_src(src,steps="post")
+            yield from asyncio.wait(job)
+    task = asyncio.ensure_future(do(sources))
+    return task
+
 from biothings.utils.hub import schedule, top, pending, done
 
 COMMANDS = {
@@ -62,6 +81,7 @@ COMMANDS = {
         "um" : upload_manager,
         "upload" : upload_manager.upload_src,
         "upload_all": upload_manager.upload_all,
+        "snpeff": snpeff,
         # building/merging
         "bm" : build_manager,
         "merge" : build_manager.merge,
