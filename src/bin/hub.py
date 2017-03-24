@@ -60,6 +60,8 @@ def snpeff(build_name=None,sources=[]):
         sources = mongo.get_source_fullnames(build_manager.list_sources(build_name))
     else:
         sources = mongo.get_source_fullnames(sources)
+    # remove any snpeff related collection
+    sources = [src for src in sources if not src.startswith("snpeff")]
     config.logger.info("Sequentially running snpeff on %s" % repr(sources))
     @asyncio.coroutine
     def do(srcs):
