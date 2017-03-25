@@ -47,7 +47,7 @@ class MyVariantDataBuilder(builder.DataBuilder):
         id_batch_size = batch_size * job_manager.process_queue._max_workers * 2
         self.logger.info("Fetch _ids from '%s' with batch_size=%d, and create post-merger job with batch_size=%d" % \
                 (self.target_backend.target_collection.name, id_batch_size, batch_size))
-        for big_doc_ids in id_feeder(self.target_backend.target_collection, batch_size=id_batch_size):
+        for big_doc_ids in id_feeder(self.target_backend.target_collection, batch_size=id_batch_size, logger=self.logger):
             for doc_ids in iter_n(big_doc_ids,batch_size):
                 yield from asyncio.sleep(0.1)
                 cnt += len(doc_ids)

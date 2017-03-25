@@ -37,13 +37,13 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
         assert snpeff_doc, "No snpeff information found, has it been dumped & uploaded ?"
         snpeff_dir = snpeff_doc["data_folder"]
         # -q: when there's an update, there's a message on stderr....
-        cmd = "java -Xmx4g -jar %s/snpEff/snpEff.jar -q %s" % (snpeff_dir,version)
+        cmd = "java -Xmx4g -jar %s/snpEff/snpEff.jar -t -noStats %s" % (snpeff_dir,version)
         # genome files are in "data_folder"/../data
         genomes = glob.glob(os.path.join(snpeff_dir,"..","data","%s_genome.*" % version))
         assert len(genomes) == 1, "Expected only one genome files for '%s', got: %s" % (version,genomes)
         genome = genomes[0]
-        annotator = snpeff_parser.SnpeffAnnotator(cmd)
-        vcf_builder = snpeff_parser.VCFConstruct(genome)
+        annotator = snpeff_parser.SnpeffAnnotator(cmd,logger=self.logger)
+        vcf_builder = snpeff_parser.VCFConstruct(genome,logger=self.logger)
         storage = UpsertStorage(None,snpeff_class.name,self.logger)
         col = self.db[self.collection_name]
         total = math.ceil(col.count()/batch_size)
@@ -64,12 +64,12 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
                     if len(vcf["vcf"][k]) > MAX_REF_ALT_LEN:
                         msg = "...(trimmed)"
                         vcf["vcf"][k] = vcf["vcf"][k][:MAX_REF_ALT_LEN - len(msg)] + msg
-                hgvs_vcfs[annot["_id"]] = vcf
+                hgvs_vcfs[_id] = vcf
 
             data = annotate_start_end(hgvs_vcfs,version)
             storage.process(data, batch_size)
 
-        for ids in id_feeder(col, batch_size=batch_size):
+        for ids in id_feeder(col, batch_size=batch_size, logger=self.logger):
             cnt += 1
             self.logger.debug("Processing batch %s/%s [%.1f]" % (cnt,total,(cnt/total*100)))
             # don't re-compute annotations if already there
