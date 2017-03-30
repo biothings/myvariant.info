@@ -15,7 +15,7 @@ class VCFConstruct(object):
     def __init__(self, genome, logger=logging):
         self.genome = genome
         self._chr_data = None
-        self.logger = logging
+        self.logger = logger
 
     def load_chr_data(self):
         self.logger.info("\tLoading chromosome data from '%s'..." % self.genome)
@@ -145,13 +145,6 @@ class VCFConstruct(object):
         # extract each hgvs_id from list, transform into vcf format
         hgvs_vcfs = {}
         for hgvs_id in hgvs_ids:
-            # annotations are 3kb on average, when we have N nucleotide, we have to limit
-            # the number of generated annotations, otherwise we can't store them
-            # (document is too big). 3KB * 4**4 < 1MB, we're on the safe side
-            # (and we don't want too big docs anyways)
-            if hgvs_id.count("N") > 1:
-                self.logger.warning("Can't process '%s', it would produce a document too big" % hgvs_id)
-                continue
             if '>' in hgvs_id:
                 hgvs_info = self.snp_hgvs_id_parser(hgvs_id)
                 if not hgvs_info:
@@ -211,7 +204,7 @@ class SnpeffAnnotator(object):
             self.snpeff_cmd = cmd.split()
         else:
             self.snpeff_cmd = cmd
-        self.logger = logging
+        self.logger = logger
 
     def check_hgvs_info(self,hgvs_info):
         # last one should be a nucleotide

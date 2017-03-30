@@ -52,10 +52,17 @@ index_manager = indexer.IndexerManager(pindexer=pindexer,
 index_manager.sync()
 
 import biothings.utils.mongo as mongo
-def snpeff(build_name=None,sources=[]):
-    """Shortcut to run snpeff on all sources given a build_name
-    or a list of source names
-    will process sources one by one"""
+def snpeff(build_name=None,sources=[], forcecache=True):
+    """
+    Shortcut to run snpeff on all sources given a build_name
+    or a list of source names will process sources one by one
+    Since it's particularly useful when snpeff data needs reprocessing
+
+    forcecache=True is used to make sure all cache files are used to
+    speed up, while source is actually being postprocessed. We're assuming
+    data hasn't changed and there's no new _ids since the last time source
+    was processed.
+    """
     if build_name:
         sources = mongo.get_source_fullnames(build_manager.list_sources(build_name))
     else:
@@ -67,7 +74,7 @@ def snpeff(build_name=None,sources=[]):
     def do(srcs):
         for src in srcs:
             config.logger.info("Running snpeff on '%s'" % src)
-            job = upload_manager.upload_src(src,steps="post")
+            job = upload_manager.upload_src(src,steps="post",forcecache=forcecache)
             yield from asyncio.wait(job)
     task = asyncio.ensure_future(do(sources))
     return task

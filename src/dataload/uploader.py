@@ -27,7 +27,7 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
         pinfo.setdefault("__reqs__",{})["mem"] = (self.__class__.SNPEFF_BATCH_SIZE/100000.) * (1024**3)
         return pinfo
 
-    def do_snpeff(self, batch_size=SNPEFF_BATCH_SIZE, force=False):
+    def do_snpeff(self, batch_size=SNPEFF_BATCH_SIZE, force=False, forcecache=False):
         self.logger.info("Updating snpeff information from source '%s' (collection:%s)" % (self.fullname,self.collection_name))
         # select Snpeff uploader to get collection name and src_dump _id
         version = self.__class__.__metadata__["assembly"]
@@ -37,7 +37,7 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
         assert snpeff_doc, "No snpeff information found, has it been dumped & uploaded ?"
         snpeff_dir = snpeff_doc["data_folder"]
         # -q: when there's an update, there's a message on stderr....
-        cmd = "java -Xmx4g -jar %s/snpEff/snpEff.jar -t -noStats %s" % (snpeff_dir,version)
+        cmd = "java -Xmx4g -jar %s/snpEff/snpEff.jar -t -noStats -noExpandIUB %s" % (snpeff_dir,version)
         # genome files are in "data_folder"/../data
         genomes = glob.glob(os.path.join(snpeff_dir,"..","data","%s_genome.*" % version))
         assert len(genomes) == 1, "Expected only one genome files for '%s', got: %s" % (version,genomes)
@@ -69,7 +69,7 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
             data = annotate_start_end(hgvs_vcfs,version)
             storage.process(data, batch_size)
 
-        for ids in id_feeder(col, batch_size=batch_size, logger=self.logger):
+        for ids in id_feeder(col, batch_size=batch_size, logger=self.logger, force=forcecache):
             cnt += 1
             self.logger.debug("Processing batch %s/%s [%.1f]" % (cnt,total,(cnt/total*100)))
             # don't re-compute annotations if already there
@@ -94,10 +94,11 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
         if to_process:
             process(to_process)
 
-    def post_update_data(self, steps, force, batch_size, job_manager):
+    def post_update_data(self, steps, force, batch_size, job_manager, **kwargs):
         # this one will run in current thread, snpeff java prg will
         # multiprocess itself, no need to do more
-        self.do_snpeff(force=force)
+        forcecache = kwargs.get("forcecache",False)
+        self.do_snpeff(force=force,forcecache=forcecache)
 
 
 def annotate_start_end(hgvs_vcfs, assembly):
