@@ -237,7 +237,7 @@ def _map_line_to_json(cp, hg19):
             elif variation_type == 'copy number loss' or\
                     variation_type == 'copy number gain':
                 if hgvs_genome and chrom:
-                    hgvs_id = "chr" + chrom + ":" + hgvs_genome.split('.')[2]
+                    hgvs_id = "chr" + chrom + ":g." + hgvs_genome.split('.')[2]
             elif hgvs_coding:
                 hgvs_id = hgvs_coding
                 coding_hgvs_only = True
