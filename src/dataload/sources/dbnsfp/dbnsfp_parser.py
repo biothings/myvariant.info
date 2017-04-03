@@ -3,7 +3,7 @@ import glob
 from biothings.utils.dataload import list_split, dict_sweep, unlist, value_convert_to_number
 
 
-VALID_COLUMN_NO = 187
+VALID_COLUMN_NO = 194
 
 '''this parser is for dbNSFP v3.3a beta2 downloaded from
 https://sites.google.com/site/jpopgen/dbNSFP'''
@@ -42,7 +42,7 @@ def _map_line_to_json(df, version, index=0):
         freq = siphy_29way_pi.split(":")
         siphy = {'a': freq[0], 'c': freq[1], 'g': freq[2], 't': freq[3]}
     gtex_gene = df["GTEx_V6_gene"].split('|')
-    gtex_tissue = df["GTEx_V6_tissue"].split('|')
+    gtex_tissue = df["GTEx_V6_tissue "].split('|')
     gtex = map(dict, map(lambda t: zip(('gene', 'tissue'), t), zip(gtex_gene, gtex_tissue)))
     acc = df["Uniprot_acc_Polyphen2"].rstrip().rstrip(';').split(";")
     pos = df["Uniprot_aapos_Polyphen2"].rstrip().rstrip(';').split(";")
@@ -59,10 +59,38 @@ def _map_line_to_json(df, version, index=0):
     metasvm_score = df["MetaSVM_score"].split(';')
     fathmm_score = df["FATHMM_score"].split(';')
     metalr_score = df["MetaLR_score"].split(';')
+    revel_score = df["REVEL_score"].split(';')
+    '''
+    parse mutpred top 5 features
+    '''
+    def modify_pvalue(pvalue):
+        return float(pvalue.strip('P = '))
+    mutpred_mechanisms = df["MutPred_Top5features"]
+    if mutpred_mechanisms not in ['.', ',', '-']:
+        mutpred_mechanisms = mutpred_mechanisms.split(" (") and mutpred_mechanisms.split(";")
+        mutpred_mechanisms = [m.rstrip(")") for m in mutpred_mechanisms]
+        mutpred_mechanisms = [i.split(" (") for i in mutpred_mechanisms]
+        mutpred_mechanisms = sum(mutpred_mechanisms, [])
+        mechanisms = [
+            {"mechanism": mutpred_mechanisms[0],
+             "p_val": modify_pvalue(mutpred_mechanisms[1])},
+            {"mechanism": mutpred_mechanisms[2],
+             "p_val": modify_pvalue(mutpred_mechanisms[3])},
+            {"mechanism": mutpred_mechanisms[4],
+             "p_val": modify_pvalue(mutpred_mechanisms[5])},
+            {"mechanism": mutpred_mechanisms[6],
+             "p_val": modify_pvalue(mutpred_mechanisms[7])},
+            {"mechanism": mutpred_mechanisms[8],
+             "p_val": modify_pvalue(mutpred_mechanisms[9])}
+        ]
+    else:
+        mechanisms = '.'
 
     # normalize scores
+
     def norm(arr):
         return [None if item == '.' else item for item in arr]
+
     provean_score = norm(provean_score)
     sift_score = norm(sift_score)
     hdiv_score = norm(hdiv_score)
@@ -75,6 +103,7 @@ def _map_line_to_json(df, version, index=0):
     metasvm_score = norm(metasvm_score)
     fathmm_score = norm(fathmm_score)
     metalr_score = norm(metalr_score)
+    revel_score = norm(revel_score)
 
 # load as json data
     one_snp_json = {
@@ -203,6 +232,17 @@ def _map_line_to_json(df, version, index=0):
                 "score": m_cap_score,
                 "rankscore": df["M-CAP_rankscore"],
                 "pred": df["M-CAP_pred"]
+            },
+            "revel": {
+                "score": revel_score,
+                "rankscore": df["REVEL_rankscore"]
+            },
+            "mutpred": {
+                "score": df["MutPred_score"],
+                "rankscore": df["MutPred_rankscore"],
+                "accession": df["MutPred_protID"],
+                "aa_change": df["MutPred_AAchange"],
+                "pred": mechanisms
             },
             "dann": {
                 "score": df["DANN_score"],
@@ -350,7 +390,7 @@ def _map_line_to_json(df, version, index=0):
         }
     }
 
-    one_snp_json = list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=["."]), ";")
+    one_snp_json = list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=[".", None]), ";")
     one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"])
     return one_snp_json
 
@@ -360,10 +400,10 @@ def data_generator(input_file, version):
     open_file = open(input_file)
     db_nsfp = csv.reader(open_file, delimiter="\t")
     index = next(db_nsfp)
-    assert len(index) == VALID_COLUMN_NO, "Expecting %s columns, but got %s" % (VALID_COLUMN_NO,len(index))
+    assert len(index) == VALID_COLUMN_NO, "Expecting %s columns, but got %s" % (VALID_COLUMN_NO, len(index))
     previous_row = None
     for row in db_nsfp:
-        df = dict(zip(index,row))
+        df = dict(zip(index, row))
         # use transpose matrix to have 1 row with N 187 columns
         current_row = _map_line_to_json(df, version=version)
         if previous_row and current_row:
@@ -390,7 +430,5 @@ def load_data_file(input_file, version):
 
 # load path and find files, pass to data_generator
 def load_data(path_glob, version='hg19'):
-    todo = sorted(glob.glob(path_glob))
     for input_file in sorted(glob.glob(path_glob)):
-        return load_data_file(input_file,version)
-
+        return load_data_file(input_file, version)
