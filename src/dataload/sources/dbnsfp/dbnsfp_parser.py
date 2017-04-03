@@ -431,4 +431,5 @@ def load_data_file(input_file, version):
 # load path and find files, pass to data_generator
 def load_data(path_glob, version='hg19'):
     for input_file in sorted(glob.glob(path_glob)):
-        return load_data_file(input_file, version)
+         for d in load_data_file(input_file, version):
+             yield d
