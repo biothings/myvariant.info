@@ -363,6 +363,42 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             }
                         }
                     },
+                    "revel": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "mutpred": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "accession": {
+                                "type": "string"
+                            },
+                            "aa_change": {
+                                "type": "string"
+                            },
+                            "pred": {
+                                "properties": {
+                                    "mechanism": {
+                                        "type": "string"
+                                    },
+                                    "p_val": {
+                                        "type": "float"
+                                    }
+                                }
+                            }
+                        }
+                    },
                     "integrated": {
                         "properties": {
                             "fitcons_score": {
@@ -747,22 +783,21 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
     def jobs(self):
         # tuple(input_file,version), where version is either hg38 or hg19)
         return map(lambda e: (e, self.__class__.__metadata__["assembly"]),
-                   glob.glob(os.path.join(self.data_folder,self.__class__.GLOB_PATTERN)))
+                   glob.glob(os.path.join(self.data_folder, self.__class__.GLOB_PATTERN)))
 
-    def load_data(self,input_file,hg):
-        return load_common(input_file,version=hg)
+    def load_data(self, input_file, hg):
+        return load_common(input_file, version=hg)
 
 
 class DBNSFPHG38Uploader(DBNSFPBaseUploader):
 
     name = "dbnsfp_hg38"
     main_source = "dbnsfp"
-    __metadata__ = {"assembly" : "hg38"}
+    __metadata__ = {"assembly": "hg38"}
 
 
 class DBNSFPHG19Uploader(DBNSFPBaseUploader):
 
     name = "dbnsfp_hg19"
     main_source = "dbnsfp"
-    __metadata__ = {"assembly" : "hg19"}
-
+    __metadata__ = {"assembly": "hg19"}
