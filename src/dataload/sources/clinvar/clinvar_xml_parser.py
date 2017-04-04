@@ -249,7 +249,7 @@ def _map_line_to_json(cp, hg19):
             return
         for key in HGVS:
             HGVS[key].sort()
-        rsid = None
+        rsid = []
         cosmic = None
         dbvar = None
         uniprot = None
@@ -257,8 +257,10 @@ def _map_line_to_json(cp, hg19):
         # loop through XRef to find rsid as well as other ids
         if Measure.XRef:
             for XRef in Measure.XRef:
+                //multiple rsid could be linked to one hgvs id
                 if XRef.Type == 'rs':
-                    rsid = 'rs' + str(XRef.ID)
+                    _rsid = 'rs' + str(XRef.ID)
+                    rsid.append(_rsid)
                 elif XRef.DB == 'COSMIC':
                     cosmic = XRef.ID
                 elif XRef.DB == 'OMIM':
