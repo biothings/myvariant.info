@@ -257,7 +257,7 @@ def _map_line_to_json(cp, hg19):
         # loop through XRef to find rsid as well as other ids
         if Measure.XRef:
             for XRef in Measure.XRef:
-                //multiple rsid could be linked to one hgvs id
+                #multiple rsid could be linked to one hgvs id
                 if XRef.Type == 'rs':
                     _rsid = 'rs' + str(XRef.ID)
                     rsid.append(_rsid)
