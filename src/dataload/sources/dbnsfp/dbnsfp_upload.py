@@ -757,11 +757,14 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "string",
                                 "include_in_all": True
                             },
-                            # "clinsig": {
-                            #     "type": "integer"     # can contain |, like 5|5, FIXME
-                            # },
+                             "clinsig": {
+                                 "type": "integer"
+                             },
+                             'golden_stars': {
+                                 "type" : "integer"
+                             },
                             "trait": {
-                                "type": "string"        # can contain |, FIXME
+                                "type": "string"
                             }
                         }
                     },

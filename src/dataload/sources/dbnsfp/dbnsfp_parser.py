@@ -382,9 +382,9 @@ def _map_line_to_json(df, version, index=0):
             },
             "clinvar": {
                 "rs": df["clinvar_rs"],
-                "clinsig": df["clinvar_clnsig"],
-                "trait": df["clinvar_trait"],
-                "golden_stars": df["clinvar_golden_stars"]
+                "clinsig": list(map(int,[i for i in df["clinvar_clnsig"].split("|") if i != "."])),
+                "trait": [i for i in df["clinvar_trait"].split("|") if i != "."],
+                "golden_stars": list(map(int,[i for i in df["clinvar_golden_stars"].split("|") if i != "."]))
             },
             "gtex": list(gtex)
         }
