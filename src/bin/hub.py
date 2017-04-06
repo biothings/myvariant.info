@@ -52,13 +52,13 @@ index_manager = indexer.IndexerManager(pindexer=pindexer,
 index_manager.sync()
 
 import biothings.utils.mongo as mongo
-def snpeff(build_name=None,sources=[], forcecache=True):
+def snpeff(build_name=None,sources=[], force_use_cache=True):
     """
     Shortcut to run snpeff on all sources given a build_name
     or a list of source names will process sources one by one
     Since it's particularly useful when snpeff data needs reprocessing
 
-    forcecache=True is used to make sure all cache files are used to
+    force_use_cache=True is used to make sure all cache files are used to
     speed up, while source is actually being postprocessed. We're assuming
     data hasn't changed and there's no new _ids since the last time source
     was processed.
@@ -74,9 +74,46 @@ def snpeff(build_name=None,sources=[], forcecache=True):
     def do(srcs):
         for src in srcs:
             config.logger.info("Running snpeff on '%s'" % src)
-            job = upload_manager.upload_src(src,steps="post",forcecache=forcecache)
+            job = upload_manager.upload_src(src,steps="post",force_use_cache=force_use_cache)
             yield from asyncio.wait(job)
     task = asyncio.ensure_future(do(sources))
+    return task
+
+def rebuild_cache(build_name=None,sources=None,target=None):
+    """Rebuild cache files for all sources involved in build_name, as well as 
+    the latest merged collection found for that build"""
+    if build_name:
+        sources = mongo.get_source_fullnames(build_manager.list_sources(build_name))
+        target = mongo.get_latest_build(build_name)
+    elif sources:
+        sources = mongo.get_source_fullnames(sources)
+
+    def rebuild(col):
+        cur = mongo.id_feeder(col,batch_size=10000,logger=config.logger,force_build=True)
+        [i for i in cur] # just iterate
+
+    @asyncio.coroutine
+    def do(srcs,tgt):
+        pinfo = {"category" : "cache",
+                "source" : None,
+                "step" : "rebuild",
+                "description" : ""}
+        config.logger.info("Rebuild cache for sources: %s, target: %s" % (srcs,tgt))
+        for src in srcs:
+            config.logger.info("Rebuilding cache for source '%s'" % src)
+            col = mongo.get_src_db()[src]
+            pinfo["source"] = src
+            job = yield from job_manager.defer_to_thread(pinfo, partial(rebuild,col))
+            yield from job
+            config.logger.info("Done rebuilding cache for source '%s'" % src)
+        if tgt:
+            config.logger.info("Rebuilding cache for target '%s'" % tgt)
+            col = mongo.get_target_db()[tgt]
+            pinfo["source"] = tgt
+            job = job_manager.defer_to_thread(pinfo, partial(rebuild,col))
+            yield from job
+
+    task = asyncio.ensure_future(do(sources,target))
     return task
 
 from biothings.utils.hub import schedule, top, pending, done
@@ -91,6 +128,7 @@ COMMANDS = {
         "upload" : upload_manager.upload_src,
         "upload_all": upload_manager.upload_all,
         "snpeff": snpeff,
+        "rebuild_cache": rebuild_cache,
         # building/merging
         "bm" : build_manager,
         "merge" : build_manager.merge,
