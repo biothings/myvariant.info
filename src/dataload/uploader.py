@@ -27,7 +27,7 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
         pinfo.setdefault("__reqs__",{})["mem"] = (self.__class__.SNPEFF_BATCH_SIZE/100000.) * (1024**3)
         return pinfo
 
-    def do_snpeff(self, batch_size=SNPEFF_BATCH_SIZE, force=False, forcecache=False):
+    def do_snpeff(self, batch_size=SNPEFF_BATCH_SIZE, force=False, force_use_cache=False):
         self.logger.info("Updating snpeff information from source '%s' (collection:%s)" % (self.fullname,self.collection_name))
         # select Snpeff uploader to get collection name and src_dump _id
         version = self.__class__.__metadata__["assembly"]
@@ -69,7 +69,7 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
             data = annotate_start_end(hgvs_vcfs,version)
             storage.process(data, batch_size)
 
-        for ids in id_feeder(col, batch_size=batch_size, logger=self.logger, force=forcecache):
+        for ids in id_feeder(col, batch_size=batch_size, logger=self.logger, force_use=force_use_cache):
             cnt += 1
             self.logger.debug("Processing batch %s/%s [%.1f]" % (cnt,total,(cnt/total*100)))
             # don't re-compute annotations if already there
@@ -97,8 +97,8 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
     def post_update_data(self, steps, force, batch_size, job_manager, **kwargs):
         # this one will run in current thread, snpeff java prg will
         # multiprocess itself, no need to do more
-        forcecache = kwargs.get("forcecache",False)
-        self.do_snpeff(force=force,forcecache=forcecache)
+        force_use_cache = kwargs.get("force_use_cache",False)
+        self.do_snpeff(force=force,force_use_cache=force_use_cache)
 
 
 def annotate_start_end(hgvs_vcfs, assembly):

@@ -118,3 +118,6 @@ MAX_RANDOMLY_PICKED = 10
 
 # ES s3 repository to use snapshot/restore (must be pre-configured in ES)
 SNAPSHOT_REPOSITORY = "variant_repository"
+
+# cache file format ("": ascii/text uncompressed, or "gz|zip|xz"
+CACHE_FORMAT = "xz"
