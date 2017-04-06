@@ -79,7 +79,7 @@ def snpeff(build_name=None,sources=[], force_use_cache=True):
     task = asyncio.ensure_future(do(sources))
     return task
 
-def rebuild_cache(build_name=None,sources=None,target=None):
+def rebuild_cache(build_name=None,sources=None,target=None,force_build=False):
     """Rebuild cache files for all sources involved in build_name, as well as 
     the latest merged collection found for that build"""
     if build_name:
@@ -87,9 +87,11 @@ def rebuild_cache(build_name=None,sources=None,target=None):
         target = mongo.get_latest_build(build_name)
     elif sources:
         sources = mongo.get_source_fullnames(sources)
+    if not sources and not target:
+        raise Exception("No valid sources found")
 
     def rebuild(col):
-        cur = mongo.id_feeder(col,batch_size=10000,logger=config.logger,force_build=True)
+        cur = mongo.id_feeder(col,batch_size=10000,logger=config.logger,force_build=force_build)
         [i for i in cur] # just iterate
 
     @asyncio.coroutine
@@ -100,6 +102,9 @@ def rebuild_cache(build_name=None,sources=None,target=None):
                 "description" : ""}
         config.logger.info("Rebuild cache for sources: %s, target: %s" % (srcs,tgt))
         for src in srcs:
+            # src can be a full name (eg. clinvar.clinvar_hg38) but id_feeder knows only name (clinvar_hg38)
+            if "." in src:
+                src = src.split(".")[1]
             config.logger.info("Rebuilding cache for source '%s'" % src)
             col = mongo.get_src_db()[src]
             pinfo["source"] = src

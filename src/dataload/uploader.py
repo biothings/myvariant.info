@@ -67,7 +67,12 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
                 hgvs_vcfs[_id] = vcf
 
             data = annotate_start_end(hgvs_vcfs,version)
-            storage.process(data, batch_size)
+            howmany = storage.process(data, batch_size)
+            if howmany:
+                # we need to update some metadata info about snpeff b/c data has changed
+                # so cache could be invalid
+                self.logger.debug("Invalidating cache for '%s'" % snpeff_class.name)
+                mongo.invalidate_cache(snpeff_class.name)
 
         for ids in id_feeder(col, batch_size=batch_size, logger=self.logger, force_use=force_use_cache):
             cnt += 1
