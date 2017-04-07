@@ -345,7 +345,7 @@ def rcv_feeder(input_file, hg19):
         for record_mapped in _map_line_to_json(record_parsed, hg19):
             yield record_mapped
 
-def load_data(hg19=True, data_folder=None):
+def load_data(data_folder, version):
     # try to get logger from uploader
     import logging as loggingmod
     global logging
@@ -355,7 +355,7 @@ def load_data(hg19=True, data_folder=None):
     files = glob.glob(os.path.join(data_folder,GLOB_PATTERN))
     assert len(files) == 1, "Expecting only one file matching '%s', got: %s" % (GLOB_PATTERN,files)
     input_file = files[0]
-    data_generator = rcv_feeder(input_file, hg19)
+    data_generator = rcv_feeder(input_file, version == "hg19")
     data_list = list(data_generator)
     # TODO: why do we sort this list ? this prevent from using yield/iterator
     data_list_sorted = sorted(data_list, key=lambda k: k['_id'])
