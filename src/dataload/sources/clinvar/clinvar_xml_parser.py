@@ -232,8 +232,12 @@ def _map_line_to_json(cp, hg19):
                         dup_position = hgvs_genome.find('dup')
                         if 'dup' in hgvs_genome:
                             dup_ref = hgvs_genome[dup_position+3:]
-                            hgvs_id = "chr%s:g.%s_%sdup%s" % \
-                                      (chrom, chromStart, chromEnd, dup_ref)
+                            if chromStart == chromEnd:
+                                hgvs_id = "chr%s:g.%sdup%s" % \
+                                        (chrom, chromStart, dup_ref)
+                            else:
+                                hgvs_id = "chr%s:g.%s_%sdup%s" % \
+                                        (chrom, chromStart, chromEnd, dup_ref)
             elif variation_type == 'copy number loss' or\
                     variation_type == 'copy number gain':
                 if hgvs_genome and chrom:
