@@ -12,6 +12,7 @@ __sources_dict__ = [
         'dataload.sources.emv',
         'dataload.sources.evs',
         'dataload.sources.geno2mp',
+        'dataload.sources.uniprot',
 
         # dead-resources
         'dataload.sources.cosmic',
@@ -20,7 +21,6 @@ __sources_dict__ = [
         'dataload.sources.mutdb',
         'dataload.sources.gwassnps',
         'dataload.sources.docm',
-        'dataload.sources.uniprot',
 
         # generated resources
         'dataload.sources.snpeff',

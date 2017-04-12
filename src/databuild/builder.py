@@ -56,9 +56,8 @@ class MyVariantDataBuilder(builder.DataBuilder):
                 pinfo["description"] = "#%d/%d (%.1f%%)" % (bnum,btotal,(cnt/total*100.))
                 self.logger.info("Creating post-merge job #%d/%d to process chrom %d/%d (%.1f%%)" % \
                         (bnum,btotal,cnt,total,(cnt/total*100.)))
-                ids = [doc["_id"] for doc in doc_ids]
                 job = yield from job_manager.defer_to_process(pinfo,
-                        partial(chrom_worker, self.target_backend.target_name, ids))
+                        partial(chrom_worker, self.target_backend.target_name, doc_ids))
                 def processed(f,results, batch_num):
                     try:
                         fres = f.result()
