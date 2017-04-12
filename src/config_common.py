@@ -121,3 +121,9 @@ SNAPSHOT_REPOSITORY = "variant_repository"
 
 # cache file format ("": ascii/text uncompressed, or "gz|zip|xz"
 CACHE_FORMAT = "xz"
+
+# Max queued jobs in job manager
+# this shouldn't be 0 to make sure a job is pending and ready to be processed
+# at any time (avoiding job submission preparation) but also not a huge number
+# as any pending job will consume some memory).
+MAX_QUEUED_JOBS = os.cpu_count() * 4
