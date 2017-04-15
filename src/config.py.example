@@ -78,7 +78,9 @@ HUB_MAX_WORKERS = None
 # to broadcast message to a Hipchat room
 HIPCHAT_CONFIG = { "token" : "", "roomid" : "", "from" : "" }
 
-
+# if snaphots host is different from prod host, specify the URL
+# (otherwise ES_HOST will be used when creating snapshot)
+ES_SNAPSHOT_HOST = 'localhost:9200'
 
 ###############################
 # For www module only         #
