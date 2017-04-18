@@ -122,26 +122,6 @@ def rebuild_cache(build_name=None,sources=None,target=None,force_build=False):
     return task
 
 
-from biothings.utils.es import ESIndexer
-# TODO: move this to indexer class
-# TODO: monitor snapshot status SUCCESS/IN_PROGRESS/FAILED to report task
-# completion
-def snapshot(index):
-    @asyncio.coroutine
-    def do(index):
-        es_snapshot_host = getattr(config,"ES_SNAPSHOT_HOST",config.ES_HOST)
-        idxr = ESIndexer(index=index,doc_type=config.ES_DOC_TYPE,es_host=es_snapshot_host)
-        pinfo = {"category" : "index",
-                "source" : index,
-                "step" : "snapshot",
-                "description" : es_snapshot_host}
-        config.logger.info("Creating snapshot for index '%s' on host '%s', repository '%s'" % (index,es_snapshot_host,config.SNAPSHOT_REPOSITORY))
-        job = job_manager.defer_to_thread(pinfo, partial(idxr.snapshot,config.SNAPSHOT_REPOSITORY,index))
-        yield from job
-    task = asyncio.ensure_future(do(index))
-    return task
-
-
 from biothings.utils.hub import schedule, top, pending, done
 
 COMMANDS = {
@@ -165,7 +145,7 @@ COMMANDS = {
         # indexing commands
         "im" : index_manager,
         "index" : index_manager.index,
-        "snapshot" : snapshot,
+        "snapshot" : index_manager.snapshot,
         # admin/advanced
         "loop" : loop,
         "pqueue" : process_queue,

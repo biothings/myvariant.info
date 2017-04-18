@@ -33,6 +33,7 @@ class UniprotUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                 "analyzer": "string_lowercase"
                             },
                             "ftid": {
+                                "include_in_all": True,
                                 "type": "string",
                                 "analyzer": "string_lowercase"
                             },

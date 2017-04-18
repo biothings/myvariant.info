@@ -127,3 +127,9 @@ CACHE_FORMAT = "xz"
 # at any time (avoiding job submission preparation) but also not a huge number
 # as any pending job will consume some memory).
 MAX_QUEUED_JOBS = os.cpu_count() * 4
+
+# when creating a snapshot, how long should we wait before querying ES
+# to check snapshot status/completion ? (in seconds)
+# Since myvariant's indices are pretty big, a whole snaphost won't happne in few secs,
+# let's just monitor the status every 5min
+MONITOR_SNAPSHOT_DELAY = 5 * 60
