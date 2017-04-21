@@ -163,6 +163,12 @@ Each individual variant object contains an "**_id**" field as the primary key. W
   The above _id represents that six nucleotides between genomic position 14112 and 14117 are replaced by TG.
 
 
+_score field
+------------
+
+You will often see a “_score” field in the returned variant object, which is the internal score representing how well the query matches the returned variant object. It probably does not mean much in `variant annotation service <http://docs.myvariant.info/en/latest/doc/data.html>`_ when only one variant object is returned. In `variant query service <http://docs.myvariant.info/en/latest/doc/variant_query_service.html>`_, by default, the returned variant hits are sorted by the scores in descending order.
+
+
 .. _available_fields:
 
 Available fields
