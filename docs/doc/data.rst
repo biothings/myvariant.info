@@ -25,6 +25,8 @@ keep them up-to-date, so that you don't have to do it:
 .. _Scripps Wellderly: http://www.stsiweb.org/wellderly/
 .. _EXAC: http://exac.broadinstitute.org/
 .. _GRASP: http://iapps.nhlbi.nih.gov/GRASP
+.. _UniProt: ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/variants/README
+
 
 .. raw:: html
 
@@ -62,6 +64,8 @@ Total variants loaded: **334,292,622**
 | `EXAC`_                       | v0.3          | 10,195,872                | exac                       |
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `GRASP`_                      | v2.0.0.0      | 2,212,148                 | grasp                      |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `UniProt`_                    | 201703        | 477,711                   | uniprot                    |
 +-------------------------------+---------------+---------------------------+----------------------------+
 
 .. raw:: html
