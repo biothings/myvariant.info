@@ -158,3 +158,25 @@ You can install this package with `PyPI <https://pypi.python.org/pypi/myvariant-
 .. raw:: html
 
     <div id="spacer" style="height:300px"></div>
+
+
+A JBrowse plugin for MyVariant.info and MyGene.info
+----------------------------------------------------
+
+`JBrowse <https://jbrowse.org/>`_ provides a fast, embeddable genome browser built completely with JavaScript and HTML5.
+
+`Colin <https://github.com/cmdcolin>`_ from the JBrowse team made a very nice plugin to visualize the gene and variant annotations in JBrowse Genome Browser, using the data served from both `MyGene.info <http://mygene.info>`_ and `MyVariant.info <http://myvariant.info>`_ APIs.
+
+* Live demo
+
+  To see it live, here is `the demo site <https://gmod.github.io/jbrowse-registry/demos/JBrowse-1.12.1/?data=..%2Fmyvariantviewer&tracks=MyGene.info%20v3%2CMyVariant.info%20grasp&loc=chr1%3A19863726..20086213&highlight=>`_.  It has been tested with hg38, hg19, and zebrafish and has mygene.info and myvariant.info integrations
+
+* Source code
+
+  https://github.com/elsiklab/myvariantviewer
+
+* A screenshot
+
+  .. image:: /_static/jbrowse-plugin-screenshot-small.png
+      :target: /_static/jbrowse-plugin-screenshot.png
+      :align: center
