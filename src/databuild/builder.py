@@ -47,7 +47,7 @@ class MyVariantDataBuilder(builder.DataBuilder):
         id_batch_size = batch_size * job_manager.process_queue._max_workers * 2
         self.logger.info("Fetch _ids from '%s' with batch_size=%d, and create post-merger job with batch_size=%d" % \
                 (self.target_backend.target_collection.name, id_batch_size, batch_size))
-        for big_doc_ids in id_feeder(self.target_backend.target_collection, batch_size=id_batch_size):
+        for big_doc_ids in id_feeder(self.target_backend.target_collection, batch_size=id_batch_size, logger=self.logger):
             for doc_ids in iter_n(big_doc_ids,batch_size):
                 yield from asyncio.sleep(0.1)
                 cnt += len(doc_ids)
@@ -56,9 +56,8 @@ class MyVariantDataBuilder(builder.DataBuilder):
                 pinfo["description"] = "#%d/%d (%.1f%%)" % (bnum,btotal,(cnt/total*100.))
                 self.logger.info("Creating post-merge job #%d/%d to process chrom %d/%d (%.1f%%)" % \
                         (bnum,btotal,cnt,total,(cnt/total*100.)))
-                ids = [doc["_id"] for doc in doc_ids]
                 job = yield from job_manager.defer_to_process(pinfo,
-                        partial(chrom_worker, self.target_backend.target_name, ids))
+                        partial(chrom_worker, self.target_backend.target_name, doc_ids))
                 def processed(f,results, batch_num):
                     try:
                         fres = f.result()

@@ -7,23 +7,24 @@ from biothings.utils.common import loadobj
 from utils.hgvs import get_hgvs_from_vcf, trim_delseq_from_hgvs
 
 from biothings import config
-logger = config.logger
+logging = config.logger
 
 
 class VCFConstruct(object):
 
-    def __init__(self, genome):
+    def __init__(self, genome, logger=logging):
         self.genome = genome
         self._chr_data = None
+        self.logger = logger
 
     def load_chr_data(self):
-        logger.info("\tLoading chromosome data from '%s'..." % self.genome)
+        self.logger.info("\tLoading chromosome data from '%s'..." % self.genome)
         try:
             self._chr_data = loadobj(self.genome)
         except Exception as e:
-            logger.info(e)
+            self.logger.info(e)
             raise
-        logger.info("Done.")
+        self.logger.info("Done.")
 
     def snp_hgvs_id_parser(self, id):
         '''get chr, pos, ref, alt from hgvs_id'''
@@ -90,7 +91,7 @@ class VCFConstruct(object):
                 nuc_chr = bit_to_nuc(nuc_chr_bit)
                 ref += nuc_chr
             except Exception as e:
-                logger.warning("Couldn't extract nucleotide from bits with HGVS %s: %s" % (repr(hgvs),e))
+                self.logger.warning("Couldn't extract nucleotide from bits with HGVS %s: %s" % (repr(hgvs),e))
                 return None
         alt = ref[0]
         if chrom == 'MT':
@@ -108,7 +109,7 @@ class VCFConstruct(object):
         try:
             ref = bit_to_nuc(nuc_chr_bit)
         except Exception as e:
-            logger.warning("Couldn't extract nucleotide from bits with HGVS %s: %s" % (repr(hgvs),e))
+            self.logger.warning("Couldn't extract nucleotide from bits with HGVS %s: %s" % (repr(hgvs),e))
             return None
         alt = hgvs[3]
         alt = ref + alt
@@ -131,7 +132,7 @@ class VCFConstruct(object):
                 nuc_chr = bit_to_nuc(nuc_chr_bit)
                 ref += nuc_chr
             except Exception as e:
-                logger.warning("Couldn't extract nucleotide from bits with HGVS %s: %s" % (repr(hgvs),e))
+                self.logger.warning("Couldn't extract nucleotide from bits with HGVS %s: %s" % (repr(hgvs),e))
                 return None
         alt = hgvs[3]
         if chrom == 'MT':
@@ -190,7 +191,7 @@ class VCFConstruct(object):
                 hgvs_vcfs[hgvs_id] = {"_id" : hgvs_id, "vcf" : vcf}
 
             else:
-                logger.info('%s: beyond current capacity, skip it' % hgvs_id)
+                self.logger.info('%s: beyond current capacity, skip it' % hgvs_id)
                 continue
 
         return hgvs_vcfs
@@ -198,11 +199,12 @@ class VCFConstruct(object):
 
 class SnpeffAnnotator(object):
 
-    def __init__(self,cmd):
+    def __init__(self, cmd, logger=logging):
         if type(cmd) == str:
             self.snpeff_cmd = cmd.split()
         else:
             self.snpeff_cmd = cmd
+        self.logger = logger
 
     def check_hgvs_info(self,hgvs_info):
         # last one should be a nucleotide
@@ -216,27 +218,41 @@ class SnpeffAnnotator(object):
 
         # title of vcf
         vcf_stdin = ['#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO']
-        logger.info("Running '%s'" % self.snpeff_cmd)
         for hgvs_id in hgvs_vcfs:
             vcf = hgvs_vcfs[hgvs_id]["vcf"]
             try:
                 self.check_hgvs_info(vcf)
             except (TypeError, ValueError) as e:
-                logger.warning("Skipping HGVS %s: %s" % (repr(hgvs_vcfs[hgvs_id]),e))
+                self.logger.warning("Skipping HGVS %s: %s" % (repr(hgvs_vcfs[hgvs_id]),e))
                 continue
             # add hgvs ID at the end so we can match for sure which annotations correspond to which ID 
             # instead of rebuild it from VCF info (they can be different)
             # this comment will be at the first position in the result line
             vcf_stdin.append(str(vcf["chrom"]) + '\t' + str(vcf["position"]) + '\t' + '.' + '\t' + vcf["ref"] + '\t' + vcf["alt"] + '\t.\t.\t.' + "\t# hgvs:" + hgvs_id)
 
+        if (len(vcf_stdin) - 1) == 0:
+            self.logger.info("No HGVS ID as input (previously filtered out)")
+            return
+        self.logger.info("Running '%s' on %d HGVS IDs" % (self.snpeff_cmd,len(vcf_stdin)-1)) # -1: header
         proc = subprocess.Popen(self.snpeff_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout, stderr) = proc.communicate("\n".join(vcf_stdin).encode())
-        if stderr.decode() != '':
+        stderr = stderr.decode()
+        # they print some news message on stderr, bad idea when we use it to detect errors.
+        # try to get rid of it
+        if "NEW VERSION!" in stderr:
+            stderr = stderr.splitlines()
+            start = stderr.index("NEW VERSION!")
+            # message is 5 lines long (hopefully..)
+            end = start + 5
+            stderr = stderr[:start] + stderr[end:]
+            # rebuild and clean any empty lines
+            stderr = "\n".join(stderr).strip()
+        if stderr != '':
             fn = "snpeff_err_%s.pickle" % datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             pickle.dump({"input" : hgvs_vcfs,
                          "vcf_stdin" : vcf_stdin,
-                         "stderr" : stderr.decode()},open(fn,"wb"))
-            raise Exception("Something went wrong while generating snpeff annotation (see dump %s for more):\n%s" % (fn,stderr.decode()))
+                         "stderr" : stderr},open(fn,"wb"))
+            raise Exception("Something went wrong while generating snpeff annotation (see dump %s for more):\n%s" % (fn,stderr))
 
         strout = stdout.decode()
         vcf_stdout_raw = strout.splitlines()

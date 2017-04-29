@@ -20,13 +20,11 @@ ES_HOST = 'localhost:9200'
 # elasticsearch index name
 ES_INDEX = 'myvariant_current'
 # base index name - used to switch indices
-ES_INDEX_BASE = 'myvariant_current_201607'
+ES_INDEX_BASE = 'myvariant_current'
 # Assemblies supported (must resolve to a valid ES index, along with ES_INDEX_BASE)
 SUPPORTED_ASSEMBLIES = ['hg19', 'hg38']
 # elasticsearch document type
 ES_DOC_TYPE = 'variant'
-# defautlt number_of_shards when create a new index
-ES_NUMBER_OF_SHARDS = 20
 
 API_VERSION = 'v1'
 
@@ -79,7 +77,8 @@ HIPCHAT_MESSAGE_COLOR = 'green'
 
 # Allow searching by other ids with annotation endpoint
 ANNOTATION_ID_REGEX_LIST = [(re.compile(r'rs[0-9]+', re.I), 'dbsnp.rsid'),
-                            (re.compile(r'rcv[0-9\.]+', re.I), 'clinvar.rcv.accession')]
+                            (re.compile(r'rcv[0-9\.]+', re.I), 'clinvar.rcv.accession'),
+                            (re.compile(r'var_[0-9]+', re.I), 'uniprot.humsavar.ftid')]
 
 ASSEMBLY_TYPEDEF = {'assembly': {'type': str, 'default': 'hg19'}}
 ANNOTATION_GET_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
@@ -120,3 +119,18 @@ MAX_RANDOMLY_PICKED = 10
 
 # ES s3 repository to use snapshot/restore (must be pre-configured in ES)
 SNAPSHOT_REPOSITORY = "variant_repository"
+
+# cache file format ("": ascii/text uncompressed, or "gz|zip|xz"
+CACHE_FORMAT = "xz"
+
+# Max queued jobs in job manager
+# this shouldn't be 0 to make sure a job is pending and ready to be processed
+# at any time (avoiding job submission preparation) but also not a huge number
+# as any pending job will consume some memory).
+MAX_QUEUED_JOBS = os.cpu_count() * 4
+
+# when creating a snapshot, how long should we wait before querying ES
+# to check snapshot status/completion ? (in seconds)
+# Since myvariant's indices are pretty big, a whole snaphost won't happne in few secs,
+# let's just monitor the status every 5min
+MONITOR_SNAPSHOT_DELAY = 5 * 60

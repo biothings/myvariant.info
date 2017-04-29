@@ -232,12 +232,16 @@ def _map_line_to_json(cp, hg19):
                         dup_position = hgvs_genome.find('dup')
                         if 'dup' in hgvs_genome:
                             dup_ref = hgvs_genome[dup_position+3:]
-                            hgvs_id = "chr%s:g.%s_%sdup%s" % \
-                                      (chrom, chromStart, chromEnd, dup_ref)
+                            if chromStart == chromEnd:
+                                hgvs_id = "chr%s:g.%sdup%s" % \
+                                        (chrom, chromStart, dup_ref)
+                            else:
+                                hgvs_id = "chr%s:g.%s_%sdup%s" % \
+                                        (chrom, chromStart, chromEnd, dup_ref)
             elif variation_type == 'copy number loss' or\
                     variation_type == 'copy number gain':
                 if hgvs_genome and chrom:
-                    hgvs_id = "chr" + chrom + ":" + hgvs_genome.split('.')[2]
+                    hgvs_id = "chr" + chrom + ":g." + hgvs_genome.split('.')[2]
             elif hgvs_coding:
                 hgvs_id = hgvs_coding
                 coding_hgvs_only = True
@@ -249,7 +253,7 @@ def _map_line_to_json(cp, hg19):
             return
         for key in HGVS:
             HGVS[key].sort()
-        rsid = None
+        rsid = []
         cosmic = None
         dbvar = None
         uniprot = None
@@ -257,8 +261,10 @@ def _map_line_to_json(cp, hg19):
         # loop through XRef to find rsid as well as other ids
         if Measure.XRef:
             for XRef in Measure.XRef:
+                #multiple rsid could be linked to one hgvs id
                 if XRef.Type == 'rs':
-                    rsid = 'rs' + str(XRef.ID)
+                    _rsid = 'rs' + str(XRef.ID)
+                    rsid.append(_rsid)
                 elif XRef.DB == 'COSMIC':
                     cosmic = XRef.ID
                 elif XRef.DB == 'OMIM':
@@ -339,7 +345,7 @@ def rcv_feeder(input_file, hg19):
         for record_mapped in _map_line_to_json(record_parsed, hg19):
             yield record_mapped
 
-def load_data(hg19=True, data_folder=None):
+def load_data(data_folder, version):
     # try to get logger from uploader
     import logging as loggingmod
     global logging
@@ -349,7 +355,7 @@ def load_data(hg19=True, data_folder=None):
     files = glob.glob(os.path.join(data_folder,GLOB_PATTERN))
     assert len(files) == 1, "Expecting only one file matching '%s', got: %s" % (GLOB_PATTERN,files)
     input_file = files[0]
-    data_generator = rcv_feeder(input_file, hg19)
+    data_generator = rcv_feeder(input_file, version == "hg19")
     data_list = list(data_generator)
     # TODO: why do we sort this list ? this prevent from using yield/iterator
     data_list_sorted = sorted(data_list, key=lambda k: k['_id'])

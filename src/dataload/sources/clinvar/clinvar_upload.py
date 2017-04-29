@@ -212,7 +212,7 @@ class ClinvarHG19Uploader(ClinvarBaseUploader):
     def load_data(self,data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)
         try:
-            return load_common(hg19=True,data_folder=data_folder)
+            return load_common(data_folder,"hg19")
         except Exception as e:
             import traceback
             self.logger.error("Error while uploading, %s:\n%s" % (e,traceback.format_exc()))
@@ -231,7 +231,7 @@ class ClinvarHG38Uploader(ClinvarBaseUploader):
     def load_data(self,data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)
         try:
-            return load_common(hg19=False,data_folder=data_folder)
+            return load_common(data_folder,"hg38")
         except Exception as e:
             import traceback
             self.logger.error("Error while uploading, %s:\n%s" % (e,traceback.format_exc()))

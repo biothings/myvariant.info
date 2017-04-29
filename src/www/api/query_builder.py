@@ -33,7 +33,7 @@ class ESQueryBuilder(ESQueryBuilder):
                         "bool": {
                             "must": [
                                         {
-                                            "term": {"chrom": query_match['chr']}    
+                                            "match": {"chrom": query_match['chr']}
                                         },
                                         {
                                             "range": {self.options.assembly + ".start": {"lte": query_match['gend']}}

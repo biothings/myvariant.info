@@ -25,6 +25,8 @@ keep them up-to-date, so that you don't have to do it:
 .. _Scripps Wellderly: http://www.stsiweb.org/wellderly/
 .. _EXAC: http://exac.broadinstitute.org/
 .. _GRASP: http://iapps.nhlbi.nih.gov/GRASP
+.. _UniProt: ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/variants/README
+
 
 .. raw:: html
 
@@ -62,6 +64,8 @@ Total variants loaded: **334,292,622**
 | `EXAC`_                       | v0.3          | 10,195,872                | exac                       |
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `GRASP`_                      | v2.0.0.0      | 2,212,148                 | grasp                      |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `UniProt`_                    | 201703        | 477,711                   | uniprot                    |
 +-------------------------------+---------------+---------------------------+----------------------------+
 
 .. raw:: html
@@ -161,6 +165,12 @@ Each individual variant object contains an "**_id**" field as the primary key. W
     chrX:g.14112_14117delinsTG
 
   The above _id represents that six nucleotides between genomic position 14112 and 14117 are replaced by TG.
+
+
+_score field
+------------
+
+You will often see a “_score” field in the returned variant object, which is the internal score representing how well the query matches the returned variant object. It probably does not mean much in `variant annotation service <http://docs.myvariant.info/en/latest/doc/data.html>`_ when only one variant object is returned. In `variant query service <http://docs.myvariant.info/en/latest/doc/variant_query_service.html>`_, by default, the returned variant hits are sorted by the scores in descending order.
 
 
 .. _available_fields:

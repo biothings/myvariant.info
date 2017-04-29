@@ -23,3 +23,4 @@ pymongo>=3.2
 bitarray==0.8.1    # used in utils.validate module
 git+https://github.com/olivierverdier/dispatch.git#egg=dispatcher
 asyncssh==1.7.1
+boto

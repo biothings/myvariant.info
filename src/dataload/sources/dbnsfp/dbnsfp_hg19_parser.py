@@ -1,9 +1,9 @@
 import csv
 import glob
-from biothings.utils.dataload import list_split, dict_sweep, unlist, value_convert_to_number
+from utils.dataload import list_split, dict_sweep, unlist
 
 
-VALID_COLUMN_NO = 194
+VALID_COLUMN_NO = 136
 
 '''this parser is for dbNSFP v3.3a beta2 downloaded from
 https://sites.google.com/site/jpopgen/dbNSFP'''
@@ -15,18 +15,18 @@ def _map_line_to_json(df, version, index=0):
     if chrom == 'M':
         chrom = 'MT'
     # fields[7] in version 2, represent hg18_pos
-    hg18_end = df["hg18_pos(1-based)"]
+    hg18_end = df["hg18_pos(1-coor)"]
     if hg18_end == ".":
         hg18_end = "."
     else:
         hg18_end = int(hg18_end)
     # in case of no hg19 position provided, remove the item
-    if df["hg19_pos(1-based)"] == '.':
+    if df["pos(1-coor)"] == '.':
         return None
     else:
-        chromStart = int(df["hg19_pos(1-based)"])
+        chromStart = int(df["pos(1-coor)"])
         chromEnd = chromStart
-    chromStart_38 = int(df["pos(1-based)"])
+    chromStart_38 = int(df["hg38_pos"])
     ref = df["ref"].upper()
     alt = df["alt"].upper()
     HGVS_19 = "chr%s:g.%d%s>%s" % (chrom, chromStart, ref, alt)
@@ -41,11 +41,8 @@ def _map_line_to_json(df, version, index=0):
     else:
         freq = siphy_29way_pi.split(":")
         siphy = {'a': freq[0], 'c': freq[1], 'g': freq[2], 't': freq[3]}
-    gtex_gene = df["GTEx_V6_gene"].split('|')
-    gtex_tissue = df["GTEx_V6_tissue "].split('|')
-    gtex = map(dict, map(lambda t: zip(('gene', 'tissue'), t), zip(gtex_gene, gtex_tissue)))
-    acc = df["Uniprot_acc_Polyphen2"].rstrip().rstrip(';').split(";")
-    pos = df["Uniprot_aapos_Polyphen2"].rstrip().rstrip(';').split(";")
+    acc = df["Uniprot_acc"].rstrip().rstrip(';').split(";")
+    pos = df["Uniprot_aapos"].rstrip().rstrip(';').split(";")
     uniprot = map(dict, map(lambda t: zip(('acc', 'pos'), t), zip(acc, pos)))
     provean_score = df["PROVEAN_score"].split(';')
     sift_score = df["SIFT_score"].split(';')
@@ -117,12 +114,12 @@ def _map_line_to_json(df, version, index=0):
                 "end": chromEnd
             },
             "hg18": {
-                "start": df["hg18_pos(1-based)"],
+                "start": df["hg18_pos(1-coor)"],
                 "end": hg18_end
             },
             "hg38": {
-                "start": df["pos(1-based)"],
-                "end": df["pos(1-based)"]
+                "start": df["hg38_pos"],
+                "end": df["hg38_pos"]
             },
             "ref": ref,
             "alt": alt,
@@ -131,8 +128,7 @@ def _map_line_to_json(df, version, index=0):
                 "alt": df["aaalt"],
                 "pos": df["aapos"],
                 "refcodon": df["refcodon"],
-                "codonpos": df["codonpos"],
-                "codon_degeneracy": df["codon_degeneracy"],
+                "codonpos": df["codonpos"]
             },
             "genename": df["genename"],
             "uniprot": list(uniprot),
@@ -143,8 +139,7 @@ def _map_line_to_json(df, version, index=0):
             #"denisova": fields[18]
             "ensembl": {
                 "geneid": df["Ensembl_geneid"],
-                "transcriptid": df["Ensembl_transcriptid"],
-                "proteinid": df["Ensembl_proteinid"]
+                "transcriptid": df["Ensembl_transcriptid"]
             },
             "sift": {
                 "score": sift_score,
@@ -172,18 +167,16 @@ def _map_line_to_json(df, version, index=0):
             "mutationtaster": {
                 "score": mutationtaster_score,
                 "converted_rankscore": df["MutationTaster_converted_rankscore"],
-                "pred": df["MutationTaster_pred"],
-                "model": df["MutationTaster_model"],
-                "AAE": df["MutationTaster_AAE"]
+                "pred": df["MutationTaster_pred"]
             },
             "mutationassessor": {
                 "score": mutationassessor_score,
-                "rankscore": df["MutationAssessor_score_rankscore"],
+                "rankscore": df["MutationAssessor_rankscore"],
                 "pred": df["MutationAssessor_pred"]
             },
             "fathmm": {
                 "score": fathmm_score,
-                "rankscore": df["FATHMM_converted_rankscore"],
+                "rankscore": df["FATHMM_rankscore"],
                 "pred": df["FATHMM_pred"]
             },
             "provean": {
@@ -193,15 +186,7 @@ def _map_line_to_json(df, version, index=0):
             },
             "vest3": {
                 "score": vest3_score,
-                "rankscore": df["VEST3_rankscore"],
-                "transcriptid": df["Transcript_id_VEST3"],
-                "transcriptvar": df["Transcript_var_VEST3"]
-            },
-            "fathmm-mkl": {
-                "coding_score": df["fathmm-MKL_coding_score"],
-                "coding_rankscore": df["fathmm-MKL_coding_rankscore"],
-                "coding_pred": df["fathmm-MKL_coding_pred"],
-                "coding_group": df["fathmm-MKL_coding_group"]
+                "rankscore": df["VEST3_rankscore"]
             },
             "eigen": {
                 "coding_or_noncoding": df["Eigen_coding_or_noncoding"],
@@ -212,10 +197,6 @@ def _map_line_to_json(df, version, index=0):
                 "raw": df["Eigen-PC-raw"],
                 "phred": df["Eigen-PC-phred"],
                 "raw_rankscore": df["Eigen-PC-raw_rankscore"]
-            },
-            "genocanyon": {
-                "score": df["GenoCanyon_score"],
-                "rankscore": df["GenoCanyon_score_rankscore"]
             },
             "metasvm": {
                 "score": metasvm_score,
@@ -244,43 +225,21 @@ def _map_line_to_json(df, version, index=0):
                 "aa_change": df["MutPred_AAchange"],
                 "pred": mechanisms
             },
-            "dann": {
-                "score": df["DANN_score"],
-                "rankscore": df["DANN_rankscore"]
-            },
             "gerp++": {
                 "nr": df["GERP++_NR"],
                 "rs": df["GERP++_RS"],
                 "rs_rankscore": df["GERP++_RS_rankscore"]
-            },
-            "integrated": {
-                "fitcons_score": df["integrated_fitCons_score"],
-                "fitcons_rankscore": df["integrated_fitCons_score_rankscore"],
-                "confidence_value": df["integrated_confidence_value"]
-            },
-            "gm12878": {
-                "fitcons_score": df["GM12878_fitCons_score"],
-                "fitcons_rankscore": df["GM12878_fitCons_score_rankscore"],
-                "confidence_value": df["GM12878_confidence_value"]
-            },
-            "h1-hesc": {
-                "fitcons_score": df["H1-hESC_fitCons_score"],
-                "fitcons_rankscore": df["H1-hESC_fitCons_score_rankscore"],
-                "confidence_value": df["H1-hESC_confidence_value"]
-            },
-            "huvec": {
-                "fitcons_score": df["HUVEC_fitCons_score"],
-                "fitcons_rankscore": df["HUVEC_fitCons_score_rankscore"],
-                "confidence_value": df["HUVEC_confidence_value"]
             },
             "phylo": {
                 "p100way": {
                     "vertebrate": df["phyloP100way_vertebrate"],
                     "vertebrate_rankscore": df["phyloP100way_vertebrate_rankscore"]
                 },
-                "p20way": {
-                    "mammalian": df["phyloP20way_mammalian"],
-                    "mammalian_rankscore": df["phyloP20way_mammalian_rankscore"]
+                "p46way": {
+                    "placental": df["phyloP46way_placental"],
+                    "placental_rankscore": df["phyloP46way_placental_rankscore"],
+                    "primate": df["phyloP46way_primate"],
+                    "primate_rankscore": df["phyloP46way_primate_rankscore"]
                 }
             },
             "phastcons": {
@@ -288,9 +247,11 @@ def _map_line_to_json(df, version, index=0):
                     "vertebrate": df["phastCons100way_vertebrate"],
                     "vertebrate_rankscore": df["phastCons100way_vertebrate_rankscore"]
                 },
-                "20way": {
-                    "mammalian": df["phastCons20way_mammalian"],
-                    "mammalian_rankscore": df["phastCons20way_mammalian_rankscore"]
+                "46way": {
+                    "placental": df["phastCons46way_placental"],
+                    "placental_rankscore": df["phastCons46way_placental_rankscore"],
+                    "primate": df["phastCons46way_primate"],
+                    "primate_rankscore": df["phastCons46way_primate_rankscore"]
                 }
             },
             "siphy_29way": {
@@ -298,33 +259,21 @@ def _map_line_to_json(df, version, index=0):
                 "logodds": df["SiPhy_29way_logOdds"],
                 "logodds_rankscore": df["SiPhy_29way_logOdds_rankscore"]
             },
-            "1000gp3": {
-                "ac": df["1000Gp3_AC"],
-                "af": df["1000Gp3_AF"],
-                "afr_ac": df["1000Gp3_AFR_AC"],
-                "afr_af": df["1000Gp3_AFR_AF"],
-                "eur_ac": df["1000Gp3_EUR_AC"],
-                "eur_af": df["1000Gp3_EUR_AF"],
-                "amr_ac": df["1000Gp3_AMR_AC"],
-                "amr_af": df["1000Gp3_AMR_AF"],
-                "eas_ac": df["1000Gp3_EAS_AC"],
-                "eas_af": df["1000Gp3_EAS_AF"],
-                "sas_ac": df["1000Gp3_SAS_AC"],
-                "sas_af": df["1000Gp3_SAS_AF"]
-            },
-            "twinsuk": {
-                "ac": df["TWINSUK_AC"],
-                "af": df["TWINSUK_AF"]
-            },
-            "alspac": {
-                "ac": df["ALSPAC_AC"],
-                "af": df["ALSPAC_AF"]
+            "1000gp1": {
+                "ac": df["1000Gp1_AC"],
+                "af": df["1000Gp1_AF"],
+                "afr_ac": df["1000Gp1_AFR_AC"],
+                "afr_af": df["1000Gp1_AFR_AF"],
+                "eur_ac": df["1000Gp1_EUR_AC"],
+                "eur_af": df["1000Gp1_EUR_AF"],
+                "amr_ac": df["1000Gp1_AMR_AC"],
+                "amr_af": df["1000Gp1_AMR_AF"],
+                "asn_ac": df["1000Gp1_ASN_AC"],
+                "asn_af": df["1000Gp1_ASN_AF"]
             },
             "esp6500": {
-                "aa_ac": df["ESP6500_AA_AC"],
                 "aa_af": df["ESP6500_AA_AF"],
-                "ea_ac": df["ESP6500_EA_AC"],
-                "ea_af": df["ESP6500_EA_AF"]
+                "ea_af": df["ESP6500_EA_AF "]
             },
             "exac": {
                 "ac": df["ExAC_AC"],
@@ -344,53 +293,22 @@ def _map_line_to_json(df, version, index=0):
                 "sas_ac": df["ExAC_SAS_AC"],
                 "sas_af": df["ExAC_SAS_AF"]
             },
-            "exac_nontcga": {
-                "ac": df["ExAC_nonTCGA_AC"],
-                "af": df["ExAC_nonTCGA_AF"],
-                "adj_ac": df["ExAC_nonTCGA_Adj_AC"],
-                "adj_af": df["ExAC_nonTCGA_Adj_AF"],
-                "afr_ac": df["ExAC_nonTCGA_AFR_AC"],
-                "afr_af": df["ExAC_nonTCGA_AFR_AF"],
-                "amr_ac": df["ExAC_nonTCGA_AMR_AC"],
-                "amr_af": df["ExAC_nonTCGA_AMR_AF"],
-                "eas_ac": df["ExAC_nonTCGA_EAS_AC"],
-                "eas_af": df["ExAC_nonTCGA_EAS_AF"],
-                "fin_ac": df["ExAC_nonTCGA_FIN_AC"],
-                "fin_af": df["ExAC_nonTCGA_FIN_AF"],
-                "nfe_ac": df["ExAC_nonTCGA_NFE_AC"],
-                "nfe_af": df["ExAC_nonTCGA_NFE_AF"],
-                "sas_ac": df["ExAC_nonTCGA_SAS_AC"],
-                "sas_af": df["ExAC_nonTCGA_SAS_AF"]
-            },
-            "exac_nonpsych": {
-                "ac": df["ExAC_nonpsych_AC"],
-                "af": df["ExAC_nonpsych_AF"],
-                "adj_ac": df["ExAC_nonpsych_Adj_AC"],
-                "adj_af": df["ExAC_nonpsych_Adj_AF"],
-                "afr_ac": df["ExAC_nonpsych_AFR_AC"],
-                "afr_af": df["ExAC_nonpsych_AFR_AF"],
-                "amr_ac": df["ExAC_nonpsych_AMR_AC"],
-                "amr_af": df["ExAC_nonpsych_AMR_AF"],
-                "eas_ac": df["ExAC_nonpsych_EAS_AC"],
-                "eas_af": df["ExAC_nonpsych_EAS_AF"],
-                "fin_ac": df["ExAC_nonpsych_FIN_AC"],
-                "fin_af": df["ExAC_nonpsych_FIN_AF"],
-                "nfe_ac": df["ExAC_nonpsych_NFE_AC"],
-                "nfe_af": df["ExAC_nonpsych_NFE_AF"],
-                "sas_ac": df["ExAC_nonpsych_SAS_AC"],
-                "sas_af": df["ExAC_nonpsych_SAS_AF"]
+            "aric5606": {
+                "aa_ac": df["ARIC5606_AA_AC"],
+                "aa_af": df["ARIC5606_AA_AF"],
+                "ea_ac": df["ARIC5606_EA_AC"],
+                "ea_af": df["ARIC5606_EA_AF"]
             },
             "clinvar": {
                 "rs": df["clinvar_rs"],
                 "clinsig": list(map(int,[i for i in df["clinvar_clnsig"].split("|") if i != "."])),
                 "trait": [i for i in df["clinvar_trait"].split("|") if i != "."],
                 "golden_stars": list(map(int,[i for i in df["clinvar_golden_stars"].split("|") if i != "."]))
-            },
-            "gtex": list(gtex)
+            }
         }
     }
 
-    one_snp_json = list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=[".", '-', None]), ";")
+    one_snp_json = list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=[".", None]), ";")
     one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"])
     return one_snp_json
 
