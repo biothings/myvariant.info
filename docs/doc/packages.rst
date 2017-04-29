@@ -106,7 +106,7 @@ See https://pypi.python.org/pypi/myvariant for more details.
 
 MyVariant R package
 -------------------
-An R wrapper for the MyVariant.info API is available in Bioconductor as of v. 3.2.  To install::
+An R wrapper for the MyVariant.info API is available in Bioconductor since v3.2.  To install::
 
     source("https://bioconductor.org/biocLite.R")
     biocLite("myvariant")
@@ -115,7 +115,7 @@ To view documentation for your installation, enter R and type::
 
     browseVignettes("myvariant")
 
-For more information, visit the `Bioconductor myvariant page <https://www.bioconductor.org/packages/devel/bioc/html/myvariant.html>`_.
+For more information, visit the `Bioconductor myvariant page <https://www.bioconductor.org/packages/release/bioc/html/myvariant.html>`_.
 
 
 MyVariant Node.js package
