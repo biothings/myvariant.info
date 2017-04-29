@@ -155,10 +155,6 @@ You can install this package with `PyPI <https://pypi.python.org/pypi/myvariant-
     pip install myvariant-api
 
 
-.. raw:: html
-
-    <div id="spacer" style="height:300px"></div>
-
 
 A JBrowse plugin for MyVariant.info and MyGene.info
 ----------------------------------------------------
@@ -178,5 +174,11 @@ A JBrowse plugin for MyVariant.info and MyGene.info
 * A screenshot
 
   .. image:: /_static/jbrowse-plugin-screenshot-small.png
-      :target: /_static/jbrowse-plugin-screenshot.png
+      :target: ../_static/jbrowse-plugin-screenshot.png
       :align: center
+
+
+
+.. raw:: html
+
+    <div id="spacer" style="height:300px"></div>
