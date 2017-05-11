@@ -23,6 +23,7 @@ import biothings.dataload.uploader as uploader
 import biothings.dataload.dumper as dumper
 import biothings.databuild.builder as builder
 import biothings.databuild.differ as differ
+import biothings.databuild.syncer as syncer
 import biothings.dataindex.indexer as indexer
 from databuild.builder import MyVariantDataBuilder
 from databuild.mapper import TagObserved
@@ -45,6 +46,8 @@ build_manager.configure()
 
 differ_manager = differ.DifferManager(job_manager=job_manager)
 differ_manager.configure()
+syncer_manager = syncer.SyncerManager(job_manager=job_manager)
+syncer_manager.configure()
 
 pindexer = partial(VariantIndexer,es_host=config.ES_HOST)
 index_manager = indexer.IndexerManager(pindexer=pindexer,
@@ -138,6 +141,9 @@ COMMANDS = {
         # building/merging
         "bm" : build_manager,
         "merge" : build_manager.merge,
+        "mongo_sync" : partial(syncer_manager.sync,"mongo"),
+        "es_sync" : partial(syncer_manager.sync,"es"),
+        "sm" : syncer_manager,
         # diff
         "dim" : differ_manager,
         "diff" : partial(differ_manager.diff,"jsondiff"),
