@@ -18,7 +18,8 @@ If you have/find a variant annotation resource you want to include in our system
 2. Add your own data plugin (under a subfolder): The subfolder should start with two files: one parser file and another '\_\_init\_\_.py' file. The parser file, you should include the `load_data` function(see step 3). In '\_\_init\_\_.py' file, you can just leave it empty. Although not required, we typically name the parser file as "\<data_src\>_parser.py", like "dbsnp_parser.py", or "dbsnp_vcf_parser.py" when a data source provides multiple file formats.
 
 3. Write `load_data` function: The first input parameter should be the input file or the input folder for multiple input files. The output of this function should be either a list or generator of JSON documents. A generator is ideal for large lists that won't fit into memory. (Details will be shown in the next section)
-If your data file support both hg19 and hg38 genomic assembly for variants, your `load_data` function should support a parameter to return either hg19 or hg38 based variants (e.g. using "assembly=hg19|hg38").
+   
+   If your data file support both hg19 and hg38 genomic assembly for variants, your `load_data` function should support a parameter to return either hg19 or hg38 based variants (e.g. using "assembly=hg19|hg38").
 
 4. [Optional] add Meta dictionary: you can put some metadata like "maintainer", "requirements" etc. at the top of the parser file. Here is an example:
  ```
@@ -38,7 +39,8 @@ If your data file support both hg19 and hg38 genomic assembly for variants, your
 6. [Optional] validate HGVS IDs (Details will be shown in the next section)
 
 7. Commit and send the pull request.
-Here is a real-world pull request examples from one of our contributors: #13.
+
+   Here is a real-world pull request examples from one of our contributors: [#13](https://github.com/biothings/myvariant.info/pull/13).
 
 8. And the last, if you have trouble to code a data plugin, you can just produce a dump of JSON document list using whatever tools you like, and send over your dumped file to us. But that will require us to load it manually.
 
