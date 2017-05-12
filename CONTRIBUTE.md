@@ -7,7 +7,8 @@ If you have/find a variant annotation resource you want to include in our system
 1. Code in Python (at least for now), and prefer in Python 3.
 2. Use hg19 or hg38 genome assembly for genomic coordinates (assuming we are dealing with human variants for now)
 3. all data plugins are located under [src/dataload/sources](src/dataload/sources) folder. You should follow this [sample_src example](src/dataload/sources/sample_src).
-4. Other existing data plugin folders typically contain `*_upload.py` and `*_dump.py` files. You generally don't need to worry about the `Uploader` and `Dumper` classes in these file. Just follow the steps below to provide us a simple data parser. Once we verify your data parser, we will convert it to the formal `Uploader` and `Dumper` classes.
+4. Each data plugin is one sub-folder under "sources", and the name of the sub-folder is typically the same as the root-level data_src key name, e.g. ["dbsnp" subfolder](/src/dataload/sources/dbsnp) handles all annoation data under "dbsnp" key.
+5. Other existing data plugin folders typically contain `*_upload.py` and `*_dump.py` files. You generally don't need to worry about the `Uploader` and `Dumper` classes in these files. Just follow the steps below to provide us a simple data parser. Once we verify your data parser, we will convert it to the formal `Uploader` and `Dumper` classes.
 
 ## Steps to follow
 1. Fork this repo, and clone it locally
@@ -17,8 +18,7 @@ If you have/find a variant annotation resource you want to include in our system
 2. Add your own data plugin (under a subfolder): The subfolder should start with two files: one parser file and another '\_\_init\_\_.py' file. The parser file, you should include the `load_data` function(see step 3). In '\_\_init\_\_.py' file, you can just leave it empty. Although not required, we typically name the parser file as "\<data_src\>_parser.py", like "dbsnp_parser.py", or "dbsnp_vcf_parser.py" when a data source provides multiple file formats.
 
 3. Write `load_data` function: The first input parameter should be the input file or the input folder for multiple input files. The output of this function should be either a list or generator of JSON documents. A generator is ideal for large lists that won't fit into memory. (Details will be shown in the next section)
-
-  If your data file support both hg19 and hg38 genomic assembly for variants, your `load_data` should support a parameter to return either hg19 or hg38 based variants (e.g. using "assembly=hg19|hg38").
+If your data file support both hg19 and hg38 genomic assembly for variants, your `load_data` function should support a parameter to return either hg19 or hg38 based variants (e.g. using "assembly=hg19|hg38").
 
 4. [Optional] add Meta dictionary: you can put some metadata like "maintainer", "requirements" etc. at the top of the parser file. Here is an example:
  ```
@@ -37,14 +37,14 @@ If you have/find a variant annotation resource you want to include in our system
 
 6. [Optional] validate HGVS IDs (Details will be shown in the next section)
 
-7. Commit and send the pull request
+7. Commit and send the pull request.
+Here is a real-world pull request examples from one of our contributors: #13.
 
 8. And the last, if you have trouble to code a data plugin, you can just produce a dump of JSON document list using whatever tools you like, and send over your dumped file to us. But that will require us to load it manually.
 
 ## `load_data` function
-Parsers should be written in python and structured into JSON format to be uploaded into MongoDB, where the data will be indexed to ElasticSearch. Generic functions are can be utilized from the utils.dataload module to help structure data properly into JSON as well as clean up data. Further elaboration will be provided.
+Parsers should be written in python and convert the input data file into structured JSON objects. We will then take the output and merge them with other data sources at our data backend. Some generic helper functions from [`utils.dataload`](src/utils/dataload) module can be utilized to help structure data properly into JSON as well as clean up data.
 Check out the example [src/dataload/sources/sample_src](src/dataload/sources/sample_src) folder.
-
 
 The `load_data` function could be divided into two parts:
 
@@ -52,13 +52,13 @@ The `load_data` function could be divided into two parts:
 The first step is to read in source files. The source files could be in different formats, including tsv, csv, vcf, xml. There are a variety of python libraries and packages available to help read and parse these data files, e.g. python cvs library, PyVCF. Here, we have listed examples of data loading modules for some of the major formats.
 
 #### 1) tsv/csv file example
-An example of ‘tsv’ or ‘csv’ data loading module could be found under: [src/dataload/sources/dbnsfp/dbnsfp_parser.py](src/dataload/sources/dbnsfp/dbnsfp_parser.py)
+An example of "*tsv*" or "*csv*" data loading module could be found under: [src/dataload/sources/dbnsfp/dbnsfp_parser.py](src/dataload/sources/dbnsfp/dbnsfp_parser.py)
 
 #### 2) vcf file example
-An example of ‘vcf’ data loading module could be found under: [src/dataload/sources/exac/exac_parser.py](src/dataload/sources/exac/exac_parser.py)
+An example of "*vcf*" data loading module could be found under: [src/dataload/sources/exac/exac_parser.py](src/dataload/sources/exac/exac_parser.py)
 
 #### 3) xml file example
-An example of ‘xml’ data loading module could be found under: [src/dataload/sources/clinvar/clinvar_xml_parser.py](src/dataload/sources/clinvar/clinvar_xml_parser.py)
+An example of "*xml*" data loading module could be found under: [src/dataload/sources/clinvar/clinvar_xml_parser.py](src/dataload/sources/clinvar/clinvar_xml_parser.py)
 
 ### 2. Convert each item into a JSON object
 All JSON objects for MyVariant.info should have two required fields: the **_id** field and the **<data_src\>** field.
