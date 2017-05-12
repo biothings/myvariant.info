@@ -11,11 +11,11 @@ If you have/find a variant annotation resource you want to include in our system
 5. Other existing data plugin folders typically contain `*_upload.py` and `*_dump.py` files. You generally don't need to worry about the `Uploader` and `Dumper` classes in these files. Just follow the steps below to provide us a simple data parser. Once we verify your data parser, we will convert it to the formal `Uploader` and `Dumper` classes.
 
 ## Steps to follow
-1. Fork this repo, and clone it locally
+1. Fork this repo, and clone your *forked repo* locally
 
     https://github.com/biothings/myvariant.info
 
-2. Add your own data plugin (under a subfolder): The subfolder should start with two files: one parser file and another '\_\_init\_\_.py' file. The parser file, you should include the `load_data` function(see step 3). In '\_\_init\_\_.py' file, you can just leave it empty. Although not required, we typically name the parser file as "\<data_src\>_parser.py", like "dbsnp_parser.py", or "dbsnp_vcf_parser.py" when a data source provides multiple file formats.
+2. Add your own data plugin (under a subfolder): The subfolder should start with two files: one parser file and another `__init__.py` file. The parser file, you should include the `load_data` function(see step 3). In `__init__.py` file, you can just leave it empty. Although not required, we typically name the parser file as "\<data_src\>_parser.py", like "dbsnp_parser.py", or "dbsnp_vcf_parser.py" when a data source provides multiple file formats.
 
 3. Write `load_data` function: The first input parameter should be the input file or the input folder for multiple input files. The output of this function should be either a list or generator of JSON documents. A generator is ideal for large lists that won't fit into memory. (Details will be shown in the next section)
    
@@ -40,7 +40,7 @@ If you have/find a variant annotation resource you want to include in our system
 
 7. Commit and send the pull request.
 
-   Here is a real-world pull request examples from one of our contributors: [#13](https://github.com/biothings/myvariant.info/pull/13).
+   Here is a real-world pull request example from one of our contributors: [#13](https://github.com/biothings/myvariant.info/pull/13).
 
 8. And the last, if you have trouble to code a data plugin, you can just produce a dump of JSON document list using whatever tools you like, and send over your dumped file to us. But that will require us to load it manually.
 
@@ -99,6 +99,9 @@ A typical example of JSON object in MyVariant.info could be found at [src/datalo
 
 
 ## Variant_ID validation
+
+**NOTE** this part of code currently does not work as described, skip this step for now, and we will update the code soon.
+
 In order to make sure all variant IDs loaded into MyVariant.info strictly follows hgvs guidelines, we have developed a variant validation function to validate all variant IDs to be loads. The validation steps are as follows:
 
 
