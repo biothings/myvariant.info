@@ -33,7 +33,7 @@ If you have/find a variant annotation resource you want to include in our system
     }
  ```
 
-5. [Optional] `get_mapping` function: optional, this can be used to customize the indexing. You can just leave it empty. An example could be found at the `get_mapping` method in [src/dataload/sources/sample_src/sample_src_parser.py](src/dataload/sources/sample_src/sample_src_parser.py).
+5. [Optional] `get_mapping` function returns a mapping dictionary to describe the JSON data structure and customize indexing. Typicaly, you can just skip it first and we can help to create one. An example `get_mapping` function can be found in [src/dataload/sources/sample_src/sample_src_parser.py](src/dataload/sources/sample_src/sample_src_parser.py).
 
 6. [Optional] validate HGVS IDs (Details will be shown in the next section)
 
@@ -70,20 +70,24 @@ Each individual JSON object contains an "**_id**" field as the primary key. We u
 
 
 ##### SNV example
-	    e.g. chr1:g.35366C>T
-   	    The above ID represents a C to T SNP on chromosome 1, genomic position 35366.
+	chr1:g.35366C>T
+
+  The above ID represents a C to T SNP on chromosome 1, genomic position 35366.
 
 ##### Insertion example
-	    e.g. chr2:g.177676_177677insT
-	    The above ID represents that a T is inserted between genomic position 177676 and 177677 on chromosome 2.
+	chr2:g.177676_177677insT
+
+  The above ID represents that a T is inserted between genomic position 177676 and 177677 on chromosome 2.
 
 ##### Deletion example
-  	    e.g. chrM:g.2947878_2947880del
-	    The above ID represents that a three nucleotides deletion between genomic position 2947878 and 2947880 on chromosome M. Note that we don't include the deleted sequence in the _id field in this case.
+  	chrM:g.2947878_2947880del
+
+ The above ID represents that a three nucleotides deletion between genomic position 2947878 and 2947880 on chromosome M. Note that we don't include the deleted sequence in the _id field in this case.
 
 ##### Deletion/Insertion example
-	    e.g. chrX: g.14112_14117delinsTG
-	    The above ID represents that six nucleotides between genomic position 14112 and 14117 by TG
+	chrX: g.14112_14117delinsTG
+
+ The above ID represents that six nucleotides between genomic position 14112 and 14117 by TG
 
 #### 2) Top-level **<data_src\>** field
 The name of the top-level **<data_src\>** field should be the name of the data source, e.g. ‘clinvar’, ‘dbsnp’, all in lower-cases. Under this top-level field, you can strucutre your annotation in a proper JSON format you like. For example, you can have sub-fields like ‘chromosome’, ‘ref’, ‘alt’, ‘score’ . You can have nested structure if needed. For example, the ‘sift’ field is under 'dbnsfp' top-level **<data_src\>** field, and it contains sub-fields of ‘score’, ‘converted_rankscore’, and ‘pred’.
