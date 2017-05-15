@@ -2,6 +2,8 @@
 
 If you have/find a variant annotation resource you want to include in our system, you can follow the guideline below to contribute a JSON importer (let's call it a "data plugin") for it.
 
+In a nutshell, contributing data into MyVariant.info is just to provide us a data parser to convert your input data file(s) into a list of JSON-formatted objects.
+
 ----
 ## General guidelines
 1. Code in Python (at least for now), and prefer in Python 3.
