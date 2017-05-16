@@ -67,6 +67,18 @@ class ClinvarBaseUploader(SnpeffPostUpdateUploader):
                             }
                         }
                     },
+                    "genotypeset": {
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "analyzer": "string_lowercase"
+                            },
+                            "genotype": {
+                                "type": "string",
+                                "analyzer": "string_lowercase"
+                            }
+                        }
+                    },
                     "type": {
                         "type": "string",
                         "analyzer": "string_lowercase"
