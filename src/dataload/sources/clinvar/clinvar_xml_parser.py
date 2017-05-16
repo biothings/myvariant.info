@@ -323,14 +323,14 @@ def _map_line_to_json(cp, hg19):
                         'last_evaluated': str(last_evaluated),
                         'origin': origin,
                         'conditions': conditions})
-                    json_obj.update({'variant_id': variant_id})
-                    json_obj = (dict_sweep(unlist(value_convert(json_obj,
+                    json_obj['clinvar'].update({'variant_id': variant_id})
+                    json_obj = (dict_sweep(unlist(value_convert_to_number(json_obj,
                                                ['chrom', 'omim', 'id', 'orphanet', 'gene',
                                                 'rettbase_(cdkl5)', 'cosmic', 'dbrbc'])), [None, '', 'None']))
                     obj_list.append(json_obj)
                     id_list.append(json_obj['_id'])
         for _obj in obj_list:
-            _obj.update({'genotypeset': {
+            _obj['clinvar'].update({'genotypeset': {
                     'type': 'CompoundHeterozygote',
                     'genotype': id_list
                     }})
@@ -348,7 +348,7 @@ def _map_line_to_json(cp, hg19):
                         'origin': origin,
                         'conditions': conditions})
                 json_obj.update({'variant_id': variant_id})
-                json_obj = (dict_sweep(unlist(value_convert(json_obj,
+                json_obj = (dict_sweep(unlist(value_convert_to_number(json_obj,
                                                ['chrom', 'omim', 'id', 'orphanet', 'gene',
                                                 'rettbase_(cdkl5)', 'cosmic', 'dbrbc'])), [None, '', 'None']))
                 yield json_obj
