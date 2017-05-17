@@ -41,15 +41,15 @@ observed = TagObserved(name="observed")
 build_manager = builder.BuilderManager(
         builder_class=partial(MyVariantDataBuilder,mappers=[observed]),
         job_manager=job_manager)
-build_manager.sync()
+build_manager.configure()
 
 differ_manager = differ.DifferManager(job_manager=job_manager)
-differ_manager.sync()
+differ_manager.configure()
 
 pindexer = partial(VariantIndexer,es_host=config.ES_HOST)
 index_manager = indexer.IndexerManager(pindexer=pindexer,
         job_manager=job_manager)
-index_manager.sync()
+index_manager.configure()
 
 import biothings.utils.mongo as mongo
 def snpeff(build_name=None,sources=[], force_use_cache=True):

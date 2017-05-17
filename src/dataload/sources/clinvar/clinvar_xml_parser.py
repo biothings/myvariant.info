@@ -185,10 +185,8 @@ def parse_measure(Measure, hg19=True):
             hgvs_id = hgvs_coding
             coding_hgvs_only = True
         else:
-            print "couldn't find any id"
             return
     else:
-        print 'no measure.attribute'
         return
     for key in HGVS:
         HGVS[key].sort()
@@ -347,7 +345,7 @@ def _map_line_to_json(cp, hg19):
                         'last_evaluated': str(last_evaluated),
                         'origin': origin,
                         'conditions': conditions})
-                json_obj.update({'variant_id': variant_id})
+                json_obj['clinvar'].update({'variant_id': variant_id})
                 json_obj = (dict_sweep(unlist(value_convert_to_number(json_obj,
                                                ['chrom', 'omim', 'id', 'orphanet', 'gene',
                                                 'rettbase_(cdkl5)', 'cosmic', 'dbrbc'])), [None, '', 'None']))
