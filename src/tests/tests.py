@@ -262,24 +262,27 @@ class MyVariantTest(BiothingTestHelperMixin):
     def test_jsonld(self):
         res = self.json_ok(self.get_ok(self.api + '/variant/chr11:g.66397320A>G?jsonld=true'))
         assert '@context' in res
+        assert '@id' in res
 
-        # Check some subfields
-        assert 'snpeff' in res and '@context' in res['snpeff']
+        # Check some subfields - INVALIDATED BY NEW JSON-LD STRUCTURE
+        #assert 'snpeff' in res and '@context' in res['snpeff']
 
-        assert 'ann' in res['snpeff'] and '@context' in res['snpeff']['ann'][0]
+        #assert 'ann' in res['snpeff'] and '@context' in res['snpeff']['ann'][0]
 
         # Check a post with jsonld
         res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'jsonld': 'true'}))
         for r in res:
             assert '@context' in r
+            assert '@id' in r
 
         # Check a query get with jsonld
         res = self.json_ok(self.get_ok(self.api + '/query?q=_exists_:clinvar&fields=clinvar&size=1&jsonld=true'))
 
         assert '@context' in res['hits'][0]
+        assert '@id' in res['hits'][0]
 
         # subfields
-        assert 'clinvar' in res['hits'][0] and '@context' in res['hits'][0]['clinvar']
+        #assert 'clinvar' in res['hits'][0] and '@context' in res['hits'][0]['clinvar']
         # TODO: fix test
         #assert 'gene' in res['hits'][0]['clinvar'] and '@context' in res['hits'][0]['clinvar']['gene']
 
@@ -290,8 +293,9 @@ class MyVariantTest(BiothingTestHelperMixin):
 
         assert len(res) == 2
         assert '@context' in res[0] and '@context' in res[1]
-        assert 'snpeff' in res[1] and '@context' in res[1]['snpeff']
-        assert 'ann' in res[1]['snpeff'] and '@context' in res[1]['snpeff']['ann'][0]
+        assert '@id' in res[0] and '@id' in res[1]
+        #assert 'snpeff' in res[1] and '@context' in res[1]['snpeff']
+        #assert 'ann' in res[1]['snpeff'] and '@context' in res[1]['snpeff']['ann'][0]
 
     def test_genome_assembly(self):
         res = self.json_ok(self.get_ok(self.api + '/query?q=clinvar.ref:C%20AND%20chr11:56319006%20AND%20clinvar.alt:A&assembly=hg38'))
