@@ -69,6 +69,7 @@ GA_ACTION_QUERY_POST = 'query_post'
 GA_ACTION_ANNOTATION_GET = 'variant_get'
 GA_ACTION_ANNOTATION_POST = 'variant_post'
 GA_TRACKER_URL = 'MyVariant.info'
+URL_BASE = 'http://myvariant.info'
 
 STATUS_CHECK_ID = 'chr1:g.218631822G>A'
 
