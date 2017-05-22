@@ -64,7 +64,7 @@ class GeneDocMemeoryBackend(GeneDocBackendBase):
 
     def finalize(self):
         '''dump target_dict into a file.'''
-        from utils.common import dump
+        from biothings.utils.common import dump
         dump(self.target_dict, self.target_name+'.pyobj')
 
 
@@ -269,7 +269,7 @@ class GeneDocCouchDBBackend(GeneDocBackendBase):
 
     def _db_upload(self, doc_li, step=10000, verbose=True):
         import time
-        from utils.common import timesofar
+        from biothings.utils.common import timesofar
         from utils.dataload import list2dict, list_itemcnt, listsort
 
         output = []

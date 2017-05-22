@@ -136,6 +136,10 @@ def get_hgvs_from_vcf(chr, pos, ref, alt, mutant_type=None):
 
 def get_pos_start_end(chr, pos, ref, alt):
     '''get start,end tuple from VCF-style "chr, pos, ref, alt" data.'''
+    try:
+        pos = int(pos)
+    except ValueError:
+        raise ValueError("Invalid position %s" % repr(pos))
     if len(ref) == len(alt) == 1:
         # end is the same as start for snp
         start = end = pos
@@ -201,3 +205,19 @@ def get_hgvs_from_rsid(doc_li, rsid_fn, api_host='http://localhost:8000'):
             _doc = copy.copy(doc)
             _doc['_id'] = hgvs_id
             yield _doc
+
+def trim_delseq_from_hgvs(hgvs):
+    re_delins = re.compile("(.*del)[A-Z]+(ins.*)")
+    re_ins = re.compile("(.*ins)[A-Z]+$")
+    re_del = re.compile("(.*del)[A-Z]+$")
+    re_dup = re.compile("(.*dup)[A-Z]+$")
+    if re_delins.match(hgvs):
+        hgvs = "".join(re_delins.match(hgvs).groups())
+    elif re_ins.match(hgvs):
+        hgvs = "".join(re_ins.match(hgvs).groups())
+    elif re_del.match(hgvs):
+        hgvs = "".join(re_del.match(hgvs).groups())
+    elif re_dup.match(hgvs):
+        hgvs = "".join(re_dup.match(hgvs).groups())
+    
+    return hgvs

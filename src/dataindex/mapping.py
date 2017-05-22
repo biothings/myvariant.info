@@ -24,7 +24,7 @@ def get_mapping(sources=None):
     }
 
     for src in sources:
-        src_m = importlib.import_module('dataload.contrib.' + src + '.__init__')
+        src_m = importlib.import_module('dataload.sources.' + src + '.__init__')
         _m = src_m.get_mapping()
         m['variant']['properties'].update(_m)
 

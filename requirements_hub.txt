@@ -1,0 +1,26 @@
+# Required python modules for this project.
+#
+# The modules listed here are required for
+#   running the dataload part of this project
+# All required python modules for running a
+#   web frontend is listed in requirements_web.txt
+#
+# To install all requirement for development, run
+#
+#    pip install -r requirements.txt
+# and
+#    pip install -r requirements_web.txt
+#
+# NOTE: each datasource module at dataload.contrib.* may
+#       require their own modules to run. Check their
+#       __METADATA__ setting for required modules.
+
+
+elasticsearch==2.0.0
+requests==2.8.1
+mongokit>=0.9.1.1
+pymongo>=3.2
+bitarray==0.8.1    # used in utils.validate module
+git+https://github.com/olivierverdier/dispatch.git#egg=dispatcher
+asyncssh==1.7.1
+boto
