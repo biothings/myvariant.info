@@ -42,6 +42,7 @@ class MyVariantDataBuilder(builder.DataBuilder):
         bnum = 1
         cnt = 0
         results = {"missing" : [], "disagreed" : []}
+        root_keys = {}
         # grab ids only, so we can get more and fill queue for each step
         # each round, fill the queue to make sure every cpu slots are always working
         id_batch_size = batch_size * job_manager.process_queue._max_workers * 2
@@ -63,6 +64,11 @@ class MyVariantDataBuilder(builder.DataBuilder):
                         fres = f.result()
                         results["missing"].extend(fres["missing"])
                         results["disagreed"].extend(fres["disagreed"])
+                        # merge root key counts
+                        rk = fres["root_keys"]
+                        for k in rk:
+                            root_keys.setdefault(k,0)
+                            root_keys[k] += rk[k]
                         self.logger.info("chrom batch #%d, done" % batch_num)
                     except Exception as e:
                         import traceback
@@ -80,6 +86,12 @@ class MyVariantDataBuilder(builder.DataBuilder):
                 fn = "chrom_%s_%s.pickle" % (self.target_backend.target_name,datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
                 self.logger.info("Pickling 'chrom' discrepancies into %s" % fn)
                 pickle.dump(results,open(fn,"wb"))
+            # now store metadata
+            root_keys["total"] = root_keys.pop("_id")
+            self.logger.info("Root keys: %s" % root_keys)
+            src_build = self.source_backend.build
+            src_build.update({'_id': self.target_backend.target_name},{"$set":{"_meta.stats":root_keys}})
+
 
         return results
 
@@ -91,6 +103,11 @@ class MyVariantDataBuilder(builder.DataBuilder):
         job = self.set_chrom(batch_size, job_manager)
         task = asyncio.ensure_future(job)
         return task
+
+    def get_metadata(self,*args,**kwargs):
+        # we overide that one just to make sure existing metadata won't be
+        # overwritten by the ones coming from the base class
+        return {}
 
 
 def get_chrom(doc):
@@ -109,13 +126,15 @@ def get_chrom(doc):
         this_chrom["agreed"] = False
     return this_chrom
 
+
 def chrom_worker(col_name, ids):
     tgt = mongo.get_target_db()
     col = tgt[col_name]
     cur = col.find({'_id': {'$in': ids}})
-    bob = col.initialize_unordered_bulk_op()  
+    bob = col.initialize_unordered_bulk_op()
     disagreed = []
     missing = []
+    root_keys = {}
     at_least_one = False
     for doc in cur:
         dchrom = get_chrom(doc)
@@ -127,6 +146,11 @@ def chrom_worker(col_name, ids):
         if chrom:
             bob.find({"_id": doc["_id"]}).update({"$set": {"chrom" : chrom}})
             at_least_one = True
+        # count root keys for later metadata
+        for k in doc:
+            root_keys.setdefault(k,0)
+            root_keys[k] += 1
+
     at_least_one and bob.execute()
 
-    return {"missing": missing, "disagreed" : disagreed}
+    return {"missing": missing, "disagreed" : disagreed, "root_keys" : root_keys}

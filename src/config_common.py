@@ -135,3 +135,10 @@ MAX_QUEUED_JOBS = os.cpu_count() * 4
 # Since myvariant's indices are pretty big, a whole snaphost won't happne in few secs,
 # let's just monitor the status every 5min
 MONITOR_SNAPSHOT_DELAY = 5 * 60
+
+# Hub environment (like, prod, dev, ...)
+# Used to generate remote metadata file, like "latest.json", "versions.json"
+# If non-empty, this constant will be used to generate those url, as a prefix 
+# with "-" between. So, if "dev", we'll have "dev-latest.json", etc...
+# "" means production
+HUB_ENV = ""
