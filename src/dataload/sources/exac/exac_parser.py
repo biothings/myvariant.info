@@ -36,7 +36,7 @@ def _map_line_to_json(doc_key, item):
     for i in range(0, len(item.ALT)):
         item.ALT[i] = str(item.ALT[i])
     for alt in item.ALT:
-        alt = str(alt)
+        alt = str(item.ALT[i])
         (HGVS, var_type) = get_hgvs_from_vcf(chrom, chromStart, ref, alt, mutant_type=True)
         if HGVS is None:
             return
@@ -50,19 +50,19 @@ def _map_line_to_json(doc_key, item):
                 "alleles": item.ALT,
                 "type": var_type,
                 "ac": {
-                    "ac": info['AC'],
-                    "ac_afr": info['AC_AFR'],
-                    "ac_amr": info['AC_AMR'],
-                    "ac_adj": info['AC_Adj'],
-                    "ac_eas": info['AC_EAS'],
-                    "ac_fin": info['AC_FIN'],
-                    "ac_het": info['AC_Het'],
-                    "ac_hom": info['AC_Hom'],
-                    "ac_nfe": info['AC_NFE'],
-                    "ac_oth": info['AC_OTH'],
-                    "ac_sas": info['AC_SAS'],
-                    "ac_female": info['AC_FEMALE'],
-                    "ac_male": info['AC_MALE']
+                    "ac": info['AC'][i],
+                    "ac_afr": info['AC_AFR'][i],
+                    "ac_amr": info['AC_AMR'][i],
+                    "ac_adj": info['AC_Adj'][i],
+                    "ac_eas": info['AC_EAS'][i],
+                    "ac_fin": info['AC_FIN'][i],
+                    "ac_het": info['AC_Het'][i],
+                    "ac_hom": info['AC_Hom'][i],
+                    "ac_nfe": info['AC_NFE'][i],
+                    "ac_oth": info['AC_OTH'][i],
+                    "ac_sas": info['AC_SAS'][i],
+                    "ac_male": info['AC_MALE'][i],
+                    "ac_female": info['AC_FEMALE'][i]
                 },
                 "af": info['AF'],
                 "an": {
