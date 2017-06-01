@@ -34,8 +34,6 @@ def _map_line_to_json(doc_key, item):
     except:
         inbreedingcoeff = None
     for i in range(0, len(item.ALT)):
-        item.ALT[i] = str(item.ALT[i])
-    for alt in item.ALT:
         alt = str(item.ALT[i])
         (HGVS, var_type) = get_hgvs_from_vcf(chrom, chromStart, ref, alt, mutant_type=True)
         if HGVS is None:
