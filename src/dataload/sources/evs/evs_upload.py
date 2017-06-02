@@ -7,6 +7,14 @@ import biothings.dataload.storage as storage
 from dataload.uploader import SnpeffPostUpdateUploader
 
 
+# common to both hg19 and hg38
+SRC_META = {
+        "url" : "https://www.snpedia.com/",
+        "licence" : "CC BY-NC-SA",
+        "licence_url" : "https://www.snpedia.com/index.php/SNPedia:General_disclaimer",
+        }
+
+
 class EVSBaseUploader(SnpeffPostUpdateUploader):
 
     storage_class = storage.IgnoreDuplicatedStorage
@@ -105,12 +113,14 @@ class EVSHg19Uploader(EVSBaseUploader):
     name = "evs_hg19"
     main_source = "evs"
     __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg19"}
+                    "assembly" : "hg19",
+                    "src_meta" : SRC_META}
 
 
 class EVSHg38Uploader(EVSBaseUploader):
     name = "evs_hg38"
     main_source = "evs"
     __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg38"}
+                    "assembly" : "hg38",
+                    "src_meta" : SRC_META}
 
