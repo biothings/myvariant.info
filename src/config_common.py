@@ -142,3 +142,13 @@ MONITOR_SNAPSHOT_DELAY = 5 * 60
 # with "-" between. So, if "dev", we'll have "dev-latest.json", etc...
 # "" means production
 HUB_ENV = ""
+
+
+# Pre-prod/test ES definitions
+# (see bt.databuild.backend.create_backend() for the notation)
+ES_TEST_HOST = 'localhost:9200'
+ES_TEST_HG19 = (ES_TEST_HOST,"myvariant_current_hg19","variant")
+ES_TEST_HG38 = (ES_TEST_HOST,"myvariant_current_hg38","variant")
+# Prod ES definitions
+ES_PROD_HG19 = (ES_PROD_HOST,"myvariant_current_hg19","variant")
+ES_PROD_HG38 = (ES_PROD_HOST,"myvariant_current_hg38","variant")

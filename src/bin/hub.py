@@ -143,6 +143,12 @@ COMMANDS = {
         "merge" : build_manager.merge,
         "mongo_sync" : partial(syncer_manager.sync,"mongo"),
         "es_sync" : partial(syncer_manager.sync,"es"),
+        "es_sync_hg19_test" : partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_HG19),
+        "es_sync_hg38_test" : partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_HG38),
+        "es_sync_hg19_prod" : partial(syncer_manager.sync,"es",target_backend=config.ES_PROD_HG19),
+        "es_sync_hg38_prod" : partial(syncer_manager.sync,"es",target_backend=config.ES_PROD_HG38),
+        "es_prod": {"hg19":config.ES_PROD_HG19,"hg38":config.ES_PROD_HG38},
+        "es_test": {"hg19":config.ES_TEST_HG19,"hg38":config.ES_TEST_HG38},
         "sm" : syncer_manager,
         # diff
         "dim" : differ_manager,
