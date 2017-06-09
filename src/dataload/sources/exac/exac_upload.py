@@ -35,6 +35,10 @@ class ExacBaseUploader(SnpeffPostUpdateUploader):
                         "type": "string",
                         "analyzer": "string_lowercase"
                     },
+                    "multi-allelic": {
+                        "type": "string",
+                        "analyzer": "string_lowercase"
+                    },
                     "alleles": {
                         "type": "string",
                         "analyzer": "string_lowercase"
