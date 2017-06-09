@@ -36,6 +36,7 @@ def _map_line_to_json(doc_key, item):
     # convert vcf object to string
     item.ALT = [str(alt) for alt in item.ALT]
     # if multiallelic, put all variants as a list in multi-allelic field
+    hgvs_list = None
     if len(item.ALT) > 1:
         hgvs_list = [get_hgvs_from_vcf(chrom, chromStart, ref, alt, mutant_type=True) for alt in item.ALT]
     for i, alt in enumerate(item.ALT):
@@ -50,6 +51,7 @@ def _map_line_to_json(doc_key, item):
             doc_key : {
                 "chrom": chrom,
                 "pos": chromStart,
+                "multi-allelic": hgvs_list,
                 "ref": ref,
                 "alt": alt,
                 "alleles": item.ALT,
