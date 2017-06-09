@@ -64,7 +64,7 @@ def _map_line_to_json(doc_key, item):
                     "ac_male": info['AC_MALE'][i],
                     "ac_female": info['AC_FEMALE'][i]
                 },
-                "af": info['AF'],
+                "af": info['AF'][i],
                 "an": {
                     "an": info['AN'],
                     "an_afr": info['AN_AFR'],
