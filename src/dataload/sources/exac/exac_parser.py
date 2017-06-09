@@ -33,13 +33,18 @@ def _map_line_to_json(doc_key, item):
         inbreedingcoeff = info['InbreedingCoeff']
     except:
         inbreedingcoeff = None
-    for i in range(0, len(item.ALT)):
-        item.ALT[i] = str(item.ALT[i]) # convert vcf object to string
-    for i in range(0, len(item.ALT)):
-        alt = item.ALT[i]
+    # convert vcf object to string
+    item.ALT = [str(alt) for alt in item.ALT]
+    # if multiallelic, put all variants as a list in multi-allelic field
+    if len(item.ALT) > 1:
+        hgvs_list = [get_hgvs_from_vcf(chrom, chromStart, ref, alt, mutant_type=True) for alt in item.ALT]
+    for i, alt in enumerate(item.ALT):
         (HGVS, var_type) = get_hgvs_from_vcf(chrom, chromStart, ref, alt, mutant_type=True)
         if HGVS is None:
             return
+        assert len(item.ALT) == len(info['AC']), "Expecting length of item.ALT= length of info.AC, but not for %s" % (HGVS)
+        assert len(item.ALT) == len(info['AF']), "Expecting length of item.ALT= length of info.AF, but not for %s" % (HGVS)
+        assert len(item.ALT) == len(info['Hom_AFR']), "Expecting length of item.ALT= length of HOM_AFR, but not for %s" % (HGVS)
         one_snp_json = {
             "_id": HGVS,
             doc_key : {
@@ -122,4 +127,3 @@ def load_data(doc_key,input_file):
     for record in vcf_reader:
         for record_mapped in _map_line_to_json(doc_key,record):
             yield record_mapped
-            
