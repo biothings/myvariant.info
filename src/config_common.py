@@ -150,5 +150,6 @@ ES_TEST_HOST = 'localhost:9200'
 ES_TEST_HG19 = (ES_TEST_HOST,"myvariant_current_hg19","variant")
 ES_TEST_HG38 = (ES_TEST_HOST,"myvariant_current_hg38","variant")
 # Prod ES definitions
+ES_PROD_HOST = 'prodserver:9200'
 ES_PROD_HG19 = (ES_PROD_HOST,"myvariant_current_hg19","variant")
 ES_PROD_HG38 = (ES_PROD_HOST,"myvariant_current_hg38","variant")
