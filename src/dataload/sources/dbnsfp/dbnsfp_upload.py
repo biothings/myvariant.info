@@ -9,6 +9,13 @@ import biothings.dataload.uploader as uploader
 from biothings.dataload.storage import IgnoreDuplicatedStorage
 from dataload.uploader import SnpeffPostUpdateUploader
 
+
+SRC_META = {
+        "url" : "https://sites.google.com/site/jpopgen/dbNSFP",
+        "license_url" : "https://sites.google.com/site/jpopgen/dbNSFP",
+        }
+
+
 class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                          uploader.ParallelizedSourceUploader,
                          SnpeffPostUpdateUploader):
@@ -796,11 +803,17 @@ class DBNSFPHG38Uploader(DBNSFPBaseUploader):
 
     name = "dbnsfp_hg38"
     main_source = "dbnsfp"
-    __metadata__ = {"assembly": "hg38"}
+    __metadata__ = {
+            "assembly": "hg38",
+            "src_meta" : SRC_META
+            }
 
 
 class DBNSFPHG19Uploader(DBNSFPBaseUploader):
 
     name = "dbnsfp_hg19"
     main_source = "dbnsfp"
-    __metadata__ = {"assembly": "hg19"}
+    __metadata__ = {
+            "assembly": "hg19",
+            "src_meta" : SRC_META
+            }

@@ -26,11 +26,11 @@ class Geno2MPDumper(HTTPDumper):
         res = self.client.head(remotefile)
         remote_dt =  datetime.datetime.strptime(res.headers["Last-Modified"], '%a, %d %b %Y %H:%M:%S GMT')
         remote_lastmodified = time.mktime(remote_dt.timetuple())
+        # also set release attr
+        self.release = remote_dt.strftime("%Y-%m-%d")
         if remote_lastmodified > local_lastmodified:
             self.logger.debug("Remote file '%s' is newer (remote: %s, local: %s)" %
                     (remotefile,remote_lastmodified,local_lastmodified))
-            # also set release attr
-            self.release = remote_dt.strftime("%Y-%m-%d")
             return True
         else:
             return False
@@ -42,7 +42,8 @@ class Geno2MPDumper(HTTPDumper):
         except TypeError:
             # current data folder doesn't even exist
             current_localfile = None
-        if current_localfile is None or self.remote_is_better(self.__class__.SRC_URL,current_localfile):
+        remote_better = self.remote_is_better(self.__class__.SRC_URL,current_localfile)
+        if force or current_localfile is None or remote_better:
             new_localfile = os.path.join(self.new_data_folder,filename)
             self.to_dump.append({"remote":self.__class__.SRC_URL, "local":new_localfile})
 

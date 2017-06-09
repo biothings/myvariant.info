@@ -6,6 +6,12 @@ import biothings.dataload.uploader as uploader
 from dataload.uploader import SnpeffPostUpdateUploader
 
 
+SRC_META = {
+        "url" : "https://www.ncbi.nlm.nih.gov/projects/SNP/",
+        "license_url" : "https://www.ncbi.nlm.nih.gov/home/about/policies/",
+        }
+
+
 class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                     uploader.ParallelizedSourceUploader,
                     SnpeffPostUpdateUploader):
@@ -102,8 +108,11 @@ class DBSNPHg19Uploader(DBSNPBaseUploader):
 
     main_source = "dbsnp"
     name = "dbsnp_hg19"
-    __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg19"}
+    __metadata__ = {
+            "mapper" : 'observed',
+            "assembly" : "hg19",
+            "src_meta" : SRC_META
+            }
     GLOB_PATTERN = "human_9606_*_GRCh37*/VCF/*.vcf.gz"
 
     def post_update_data(self, *args, **kwargs):
@@ -117,7 +126,10 @@ class DBSNPHg38Uploader(DBSNPBaseUploader):
 
     main_source = "dbsnp"
     name = "dbsnp_hg38"
-    __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg38"}
+    __metadata__ = {
+            "mapper" : 'observed',
+            "assembly" : "hg38",
+            "src_meta" : SRC_META
+            }
     GLOB_PATTERN = "human_9606_*_GRCh38*/VCF/*.vcf.gz"
 

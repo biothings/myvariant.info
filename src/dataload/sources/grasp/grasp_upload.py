@@ -13,7 +13,12 @@ class GraspUploader(uploader.IgnoreDuplicatedSourceUploader,
     name = "grasp"
     strorage_class = storage.IgnoreDuplicatedStorage
     __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg19"}
+            "assembly" : "hg19",
+            "src_meta" : {
+                "url" : "https://grasp.nhlbi.nih.gov/Updates.aspx",
+                "license_url" : "https://grasp.nhlbi.nih.gov/Terms.aspx",
+                }
+            }
 
     def load_data(self,data_folder):
         # there's one zip there, let's get the zipped filename

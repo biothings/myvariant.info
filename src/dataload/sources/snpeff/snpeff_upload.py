@@ -1,5 +1,12 @@
-
 import biothings.dataload.uploader as uploader
+
+
+SRC_META = {
+        "url" : "http://snpeff.sourceforge.net/",
+        "license" : "LGPLv3",
+        "license_url" : "http://snpeff.sourceforge.net/download.html",
+        }
+
 
 class SnpeffBaseUploader(uploader.NoDataSourceUploader):
 
@@ -162,10 +169,16 @@ class SnpeffBaseUploader(uploader.NoDataSourceUploader):
 
 class SnpeffHg19Uploader(SnpeffBaseUploader):
     name = "snpeff_hg19"
-    __metadata__ = {"assembly" : "hg19"}
+    __metadata__ = {
+            "assembly" : "hg19",
+            "src_meta" : SRC_META,
+            }
 
 
 class SnpeffHg38Uploader(SnpeffBaseUploader):
     name = "snpeff_hg38"
-    __metadata__ = {"assembly" : "hg38"}
+    __metadata__ = {
+            "assembly" : "hg38",
+            "src_meta" : SRC_META,
+            }
 

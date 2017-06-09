@@ -7,7 +7,13 @@ from dataload.uploader import SnpeffPostUpdateUploader
 class ExacBaseUploader(SnpeffPostUpdateUploader):
 
     __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg19"}
+            "assembly" : "hg19",
+            "src_meta" : {
+                "url" : "http://exac.broadinstitute.org/",
+                "license" : "ODbL",
+                "license_url" : "http://exac.broadinstitute.org/terms",
+                }
+            }
 
     @classmethod
     def get_mapping(klass):

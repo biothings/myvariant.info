@@ -10,7 +10,12 @@ class Geno2MPUploader(SnpeffPostUpdateUploader):
 
     name = "geno2mp"
     __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg19"}
+            "assembly" : "hg19",
+            "src_meta" : {
+                "url" : "http://geno2mp.gs.washington.edu",
+                "license_url" : "http://www.washington.edu/online/terms/",
+                }
+            }
 
     def load_data(self,data_folder):
         # there's one vcf file there, let's get it

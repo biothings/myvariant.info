@@ -9,9 +9,8 @@ from dataload.uploader import SnpeffPostUpdateUploader
 
 # common to both hg19 and hg38
 SRC_META = {
-        "url" : "https://www.snpedia.com/",
-        "licence" : "CC BY-NC-SA",
-        "licence_url" : "https://www.snpedia.com/index.php/SNPedia:General_disclaimer",
+        "url" : "http://evs.gs.washington.edu/EVS/",
+        "license_url" : "http://www.washington.edu/online/terms/"
         }
 
 

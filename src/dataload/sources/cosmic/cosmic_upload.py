@@ -4,8 +4,14 @@ from dataload.uploader import SnpeffPostUpdateUploader
 class CosmicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
 
     name = "cosmic"
-    __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg19"}
+    __metadata__ = {
+            "mapper" : 'observed',
+            "assembly" : "hg19",
+            "src_meta" : {
+                "url" : "http://cancer.sanger.ac.uk/cosmic",
+                "license_url" : "http://www.sanger.ac.uk/about/who-we-are/policies/open-access-science",
+                }
+            }
 
     @classmethod
     def get_mapping(klass):

@@ -5,7 +5,13 @@ class UniprotUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
 
     name = "uniprot"
     __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg38"}
+            "assembly" : "hg38",
+            "src_meta" : {
+                "url" : "http://www.uniprot.org/",
+                "license" : "CC BY-ND 3.0",
+                "license_url" : "http://www.uniprot.org/help/license",
+                }
+            }
 
     @classmethod
     def get_mapping(klass):

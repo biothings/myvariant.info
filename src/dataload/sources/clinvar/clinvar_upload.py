@@ -2,6 +2,12 @@ from .clinvar_xml_parser import load_data as load_common
 import biothings.dataload.uploader as uploader
 from dataload.uploader import SnpeffPostUpdateUploader
 
+
+SRC_META = {
+        "url" : "https://www.ncbi.nlm.nih.gov/clinvar/",
+        "license_url" : "https://www.ncbi.nlm.nih.gov/home/about/policies/",
+        }
+
 class ClinvarBaseUploader(SnpeffPostUpdateUploader):
 
     def get_pinfo(self):
@@ -219,6 +225,7 @@ class ClinvarHG19Uploader(ClinvarBaseUploader):
     __metadata__ = {
             "mapper" : 'observed',
             "assembly" : "hg19",
+            "src_meta" : SRC_META,
             }
 
     def load_data(self,data_folder):
@@ -238,6 +245,7 @@ class ClinvarHG38Uploader(ClinvarBaseUploader):
     __metadata__ = {
             "mapper" : 'observed',
             "assembly" : "hg38",
+            "src_meta" : SRC_META,
             }
 
     def load_data(self,data_folder):

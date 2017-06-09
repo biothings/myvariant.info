@@ -6,11 +6,17 @@ from .emv_parser import load_data
 import biothings.dataload.uploader as uploader
 from dataload.uploader import SnpeffPostUpdateUploader
 
+
 class EMVUploader(SnpeffPostUpdateUploader):
 
     name = "emv"
     __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg19"}
+            "assembly" : "hg19",
+            "src_meta" : {
+                "url" : "http://geneticslab.emory.edu/emvclass/emvclass.php",
+                "license_url" : "?",
+                }
+            }
 
     def load_data(self,data_folder):
         # there's one csv file there, let's get it

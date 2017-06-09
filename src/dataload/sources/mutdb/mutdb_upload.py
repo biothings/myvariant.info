@@ -6,7 +6,12 @@ class MutDBUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
 
     name = "mutdb"
     __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg19"}
+            "assembly" : "hg19",
+            "src_meta" : {
+                "url" : "http://www.mutdb.org/",
+                "license_url" : "?",
+                }
+            }
 
     @classmethod
     def get_mapping(klass):

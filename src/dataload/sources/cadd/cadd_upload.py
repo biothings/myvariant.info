@@ -8,7 +8,13 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
     keep_archive = 1
 
     name = "cadd"
-    __metadata__ = {"assembly" : "hg19"}
+    __metadata__ = {
+            "assembly" : "hg19",
+            "src_meta" : {
+                "url" : "http://cadd.gs.washington.edu/home",
+                "license_url" : "http://cadd.gs.washington.edu/contact",
+                }
+            }
 
     def load_data(self,data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)

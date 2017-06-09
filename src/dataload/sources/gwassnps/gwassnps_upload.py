@@ -5,7 +5,12 @@ class GwassnpsUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
 
     name = "gwassnps"
     __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg19"}
+            "assembly" : "hg19",
+            "src_meta" : {
+                "url" : "http://help.gwascentral.org/data/database-content/",
+                "license_url" : "http://help.gwascentral.org/data/data-sharing-statement/",
+                }
+            }
 
     @classmethod
     def get_mapping(klass):

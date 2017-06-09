@@ -7,7 +7,13 @@ class WellderlyFactoryUploader(uploader.DummySourceUploader,SnpeffPostUpdateUplo
 
     name = "wellderly"
     __metadata__ = {"mapper" : 'observed',
-                    "assembly" : "hg19"}
+            "assembly" : "hg19",
+            "src_meta" : {
+                "url" : "https://genomics.scripps.edu/browser/",
+                "license_url" : "?",
+                }
+            }
+
     #split_collections = ["wellderly_cg1","wellderly_cg10","wellderly_cg11",
     #                     "wellderly_cg12","wellderly_cg13","wellderly_cg14",
     #                     "wellderly_cg15","wellderly_cg16","wellderly_cg17",
