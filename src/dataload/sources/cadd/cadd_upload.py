@@ -13,6 +13,7 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
             "src_meta" : {
                 "url" : "http://cadd.gs.washington.edu/home",
                 "license_url" : "http://cadd.gs.washington.edu/contact",
+                "license_url_short": "http://goo.gl/bkpNhq"
                 }
             }
 

@@ -10,6 +10,7 @@ class UniprotUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                 "url" : "http://www.uniprot.org/",
                 "license" : "CC BY-ND 3.0",
                 "license_url" : "http://www.uniprot.org/help/license",
+                "license_url_short": "https://goo.gl/4CUyQv"
                 }
             }
 

@@ -9,6 +9,7 @@ from dataload.uploader import SnpeffPostUpdateUploader
 SRC_META = {
         "url" : "https://www.ncbi.nlm.nih.gov/projects/SNP/",
         "license_url" : "https://www.ncbi.nlm.nih.gov/home/about/policies/",
+        "license_url_short": "https://goo.gl/Ztr5rl"
         }
 
 

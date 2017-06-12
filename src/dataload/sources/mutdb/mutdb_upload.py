@@ -9,7 +9,8 @@ class MutDBUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
             "assembly" : "hg19",
             "src_meta" : {
                 "url" : "http://www.mutdb.org/",
-                "license_url" : "?",
+                "license_url" : "http://www.mutdb.org/",
+                "license_url_short": "https://goo.gl/I4Ipa2"
                 }
             }
 

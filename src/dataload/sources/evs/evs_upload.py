@@ -10,7 +10,8 @@ from dataload.uploader import SnpeffPostUpdateUploader
 # common to both hg19 and hg38
 SRC_META = {
         "url" : "http://evs.gs.washington.edu/EVS/",
-        "license_url" : "http://www.washington.edu/online/terms/"
+        "license_url" : "http://evs.gs.washington.edu/EVS/",
+        "license_url_short": "https://goo.gl/okv78q"
         }
 
 

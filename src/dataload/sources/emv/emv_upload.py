@@ -13,8 +13,9 @@ class EMVUploader(SnpeffPostUpdateUploader):
     __metadata__ = {"mapper" : 'observed',
             "assembly" : "hg19",
             "src_meta" : {
-                "url" : "http://geneticslab.emory.edu/emvclass/emvclass.php",
-                "license_url" : "?",
+                "url" : "http://www.egl-eurofins.com/emvclass/emvclass.php",
+                "license_url" : "http://www.egl-eurofins.com/emvclass/emvclass.php",
+                "license_url_short": "https://goo.gl/oX3jov"
                 }
             }
 

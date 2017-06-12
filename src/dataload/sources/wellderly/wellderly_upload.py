@@ -10,7 +10,8 @@ class WellderlyFactoryUploader(uploader.DummySourceUploader,SnpeffPostUpdateUplo
             "assembly" : "hg19",
             "src_meta" : {
                 "url" : "https://genomics.scripps.edu/browser/",
-                "license_url" : "?",
+                "license_url" : "https://genomics.scripps.edu/browser/page-help.html",
+                "license_url_short": "https://goo.gl/e8OO17"
                 }
             }
 

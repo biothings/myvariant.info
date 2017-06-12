@@ -12,6 +12,7 @@ class ExacBaseUploader(SnpeffPostUpdateUploader):
                 "url" : "http://exac.broadinstitute.org/",
                 "license" : "ODbL",
                 "license_url" : "http://exac.broadinstitute.org/terms",
+                "license_url_short": "https://goo.gl/MH8b34"
                 }
             }
 

@@ -5,7 +5,8 @@ from dataload.uploader import SnpeffPostUpdateUploader
 
 SRC_META = {
         "url" : "https://www.ncbi.nlm.nih.gov/clinvar/",
-        "license_url" : "https://www.ncbi.nlm.nih.gov/home/about/policies/",
+        "license_url" : "https://www.ncbi.nlm.nih.gov/clinvar/intro/",
+        "license_url_short": "https://goo.gl/OaHML9"
         }
 
 class ClinvarBaseUploader(SnpeffPostUpdateUploader):

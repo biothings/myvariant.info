@@ -7,8 +7,9 @@ class GwassnpsUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
     __metadata__ = {"mapper" : 'observed',
             "assembly" : "hg19",
             "src_meta" : {
-                "url" : "http://help.gwascentral.org/data/database-content/",
-                "license_url" : "http://help.gwascentral.org/data/data-sharing-statement/",
+                "url" : "http://www.ebi.ac.uk/gwas/",
+                "license_url" : "http://www.ebi.ac.uk/gwas/docs/about",
+                "license_url_short": "https://goo.gl/Zy0C5e"
                 }
             }
 

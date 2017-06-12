@@ -9,7 +9,9 @@ class CosmicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
             "assembly" : "hg19",
             "src_meta" : {
                 "url" : "http://cancer.sanger.ac.uk/cosmic",
-                "license_url" : "http://www.sanger.ac.uk/about/who-we-are/policies/open-access-science",
+                "license_url" : "http://cancer.sanger.ac.uk/cosmic/license",
+                "license_url_short": "https://goo.gl/2tibWa",
+                "note": "COSMIC v68 was imported from UCSC database dump. This is the last freely available somatic variants from COSMIC before their licence change."
                 }
             }
 

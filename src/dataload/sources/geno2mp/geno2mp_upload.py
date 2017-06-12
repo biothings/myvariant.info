@@ -13,7 +13,8 @@ class Geno2MPUploader(SnpeffPostUpdateUploader):
             "assembly" : "hg19",
             "src_meta" : {
                 "url" : "http://geno2mp.gs.washington.edu",
-                "license_url" : "http://www.washington.edu/online/terms/",
+                "license_url" : "http://geno2mp.gs.washington.edu/Geno2MP/#/terms",
+                "license_url_short": "https://goo.gl/D6Edka"
                 }
             }
 

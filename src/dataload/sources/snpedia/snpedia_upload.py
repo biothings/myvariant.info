@@ -12,6 +12,7 @@ class SnpediaUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                 "url" : "https://www.snpedia.com/",
                 "license" : "CC BY-NC-SA",
                 "license_url" : "https://www.snpedia.com/index.php/SNPedia:General_disclaimer",
+                "license_url_short": "https://goo.gl/3DZUWK"
                 }
             }
 

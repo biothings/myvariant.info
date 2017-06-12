@@ -17,6 +17,7 @@ class GraspUploader(uploader.IgnoreDuplicatedSourceUploader,
             "src_meta" : {
                 "url" : "https://grasp.nhlbi.nih.gov/Updates.aspx",
                 "license_url" : "https://grasp.nhlbi.nih.gov/Terms.aspx",
+                "license_url_short": "https://goo.gl/0V1pj5"
                 }
             }
 
