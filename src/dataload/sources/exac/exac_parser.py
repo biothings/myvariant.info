@@ -38,7 +38,7 @@ def _map_line_to_json(doc_key, item):
     # if multiallelic, put all variants as a list in multi-allelic field
     hgvs_list = None
     if len(item.ALT) > 1:
-        hgvs_list = [get_hgvs_from_vcf(chrom, chromStart, ref, alt, mutant_type=True) for alt in item.ALT]
+        hgvs_list = [get_hgvs_from_vcf(chrom, chromStart, ref, alt, mutant_type=False) for alt in item.ALT]
     for i, alt in enumerate(item.ALT):
         (HGVS, var_type) = get_hgvs_from_vcf(chrom, chromStart, ref, alt, mutant_type=True)
         if HGVS is None:
