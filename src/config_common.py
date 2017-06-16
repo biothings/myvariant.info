@@ -81,12 +81,18 @@ ANNOTATION_ID_REGEX_LIST = [(re.compile(r'rs[0-9]+', re.I), 'dbsnp.rsid'),
                             (re.compile(r'rcv[0-9\.]+', re.I), 'clinvar.rcv.accession'),
                             (re.compile(r'var_[0-9]+', re.I), 'uniprot.humsavar.ftid')]
 
+# typedef for assembly parameter
 ASSEMBLY_TYPEDEF = {'assembly': {'type': str, 'default': 'hg19'}}
 ANNOTATION_GET_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
 ANNOTATION_POST_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
 QUERY_GET_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
 QUERY_POST_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
 METADATA_GET_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
+# send assembly to transform stage also
+ANNOTATION_GET_TRANSFORM_KWARGS.update(ASSEMBLY_TYPEDEF)
+ANNOTATION_POST_TRANSFORM_KWARGS.update(ASSEMBLY_TYPEDEF)
+QUERY_GET_TRANSFORM_KWARGS.update(ASSEMBLY_TYPEDEF)
+QUERY_POST_TRANSFORM_KWARGS.update(ASSEMBLY_TYPEDEF)
 
 JSONLD_CONTEXT_PATH = 'www/context/context.json'
 

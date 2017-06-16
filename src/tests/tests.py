@@ -244,20 +244,19 @@ class MyVariantTest(BiothingTestHelperMixin):
     # Too slow
     def test_licenses(self):
         # cadd license
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr17:g.61949543G>A?fields=cadd'))
-        assert '_license' in res['cadd']
-        assert res['cadd']['_license']
-
-        # dbnsfp licenses
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr1:g.69109T>G?fields=dbnsfp'))
-        assert 'dann' in res['dbnsfp'] and '_license' in res['dbnsfp']['dann']
-        assert res['dbnsfp']['dann']['_license']
-
-        assert 'vest3' in res['dbnsfp'] and '_license' in res['dbnsfp']['vest3']
-        assert res['dbnsfp']['vest3']['_license']
-
-        assert 'polyphen2' in res['dbnsfp'] and '_license' in res['dbnsfp']['polyphen2']
-        assert res['dbnsfp']['polyphen2']['_license']
+        res = self.json_ok(self.get_ok(self.api + '/variant/chr17:g.61949543G>A'))
+        if 'cadd' in res:
+            assert '_license' in res['cadd']
+            assert res['cadd']['_license']
+        if 'comsic' in res:
+            assert '_license' in res['cosmic']
+            assert res['cosmic']['_license']
+        if 'dbsnp' in res:
+            assert '_license' in res['dbsnp']
+            assert res['dbsnp']['_license']
+        if 'snpeff' in res:
+            assert '_license' in res['snpeff']
+            assert res['snpeff']['_license']
 
     def test_jsonld(self):
         res = self.json_ok(self.get_ok(self.api + '/variant/chr11:g.66397320A>G?jsonld=true'))
