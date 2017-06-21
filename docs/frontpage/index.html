@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href="https://cdn.rawgit.com/biothings/myvariant.info/production/docs/frontpage/index.css" rel="stylesheet">
+    <!--  Uncomment these if any scripting needs to be done
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="https://cdn.rawgit.com/biothings/myvariant.info/production/docs/frontpage/index.js"></script>-->
+</head>
+<body>
+    <h2>MyVariant.info Data Restore Instructions</h2>
+    <p>Once the Docker container is running, you can initiate the data restore script as follows:</p>
+    <ol>
+        <li><p class='code'>docker exec -d [container_name] /home/biothings/es_restore</p>
+            <p>This step will initiate a restore of ~ 1TB of data from our AWS S3 bucket.  Depending on your system configuration, it can take many hours to complete.</p></li>
+        <li><p>To monitor the data restore progress, you can open your web browser and point it to: <span class='inline-link'>http://localhost:9200/_plugin/head</span>.  
+               This page is an Elasticsearch management tool.  Each index 
+               (<span class='emphasize'>variant_hg19_20170517</span> and <span class='emphasize'>variant_hg38_20170517</span>) 
+               will eventually be shown here, along with 20 boxes numbered 0-19 underneath each.  Each of these 
+               boxes represents a shard of the data.  When a shard has completed recovery and is searchable, its 
+               box will turn from yellow to green.  Once all 40 shards (in both indices) turn green, the entire 
+               database is searchable.</p></li>
+    </ol>
+</body>
+</html>
