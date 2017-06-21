@@ -1,0 +1,16 @@
+/* css for stand alone front page */
+body {
+    font-family: 'Open Sans', serif;
+    width: 600px;
+}
+.code {
+    font-family: monospace;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.inline-link {
+    font-family: monospace;
+}
+.emphasize {
+    font-weight: bold;
+}   
