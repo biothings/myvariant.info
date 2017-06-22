@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The landing page for the standalone MyVariant.info API server.">
+    <title>The standalone MyVariant.info API server</title>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-min.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" href="css/layouts/marketing-old-ie.css">
+        <![endif]-->
+        <!--[if gt IE 8]><!-->
+            <link rel="stylesheet" href="css/layouts/marketing.css">
+        <!--<![endif]-->
+    <!--[if lt IE 9]>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.js"></script>
+    <![endif]-->
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script>
+      function goto_next(){
+        $('html, body').animate({
+            scrollTop: $("#content-next").offset().top - 30
+        }, 1000);
+      }
+    </script>
+
+
+<!--
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href="https://cdn.rawgit.com/biothings/myvariant.info/production/docs/frontpage/index.css" rel="stylesheet">
+    Uncomment these if any scripting needs to be done
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="https://cdn.rawgit.com/biothings/myvariant.info/production/docs/frontpage/index.js"></script>-->
+</head>
+<body>
+  <div class="header">
+      <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+          <a class="pure-menu-heading" href="">MyVariant.info - standalone</a>
+
+          <ul class="pure-menu-list">
+              <li class="pure-menu-item pure-menu-selected"><a href="#" class="pure-menu-link">Home</a></li>
+              <li class="pure-menu-item"><a href="http://myvariant.info" class="pure-menu-link">Goto public MyVariant.info</a></li>
+          </ul>
+      </div>
+  </div>
+
+  <div class="splash-container">
+      <div class="splash">
+          <h1 class="splash-head">Congratulations!</h1>
+          <p class="splash-subhead">
+              You standalone MyVariant.info API server is now live...
+          </p>
+          <p>
+              <a href="JavaScript:goto_next();" class="pure-button pure-button-primary">Get Started</a>
+          </p>
+      </div>
+  </div>
+
+  <div class="content-wrapper">
+      <div class="content" id="content-next">
+          <h2 class="content-head is-center">What to do next</h2>
+
+          <div class="pure-g">
+              <div class="l-box is-center pure-u-1 pure-u-md-1 pure-u-lg-1">
+
+                  <h3 class="content-subhead">
+                      <i class="fa fa-cloud-download"></i>
+                      Restore Variant data
+                  </h3>
+                  <p>
+                    <p>Once the Docker container is running, you can initiate the data
+                       restore script as follows:
+                       <pre>docker exec -ti CONTAINER /home/biothings/es_restore.sh</pre>
+                     </p>
+
+                  </p>
+              </div>
+              <div class="l-box is-center pure-u-1 pure-u-md-1 pure-u-lg-1">
+                  <h3 class="content-subhead">
+                      <i class="fa fa-th-large"></i>
+                      Monitor data restoration progress
+                  </h3>
+                  <p>
+                      The last step will initiate a restore of ~ 1TB of data from our AWS S3 bucket.
+                      Depending on your system configuration, it can take quite a whole, varying from over-night to two-days.
+                      You can monitor the progress at "http://docker_host:9201/_plugin/head". Once all blocks are turning green
+                      and the "cluster health" on the top displays "<span style="background-color:green;color:black;">green (40 of 40)</span>",  the entire data restoration is complete.
+                  </p>
+              </div>
+              <div class="l-box is-center pure-u-1 pure-u-md-1 pure-u-lg-1">
+                  <h3 class="content-subhead">
+                      <i class="fa fa-rocket"></i>
+                      Now ready to test the API
+                  </h3>
+                  <p>
+                      After the data restoration is complete, you can now test the live API. Try some test requests like these:
+                      <ul>
+                        <li><a href="/metadata">/metadata</a></li>
+                        <li><a href="/v1/variant/chr7:g.55241707G>T">/v1/variant/chr7:g.55241707G&gt;T</a></li>
+                        <li><a href="/v1/variant/chr9:g.107620835G>A?fields=dbsnp">/v1/variant/chr9:g.107620835G&gt;A?fields=dbsnp</a></li>
+                        <li><a href="/v1/query/?q=dbnsfp.genename:BTK">/v1/query/?q=dbnsfp.genename:BTK</a></li>
+                        <li><a href="/v1/query/?q=chr1:69000-70000">/v1/query/?q=chr1:69000-70000</a></li>
+                        <li><a href="/v1/query/?q=_exists_:wellderly AND cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen">/v1/query/?q=_exists_:wellderly AND cadd.polyphen.cat:possibly_damaging&amp;fields=wellderly,cadd.polyphen</a></li>
+                      </ul>
+                  </p>
+              </div>
+          </div>
+      </div>
+
+      <div class="ribbon l-box-lrg pure-g">
+          <div class="l-box-lrg is-center pure-u-1 pure-u-md-1-2 pure-u-lg-2-5">
+              <img width="300" alt="" class="pure-img-responsive" src="/img/common/file-icons.png">
+          </div>
+          <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-3-5">
+
+              <h2 class="content-head content-head-ribbon">Routine management</h2>
+
+              <p>
+                  <pre> Coming soon!</pre>
+              </p>
+          </div>
+      </div>
+
+      <!-- <div class="content">
+          <h2 class="content-head is-center">Dolore magna aliqua. Uis aute irure.</h2>
+
+          <div class="pure-g">
+              <div class="l-box-lrg pure-u-1 pure-u-md-2-5">
+                  <form class="pure-form pure-form-stacked">
+                      <fieldset>
+
+                          <label for="name">Your Name</label>
+                          <input id="name" type="text" placeholder="Your Name">
+
+
+                          <label for="email">Your Email</label>
+                          <input id="email" type="email" placeholder="Your Email">
+
+                          <label for="password">Your Password</label>
+                          <input id="password" type="password" placeholder="Your Password">
+
+                          <button type="submit" class="pure-button">Sign Up</button>
+                      </fieldset>
+                  </form>
+              </div>
+
+              <div class="l-box-lrg pure-u-1 pure-u-md-3-5">
+                  <h4>Contact Us</h4>
+                  <p>
+                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                      quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                      consequat.
+                  </p>
+
+                  <h4>More Information</h4>
+                  <p>
+                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                      tempor incididunt ut labore et dolore magna aliqua.
+                  </p>
+              </div>
+          </div>
+
+      </div>
+
+      <div class="footer l-box is-center">
+          View the source of this layout to learn more. Made with love by the YUI Team.
+      </div>-->
+
+  </div>
+
+</body>
+</html>
