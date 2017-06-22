@@ -63,11 +63,10 @@ class DemoHandler(RequestHandler):
         with open('../docs/demo/index.html', 'r') as demo_file:
             self.write(demo_file.read())
 
-class FrontpageHandler(RequestHandler):
-    ''' For the standalone front page. '''
+class StandaloneFrontpageHandler(RequestHandler):
+    ''' For the standalone frontpage. '''
     def initialize(self, web_settings):
         self.web_settings = web_settings
 
     def get(self):
-        with open('../docs/frontpage/index.html', 'r') as _file:
-            self.write(_file.read())
+        self.render('../docs/standalone/index.html')
