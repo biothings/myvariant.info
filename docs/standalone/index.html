@@ -17,10 +17,12 @@
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
 
         <!--[if lte IE 8]>
-            <link rel="stylesheet" href="css/layouts/marketing-old-ie.css">
+            <link rel="stylesheet" href="https://cdn.rawgit.com/biothings/myvariant.info/production/docs/standalone/css/layouts/marketing-old-ie.css">
+
         <![endif]-->
         <!--[if gt IE 8]><!-->
-            <link rel="stylesheet" href="css/layouts/marketing.css">
+            <link rel="stylesheet" href="https://cdn.rawgit.com/biothings/myvariant.info/production/docs/standalone/css/layouts/marketing.css">
+
         <!--<![endif]-->
     <!--[if lt IE 9]>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.js"></script>
@@ -80,7 +82,7 @@
                   </h3>
                   <p>
                     <p>Once the Docker container is running, you can initiate the data
-                       restore script as follows:
+                       restoration script as follows:
                        <pre>docker exec -ti CONTAINER /home/biothings/es_restore.sh</pre>
                      </p>
 
@@ -92,8 +94,8 @@
                       Monitor data restoration progress
                   </h3>
                   <p>
-                      The last step will initiate a restore of ~ 1TB of data from our AWS S3 bucket.
-                      Depending on your system configuration, it can take quite a whole, varying from over-night to two-days.
+                      The above step initiates a restoration of ~ 1TB of data from our repository.
+                      Depending on your system configuration, it can take quite a whole, varying from over-night to one-day.
                       You can monitor the progress at "http://docker_host:9201/_plugin/head". Once all blocks are turning green
                       and the "cluster health" on the top displays "<span style="background-color:green;color:black;">green (40 of 40)</span>",  the entire data restoration is complete.
                   </p>
@@ -120,7 +122,7 @@
 
       <div class="ribbon l-box-lrg pure-g">
           <div class="l-box-lrg is-center pure-u-1 pure-u-md-1-2 pure-u-lg-2-5">
-              <img width="300" alt="" class="pure-img-responsive" src="/img/common/file-icons.png">
+              <!--<img width="300" alt="" class="pure-img-responsive" src="/img/common/file-icons.png">-->
           </div>
           <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-3-5">
 
