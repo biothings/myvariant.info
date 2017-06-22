@@ -28,11 +28,12 @@ def load_data():
         if set(['error', 'status']) != set(doc.keys()):
             [chrom, pos, ref, alt] = [doc['coordinates'][x] for x in ['chromosome', 'start', 'reference_bases', 'variant_bases']]
             doc.pop("id")
+            new_doc = {}
             doc['variant_id'] = variant_id
             if chrom and ref and alt:
                 no_case1 += 1
                 try:
-                  doc['_id'] = get_hgvs_from_vcf(chrom, pos, ref, alt)
+                  new_doc['_id'] = get_hgvs_from_vcf(chrom, pos, ref, alt)
                 except ValueError:
                   print("id has ref,alt, but coudn't be converted to hgvs id: {}".format(variant_id))
                   continue
@@ -42,22 +43,23 @@ def load_data():
                 start = int(pos)
                 end = int(pos) + len(ref) - 1
                 if start == end:
-                    doc['_id'] = 'chr{0}:g.{1}del'.format(chrom, start)
+                    new_doc['_id'] = 'chr{0}:g.{1}del'.format(chrom, start)
                 else:
-                    doc['_id'] = 'chr{0}:g.{1}_{2}del'.format(chrom, start, end)
+                    new_doc['_id'] = 'chr{0}:g.{1}_{2}del'.format(chrom, start, end)
             # handle cases of insertions where only alt info is provided
             elif chrom and alt and not ref:
                 no_case3 += 1
-                doc['_id'] = 'chr{0}:g.{1}_{2}ins{3}'.format(chrom, start, end, alt)
+                new_doc['_id'] = 'chr{0}:g.{1}_{2}ins{3}'.format(chrom, start, end, alt)
             # handle cases where no ref or alt info provided,
             # in this case, use CIVIC internal ID as the primary id for MyVariant.info, e.g. CIVIC_VARIANT:1
             else:
                 no_case4 += 1
-                doc['_id'] = 'CIVIC_VARIANT:' + str(variant_id)
+                new_doc['_id'] = 'CIVIC_VARIANT:' + str(variant_id)
             for _evidence in doc['evidence_items']:
                 if 'disease' in _evidence and 'doid' in _evidence['disease'] and _evidence['disease']['doid']:
                     _evidence['disease']['doid'] = 'DOID:' + _evidence['disease']['doid']
-            yield dict_sweep(unlist(doc),['null', 'N/A', None, [], {}])
+            new_doc['civic'] = doc
+            yield dict_sweep(unlist(new_doc),['','null', 'N/A', None, [], {}])
             # change doid into its formal representation, which should be sth like DOID:1
         else:
             continue
