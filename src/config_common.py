@@ -100,6 +100,16 @@ JSONLD_CONTEXT_PATH = 'www/context/context.json'
 # MYVARIANT HUB VARS  #
 # ################### #
 
+# fill with "token", "roomid" and "from" keys
+# to broadcast message to a Hipchat room
+HIPCHAT_CONFIG = {
+    'token': '',
+    "usertoken" : "",
+    'roomid': '',
+    'from': '',
+    'host': '',
+}
+
 DATA_SRC_MASTER_COLLECTION = 'src_master'   # for metadata of each src collections
 DATA_SRC_DUMP_COLLECTION = 'src_dump'       # for src data download information
 DATA_SRC_BUILD_COLLECTION = 'src_build'     # for src data build information
