@@ -1,3 +1,5 @@
+
+
 # -*- coding: utf-8 -*-
 from biothings.www.api.es.handlers import BiothingHandler
 from biothings.www.api.es.handlers import MetadataHandler
@@ -5,6 +7,7 @@ from biothings.www.api.es.handlers import QueryHandler
 from biothings.www.api.es.handlers import StatusHandler
 from tornado.web import RequestHandler
 from re import search
+
 
 class CommonHandlerMixin(object):
     def _sanitize_assembly(self, kwargs):
@@ -14,9 +17,10 @@ class CommonHandlerMixin(object):
             else:
                 kwargs['assembly'] = kwargs['assembly'].lower()
         return kwargs
-    
+
     def _get_es_index(self, options):
         return '_'.join([self.web_settings.ES_INDEX_BASE, options.esqb_kwargs.assembly])
+
 
 class VariantHandler(CommonHandlerMixin, BiothingHandler):
     ''' This class is for the /variant endpoint. '''
@@ -34,6 +38,7 @@ class VariantHandler(CommonHandlerMixin, BiothingHandler):
             if de and de != ':g.':
                 self.redirect(':g.'.join(self.request.uri.split(de)), permanent=True)
 
+
 class QueryHandler(CommonHandlerMixin, QueryHandler):
     ''' This class is for the /query endpoint. '''
     # overridden to sanitize assembly param
@@ -42,9 +47,11 @@ class QueryHandler(CommonHandlerMixin, QueryHandler):
         kwargs = self._sanitize_assembly(kwargs)
         return kwargs
 
+
 class StatusHandler(StatusHandler):
     ''' This class is for the /status endpoint. '''
     pass
+
 
 class MetadataHandler(CommonHandlerMixin, MetadataHandler):
     ''' This class is for the /metadata endpoint. '''
@@ -53,6 +60,7 @@ class MetadataHandler(CommonHandlerMixin, MetadataHandler):
         kwargs = super(MetadataHandler, self)._sanitize_params(kwargs)
         kwargs = self._sanitize_assembly(kwargs)
         return kwargs
+
 
 class DemoHandler(RequestHandler):
     ''' For the /demo page. '''
@@ -63,10 +71,12 @@ class DemoHandler(RequestHandler):
         with open('../docs/demo/index.html', 'r') as demo_file:
             self.write(demo_file.read())
 
+
 class StandaloneFrontpageHandler(RequestHandler):
     ''' For the standalone frontpage. '''
     def initialize(self, web_settings):
         self.web_settings = web_settings
 
     def get(self):
-        self.render('../docs/standalone/index.html')
+        with open('../docs/standalone/index.html', 'r') as standalone_file:
+            self.finish(standalone_file.read())
