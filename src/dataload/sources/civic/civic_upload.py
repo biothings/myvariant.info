@@ -8,7 +8,8 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
             "assembly" : "hg19",
             "src_meta" : {
                 "url" : "https://civic.genome.wustl.edu/home",
-                "license_url" : "https://civic.genome.wustl.edu/home",
+                "license_url" : "https://civic.genome.wustl.edu/faq",
+                "license_url_short": "https://goo.gl/gPCAyH",
                 "licence" : "CC0 1.0 Universal",
                 }
             }
