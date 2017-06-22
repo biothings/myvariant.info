@@ -13,6 +13,7 @@ __sources_dict__ = [
         'dataload.sources.evs',
         'dataload.sources.geno2mp',
         'dataload.sources.uniprot',
+        'dataload.sources.civic',
 
         # dead-resources
         'dataload.sources.cosmic',
