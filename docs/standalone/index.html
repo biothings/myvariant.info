@@ -27,6 +27,56 @@
     <!--[if lt IE 9]>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.js"></script>
     <![endif]-->
+
+    <style>
+    .is-justify {
+      text-align: justify;
+    }
+    #content-next {
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: justify;
+    }
+    pre {
+      overflow-x: auto;
+      padding: .5rem;
+      font-size: 1rem;
+      background-color: #f7f7f9;
+      border: 1px solid silver;
+      font-family: monospace;
+      color: #950b2f;
+      display: block;
+      white-space: pre;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #example_query {
+      overflow-x: auto;
+      padding: .5rem;
+      font-size: 1rem;
+      background-color: #f7f7f9;
+      border: 1px solid silver;
+      font-family: monospace;
+      color: #950b2f;
+      display: block;
+      text-align: left;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #example_query a {
+      color: #950b2f;
+    }
+    .es_status {
+      background-color:green;
+      color:black;
+      font-family: Verdana, sans-serif;
+      font-weight: bold;
+    }
+
+    </style>
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script>
       function goto_next(){
@@ -34,6 +84,12 @@
             scrollTop: $("#content-next").offset().top - 30
         }, 1000);
       }
+
+      $("#es_head_url").ready(function(){
+        var es_url = 'http://' + window.location.hostname + ':9201/_plugin/head';
+        var html = '<a href="' + es_url + '">' + es_url + '</a>';
+        $("#es_head_url").html(html);
+      })
     </script>
 
 
@@ -80,11 +136,11 @@
                       <i class="fa fa-cloud-download"></i>
                       Restore Variant data
                   </h3>
-                  <p>
-                    <p>Once the Docker container is running, you can initiate the data
+                  <p class="is-justify">
+                    Once the Docker container is running, you can initiate the data
                        restoration script as follows:
-                       <pre>docker exec -ti CONTAINER /home/biothings/es_restore.sh</pre>
-                     </p>
+                       <pre><code>docker exec -ti CONTAINER /home/biothings/es_restore.sh</code></pre>
+
 
                   </p>
               </div>
@@ -93,11 +149,11 @@
                       <i class="fa fa-th-large"></i>
                       Monitor data restoration progress
                   </h3>
-                  <p>
+                  <p class="is-justify">
                       The above step initiates a restoration of ~ 1TB of data from our repository.
                       Depending on your system configuration, it can take quite a whole, varying from over-night to one-day.
-                      You can monitor the progress at "http://docker_host:9201/_plugin/head". Once all blocks are turning green
-                      and the "cluster health" on the top displays "<span style="background-color:green;color:black;">green (40 of 40)</span>",  the entire data restoration is complete.
+                      You can monitor the progress at <span id="es_head_url"></span>. Once all blocks are turning green
+                      and the "cluster health" on the top displays "<span class="es_status">&nbsp;green (40 of 40)&nbsp;</span>",  the entire data restoration is complete.
                   </p>
               </div>
               <div class="l-box is-center pure-u-1 pure-u-md-1 pure-u-lg-1">
@@ -105,16 +161,17 @@
                       <i class="fa fa-rocket"></i>
                       Now ready to test the API
                   </h3>
-                  <p>
+                  <p class="is-justify">
                       After the data restoration is complete, you can now test the live API. Try some test requests like these:
-                      <ul>
-                        <li><a href="/metadata">/metadata</a></li>
-                        <li><a href="/v1/variant/chr7:g.55241707G>T">/v1/variant/chr7:g.55241707G&gt;T</a></li>
-                        <li><a href="/v1/variant/chr9:g.107620835G>A?fields=dbsnp">/v1/variant/chr9:g.107620835G&gt;A?fields=dbsnp</a></li>
-                        <li><a href="/v1/query/?q=dbnsfp.genename:BTK">/v1/query/?q=dbnsfp.genename:BTK</a></li>
-                        <li><a href="/v1/query/?q=chr1:69000-70000">/v1/query/?q=chr1:69000-70000</a></li>
-                        <li><a href="/v1/query/?q=_exists_:wellderly AND cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen">/v1/query/?q=_exists_:wellderly AND cadd.polyphen.cat:possibly_damaging&amp;fields=wellderly,cadd.polyphen</a></li>
-                      </ul>
+                      <div id="example_query">
+                        <a href="/metadata">/metadata</a><br />
+                        <a href="/v1/variant/chr7:g.55241707G>T">/v1/variant/chr7:g.55241707G&gt;T</a><br />
+                        <a href="/v1/variant/chr9:g.107620835G>A?fields=dbsnp">/v1/variant/chr9:g.107620835G&gt;A?fields=dbsnp</a><br />
+                        <a href="/v1/query/?q=dbnsfp.genename:BTK">/v1/query/?q=dbnsfp.genename:BTK</a><br />
+                        <a href="/v1/query/?q=chr1:69000-70000">/v1/query/?q=chr1:69000-70000</a><br />
+                        <a href="/v1/query/?q=_exists_:wellderly AND cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen">/v1/query/?q=_exists_:wellderly AND cadd.polyphen.cat:possibly_damaging&amp;fields=wellderly,cadd.polyphen</a><br />
+                      </div>
+
                   </p>
               </div>
           </div>
