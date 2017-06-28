@@ -39,12 +39,3 @@ def load_data(input_file):
                 variant[new_k] = unicodedata.normalize("NFKD", row.get(old_k, None))
 
             yield dict_sweep(variant, vals=['', 'null', 'N/A', None, [], {}])
-
-
-if __name__ == "__main__":
-
-    for v in load_data('cgi_biomarkers_per_variant.tsv'):
-        pprint({k: {"type": "string", "analyzer": "string_lowercase"} for k in v.keys()})
-        break
-        #pprint(v)
-        #input("Press Enter to continue...")
