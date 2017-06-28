@@ -188,20 +188,17 @@ def fix_hgvs_indel(hgvs_id):
     return _hgvs_id
 
 
-def get_hgvs_from_rsid(doc_li, rsid_fn, api_host='http://localhost:8000'):
+def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col):
     """input doc_li is a list doc with rsid, rsid_fn is a function to return rsid from
-       each doc.
+       each doc. dbsnp_col is a mongo collection object for dbSNP data
        It will return a generator with the _id as the matching hgvs_id for a given rsid.
        if a rsid matches multiple hgvs ids, it will produce duplicated docs with each hgvs id.
     """
     for doc in doc_li:
         rsid = rsid_fn(doc)
-        # parse from myvariant.info to get hgvs_id, ref, alt information based on rsid
-        url = api_host + '/v1/query?q=dbsnp.rsid:' + rsid +\
-            '&fields=_id,dbsnp.ref,dbsnp.alt,dbsnp.chrom,dbsnp.hg19'
-        r = requests.get(url)
-        for hits in r.json()['hits']:
-            hgvs_id = hits['_id']
+        hits = [d for d in dbsnp_col.find({"dbsnp.rsid":rsid})]
+        for hit in hits:
+            hgvs_id = hit['_id']
             _doc = copy.copy(doc)
             _doc['_id'] = hgvs_id
             yield _doc
