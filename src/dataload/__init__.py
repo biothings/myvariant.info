@@ -14,6 +14,7 @@ __sources_dict__ = [
         'dataload.sources.geno2mp',
         'dataload.sources.uniprot',
         'dataload.sources.civic',
+        'dataload.sources.cgi',
 
         # dead-resources
         'dataload.sources.cosmic',
