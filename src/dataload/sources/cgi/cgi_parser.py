@@ -1,15 +1,20 @@
 import unicodedata
+from collections import defaultdict
 
 from csv import DictReader
-from pprint import pprint
 from biothings.utils.dataload import dict_sweep, open_anyfile
 
 
 def load_data(input_file):
 
     with open_anyfile(input_file) as in_f:
-        reader = DictReader(in_f, delimiter='\t')
 
+        # Remove duplicated lines if any
+        header = next(in_f).strip().split('\t')
+        lines = set(list(in_f))
+        reader = DictReader(lines, fieldnames=header, delimiter='\t')
+
+        results = defaultdict(list)
         for row in reader:
 
             variant = {}
@@ -24,6 +29,7 @@ def load_data(input_file):
 
             # Use gDNA as variant identifier
             variant['_id'] = row['gDNA']
+            variant['cgi'] = {}
 
             for k in [
                 'region', 'cDNA', 'Evidence level', 'transcript', 'Gene', ('individual_mutation', 'protein_change'), 'Primary Tumor type',
@@ -36,6 +42,17 @@ def load_data(input_file):
                     new_k = k.lower().replace(' ', '_')
                     old_k = k
 
-                variant[new_k] = unicodedata.normalize("NFKD", row.get(old_k, None))
+                variant['cgi'][new_k] = unicodedata.normalize("NFKD", row.get(old_k, None))
 
-            yield dict_sweep(variant, vals=['', 'null', 'N/A', None, [], {}])
+            variant = dict_sweep(variant, vals=['', 'null', 'N/A', None, [], {}])
+            results[variant['_id']].append(variant)
+
+        # Merge duplications
+        for v in results.values():
+            if len(v) == 1:
+                yield v[0]
+            else:
+                yield {
+                    '_id': v[0]['_id'],
+                    'cgi': [i['cgi'] for i in v]
+                }
