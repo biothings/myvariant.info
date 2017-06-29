@@ -2,8 +2,10 @@ import csv
 import requests
 from itertools import groupby
 from functools import partial
-from biothings.utils.dataload import dict_sweep, list_split, unlist, value_convert_to_number, merge_duplicate_rows
+from biothings.utils.dataload import dict_sweep, list_split, unlist, \
+                                     value_convert_to_number, merge_duplicate_rows
 import biothings.utils.mongo as mongo
+from utils.hgvs import get_hgvs_from_rsid
 
 VALID_COLUMN_NO = 70
 
@@ -22,7 +24,8 @@ def _map_line_to_json(fields,dbsnp_col):
     # load as json data
     if rsid is None:
         return
-    docs = [d for d in dbsnp_col.find({"dbsnp.rsid":rsid})]
+    #docs = [d for d in dbsnp_col.find({"dbsnp.rsid":rsid})]
+    docs = get_hgvs_from_rsid([{"_id":rsid}], lambda d: d["_id"], dbsnp_col)
     for doc in docs:
         HGVS = doc['_id']
         one_snp_json = {
@@ -106,7 +109,7 @@ def _map_line_to_json(fields,dbsnp_col):
                     'eqtl_meth_metab_study': fields[69]
                 }
             }
-        return list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), [""]), ",")
+        yield list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), [""]), ",")
 
 ''' replace None indices with '''
 
@@ -134,7 +137,7 @@ def load_data(input_file):
     grasp = map(row_generator, open_file)
     grasp = filter(lambda row: row[58] != "", grasp)
     json_rows = map(partial(_map_line_to_json,dbsnp_col=dbsnp_col), grasp)
-    json_rows = (row for row in json_rows if row)
+    json_rows = (row for g in json_rows for row in g if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     for row in (merge_duplicate_rows(rg, "grasp") for rg in row_groups):
         yield row
