@@ -9,7 +9,7 @@ class CgiUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                     "src_meta": {
                         "url": "https://www.cancergenomeinterpreter.org/home",
                         "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
-                        "license_url_short": "https://goo.gl/wtye9y",
+                        "license_url_short": "https://goo.gl/pBW3vj",
                         "licence": "CC0 1.0 Universal",
                     }
                     }
