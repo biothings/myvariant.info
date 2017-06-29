@@ -188,20 +188,26 @@ def fix_hgvs_indel(hgvs_id):
     return _hgvs_id
 
 
-def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col):
+def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col, skip_unmatched=False):
     """input doc_li is a list doc with rsid, rsid_fn is a function to return rsid from
        each doc. dbsnp_col is a mongo collection object for dbSNP data
        It will return a generator with the _id as the matching hgvs_id for a given rsid.
        if a rsid matches multiple hgvs ids, it will produce duplicated docs with each hgvs id.
+       If rsid_fn returns None, then the original document is yielded
     """
     for doc in doc_li:
         rsid = rsid_fn(doc)
+        if rsid is None:
+            yield doc
         hits = [d for d in dbsnp_col.find({"dbsnp.rsid":rsid})]
-        for hit in hits:
-            hgvs_id = hit['_id']
-            _doc = copy.copy(doc)
-            _doc['_id'] = hgvs_id
-            yield _doc
+        if hits:
+            for hit in hits:
+                hgvs_id = hit['_id']
+                _doc = copy.copy(doc)
+                _doc['_id'] = hgvs_id
+                yield _doc
+        elif skip_unmatched:
+            yield doc
 
 def trim_delseq_from_hgvs(hgvs):
     re_delins = re.compile("(.*del)[A-Z]+(ins.*)")
