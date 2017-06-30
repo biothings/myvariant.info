@@ -65,6 +65,10 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                 "type": "string",
                                 "analyzer": "string_lowercase"
                             },
+                            "url": {
+                                "index": "no",
+                                "type": "string",
+                            }
                         }
                     },
                     "coordinates": {
@@ -144,6 +148,10 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                         "type": "string",
                                         "analyzer": "string_lowercase"
                                     },
+                                    "url": {
+                                        "type": "string",
+                                        "analyzer": "string_lowercase"
+                                    }
                                 }
                             },
                             "drugs": {
@@ -213,8 +221,8 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                         "analyzer": "string_lowercase"
                                     },
                                     "source_url": {
+                                        "index": "no",
                                         "type": "string",
-                                        "analyzer": "string_lowercase"
                                     },
                                     "open_access": {
                                         "type": "boolean"
@@ -319,6 +327,10 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
                                             },
+                                            "url": {
+                                                "index": "no",
+                                                "type": "string",
+                                            }
                                         }
                                     },
                                     "coordinates": {
@@ -420,6 +432,13 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
                                             },
+                                            "avatar_url": {
+                                                "index": "no",
+                                                "type": "string",
+                                            },
+                                            #"avatars": {
+                                            #    "index": "no",
+                                            #},
                                             "area_of_expertise": {
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
@@ -436,6 +455,10 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
                                             },
+                                            "url": {
+                                                "index": "no",
+                                                "type": "string",
+                                            },
                                             "twitter_handle": {
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
@@ -443,6 +466,10 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                             "facebook_profile": {
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
+                                            },
+                                            "linkedin_profile": {
+                                                "index":"no",
+                                                "type":"string",
                                             },
                                             "bio": {
                                                 "type": "string",
@@ -464,10 +491,17 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                         "type": "string",
                                                         "analyzer": "string_lowercase"
                                                     },
+                                                    "url": {
+                                                        "index": "no",
+                                                        "type": "string",
+                                                    },
                                                     "description": {
                                                         "type": "string",
                                                         "analyzer": "string_lowercase"
                                                     },
+                                                    #"profile_image": {
+                                                    #    "index":"no",
+                                                    #}
                                                 }
                                             }
                                         }
@@ -504,6 +538,13 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
                                             },
+                                            "avatar_url": {
+                                                "index": "no",
+                                                "type": "string",
+                                            },
+                                            #"avatars": {
+                                            #    "index": "no",
+                                            #},
                                             "area_of_expertise": {
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
@@ -520,6 +561,10 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
                                             },
+                                            "url": {
+                                                "index": "no",
+                                                "type":"string",
+                                            },
                                             "twitter_handle": {
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
@@ -529,8 +574,8 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                 "analyzer": "string_lowercase"
                                             },
                                             "linkedin_profile": {
-                                                "type": "string",
-                                                "analyzer": "string_lowercase"
+                                                "index": "no",
+                                                "type":"string",
                                             },
                                             "bio": {
                                                 "type": "string",
@@ -552,10 +597,17 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                         "type": "string",
                                                         "analyzer": "string_lowercase"
                                                     },
+                                                    "url": {
+                                                        "index": "no",
+                                                        "type":"string",
+                                                    },
                                                     "description": {
                                                         "type": "string",
                                                         "analyzer": "string_lowercase"
                                                     },
+                                                    #"profile_image": {
+                                                    #    "index":"no",
+                                                    #}
                                                 }
                                             }
                                         }
