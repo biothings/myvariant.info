@@ -65,10 +65,6 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                 "type": "string",
                                 "analyzer": "string_lowercase"
                             },
-                            "url": {
-                                "type": "string",
-                                "analyzer": "string_lowercase"
-                            }
                         }
                     },
                     "coordinates": {
@@ -148,10 +144,6 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                         "type": "string",
                                         "analyzer": "string_lowercase"
                                     },
-                                    "url": {
-                                        "type": "string",
-                                        "analyzer": "string_lowercase"
-                                    }
                                 }
                             },
                             "drugs": {
@@ -327,10 +319,6 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
                                             },
-                                            "url": {
-                                                "type": "string",
-                                                "analyzer": "string_lowercase"
-                                            }
                                         }
                                     },
                                     "coordinates": {
@@ -432,14 +420,6 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
                                             },
-                                            "avatar_url": {
-                                                "type": "string",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "avatars": {
-                                                "type": "string",
-                                                "analyzer": "string_lowercase"
-                                            },
                                             "area_of_expertise": {
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
@@ -456,19 +436,11 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
                                             },
-                                            "url": {
-                                                "type": "string",
-                                                "analyzer": "string_lowercase"
-                                            },
                                             "twitter_handle": {
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
                                             },
                                             "facebook_profile": {
-                                                "type": "string",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "linkedin_profile": {
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
                                             },
@@ -492,18 +464,10 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                         "type": "string",
                                                         "analyzer": "string_lowercase"
                                                     },
-                                                    "url": {
-                                                        "type": "string",
-                                                        "analyzer": "string_lowercase"
-                                                    },
                                                     "description": {
                                                         "type": "string",
                                                         "analyzer": "string_lowercase"
                                                     },
-                                                    "profile_image": {
-                                                        "type": "string",
-                                                        "analyzer": "string_lowercase"
-                                                    }
                                                 }
                                             }
                                         }
@@ -540,14 +504,6 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
                                             },
-                                            "avatar_url": {
-                                                "type": "string",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "avatars": {
-                                                "type": "string",
-                                                "analyzer": "string_lowercase"
-                                            },
                                             "area_of_expertise": {
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
@@ -561,10 +517,6 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                 "analyzer": "string_lowercase"
                                             },
                                             "created_at": {
-                                                "type": "string",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "url": {
                                                 "type": "string",
                                                 "analyzer": "string_lowercase"
                                             },
@@ -600,18 +552,10 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                                         "type": "string",
                                                         "analyzer": "string_lowercase"
                                                     },
-                                                    "url": {
-                                                        "type": "string",
-                                                        "analyzer": "string_lowercase"
-                                                    },
                                                     "description": {
                                                         "type": "string",
                                                         "analyzer": "string_lowercase"
                                                     },
-                                                    "profile_image": {
-                                                        "type": "string",
-                                                        "analyzer": "string_lowercase"
-                                                    }
                                                 }
                                             }
                                         }
