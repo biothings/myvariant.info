@@ -1,3 +1,3 @@
-from .cgi_upload import CgiUploader
-from .cgi_dump import CgiDumper
+from .cgi_upload import CGIUploader
+from .cgi_dump import CGIDumper
 

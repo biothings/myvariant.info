@@ -1,8 +1,10 @@
+import os
+
 from dataload.uploader import SnpeffPostUpdateUploader
 from .cgi_parser import load_data
 
 
-class CgiUploader(SnpeffPostUpdateUploader):
+class CGIUploader(SnpeffPostUpdateUploader):
     name = "cgi"
     __metadata__ = {"mapper": 'observed',
                     "assembly": "hg19",
