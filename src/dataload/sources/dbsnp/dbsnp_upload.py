@@ -28,6 +28,12 @@ class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
         self.logger.info("Load data from '%s' for chr %s" % (input_file,chrom))
         return load_data(self.__class__.__metadata__["assembly"],input_file,chrom)
 
+    def post_update_data(self, *args, **kwargs):
+        super(DBSNPBaseUploader,self).post_update_data(*args,**kwargs)
+        self.logger.info("Indexing 'rsid'")
+        # background=true or it'll lock the whole database...
+        self.collection.create_index("dbsnp.rsid",background=True)
+
     @classmethod
     def get_mapping(klass):
         mapping = {
@@ -116,11 +122,6 @@ class DBSNPHg19Uploader(DBSNPBaseUploader):
             }
     GLOB_PATTERN = "human_9606_*_GRCh37*/VCF/*.vcf.gz"
 
-    def post_update_data(self, *args, **kwargs):
-        super(DBSNPBaseUploader,self).post_update_data(*args,**kwargs)
-        self.logger.info("Indexing 'rsid'")
-        # background=true or it'll lock the whole database...
-        self.collection.create_index("dbsnp.rsid",background=True)
 
 
 class DBSNPHg38Uploader(DBSNPBaseUploader):
