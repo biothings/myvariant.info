@@ -9,6 +9,7 @@ def _map_line_to_json(doc_key, item):
     chromStart = item.POS
     ref = item.REF
     info = item.INFO
+    _filter = info.FILTER
     try:
         baseqranksum = info['BaseQRankSum']
     except:
@@ -51,6 +52,7 @@ def _map_line_to_json(doc_key, item):
             doc_key : {
                 "chrom": chrom,
                 "pos": chromStart,
+                "filter": _filter,
                 "multi-allelic": hgvs_list,
                 "ref": ref,
                 "alt": alt,

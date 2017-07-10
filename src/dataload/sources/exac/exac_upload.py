@@ -32,6 +32,10 @@ class ExacBaseUploader(SnpeffPostUpdateUploader):
                         "type": "string",
                         "analyzer": "string_lowercase"
                     },
+                    "filter": {
+                        "type": "string",
+                        "analyzer": "string_lowercase"
+                    },
                     "alt": {
                         "type": "string",
                         "analyzer": "string_lowercase"
