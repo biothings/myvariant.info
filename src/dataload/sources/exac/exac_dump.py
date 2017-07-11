@@ -19,7 +19,7 @@ class ExacDumper(FTPDumper):
     CWD_DIR = 'pub/ExAC_release'
     FILE_PATTERN = ".*ExAC.r%s\.sites.*\.vcf\.gz$" # need release number
 
-    SCHEDULE = "0 9 * * *"
+    SCHEDULE = None # version is forced so no need to schedule that one anyway
 
     def get_newest_info(self):
         # there's a "current" symlink to latest, but we want to detect new releases
