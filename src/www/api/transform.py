@@ -6,10 +6,17 @@ class ESResultTransformer(ESResultTransformer):
     def _modify_doc(self, doc):
         for source, val in self.source_metadata[self.options.assembly].items():
             if source in doc:
-                try:
-                    doc[source]['_license'] = val.get('license_url_short', val.get('license_url'))
-                except:
-                    pass
+                if isinstance(doc[source], dict):
+                    try:
+                        doc[source]['_license'] = val.get('license_url_short', val.get('license_url'))
+                    except:
+                        pass
+                elif isinstance(doc[source], list):
+                    for d in doc[source]:
+                        try:
+                            d['_license'] = val.get('license_url_short', val.get('license_url'))
+                        except:
+                            pass                            
         #if 'cadd' in doc:
         #    doc['cadd']['_license'] = 'http://goo.gl/bkpNhq'
         #if 'dbnsfp' in doc:
