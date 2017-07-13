@@ -7,6 +7,10 @@ from functools import partial
 import config, biothings
 biothings.config_for_app(config)
 
+import logging
+logging.info("Hub DB backend: %s" % biothings.config.HUB_DB_BACKEND)
+logging.info("Hub database: %s" % biothings.config.DATA_HUB_DB_DATABASE)
+
 from biothings.utils.manager import JobManager
 loop = asyncio.get_event_loop()
 process_queue = concurrent.futures.ProcessPoolExecutor(max_workers=config.HUB_MAX_WORKERS)
