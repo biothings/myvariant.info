@@ -54,16 +54,14 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                 "analyzer": "string_lowercase"
                             },
                             "display_name": {
-                                "type": "string",
-                                "analyzer": "string_lowercase"
+                                "type": "string"
                             },
                             "so_id": {
                                 "type": "string",
                                 "analyzer": "string_lowercase"
                             },
                             "description": {
-                                "type": "string",
-                                "analyzer": "string_lowercase"
+                                "type": "string"
                             },
                             "url": {
                                 "index": "no",
@@ -128,8 +126,7 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                 "analyzer": "string_lowercase"
                             },
                             "description": {
-                                "type": "string",
-                                "analyzer": "string_lowercase"
+                                "type": "string"
                             },
                             "disease": {
                                 "properties": {
@@ -137,20 +134,18 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                         "type": "integer"
                                     },
                                     "name": {
-                                        "type": "string",
-                                        "analyzer": "string_lowercase"
+                                        "type": "string"
                                     },
                                     "display_name": {
-                                        "type": "string",
-                                        "analyzer": "string_lowercase"
+                                        "type": "string"
                                     },
                                     "doid": {
                                         "type": "string",
                                         "analyzer": "string_lowercase"
                                     },
                                     "url": {
-                                        "type": "string",
-                                        "analyzer": "string_lowercase"
+                                        "index": "no",
+                                        "type": "string"
                                     }
                                 }
                             },
@@ -160,8 +155,7 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                         "type": "integer"
                                     },
                                     "name": {
-                                        "type": "string",
-                                        "analyzer": "string_lowercase"
+                                        "type": "string"
                                     },
                                     "pubchem_id": {
                                         "type": "string",
@@ -177,8 +171,7 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                 "analyzer": "string_lowercase"
                             },
                             "clinical_siginificance": {
-                                "type": "string",
-                                "analyzer": "string_lowercase"
+                                "type": "string"
                             },
                             "evidence_direction": {
                                 "type": "string",
@@ -209,8 +202,7 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                         "type": "integer"
                                     },
                                     "name": {
-                                        "type": "string",
-                                        "analyzer": "string_lowercase"
+                                        "type": "string"
                                     },
                                     "citation": {
                                         "type": "string",
@@ -272,12 +264,10 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                                 "type": "integer"
                             },
                             "name": {
-                                "type": "string",
-                                "analyzer": "string_lowercase"
+                                "type": "string"
                             },
                             "description": {
-                                "type": "string",
-                                "analyzer": "string_lowercase"
+                                "type": "string"
                             },
                             "variants": {
                                 "properties": {
