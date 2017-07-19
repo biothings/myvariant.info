@@ -106,7 +106,7 @@ class MyVariantDataBuilder(builder.DataBuilder):
 
     def get_metadata(self,*args,**kwargs):
         # we overide that one just to make sure existing metadata won't be
-        # overwritten by the ones coming from the base class
+        # overwritten by the ones coming from the base class (see root_keys in set_chrom())
         return {}
 
 
