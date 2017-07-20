@@ -8,7 +8,7 @@ import biothings, config
 biothings.config_for_app(config)
 
 from config import DATA_ARCHIVE_ROOT, logger as logging
-from biothings.dataload.dumper import FTPDumper
+from biothings.hub.dataload.dumper import FTPDumper
 
 class DBSNPDumper(FTPDumper):
     SRC_NAME = "dbsnp"

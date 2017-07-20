@@ -1,4 +1,4 @@
-import biothings.dataload.uploader as uploader
+import biothings.hub.dataload.uploader as uploader
 
 
 SRC_META = {

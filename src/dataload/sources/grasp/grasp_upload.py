@@ -3,8 +3,8 @@ import glob
 import zipfile
 
 from .grasp_parser import load_data
-import biothings.dataload.uploader as uploader
-import biothings.dataload.storage as storage
+import biothings.hub.dataload.uploader as uploader
+import biothings.hub.dataload.storage as storage
 from dataload.uploader import SnpeffPostUpdateUploader
 
 class GraspUploader(uploader.IgnoreDuplicatedSourceUploader,
@@ -32,7 +32,7 @@ class GraspUploader(uploader.IgnoreDuplicatedSourceUploader,
         if len(content) != 1:
             raise uploader.ResourceError("Expecting only one file in the archive, got: %s" % content)
         input_file = content.pop()
-        input_file = os.path.join(data_folder,input_file)
+        input_file = os.path.join(data_folder,"sorted")#input_file)
         self.logger.info("Load data from file '%s'" % input_file)
         res = load_data(input_file)
         return res

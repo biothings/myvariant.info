@@ -2,7 +2,7 @@ import itertools, glob, os
 
 from .dbsnp_dump import main as download
 from .dbsnp_vcf_parser import load_data
-import biothings.dataload.uploader as uploader
+import biothings.hub.dataload.uploader as uploader
 from dataload.uploader import SnpeffPostUpdateUploader
 
 

@@ -3,7 +3,7 @@ import glob
 import zipfile
 
 from .geno2mp_parser import load_data
-import biothings.dataload.uploader as uploader
+import biothings.hub.dataload.uploader as uploader
 from dataload.uploader import SnpeffPostUpdateUploader
 
 class Geno2MPUploader(SnpeffPostUpdateUploader):
