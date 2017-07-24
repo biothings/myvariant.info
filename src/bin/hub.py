@@ -179,7 +179,7 @@ passwords = {
 
 from biothings.utils.hub import start_server
 
-server = start_server(loop,"MyVariant hub",passwords=passwords,port=config.SSH_HUB_PORT,commands=COMMANDS)
+server = start_server(loop,"MyVariant hub",passwords=passwords,port=config.HUB_SSH_PORT,commands=COMMANDS)
 
 try:
     loop.run_until_complete(server)
