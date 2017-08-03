@@ -71,7 +71,12 @@ GA_ACTION_ANNOTATION_POST = 'variant_post'
 GA_TRACKER_URL = 'MyVariant.info'
 URL_BASE = 'http://myvariant.info'
 
-STATUS_CHECK_ID = 'chr1:g.218631822G>A'
+# kwargs for status check get
+STATUS_CHECK = {
+    'id': 'chr1:g.218631822G>A',
+    'index': 'myvariant_current_hg19',
+    'doc_type': 'variant'
+}
 
 # hipchat message color for this app
 HIPCHAT_MESSAGE_COLOR = 'green'
