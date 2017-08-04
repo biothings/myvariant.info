@@ -17,7 +17,7 @@ def get_pos_start_end_from_hgvs(hgvs, var_type, position):
         start = position
         end = position
     else:
-        start_end = hgvs.split("del")[0].split("ins")[0].split(".")[1]
+        start_end = hgvs.split("del")[0].split("ins")[0].split("g.")[1]
         start_end = start_end.split("_")
         if len(start_end) == 1:
             start = int(start_end[0])
@@ -36,10 +36,8 @@ def _map_line_to_json(df):
     chrom = df["Chr"]
     if chrom == 'M':
         chrom = 'MT'
-
     position = int(df["Position"])
     ref, alt = df["Variant"].upper().split(">")
-
     HGVS, var_type = get_hgvs_from_vcf(chrom, position, ref, alt, mutant_type=True)
     chromStart, chromEnd = get_pos_start_end_from_hgvs(HGVS, var_type, position)
 
