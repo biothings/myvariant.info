@@ -145,6 +145,7 @@ COMMANDS = {
         # building/merging
         "bm" : build_manager,
         "merge" : build_manager.merge,
+        "premerge" : partial(build_manager.merge,steps=["merge","metadata"]),
         "mongo_sync" : partial(syncer_manager.sync,"mongo"),
         "es_sync" : partial(syncer_manager.sync,"es"),
         "es_sync_hg19_test" : partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_HG19),
