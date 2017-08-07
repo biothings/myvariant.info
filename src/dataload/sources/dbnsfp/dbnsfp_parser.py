@@ -3,9 +3,9 @@ import glob
 from biothings.utils.dataload import list_split, dict_sweep, unlist, value_convert_to_number
 
 
-VALID_COLUMN_NO = 194
+VALID_COLUMN_NO = 245
 
-'''this parser is for dbNSFP v3.3a beta2 downloaded from
+'''this parser is for dbNSFP v3.5a beta2 downloaded from
 https://sites.google.com/site/jpopgen/dbNSFP'''
 
 # convert one snp to json
@@ -41,8 +41,8 @@ def _map_line_to_json(df, version, index=0):
     else:
         freq = siphy_29way_pi.split(":")
         siphy = {'a': freq[0], 'c': freq[1], 'g': freq[2], 't': freq[3]}
-    gtex_gene = df["GTEx_V6_gene"].split('|')
-    gtex_tissue = df["GTEx_V6_tissue "].split('|')
+    gtex_gene = df["GTEx_V6p_gene"].split('|')
+    gtex_tissue = df["GTEx_V6p_tissue"].split('|')
     gtex = map(dict, map(lambda t: zip(('gene', 'tissue'), t), zip(gtex_gene, gtex_tissue)))
     acc = df["Uniprot_acc_Polyphen2"].rstrip().rstrip(';').split(";")
     pos = df["Uniprot_aapos_Polyphen2"].rstrip().rstrip(';').split(";")
@@ -109,7 +109,7 @@ def _map_line_to_json(df, version, index=0):
     one_snp_json = {
         "_id": HGVS,
         "dbnsfp": {
-            "rsid": df["rs_dbSNP147"],
+            "rsid": df["rs_dbSNP150"],
             #"rsid_dbSNP144": fields[6],
             "chrom": chrom,
             "hg19": {
@@ -379,6 +379,61 @@ def _map_line_to_json(df, version, index=0):
                 "nfe_af": df["ExAC_nonpsych_NFE_AF"],
                 "sas_ac": df["ExAC_nonpsych_SAS_AC"],
                 "sas_af": df["ExAC_nonpsych_SAS_AF"]
+            },
+            "gnomad_exomes": {
+                "ac": df["gnomAD_exomes_AC"],
+                "an": df["gnomAD_exomes_AN"],
+                "af": df["gnomAD_exomes_AF"],                
+                "afr_ac": df["gnomAD_exomes_AFR_AC"],
+                "afr_af": df["gnomAD_exomes_AFR_AF"],
+                "afr_an": df["gnomAD_exomes_AFR_AN"],
+                "amr_ac": df["gnomAD_exomes_AMR_AC"],
+                "amr_an": df["gnomAD_exomes_AMR_AN"],
+                "amr_af": df["gnomAD_exomes_AMR_AF"],
+                "asj_ac": df["gnomAD_exomes_ASJ_AC"],
+                "asj_an": df["gnomAD_exomes_ASJ_AN"],
+                "asj_af": df["gnomAD_exomes_ASJ_AF"],
+                "eas_ac": df["gnomAD_exomes_EAS_AC"],
+                "eas_af": df["gnomAD_exomes_EAS_AF"],
+                "eas_an": df["gnomAD_exomes_EAS_AN"],
+                "fin_ac": df["gnomAD_exomes_FIN_AC"],
+                "fin_af": df["gnomAD_exomes_FIN_AF"],
+                "fin_an": df["gnomAD_exomes_FIN_AN"],
+                "nfe_ac": df["gnomAD_exomes_NFE_AC"],
+                "nfe_af": df["gnomAD_exomes_NFE_AF"],
+                "nfe_an": df["gnomAD_exomes_NFE_AN"],
+                "sas_ac": df["gnomAD_exomes_SAS_AC"],
+                "sas_af": df["gnomAD_exomes_SAS_AF"],
+                "sas_an": df["gnomAD_exomes_SAS_AN"],
+                "oth_ac": df["gnomAD_exomes_OTH_AC"],
+                "oth_af": df["gnomAD_exomes_OTH_AF"],
+                "oth_an": df["gnomAD_exomes_OTH_AN"]
+            },
+            "gnomad_genomes": {
+                "ac": df["gnomAD_genomes_AC"],
+                "an": df["gnomAD_genomes_AN"],
+                "af": df["gnomAD_genomes_AF"],                
+                "afr_ac": df["gnomAD_genomes_AFR_AC"],
+                "afr_af": df["gnomAD_genomes_AFR_AF"],
+                "afr_an": df["gnomAD_genomes_AFR_AN"],
+                "amr_ac": df["gnomAD_genomes_AMR_AC"],
+                "amr_an": df["gnomAD_genomes_AMR_AN"],
+                "amr_af": df["gnomAD_genomes_AMR_AF"],
+                "asj_ac": df["gnomAD_genomes_ASJ_AC"],
+                "asj_an": df["gnomAD_genomes_ASJ_AN"],
+                "asj_af": df["gnomAD_genomes_ASJ_AF"],
+                "eas_ac": df["gnomAD_genomes_EAS_AC"],
+                "eas_af": df["gnomAD_genomes_EAS_AF"],
+                "eas_an": df["gnomAD_genomes_EAS_AN"],
+                "fin_ac": df["gnomAD_genomes_FIN_AC"],
+                "fin_af": df["gnomAD_genomes_FIN_AF"],
+                "fin_an": df["gnomAD_genomes_FIN_AN"],
+                "nfe_ac": df["gnomAD_genomes_NFE_AC"],
+                "nfe_af": df["gnomAD_genomes_NFE_AF"],
+                "nfe_an": df["gnomAD_genomes_NFE_AN"],
+                "oth_ac": df["gnomAD_genomes_OTH_AC"],
+                "oth_af": df["gnomAD_genomes_OTH_AF"],
+                "oth_an": df["gnomAD_genomes_OTH_AN"]
             },
             "clinvar": {
                 "rs": df["clinvar_rs"],
