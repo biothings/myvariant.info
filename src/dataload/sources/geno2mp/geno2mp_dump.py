@@ -4,7 +4,7 @@ import biothings, config
 biothings.config_for_app(config)
 
 from config import DATA_ARCHIVE_ROOT
-from biothings.dataload.dumper import LastModifiedHTTPDumper
+from biothings.hub.dataload.dumper import LastModifiedHTTPDumper
 from biothings.utils.common import gunzipall
 
 

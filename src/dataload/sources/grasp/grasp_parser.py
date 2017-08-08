@@ -18,13 +18,13 @@ def safe_str(s):
 
 # convert one snp to json
 def _map_line_to_json(fields,dbsnp_col):
+    # lines in fh
     assert len(fields) == VALID_COLUMN_NO
     rsid = fields[8]
 
     # load as json data
     if rsid is None:
         return
-    #docs = [d for d in dbsnp_col.find({"dbsnp.rsid":rsid})]
     docs = get_hgvs_from_rsid([{"_id":rsid}], lambda d: d["_id"], dbsnp_col)
     for doc in docs:
         HGVS = doc['_id']
@@ -124,6 +124,26 @@ def row_generator(db_row):
             row.append('')
     return row
 
+def parse_rsid_group(data, dbsnp_col):
+    # lines are sorted by rsid, so we parse group of rsid data and
+    # yield them once we reached another group
+    current_rsid = None
+    rsid_group = []
+    # debug...
+    processed = {}
+    for line in data:
+        new_rsid = line[8].strip() # 8: rsid columns
+        if new_rsid != current_rsid:
+            for row in rsid_group:
+                yield row
+            rsid_group = []
+            assert not new_rsid in processed, "Already processed: %s" % repr(new_rsid)
+
+        rows = _map_line_to_json(line,dbsnp_col=dbsnp_col)
+        [rsid_group.append(row) for row in rows]
+        current_rsid = new_rsid
+        processed[current_rsid] = True
+
 
 # open file, parse, pass to json mapper
 def load_data(input_file):
@@ -136,8 +156,9 @@ def load_data(input_file):
     next(open_file)
     grasp = map(row_generator, open_file)
     grasp = filter(lambda row: row[58] != "", grasp)
-    json_rows = map(partial(_map_line_to_json,dbsnp_col=dbsnp_col), grasp)
-    json_rows = (row for g in json_rows for row in g if row)
+    #json_rows = map(partial(_map_line_to_json,dbsnp_col=dbsnp_col), grasp)
+    json_rows = (row for row in parse_rsid_group(grasp,dbsnp_col))
+    #json_rows = (row for g in json_rows for row in g if row)
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     for row in (merge_duplicate_rows(rg, "grasp") for rg in row_groups):
         yield row

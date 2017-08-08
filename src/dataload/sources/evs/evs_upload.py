@@ -3,7 +3,7 @@ import glob
 import zipfile
 
 from .evs_parser import load_data
-import biothings.dataload.storage as storage
+import biothings.hub.dataload.storage as storage
 from dataload.uploader import SnpeffPostUpdateUploader
 
 

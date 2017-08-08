@@ -1,7 +1,7 @@
 import sys
-from biothings.www.api.helper import BaseHandler
+from biothings.web.api.helper import BaseHandler
 from biothings.utils.common import dotdict
-from www.api.transform import ESResultTransformer
+from web.api.transform import ESResultTransformer
 #import logging
 
 class BeaconHandler(BaseHandler):

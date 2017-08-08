@@ -3,7 +3,7 @@ import asyncio
 from boto import connect_s3
 
 import config
-import biothings.dataindex.indexer as indexer
+import biothings.hub.dataindex.indexer as indexer
 from biothings.utils.aws import send_s3_file
 
 

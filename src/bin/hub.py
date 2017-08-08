@@ -23,12 +23,12 @@ job_manager = JobManager(loop,
                       )
 
 import dataload
-import biothings.dataload.uploader as uploader
-import biothings.dataload.dumper as dumper
-import biothings.databuild.builder as builder
-import biothings.databuild.differ as differ
-import biothings.databuild.syncer as syncer
-import biothings.dataindex.indexer as indexer
+import biothings.hub.dataload.uploader as uploader
+import biothings.hub.dataload.dumper as dumper
+import biothings.hub.databuild.builder as builder
+import biothings.hub.databuild.differ as differ
+import biothings.hub.databuild.syncer as syncer
+import biothings.hub.dataindex.indexer as indexer
 from databuild.builder import MyVariantDataBuilder
 from databuild.mapper import TagObserved
 from dataindex.indexer import VariantIndexer
@@ -180,7 +180,7 @@ passwords = {
 
 from biothings.utils.hub import start_server
 
-server = start_server(loop,"MyVariant hub",passwords=passwords,port=config.SSH_HUB_PORT,commands=COMMANDS)
+server = start_server(loop,"MyVariant hub",passwords=passwords,port=config.HUB_SSH_PORT,commands=COMMANDS)
 
 try:
     loop.run_until_complete(server)
