@@ -4,7 +4,7 @@ from biothings.utils.dataload import value_convert_to_number
 from biothings.utils.dataload import merge_duplicate_rows
 from utils.hgvs import get_hgvs_from_vcf
 from itertools import groupby
-import numpy as np
+from math import nan
 
 VALID_COLUMN_NO = 31
 
@@ -18,9 +18,12 @@ def _map_line_to_json(df):
     chrom = df["Chr"]
     if chrom == 'M':
         chrom = 'MT'
+
     position = int(df["Position"])
     ref, alt = df["Variant"].upper().split(">")
-    HGVS, var_type = get_hgvs_from_vcf(chrom, position, ref, alt, mutant_type=True)
+
+    HGVS = get_hgvs_from_vcf(chrom, position, ref, alt, mutant_type=False)
+
     sampleid = df["SampleID"]
     studyname = df["StudyName"]
     pubmedid = df["PubmedID"]
@@ -92,6 +95,7 @@ def _map_line_to_json(df):
         }
     }
     # one_snp_json = dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=[np.nan])
+
     one_snp_json = value_convert_to_number(one_snp_json)
     return one_snp_json
 
@@ -102,14 +106,14 @@ def clean_index(s):
 
 def clean_data(d, vals):
     if d in vals:
-        return np.nan
+        return nan
     else:
         return d
 
 
 def clean_rsid(d, vals):
     if d in vals:
-        return np.nan
+        return nan
     else:
         return "rs{}".format(d)
 
@@ -130,7 +134,7 @@ def load_data(input_file, version='hg19'):
     json_rows = sorted(json_rows, key=lambda row: row["_id"])
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     json_rows = (merge_duplicate_rows(rg, "denovodb") for rg in row_groups)
-    return (unlist(dict_sweep(row, vals=[np.nan, ])) for row in json_rows)
+    return (unlist(dict_sweep(row, vals=[nan, ])) for row in json_rows)
     # return (merge_duplicate_rows(rg, "denovodb") for rg in row_groups)
 
 
