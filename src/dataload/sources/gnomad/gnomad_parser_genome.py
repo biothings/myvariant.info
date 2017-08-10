@@ -52,13 +52,11 @@ def _map_line_to_json(doc_key, item):
                     "ac": info['AC'][i],
                     "ac_afr": info['AC_AFR'][i],
                     "ac_amr": info['AC_AMR'][i],
+                    "ac_asj": info['AC_ASJ'][i],
                     "ac_eas": info['AC_EAS'][i],
                     "ac_fin": info['AC_FIN'][i],
                     "ac_nfe": info['AC_NFE'][i],
-                    "ac_nfe": info['AC_NFE'][i],
                     "ac_oth": info['AC_OTH'][i],
-                    "ac_asj": info['AC_ASJ'][i],
-                    "ac_sas": info['AC_SAS'][i],
                     "ac_male": info['AC_Male'][i],
                     "ac_female": info['AC_Female'][i],
                     "ac_raw": info['AC_raw'][i]
@@ -72,7 +70,6 @@ def _map_line_to_json(doc_key, item):
                     "af_fin": info['AF_FIN'][i],
                     "af_nfe": info['AF_NFE'][i],
                     "af_oth": info['AF_OTH'][i],
-                    "af_sas": info['AF_SAS'][i],
                     "af_female": info['AF_Female'][i],
                     "af_male": info['AF_Male'][i],
                     "af_raw": info['AF_raw'][i]
@@ -86,7 +83,6 @@ def _map_line_to_json(doc_key, item):
                     "an_fin": info['AN_FIN'],
                     "an_nfe": info['AN_NFE'],
                     "an_oth": info['AN_OTH'],
-                    "an_sas": info['AN_SAS'],
                     "an_female": info['AN_Female'],
                     "an_male": info['AN_Male'],
                     "an_raw": info['AN_raw']
@@ -100,7 +96,6 @@ def _map_line_to_json(doc_key, item):
                     "gc_fin": info['GC_FIN'],
                     "gc_nfe": info['GC_NFE'],
                     "gc_oth": info['GC_OTH'],
-                    "gc_sas": info['GC_SAS'],
                     "gc_female": info['GC_Female'],
                     "gc_male": info['GC_Male'],
                     "gc_raw": info['GC_raw']
@@ -117,7 +112,6 @@ def _map_line_to_json(doc_key, item):
                     "hom_fin": info['Hom_FIN'],
                     "hom_nfe": info['Hom_NFE'],
                     "hom_oth": info['Hom_OTH'],
-                    "hom_sas": info['Hom_SAS'],
                     "hom_female": info['Hom_Female'],
                     "hom_male": info['Hom_Male'],
                     "hom_raw": info['Hom_raw']
