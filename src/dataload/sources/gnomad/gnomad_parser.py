@@ -6,6 +6,7 @@ from utils.hgvs import get_hgvs_from_vcf
 
 def _map_line_to_json(doc_key, item):
     chrom = item.CHROM
+    # test on chrom 22 only for the momment, need to remove '22' later
     chromStart = item.POS
     ref = item.REF
     info = item.INFO
