@@ -1,5 +1,5 @@
 from biothings.utils.common import loadobj
-import biothings.databuild.mapper as mapper
+import biothings.hub.databuild.mapper as mapper
 
 class TagObserved(mapper.BaseMapper):
 

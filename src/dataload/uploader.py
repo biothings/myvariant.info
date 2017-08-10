@@ -1,8 +1,8 @@
 import glob, os, math, asyncio
 from functools import partial
 
-import biothings.dataload.uploader as uploader
-from biothings.dataload.storage import UpsertStorage
+import biothings.hub.dataload.uploader as uploader
+from biothings.hub.dataload.storage import UpsertStorage
 from biothings.utils.mongo import doc_feeder, id_feeder
 import biothings.utils.mongo as mongo
 from biothings.utils.common import iter_n

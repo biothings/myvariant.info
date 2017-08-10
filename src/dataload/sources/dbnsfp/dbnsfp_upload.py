@@ -5,8 +5,8 @@ import concurrent.futures
 import logging
 
 from .dbnsfp_parser import load_data_file as load_common
-import biothings.dataload.uploader as uploader
-from biothings.dataload.storage import IgnoreDuplicatedStorage
+import biothings.hub.dataload.uploader as uploader
+from biothings.hub.dataload.storage import IgnoreDuplicatedStorage
 from dataload.uploader import SnpeffPostUpdateUploader
 
 
