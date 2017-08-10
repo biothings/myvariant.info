@@ -26,6 +26,8 @@ keep them up-to-date, so that you don't have to do it:
 .. _EXAC: http://exac.broadinstitute.org/
 .. _GRASP: http://iapps.nhlbi.nih.gov/GRASP
 .. _UniProt: ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/variants/README
+.. _CIViC: https://civic.genome.wustl.edu/home
+.. _Cancer Genome Interpreter: https://www.cancergenomeinterpreter.org/home
 
 
 .. raw:: html
@@ -66,6 +68,10 @@ Total variants loaded: **334,292,622**
 | `GRASP`_                      | v2.0.0.0      | 2,212,148                 | grasp                      |
 +-------------------------------+---------------+---------------------------+----------------------------+
 | `UniProt`_                    | 201703        | 477,711                   | uniprot                    |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `CIViC`_                      | 201706        | 1,559                     | civic                      |
++-------------------------------+---------------+---------------------------+----------------------------+
+| `Cancer Genome Interpreter`_  | 2017-07-21    | 334                       | cgi                        |
 +-------------------------------+---------------+---------------------------+----------------------------+
 
 .. raw:: html
