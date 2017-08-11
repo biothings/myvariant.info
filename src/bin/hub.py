@@ -22,24 +22,24 @@ job_manager = JobManager(loop,
                       max_memory_usage=max_mem,
                       )
 
-import dataload
+import hub.dataload
 import biothings.hub.dataload.uploader as uploader
 import biothings.hub.dataload.dumper as dumper
 import biothings.hub.databuild.builder as builder
 import biothings.hub.databuild.differ as differ
 import biothings.hub.databuild.syncer as syncer
 import biothings.hub.dataindex.indexer as indexer
-from databuild.builder import MyVariantDataBuilder
-from databuild.mapper import TagObserved
-from dataindex.indexer import VariantIndexer
+from hub.databuild.builder import MyVariantDataBuilder
+from hub.databuild.mapper import TagObserved
+from hub.dataindex.indexer import VariantIndexer
 
 # will check every 10 seconds for sources to upload
 upload_manager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=job_manager)
-upload_manager.register_sources(dataload.__sources_dict__)
+upload_manager.register_sources(hub.dataload.__sources_dict__)
 upload_manager.poll()
 
 dmanager = dumper.DumperManager(job_manager=job_manager)
-dmanager.register_sources(dataload.__sources_dict__)
+dmanager.register_sources(hub.dataload.__sources_dict__)
 dmanager.schedule_all()
 
 observed = TagObserved(name="observed")
@@ -129,7 +129,7 @@ def rebuild_cache(build_name=None,sources=None,target=None,force_build=False):
     return task
 
 
-from biothings.utils.hub import schedule, top, pending, done
+from biothings.utils.hub import schedule, pending, done
 
 COMMANDS = {
         # dump commands
@@ -169,7 +169,7 @@ COMMANDS = {
         "tqueue" : thread_queue,
         "g": globals(),
         "sch" : partial(schedule,loop),
-        "top" : partial(top,process_queue,thread_queue),
+        "top" : job_manager.top,
         "pending" : pending,
         "done" : done,
         }
