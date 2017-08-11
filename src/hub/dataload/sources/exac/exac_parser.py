@@ -9,7 +9,7 @@ def _map_line_to_json(doc_key, item):
     chromStart = item.POS
     ref = item.REF
     info = item.INFO
-    _filter = info.FILTER
+    _filter = item.FILTER
     try:
         baseqranksum = info['BaseQRankSum']
     except:
