@@ -15,6 +15,7 @@ __sources_dict__ = [
         'hub.dataload.sources.uniprot',
         'hub.dataload.sources.civic',
         'hub.dataload.sources.cgi',
+        'hub.dataload.sources.gnomad',
 
         # dead-resources
         'hub.dataload.sources.cosmic',

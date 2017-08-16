@@ -38,7 +38,7 @@ def _map_line_to_json(item):
         assert len(item.ALT) == len(info['Hom_AFR']), "Expecting length of item.ALT= length of HOM_AFR, but not for %s" % (HGVS)
         one_snp_json = {
             "_id": HGVS,
-            "gnomad_exome" : {
+            "gnomad_exome": {
                 "chrom": chrom,
                 "pos": chromStart,
                 "filter": _filter,
