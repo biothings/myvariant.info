@@ -9,7 +9,7 @@ VALID_COLUMN_NO = 245
 https://sites.google.com/site/jpopgen/dbNSFP'''
 
 # convert one snp to json
-def _map_line_to_json(df, version, index=0):
+def _map_line_to_json(df, version, include_gnomad, index=0):
     # specific variable treatment
     chrom = df["#chr"]
     if chrom == 'M':
@@ -104,6 +104,63 @@ def _map_line_to_json(df, version, index=0):
     fathmm_score = norm(fathmm_score)
     metalr_score = norm(metalr_score)
     revel_score = norm(revel_score)
+
+    gnomad = {"gnomad_exomes": {
+                "ac": df["gnomAD_exomes_AC"],
+                "an": df["gnomAD_exomes_AN"],
+                "af": df["gnomAD_exomes_AF"],                
+                "afr_ac": df["gnomAD_exomes_AFR_AC"],
+                "afr_af": df["gnomAD_exomes_AFR_AF"],
+                "afr_an": df["gnomAD_exomes_AFR_AN"],
+                "amr_ac": df["gnomAD_exomes_AMR_AC"],
+                "amr_an": df["gnomAD_exomes_AMR_AN"],
+                "amr_af": df["gnomAD_exomes_AMR_AF"],
+                "asj_ac": df["gnomAD_exomes_ASJ_AC"],
+                "asj_an": df["gnomAD_exomes_ASJ_AN"],
+                "asj_af": df["gnomAD_exomes_ASJ_AF"],
+                "eas_ac": df["gnomAD_exomes_EAS_AC"],
+                "eas_af": df["gnomAD_exomes_EAS_AF"],
+                "eas_an": df["gnomAD_exomes_EAS_AN"],
+                "fin_ac": df["gnomAD_exomes_FIN_AC"],
+                "fin_af": df["gnomAD_exomes_FIN_AF"],
+                "fin_an": df["gnomAD_exomes_FIN_AN"],
+                "nfe_ac": df["gnomAD_exomes_NFE_AC"],
+                "nfe_af": df["gnomAD_exomes_NFE_AF"],
+                "nfe_an": df["gnomAD_exomes_NFE_AN"],
+                "sas_ac": df["gnomAD_exomes_SAS_AC"],
+                "sas_af": df["gnomAD_exomes_SAS_AF"],
+                "sas_an": df["gnomAD_exomes_SAS_AN"],
+                "oth_ac": df["gnomAD_exomes_OTH_AC"],
+                "oth_af": df["gnomAD_exomes_OTH_AF"],
+                "oth_an": df["gnomAD_exomes_OTH_AN"]
+            },
+            "gnomad_genomes": {
+                "ac": df["gnomAD_genomes_AC"],
+                "an": df["gnomAD_genomes_AN"],
+                "af": df["gnomAD_genomes_AF"],                
+                "afr_ac": df["gnomAD_genomes_AFR_AC"],
+                "afr_af": df["gnomAD_genomes_AFR_AF"],
+                "afr_an": df["gnomAD_genomes_AFR_AN"],
+                "amr_ac": df["gnomAD_genomes_AMR_AC"],
+                "amr_an": df["gnomAD_genomes_AMR_AN"],
+                "amr_af": df["gnomAD_genomes_AMR_AF"],
+                "asj_ac": df["gnomAD_genomes_ASJ_AC"],
+                "asj_an": df["gnomAD_genomes_ASJ_AN"],
+                "asj_af": df["gnomAD_genomes_ASJ_AF"],
+                "eas_ac": df["gnomAD_genomes_EAS_AC"],
+                "eas_af": df["gnomAD_genomes_EAS_AF"],
+                "eas_an": df["gnomAD_genomes_EAS_AN"],
+                "fin_ac": df["gnomAD_genomes_FIN_AC"],
+                "fin_af": df["gnomAD_genomes_FIN_AF"],
+                "fin_an": df["gnomAD_genomes_FIN_AN"],
+                "nfe_ac": df["gnomAD_genomes_NFE_AC"],
+                "nfe_af": df["gnomAD_genomes_NFE_AF"],
+                "nfe_an": df["gnomAD_genomes_NFE_AN"],
+                "oth_ac": df["gnomAD_genomes_OTH_AC"],
+                "oth_af": df["gnomAD_genomes_OTH_AF"],
+                "oth_an": df["gnomAD_genomes_OTH_AN"]
+            }
+        }
 
 # load as json data
     one_snp_json = {
@@ -380,61 +437,6 @@ def _map_line_to_json(df, version, index=0):
                 "sas_ac": df["ExAC_nonpsych_SAS_AC"],
                 "sas_af": df["ExAC_nonpsych_SAS_AF"]
             },
-            "gnomad_exomes": {
-                "ac": df["gnomAD_exomes_AC"],
-                "an": df["gnomAD_exomes_AN"],
-                "af": df["gnomAD_exomes_AF"],                
-                "afr_ac": df["gnomAD_exomes_AFR_AC"],
-                "afr_af": df["gnomAD_exomes_AFR_AF"],
-                "afr_an": df["gnomAD_exomes_AFR_AN"],
-                "amr_ac": df["gnomAD_exomes_AMR_AC"],
-                "amr_an": df["gnomAD_exomes_AMR_AN"],
-                "amr_af": df["gnomAD_exomes_AMR_AF"],
-                "asj_ac": df["gnomAD_exomes_ASJ_AC"],
-                "asj_an": df["gnomAD_exomes_ASJ_AN"],
-                "asj_af": df["gnomAD_exomes_ASJ_AF"],
-                "eas_ac": df["gnomAD_exomes_EAS_AC"],
-                "eas_af": df["gnomAD_exomes_EAS_AF"],
-                "eas_an": df["gnomAD_exomes_EAS_AN"],
-                "fin_ac": df["gnomAD_exomes_FIN_AC"],
-                "fin_af": df["gnomAD_exomes_FIN_AF"],
-                "fin_an": df["gnomAD_exomes_FIN_AN"],
-                "nfe_ac": df["gnomAD_exomes_NFE_AC"],
-                "nfe_af": df["gnomAD_exomes_NFE_AF"],
-                "nfe_an": df["gnomAD_exomes_NFE_AN"],
-                "sas_ac": df["gnomAD_exomes_SAS_AC"],
-                "sas_af": df["gnomAD_exomes_SAS_AF"],
-                "sas_an": df["gnomAD_exomes_SAS_AN"],
-                "oth_ac": df["gnomAD_exomes_OTH_AC"],
-                "oth_af": df["gnomAD_exomes_OTH_AF"],
-                "oth_an": df["gnomAD_exomes_OTH_AN"]
-            },
-            "gnomad_genomes": {
-                "ac": df["gnomAD_genomes_AC"],
-                "an": df["gnomAD_genomes_AN"],
-                "af": df["gnomAD_genomes_AF"],                
-                "afr_ac": df["gnomAD_genomes_AFR_AC"],
-                "afr_af": df["gnomAD_genomes_AFR_AF"],
-                "afr_an": df["gnomAD_genomes_AFR_AN"],
-                "amr_ac": df["gnomAD_genomes_AMR_AC"],
-                "amr_an": df["gnomAD_genomes_AMR_AN"],
-                "amr_af": df["gnomAD_genomes_AMR_AF"],
-                "asj_ac": df["gnomAD_genomes_ASJ_AC"],
-                "asj_an": df["gnomAD_genomes_ASJ_AN"],
-                "asj_af": df["gnomAD_genomes_ASJ_AF"],
-                "eas_ac": df["gnomAD_genomes_EAS_AC"],
-                "eas_af": df["gnomAD_genomes_EAS_AF"],
-                "eas_an": df["gnomAD_genomes_EAS_AN"],
-                "fin_ac": df["gnomAD_genomes_FIN_AC"],
-                "fin_af": df["gnomAD_genomes_FIN_AF"],
-                "fin_an": df["gnomAD_genomes_FIN_AN"],
-                "nfe_ac": df["gnomAD_genomes_NFE_AC"],
-                "nfe_af": df["gnomAD_genomes_NFE_AF"],
-                "nfe_an": df["gnomAD_genomes_NFE_AN"],
-                "oth_ac": df["gnomAD_genomes_OTH_AC"],
-                "oth_af": df["gnomAD_genomes_OTH_AF"],
-                "oth_an": df["gnomAD_genomes_OTH_AN"]
-            },
             "clinvar": {
                 "rs": df["clinvar_rs"],
                 "clinsig": list(map(int,[i for i in df["clinvar_clnsig"].split("|") if i != "."])),
@@ -444,14 +446,15 @@ def _map_line_to_json(df, version, index=0):
             "gtex": list(gtex)
         }
     }
-
+    if include_gnomad:
+        one_snp_json['dbnsfp'].update(gnomad)
     one_snp_json = list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=[".", '-', None]), ";")
     one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"])
     return one_snp_json
 
 
 # open file, parse, pass to json mapper
-def data_generator(input_file, version):
+def data_generator(input_file, version, include_gnomad):
     open_file = open(input_file)
     db_nsfp = csv.reader(open_file, delimiter="\t")
     index = next(db_nsfp)
@@ -460,7 +463,7 @@ def data_generator(input_file, version):
     for row in db_nsfp:
         df = dict(zip(index, row))
         # use transpose matrix to have 1 row with N 187 columns
-        current_row = _map_line_to_json(df, version=version)
+        current_row = _map_line_to_json(df, version=version, include_gnomad=include_gnomad)
         if previous_row and current_row:
             if current_row["_id"] == previous_row["_id"]:
                 aa = previous_row["dbnsfp"]["aa"]
@@ -477,14 +480,14 @@ def data_generator(input_file, version):
         yield previous_row
 
 
-def load_data_file(input_file, version):
-    data = data_generator(input_file, version=version)
+def load_data_file(input_file, version, include_gnomad):
+    data = data_generator(input_file, version=version, include_gnomad=include_gnomad)
     for one_snp_json in data:
         yield one_snp_json
 
 
 # load path and find files, pass to data_generator
-def load_data(path_glob, version='hg19'):
+def load_data(path_glob, version='hg19', include_gnomad=False):
     for input_file in sorted(glob.glob(path_glob)):
-         for d in load_data_file(input_file, version):
+         for d in load_data_file(input_file, version, include_gnomad):
              yield d
