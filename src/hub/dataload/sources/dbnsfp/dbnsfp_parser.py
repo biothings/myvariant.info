@@ -480,7 +480,7 @@ def data_generator(input_file, version, include_gnomad):
         yield previous_row
 
 
-def load_data_file(input_file, version, include_gnomad):
+def load_data_file(input_file, version, include_gnomad=False):
     data = data_generator(input_file, version=version, include_gnomad=include_gnomad)
     for one_snp_json in data:
         yield one_snp_json
