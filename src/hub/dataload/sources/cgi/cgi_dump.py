@@ -8,12 +8,10 @@ import biothings, config
 biothings.config_for_app(config)
 
 from config import DATA_ARCHIVE_ROOT
-from biothings.hub.dataload.dumper import ManualDumper
+from biothings.hub.dataload.dumper import LastModifiedHTTPDumper
 from biothings.utils.common import unzipall
 
-# not sure which of these 2 is right...
-#class CGIDumper(LastModifiedHTTPDumper):
-class CGIDumper(ManualDumper):
+class CGIDumper(LastModifiedHTTPDumper):
 
     SRC_NAME = "cgi"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
