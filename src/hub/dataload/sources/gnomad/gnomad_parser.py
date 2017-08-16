@@ -4,7 +4,7 @@ from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
 from utils.hgvs import get_hgvs_from_vcf
 
 
-def _map_line_to_json(doc_key, item):
+def _map_line_to_json(item):
     chrom = item.CHROM
     # test on chrom 22 only for the momment, need to remove '22' later
     chromStart = item.POS
@@ -38,7 +38,7 @@ def _map_line_to_json(doc_key, item):
         assert len(item.ALT) == len(info['Hom_AFR']), "Expecting length of item.ALT= length of HOM_AFR, but not for %s" % (HGVS)
         one_snp_json = {
             "_id": HGVS,
-            doc_key : {
+            "gnomad_exome" : {
                 "chrom": chrom,
                 "pos": chromStart,
                 "filter": _filter,
@@ -137,8 +137,8 @@ def _map_line_to_json(doc_key, item):
         yield obj
 
 
-def load_data(doc_key,input_file):
+def load_data(input_file):
     vcf_reader = vcf.Reader(open(input_file, 'r'))
     for record in vcf_reader:
-        for record_mapped in _map_line_to_json(doc_key,record):
+        for record_mapped in _map_line_to_json(record):
             yield record_mapped
