@@ -62,6 +62,10 @@ MONITOR_SNAPSHOT_DELAY = 5 * 60
 # "" means production
 HUB_ENV = ""
 
+# S3 bucket, root of all biothings diff/snapshot releases
+S3_DIFF_BUCKET = "biothings-diffs"
+# what sub-folder should be used within diff bucket to upload diff files
+S3_DIFF_FOLDER = "myvariant.info"
 
 # Pre-prod/test ES definitions
 # (see bt.databuild.backend.create_backend() for the notation)
