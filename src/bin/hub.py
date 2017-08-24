@@ -160,10 +160,13 @@ COMMANDS["es_test"] = {"hg19":config.ES_TEST_HG19,"hg38":config.ES_TEST_HG38}
 COMMANDS["diff"] = partial(differ_manager.diff,"jsondiff")
 COMMANDS["report"] = differ_manager.diff_report
 COMMANDS["release_note"] = differ_manager.release_note
-COMMANDS["publish_diff"] = differ_manager.publish_diff
+COMMANDS["publish_diff_hg19"] = partial(differ_manager.publish_diff,config.S3_DIFF_FOLDER % "hg19")
+COMMANDS["publish_diff_hg38"] = partial(differ_manager.publish_diff,config.S3_DIFF_FOLDER % "hg38")
 # indexing commands
 COMMANDS["index"] = index_manager.index
 COMMANDS["snapshot"] = index_manager.snapshot
+COMMANDS["public_snapshot_hg19"] = partial(index_manager.snapshot,config.S3_DIFF_FOLDER % "hg19")
+COMMANDS["public_snapshot_hg38"] = partial(index_manager.snapshot,config.S3_DIFF_FOLDER % "hg38")
 
 # admin/advanced
 EXTRA_NS = {

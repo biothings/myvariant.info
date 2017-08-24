@@ -30,6 +30,11 @@ MAX_RANDOMLY_PICKED = 10
 
 # ES s3 repository to use snapshot/restore (must be pre-configured in ES)
 SNAPSHOT_REPOSITORY = "variant_repository"
+# ES snapshot name accessible (usually using a URL)
+# These two snapshot configs should point to
+# the same location in a way. The different is the first 
+# used access controller to write data, and the second is read-only
+READONLY_SNAPSHOT_REPOSITORY ="variant_url"
 
 # cache file format ("": ascii/text uncompressed, or "gz|zip|xz"
 CACHE_FORMAT = "xz"
@@ -65,7 +70,7 @@ HUB_ENV = ""
 # S3 bucket, root of all biothings diff/snapshot releases
 S3_DIFF_BUCKET = "biothings-diffs"
 # what sub-folder should be used within diff bucket to upload diff files
-S3_DIFF_FOLDER = "myvariant.info"
+S3_DIFF_FOLDER = "myvariant.info-%s" # hg19/hg38
 
 # Pre-prod/test ES definitions
 # (see bt.databuild.backend.create_backend() for the notation)
