@@ -49,4 +49,52 @@ jQuery(document).ready(function() {
             }
         });
     }
+    if ((jQuery('#hg19').length) && (!(jQuery('#hg19').hasClass('loaded')))) {
+        // create the list of releases from version.json
+        jQuery.get('https://s3.amazonaws.com/biothings-diffs/myvariant.info-hg19/versions.json', function (data, Status, jqXHR) 
+        {
+            jQuery.each(data, function (index, val) {
+                jQuery('#hg19').append('<div id="rp' + index + '" class="release-pane"><a href="javascript:;" class="release-link hg19">Release ' + val + '</a><div class="release-info"></div></div>');
+                jQuery('#rp' + index + ' .release-link.hg19').click(function () {
+                    if (!(jQuery('#rp' + index + ' .release-info').hasClass('loaded'))) {
+                        jQuery.get('https://s3.amazonaws.com/biothings-diffs/myvariant.info-hg19/' + val + '.json', function(rdata, rStatus, rjqXHR) {
+                            jQuery.get(rdata['changes']['txt']['url'], function (ndata, nStatus, njqXHR) {
+                                jQuery('#rp' + index + ' .release-info').html('<pre>' + ndata + '</pre>');
+                                jQuery('#rp' + index + ' .release-info').addClass('loaded');
+                                jQuery('#rp' + index + ' .release-info').slideToggle();
+                            });
+                        });
+                    }
+                    else {
+                        jQuery('#rp' + index + ' .release-info').slideToggle();
+                    }
+                });
+            });
+            jQuery('#hg19').addClass('loaded');
+        });
+    }
+    if ((jQuery('#hg38').length) && (!(jQuery('#hg38').hasClass('loaded')))) {
+        // create the list of releases from version.json
+        jQuery.get('https://s3.amazonaws.com/biothings-diffs/myvariant.info-hg38/versions.json', function (data, Status, jqXHR) 
+        {
+            jQuery.each(data, function (index, val) {
+                jQuery('#hg38').append('<div id="hg38rp' + index + '" class="release-pane"><a href="javascript:;" class="release-link hg38">Release ' + val + '</a><div class="release-info"></div></div>');
+                jQuery('#hg38rp' + index + ' .release-link.hg38').click(function () {
+                    if (!(jQuery('#hg38rp' + index + ' .release-info').hasClass('loaded'))) {
+                        jQuery.get('https://s3.amazonaws.com/biothings-diffs/myvariant.info-hg38/' + val + '.json', function(rdata, rStatus, rjqXHR) {
+                            jQuery.get(rdata['changes']['txt']['url'], function (ndata, nStatus, njqXHR) {
+                                jQuery('#hg38rp' + index + ' .release-info').html('<pre>' + ndata + '</pre>');
+                                jQuery('#hg38rp' + index + ' .release-info').addClass('loaded');
+                                jQuery('#hg38rp' + index + ' .release-info').slideToggle();
+                            });
+                        });
+                    }
+                    else {
+                        jQuery('#hg38rp' + index + ' .release-info').slideToggle();
+                    }
+                });
+            });
+            jQuery('#hg38').addClass('loaded');
+        });
+    }
 });
