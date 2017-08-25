@@ -67,10 +67,12 @@ MONITOR_SNAPSHOT_DELAY = 5 * 60
 # "" means production
 HUB_ENV = ""
 
-# S3 bucket, root of all biothings diff/snapshot releases
+# S3 bucket, root of all biothings releases information
+S3_RELEASE_BUCKET = "biothings-releases"
+# S3 bucket, root of all biothings diffs
 S3_DIFF_BUCKET = "biothings-diffs"
 # what sub-folder should be used within diff bucket to upload diff files
-S3_DIFF_FOLDER = "myvariant.info-%s" # hg19/hg38
+S3_APP_FOLDER = "myvariant.info-%s" # hg19/hg38
 
 # Pre-prod/test ES definitions
 # (see bt.databuild.backend.create_backend() for the notation)
@@ -153,9 +155,15 @@ ES_HOST = ConfigurationError("Define ElasticSearch host used for index creation 
 # Path to a folder to store all downloaded files, logs, caches, etc...
 DATA_ARCHIVE_ROOT = ConfigurationError("Define path to folder which will contain all downloaded data, cache files, etc...")
 
+# Path to folder containing diff files
 DIFF_PATH = ConfigurationError("Define path to folder which will contain output files from diff")
 # Usually inside DATA_ARCHIVE_ROOT
 #DIFF_PATH = os.path.join(DATA_ARCHIVE_ROOT,"diff")
+
+# Path to folder containing release note files
+RELEASE_PATH = ConfigurationError("Define path to folder which will contain output files from diff")
+# Usually inside DATA_ARCHIVE_ROOT
+#RELEASE_PATH = os.path.join(DATA_ARCHIVE_ROOT,"release")
 
 # this dir must be created manually
 LOG_FOLDER = ConfigurationError("Define path to folder which will contain log files")
