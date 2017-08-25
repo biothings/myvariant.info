@@ -42,7 +42,7 @@ CACHE_FORMAT = "xz"
 # How much memory hub is allowed to use:
 # - "auto", let hub decides (will use 50%-60% of available RAM)
 # - None: no limit
-# - otherwise specify a number in GiB
+# - otherwise specify a number in bytes
 HUB_MAX_MEM_USAGE = None
 
 # Max number of *processes* hub can access to run jobs

@@ -23,11 +23,8 @@ loop = asyncio.get_event_loop()
 process_queue = concurrent.futures.ProcessPoolExecutor(max_workers=config.HUB_MAX_WORKERS)
 thread_queue = concurrent.futures.ThreadPoolExecutor()
 loop.set_default_executor(process_queue)
-max_mem = type(config.HUB_MAX_MEM_USAGE) == int and config.HUB_MAX_MEM_USAGE * 1024**3 or config.HUB_MAX_MEM_USAGE
-job_manager = JobManager(loop,
-                      process_queue, thread_queue,
-                      max_memory_usage=max_mem,
-                      )
+job_manager = JobManager(loop,num_workers=config.HUB_MAX_WORKERS,
+                      max_memory_usage=config.HUB_MAX_MEM_USAGE)
 
 import hub.dataload
 import biothings.hub.dataload.uploader as uploader
