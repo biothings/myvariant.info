@@ -3,20 +3,12 @@ Data release notes
 
 This page contains metadata about each MyVariant.info data release.  Click a link to see more.
 
-MyVariant hg19 index
-====================
+MyVariant Releases
+==================
 
 .. raw:: html
 
-    <div id="hg19"></div>
-
-MyVariant hg38 index
-====================
-
-.. raw:: html
-
-    <div id="hg38"></div>
-
+    <div id="all-releases"></div>
 
 .. raw:: html
 

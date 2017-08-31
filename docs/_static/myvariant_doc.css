@@ -7,9 +7,11 @@
 .dataTables_length {float:right !important;}
 .dataTables_filter input[type="search"] {font-size:12px;padding-top:1px;padding-bottom:1px; width:200px;}
 .release-info {display:none;border:1px solid grey;padding-left:10px;padding-right:10px;margin-top:10px;margin-left:10px;margin-bottom:10px;}
-.release-info pre {overflow-x:scroll;font-size:12px}
-.release-link {display:list-item;list-style-type:disc;list-style-position:inside;margin-left:5px;}
-#myvariant-hg19-index {margin-bottom:10px;}
-#myvariant-hg19-index h2 {margin-bottom:5px;}
-#myvariant-hg38-index h2 {margin-bottom:5px;}
-.
+.release-info pre {overflow-x:scroll;font-size:12px;padding-bottom:15px;}
+.release-link {margin-left:35px;}
+.release-title {display:list-item;list-style-type:disc;list-style-position:inside;margin-bottom: 0px}
+.release-version {font-weight:bold;}
+.release-date {font-style: italic; font:monospace;}
+.release-date-line {margin-left:35px; font-size:13px;margin-bottom:5px;line-height:13px;}
+#myvariant-releases h2 {margin-bottom:5px;}
+.release-pane {padding-left:7px;/*border-left:1px solid grey;*/}
