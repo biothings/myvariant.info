@@ -56,7 +56,7 @@ MAX_QUEUED_JOBS = os.cpu_count() * 4
 
 # when creating a snapshot, how long should we wait before querying ES
 # to check snapshot status/completion ? (in seconds)
-# Since myvariant's indices are pretty big, a whole snaphost won't happne in few secs,
+# Since myvariant's indices are pretty big, a whole snaphost won't happen in few secs,
 # let's just monitor the status every 5min
 MONITOR_SNAPSHOT_DELAY = 5 * 60
 
@@ -100,6 +100,10 @@ HUB_SSH_PORT = 8022
 
 # cached data (it None, caches won't be used at all)
 CACHE_FOLDER = None
+
+# Role, when master, hub will publish data (updates, snapshot, etc...) that
+# other instances can use (production, standalones)
+BIOTHINGS_ROLE = "slave"  
 
 import logging
 from biothings.utils.loggers import setup_default_log
@@ -161,7 +165,7 @@ DIFF_PATH = ConfigurationError("Define path to folder which will contain output 
 #DIFF_PATH = os.path.join(DATA_ARCHIVE_ROOT,"diff")
 
 # Path to folder containing release note files
-RELEASE_PATH = ConfigurationError("Define path to folder which will contain output files from diff")
+RELEASE_PATH = ConfigurationError("Define path to folder which will contain release files")
 # Usually inside DATA_ARCHIVE_ROOT
 #RELEASE_PATH = os.path.join(DATA_ARCHIVE_ROOT,"release")
 

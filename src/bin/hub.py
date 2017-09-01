@@ -162,8 +162,8 @@ COMMANDS["publish_diff_hg38"] = partial(differ_manager.publish_diff,config.S3_AP
 # indexing commands
 COMMANDS["index"] = index_manager.index
 COMMANDS["snapshot"] = index_manager.snapshot
-COMMANDS["public_snapshot_hg19"] = partial(index_manager.snapshot,config.S3_APP_FOLDER % "hg19")
-COMMANDS["public_snapshot_hg38"] = partial(index_manager.snapshot,config.S3_APP_FOLDER % "hg38")
+COMMANDS["publish_snapshot_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER % "hg19")
+COMMANDS["publish_snapshot_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER % "hg38")
 
 # admin/advanced
 EXTRA_NS = {
