@@ -3,7 +3,7 @@
 # ######### #
 import os
 
-DATA_HUB_DB_DATABASE = "hub_config"         # db containing the following (internal use)
+DATA_HUB_DB_DATABASE = "variant_hubdb"         # db containing the following (internal use)
 DATA_SRC_MASTER_COLLECTION = 'src_master'   # for metadata of each src collections
 DATA_SRC_DUMP_COLLECTION = 'src_dump'       # for src data download information
 DATA_SRC_BUILD_COLLECTION = 'src_build'     # for src data build information
