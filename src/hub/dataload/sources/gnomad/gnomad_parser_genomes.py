@@ -265,7 +265,7 @@ def _map_line_to_json(item):
                 "vqsr_culprit": vqsr_culprit
             }
         }
-        one_snp_json.update(allele_info)
+        one_snp_json['gnomad_genome'].update(allele_info)
         obj = (dict_sweep(unlist(value_convert_to_number(one_snp_json)), [None]))
         yield obj
 
