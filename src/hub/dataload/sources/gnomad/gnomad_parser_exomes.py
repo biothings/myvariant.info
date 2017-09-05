@@ -3,6 +3,48 @@ import vcf
 from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
 from utils.hgvs import get_hgvs_from_vcf
 
+def parse_chrY(_info, i):
+    json_doc = {
+        "ac": {
+            "ac": _info['AC'][i],
+            "ac_afr": _info['AC_AFR'][i],
+            "ac_amr": _info['AC_AMR'][i],
+            "ac_eas": _info['AC_EAS'][i],
+            "ac_fin": _info['AC_FIN'][i],
+            "ac_nfe": _info['AC_NFE'][i],
+            "ac_nfe": _info['AC_NFE'][i],
+            "ac_oth": _info['AC_OTH'][i],
+            "ac_asj": _info['AC_ASJ'][i],
+            "ac_sas": _info['AC_SAS'][i],
+            "ac_raw": _info['AC_raw'][i]
+        },
+        "af": {
+            "af": _info['AF'][i],
+            "af_afr": _info['AF_AFR'][i],
+            "af_amr": _info['AF_AMR'][i],
+            "af_asj": _info['AF_ASJ'][i],
+            "af_eas": _info['AF_EAS'][i],
+            "af_fin": _info['AF_FIN'][i],
+            "af_nfe": _info['AF_NFE'][i],
+            "af_oth": _info['AF_OTH'][i],
+            "af_sas": _info['AF_SAS'][i],
+            "af_raw": _info['AF_raw'][i]
+        },
+        "an": {
+            "an": _info['AN'],
+            "an_afr": _info['AN_AFR'],
+            "an_amr": _info['AN_AMR'],
+            "an_asj": _info['AN_ASJ'],
+            "an_eas": _info['AN_EAS'],
+            "an_fin": _info['AN_FIN'],
+            "an_nfe": _info['AN_NFE'],
+            "an_oth": _info['AN_OTH'],
+            "an_sas": _info['AN_SAS'],
+            "an_raw": _info['AN_raw']
+        }
+    }
+    return json_doc
+
 def parse_chrX(_info, i):
     json_doc = {
         "ac": {
@@ -249,14 +291,16 @@ def _map_line_to_json(item):
     for i, alt in enumerate(item.ALT):
         if chrom == 'X':
             allele_info = parse_chrX(info, i)
+        elif chrom == 'Y':
+            allele_info = parse_chrY(info, i)
         else:
             allele_info = parse_chr(info, i)
+            assert len(item.ALT) == len(info['Hom_AFR']), "Expecting length of item.ALT= length of HOM_AFR, but not for %s" % (HGVS)
         (HGVS, var_type) = get_hgvs_from_vcf(chrom, chromStart, ref, alt, mutant_type=True)
         if HGVS is None:
             return
         assert len(item.ALT) == len(info['AC']), "Expecting length of item.ALT= length of info.AC, but not for %s" % (HGVS)
         assert len(item.ALT) == len(info['AF']), "Expecting length of item.ALT= length of info.AF, but not for %s" % (HGVS)
-        assert len(item.ALT) == len(info['Hom_AFR']), "Expecting length of item.ALT= length of HOM_AFR, but not for %s" % (HGVS)
         one_snp_json = {
             "_id": HGVS,
             "gnomad_exome": {
@@ -289,16 +333,16 @@ def _map_line_to_json(item):
 
 
 def load_data(input_file):
-    vcf_reader = vcf.Reader(open(input_file, 'r'))
+    vcf_reader = vcf.Reader(filename=input_file)
     for record in vcf_reader:
         for record_mapped in _map_line_to_json(record):
             yield record_mapped
 
 def test(input_file):
-    vcf_reader = vcf.Reader(open(input_file, 'r'))
+    vcf_reader = vcf.Reader(filename=input_file)
     chrom_li = [str(i) for i in range(1, 23)]
-    chrom_li += ['X', 'Y', 'MT']
+    chrom_li += ['X', 'Y']
     for chrom in chrom_li:
         data = next(vcf_reader.fetch(chrom))
-        print(_map_line_to_json(data))
+        print(list(_map_line_to_json(data)))
 
