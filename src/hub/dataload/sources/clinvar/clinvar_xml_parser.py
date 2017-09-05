@@ -168,14 +168,22 @@ def parse_measure(Measure, hg19=True):
                     ins_position = hgvs_genome.find('ins')
                     if 'ins' in hgvs_genome:
                         ins_ref = hgvs_genome[ins_position+3:]
-                        hgvs_id = "chr%s:g.%s_%sins%s" % \
-                                  (chrom, chromStart, chromEnd, ins_ref)
+                        if chromStart == chromEnd:
+                            hgvs_id = "chr%s:g.%sins%s" % \
+                                      (chrom, chromStart, ins_ref)
+                        else:
+                            hgvs_id = "chr%s:g.%s_%sins%s" % \
+                                      (chrom, chromStart, chromEnd, ins_ref)
             elif variation_type == 'Duplication':
                 if hgvs_genome:
                     dup_position = hgvs_genome.find('dup')
                     if 'dup' in hgvs_genome:
                         dup_ref = hgvs_genome[dup_position+3:]
-                        hgvs_id = "chr%s:g.%s_%sdup%s" % \
+                        if chromStart == chromEnd:
+                            hgvs_id = "chr%s:g.%sdup%s" % \
+                                  (chrom, chromStart, dup_ref)
+                        else:
+                            hgvs_id = "chr%s:g.%s_%sdup%s" % \
                                   (chrom, chromStart, chromEnd, dup_ref)
         elif variation_type == 'copy number loss' or\
                 variation_type == 'copy number gain':
