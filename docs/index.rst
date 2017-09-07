@@ -28,7 +28,6 @@ Documentation
     :maxdepth: 3
 
     Try it live on interactive API page <http://myvariant.info/v1/api>
-    doc/quick_start
     doc/data    
     doc/variant_query_service
     doc/variant_annotation_service
