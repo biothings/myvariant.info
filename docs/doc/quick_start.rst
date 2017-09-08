@@ -6,7 +6,6 @@ Quick start
 Variant query service
 ^^^^^^^^^^^^^^^^^^^^^
 
-
 URL
 """""
 ::
@@ -26,17 +25,16 @@ Examples
     http://myvariant.info/v1/query?q=_exists_:dbsnp AND _exists_:cosmic    
     
 
-.. Hint:: View nicely formatted JSON result in your browser with this handy add-on: `JSON formater <https://chrome.google.com/webstore/detail/bcjindcccaagfpapjjmafapmmgkkhgoa>`_ for Chrome or `JSONView <https://addons.mozilla.org/en-US/firefox/addon/jsonview/>`_ for Firefox.
-
+.. Hint:: View nicely formatted JSON result in your browser with this handy add-on: `JSON formatter <https://chrome.google.com/webstore/detail/bcjindcccaagfpapjjmafapmmgkkhgoa>`_ for Chrome or `JSONView <https://addons.mozilla.org/en-US/firefox/addon/jsonview/>`_ for Firefox.
 
 
 To learn more
 """""""""""""
 
-* You can read `the full description of our query syntax here <variant_query_service.html>`_.
+* You can read `the full description of our query syntax here <doc/variant_query_service.html>`__.
 * Try it live on `interactive API page <http://myvariant.info/v1/api>`_.
-* Batch queries? Yes, you can. do it with `a POST request <variant_query_service.html#batch-queries-via-post>`_.
-
+* Play with our `demo application <http://myvariant.info/demo>`_.
+* Batch queries? Yes, you can. do it with `a POST request <doc/variant_query_service.html#batch-queries-via-post>`__.
 
 
 Variant annotation service
@@ -65,6 +63,7 @@ Examples
 To learn more
 """""""""""""
 
-* You can read `the full description of our query syntax here <variant_annotation_service.html>`_.
+* You can read `the full description of our query syntax here <doc/variant_annotation_service.html>`__.
 * Try it live on `interactive API page <http://myvariant.info/v1/api>`_.
-* Yes, batch queries via `POST request <variant_annotation_service.html#batch-queries-via-post>`_ as well.
+* Play with our `demo application <http://myvariant.info/demo>`_.
+* Yes, batch queries via `POST request <doc/variant_annotation_service.html#batch-queries-via-post>`__ as well.

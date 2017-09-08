@@ -119,7 +119,8 @@ For more information, visit the `Bioconductor myvariant page <https://www.biocon
 
 
 MyVariant Node.js package
-------------------------
+-------------------------
+
 `myvariantjs <https://www.npmjs.com/package/myvariantjs>`_ is a `Node.js <https://nodejs.org>`_ wrapper for the MyVariant.info API, developed and maintained by `Larry Hengl <http://larryhengl.github.io/>`_.  To install::
 
     npm install myvariantjs --save

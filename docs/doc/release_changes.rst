@@ -8,7 +8,7 @@ MyVariant Releases
 
 .. raw:: html
 
-    <div id="all-releases"></div>
+    <div id="all-releases"><p class="loading">Loading release data . . .</p></div>
 
 .. raw:: html
 
