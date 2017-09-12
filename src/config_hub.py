@@ -28,6 +28,9 @@ MAX_REPORTED_IDS = 1000
 # for diff updates, number of IDs randomly picked as examples when rendering the report
 MAX_RANDOMLY_PICKED = 10
 
+# size of a diff file when in memory (used when merged/reduced)
+MAX_DIFF_SIZE = 50 * 1024**2  # 50MiB (~1MiB on disk when compressed)
+
 # ES s3 repository to use snapshot/restore (must be pre-configured in ES)
 SNAPSHOT_REPOSITORY = "variant_repository"
 # ES snapshot name accessible (usually using a URL)
@@ -163,8 +166,6 @@ DATA_ARCHIVE_ROOT = ConfigurationError("Define path to folder which will contain
 DIFF_PATH = ConfigurationError("Define path to folder which will contain output files from diff")
 # Usually inside DATA_ARCHIVE_ROOT
 #DIFF_PATH = os.path.join(DATA_ARCHIVE_ROOT,"diff")
-# size of a diff file when in memory (used when merged/reduced)
-MAX_DIFF_SIZE = 50 * 1024**2  # 50MiB (~1MiB on disk when compressed)
 
 # Path to folder containing release note files
 RELEASE_PATH = ConfigurationError("Define path to folder which will contain release files")
