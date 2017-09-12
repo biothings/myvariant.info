@@ -39,7 +39,7 @@
                         {
                             "Name": "assembly",
                             "Type": "string",
-                            "Description": "To query for variants in hg38 genome assembly, pass \"assemlby=hg38\". The default is always \"hg19\", or pass \"asembly=hg19\" explicitly."
+                            "Description": "To query for variants in hg38 genome assembly, pass \"hg38\". The default is always \"hg19\", or pass \"hg19\" explicitly."
                         },
                         {
                             "Name": "facets",
@@ -96,7 +96,7 @@
                         {
                             "Name": "assembly",
                             "Type": "string",
-                            "Description": "To query for variants in hg38 genome assembly, pass \"assemlby=hg38\". The default is always \"hg19\", or pass \"asembly=hg19\" explicitly."
+                            "Description": "To query for variants in hg38 genome assembly, pass \"hg38\". The default is always \"hg19\", or pass \"hg19\" explicitly."
                         },
                         {
                             "Name": "email",
@@ -132,7 +132,7 @@
                         {
                             "Name": "assembly",
                             "Type": "string",
-                            "Description": "To query for variants in hg38 genome assembly, pass \"assemlby=hg38\". The default is always \"hg19\", or pass \"asembly=hg19\" explicitly."
+                            "Description": "To query for variants in hg38 genome assembly, pass \"hg38\". The default is always \"hg19\", or pass \"hg19\" explicitly."
                         },
                         {
                             "Name": "callback",
@@ -168,7 +168,7 @@
                         {
                             "Name": "assembly",
                             "Type": "string",
-                            "Description": "To query for variants in hg38 genome assembly, pass \"assemlby=hg38\". The default is always \"hg19\", or pass \"asembly=hg19\" explicitly."
+                            "Description": "To query for variants in hg38 genome assembly, pass \"hg38\". The default is always \"hg19\", or pass \"hg19\" explicitly."
                         },
                         {
                             "Name": "email",
@@ -193,7 +193,7 @@
                         {
                             "Name": "assembly",
                             "Type": "string",
-                            "Description": "To return the metadata for all variants in hg38 genome assembly, pass \"assemlby=hg38\". The default is always \"hg19\", or pass \"asembly=hg19\" explicitly."
+                            "Description": "To return the metadata for all variants in hg38 genome assembly, pass \"hg38\". The default is always \"hg19\", or pass \"hg19\" explicitly."
                         },
                         {
                             "Name": "callback",
