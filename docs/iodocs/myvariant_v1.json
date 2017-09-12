@@ -37,6 +37,11 @@
                             "Description": "the comma-separated fields to sort on. Prefix with \"-\" for descending order, otherwise in ascending order. Default: sort by matching scores in decending order."
                         },
                         {
+                            "Name": "assembly",
+                            "Type": "string",
+                            "Description": "To query for variants in hg38 genome assembly, pass \"assemlby=hg38\". The default is always \"hg19\", or pass \"asembly=hg19\" explicitly."
+                        },
+                        {
                             "Name": "facets",
                             "Type": "string",
                             "Description": "a single field or comma-separated fields to return facets, for example, “facets=dbsnp.vartype."
@@ -89,6 +94,11 @@
                             "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any variant object (e.g. http://myvariant.info/v1/variant/chr16:g.28883241A>G). Note that it supports dot notation, and wildcards as well, e.g., you can pass \"dbnsfp\", \"dbnsfp.genename\", or \"dbnsfp.aa.*\". If \"fields=all\", all available fields will be returned. Default: \"all\"."
                         },
                         {
+                            "Name": "assembly",
+                            "Type": "string",
+                            "Description": "To query for variants in hg38 genome assembly, pass \"assemlby=hg38\". The default is always \"hg19\", or pass \"asembly=hg19\" explicitly."
+                        },
+                        {
                             "Name": "email",
                             "Type": "string",
                             "Description": "If you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you."
@@ -118,6 +128,11 @@
                             "Name": "fields",
                             "Type": "string",
                             "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any variant object (e.g. http://myvariant.info/v1/variant/chr16:g.28883241A>G). Note that it supports dot notation, and wildcards as well, e.g., you can pass \"dbnsfp\", \"dbnsfp.genename\", or \"dbnsfp.aa.*\". If \"fields=all\", all available fields will be returned. Default: \"all\"."
+                        },
+                        {
+                            "Name": "assembly",
+                            "Type": "string",
+                            "Description": "To query for variants in hg38 genome assembly, pass \"assemlby=hg38\". The default is always \"hg19\", or pass \"asembly=hg19\" explicitly."
                         },
                         {
                             "Name": "callback",
@@ -151,6 +166,11 @@
                             "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any variant object (e.g. http://myvariant.info/v1/variant/chr16:g.28883241A>G). Note that it supports dot notation, and wildcards as well, e.g., you can pass \"dbnsfp\", \"dbnsfp.genename\", or \"dbnsfp.aa.*\". If \"fields=all\", all available fields will be returned. Default: \"all\"."
                         },
                         {
+                            "Name": "assembly",
+                            "Type": "string",
+                            "Description": "To query for variants in hg38 genome assembly, pass \"assemlby=hg38\". The default is always \"hg19\", or pass \"asembly=hg19\" explicitly."
+                        },
+                        {
                             "Name": "email",
                             "Type": "string",
                             "Description": "If you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you."
@@ -170,6 +190,11 @@
                     "HTTPMethod": "GET",
                     "URI": "/v1/metadata",
                     "parameters": [
+                        {
+                            "Name": "assembly",
+                            "Type": "string",
+                            "Description": "To return the metadata for all variants in hg38 genome assembly, pass \"assemlby=hg38\". The default is always \"hg19\", or pass \"asembly=hg19\" explicitly."
+                        },
                         {
                             "Name": "callback",
                             "Type": "string",
