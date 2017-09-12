@@ -54,20 +54,27 @@ jQuery(document).ready(function() {
     }
     if ((jQuery('#all-releases').length)) {
         // load releases
-        jQuery.get('https://s3-us-west-2.amazonaws.com/biothings-releases/myvariant.info-hg19/versions.json', 
-            function (data, Status, jqXHR) 
+        jQuery.ajax({
+            url: 'https://s3-us-west-2.amazonaws.com/biothings-releases/myvariant.info-hg19/versions.json',
+            cache: false,
+            type: "GET",
+            dataType: "json",
+            success: function (data, Status, jqXHR) 
             {
                 if (data.format == DATA_FORMAT_VERSION) {appendResponses(Releases, data.versions, "hg19");}
-                jQuery.get('https://s3-us-west-2.amazonaws.com/biothings-releases/myvariant.info-hg38/versions.json',
-                    function (nData, nStatus, njqXHR) {
+                jQuery.ajax({
+                    url: 'https://s3-us-west-2.amazonaws.com/biothings-releases/myvariant.info-hg38/versions.json',
+                    dataType: "json",
+                    type: "GET",
+                    cache: false,
+                    success: function (nData, nStatus, njqXHR) {
                         if (nData.format == DATA_FORMAT_VERSION) {appendResponses(Releases, nData.versions, "hg38");}
                         // display the releases
                         displayReleases();
                     }
-                );
+                });
             }
-        );
-        // 
+        });
     }
 });
 
@@ -102,12 +109,23 @@ function displayReleases() {
     jQuery('.release-link').click(function () {
         if (!(jQuery(this).siblings('.release-info').hasClass('loaded'))) {
             var that = this;
-            jQuery.get(jQuery(this).data().url, function (ndata, nStatus, njqXHR) {
-                jQuery.get(ndata.changes.txt.url, function (edata, eStatus, ejqXHR) {
-                    jQuery(that).siblings('.release-info').html('<pre>' + edata + '</pre>');
-                    jQuery(that).siblings('.release-info').addClass('loaded');
-                    jQuery(that).siblings('.release-info').slideToggle();
-                });
+            jQuery.ajax({
+                url: jQuery(this).data().url,
+                cache: false,
+                type: "GET",
+                dataType: "json", 
+                success: function (ndata, nStatus, njqXHR) {
+                    jQuery.ajax({
+                        url: ndata.changes.txt.url, 
+                        cache: false,
+                        type: "GET",
+                        success: function (edata, eStatus, ejqXHR) {
+                            jQuery(that).siblings('.release-info').html('<pre>' + edata + '</pre>');
+                            jQuery(that).siblings('.release-info').addClass('loaded');
+                            jQuery(that).siblings('.release-info').slideToggle();
+                        }
+                    });
+                }
             });
         }
         else {
