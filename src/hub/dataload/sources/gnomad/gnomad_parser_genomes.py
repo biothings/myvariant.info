@@ -82,7 +82,7 @@ def load_data(input_file):
     keys = vcf_reader.infos.keys()
     keys = [_key for _key in keys if _key.startswith(("AC", "AF", "AN", "Hom", "GC", "Hemi"))]
     for record in vcf_reader:
-        for record_mapped in _map_line_to_json(record， keys):
+        for record_mapped in _map_line_to_json(record, keys):
             yield record_mapped
 
 def test():    
