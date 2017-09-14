@@ -10,8 +10,7 @@ from .gnomad_parser_exomes import load_data as load_data_exomes
 from ...uploader import SnpeffPostUpdateUploader
 
 
-#uploader.IgnoreDuplicatedSourceUploader,
-class GnomadBaseUploader(SnpeffPostUpdateUploader):
+class GnomadBaseUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUploader):
 
     __metadata__ = {"mapper" : 'observed',
             "assembly" : "hg19",
