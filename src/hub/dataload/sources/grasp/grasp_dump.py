@@ -23,7 +23,7 @@ Assuming manual download from: https://grasp.nhlbi.nih.gov/Updates.aspx
 - GraspFullDataset*.zip
 """)
 
-    def post_dump(self):
+    def post_dump(self, *args, **kwargs):
         self.logger.info("Unzipping files in '%s'" % self.new_data_folder) 
         unzipall(self.new_data_folder)
 

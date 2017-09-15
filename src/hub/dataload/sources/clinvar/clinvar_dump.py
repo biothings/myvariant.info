@@ -54,9 +54,9 @@ class ClinvarDumper(FTPDumper):
             localxsdfile = os.path.join(self.new_data_folder,xsd)
             self.to_dump.append({"remote": "../%s" % xsd, "local":localxsdfile})
 
-    def post_dump(self):
+    def post_dump(self, *args, **kwargs):
         generate_clinvar_lib(self.new_data_folder)
-        
+
 
 def generate_clinvar_lib(data_folder):
     sys.path.insert(0,data_folder)

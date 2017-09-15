@@ -16,7 +16,7 @@ class Geno2MPDumper(LastModifiedHTTPDumper):
     SRC_URLS = ["http://geno2mp.gs.washington.edu/download/Geno2MP.variants.vcf.gz"]
     SCHEDULE = "0 9 * * *"
 
-    def post_dump(self):
+    def post_dump(self, *args, **kwargs):
         self.logger.info("Uncompressing files in '%s'" % self.new_data_folder) 
         gunzipall(self.new_data_folder)
 

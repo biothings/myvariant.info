@@ -25,7 +25,7 @@ Under version directory, there should be 2 sub-directories, containing VCF and .
 - genomes/
 """)
 
-    def post_dump(self):
+    def post_dump(self, *args, **kwargs):
         genomes_dir = os.path.join(self.new_data_folder,"genomes")
         self.logger.info("Unzipping files in '%s'" % genomes_dir) 
         gunzipall(genomes_dir)

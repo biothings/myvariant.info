@@ -104,7 +104,7 @@ class DBNSFPDumper(GoogleDriveDumper):
         assert self.release.endswith("a"), "Release '%s' isn't academic version (how possible ?)" % self.release
         # good to go...
 
-    def post_dump(self):
+    def post_dump(self, *args, **kwargs):
         self.logger.info("Unzipping files in '%s'" % self.new_data_folder)
         unzipall(self.new_data_folder)
 

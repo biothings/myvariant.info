@@ -23,7 +23,7 @@ Assuming manual download of Snpeff tools ,from: https://sourceforge.net/projects
 - snpEff_latest_core.zip
 """)
 
-    def post_dump(self):
+    def post_dump(self, *args, **kwargs):
         self.logger.info("Uncompressing files in '%s'" % self.new_data_folder) 
         unzipall(self.new_data_folder)
 

@@ -23,7 +23,7 @@ Assuming manual download from: http://evs.gs.washington.edu/EVS/
 - ESP6500SI-V2-SSA137.GRCh38-liftover.chr*
 """)
 
-    def post_dump(self):
+    def post_dump(self, *args, **kwargs):
         self.logger.info("Uncompressing files in '%s'" % self.new_data_folder) 
         untargzall(self.new_data_folder)
 

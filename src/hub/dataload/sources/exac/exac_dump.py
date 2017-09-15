@@ -63,7 +63,7 @@ class ExacDumper(FTPDumper):
             local_nontcga = os.path.join(self.new_data_folder,nontcga)
             self.to_dump.append({"remote": os.path.join(subdir,nontcga), "local":local_nontcga})
 
-    def post_dump(self):
+    def post_dump(self, *args, **kwargs):
         self.logger.info("Uncompressing files in '%s'" % self.new_data_folder) 
         gunzipall(self.new_data_folder)
 

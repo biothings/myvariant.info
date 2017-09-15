@@ -23,7 +23,7 @@ class CGIDumper(LastModifiedHTTPDumper):
         self.client = requests.Session()
         self.client.verify = False
 
-    def post_dump(self):
+    def post_dump(self, *args, **kwargs):
         self.logger.info("Unzipping files in '%s'" % self.new_data_folder) 
         unzipall(self.new_data_folder)
 
