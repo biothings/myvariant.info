@@ -73,8 +73,7 @@ class MyVariantTest(BiothingTestHelperMixin):
         res = self.json_ok(self.get_ok(self.api + '/query?q=54097\xef\xbf\xbd\xef\xbf\xbdmouse'))
         eq_(res['hits'], [])
 
-        res = self.json_ok(self.get_ok(self.api + '/query'), checkerror=False)
-        assert 'error' in res
+        self.get_status_code(self.api + '/query', status_code=400)        
 
     def test_query_post(self):
         #/query via post
@@ -95,8 +94,8 @@ class MyVariantTest(BiothingTestHelperMixin):
                                                               'scopes': 'dbsnp.rsid',
                                                               'fields': 'dbsnp.chrom,dbsnp.alleles'}))
         assert len(res) == 1, (res, len(res))
-        res = self.json_ok(self.post_ok(self.api + '/query', {}), checkerror=False)
-        assert 'error' in res, res
+        
+        self.post_status_code(self.api + '/query', {}, status_code=400)
 
         # TODO fix this test query
         #res = self.json_ok(self.post_ok(self.api + '/query', {'q': '[rs58991260, "chr11:66397000-66398000"]',
