@@ -28,10 +28,11 @@ Documentation
     :maxdepth: 3
 
     Try it live on interactive API page <http://myvariant.info/v1/api>
-    doc/quick_start
     doc/data    
+    doc/release_changes
     doc/variant_query_service
     doc/variant_annotation_service
+    doc/response_status_codes
     doc/packages
 
 Related links

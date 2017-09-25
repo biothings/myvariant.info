@@ -23,7 +23,7 @@ from tornado.web import Application
 
 from .variant_list import VARIANT_POST_LIST
 from biothings.tests.test_helper import BiothingTestHelperMixin, TornadoRequestHelper
-from www.settings import MyVariantWebSettings
+from web.settings import MyVariantWebSettings
 
 
 class MyVariantTest(BiothingTestHelperMixin):

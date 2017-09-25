@@ -2,6 +2,9 @@ function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+var Releases = {};
+var DATA_FORMAT_VERSION = "1.0";
+
 jQuery(document).ready(function() {
     if( jQuery(' .metadata-table ').length ) {
         // get the metadata information
@@ -49,4 +52,90 @@ jQuery(document).ready(function() {
             }
         });
     }
+    if ((jQuery('#all-releases').length)) {
+        // load releases
+        jQuery.ajax({
+            url: 'https://s3-us-west-2.amazonaws.com/biothings-releases/myvariant.info-hg19/versions.json',
+            cache: false,
+            type: "GET",
+            dataType: "json",
+            success: function (data, Status, jqXHR) 
+            {
+                if (data.format == DATA_FORMAT_VERSION) {appendResponses(Releases, data.versions, "hg19");}
+                jQuery.ajax({
+                    url: 'https://s3-us-west-2.amazonaws.com/biothings-releases/myvariant.info-hg38/versions.json',
+                    dataType: "json",
+                    type: "GET",
+                    cache: false,
+                    success: function (nData, nStatus, njqXHR) {
+                        if (nData.format == DATA_FORMAT_VERSION) {appendResponses(Releases, nData.versions, "hg38");}
+                        // display the releases
+                        displayReleases();
+                    }
+                });
+            }
+        });
+    }
 });
+
+function appendResponses(rel, res, assembly) {
+    jQuery.each(res, function (index, val) {
+        var t = new Date(val["release_date"].split("T")[0].split('-'));
+        if (!(t in rel)) {rel[t] = [];}
+        val['assembly'] = assembly;
+        rel[t].push(val);
+    }); 
+}
+
+function displayReleases() {
+    // everything should be loaded and ready to display, first reverse sort all releases by date...
+    var releaseDates = Object.keys(Releases);
+    releaseDates.sort(function(a,b) {
+        return new Date(b) - new Date(a);
+    });
+    // now compile the html 
+    var html = '<p class="release-control-line"><a href="javascript:;" class="release-expand">Expand All</a>|<a href="javascript:;" class="release-collapse">Collapse All</a></p>'
+    jQuery.each(releaseDates, function (index, val) {
+        var tDate = val.toString().split(" ").slice(1,4); tDate[1] += ","; tDate = tDate.join(" ");
+        html += '<div class="release-pane"><p class="release-date">' + tDate + '</p>'; 
+        jQuery.each(Releases[val], function (rIndex, rVal) {
+            html += '<div><a href="javascript:;" class="release-link" data-url="' + rVal.url + '">' + rVal.assembly + ' version <span class="release-version">' + rVal['target_version'] + '</span></a><div class="release-info"></div></div>';
+        });
+        html += '</div>'
+    });
+    // show the html
+    jQuery('#all-releases').html(html);
+    // attach click handlers for each pop down link
+    jQuery('.release-link').click(function () {
+        if (!(jQuery(this).siblings('.release-info').hasClass('loaded'))) {
+            var that = this;
+            jQuery.ajax({
+                url: jQuery(this).data().url,
+                cache: false,
+                type: "GET",
+                dataType: "json", 
+                success: function (ndata, nStatus, njqXHR) {
+                    jQuery.ajax({
+                        url: ndata.changes.txt.url, 
+                        cache: false,
+                        type: "GET",
+                        success: function (edata, eStatus, ejqXHR) {
+                            jQuery(that).siblings('.release-info').html('<pre>' + edata + '</pre>');
+                            jQuery(that).siblings('.release-info').addClass('loaded');
+                            jQuery(that).siblings('.release-info').slideToggle();
+                        }
+                    });
+                }
+            });
+        }
+        else {
+            jQuery(this).siblings('.release-info').slideToggle();
+        }
+    });
+    // add expand collapse click handlers
+    jQuery('.release-collapse').click(function () {jQuery('.release-info').slideUp();});
+    jQuery('.release-expand').click(function () {
+        jQuery('.release-info.loaded').slideDown();
+        jQuery('.release-info:not(.loaded)').siblings('.release-link').click();
+    });
+}

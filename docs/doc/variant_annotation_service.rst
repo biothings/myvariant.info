@@ -27,7 +27,7 @@ Optionally, you can pass a "**fields**" parameter to return only the annotation 
 
     http://myvariant.info/v1/variant/chr1:g.35367G>A?fields=cadd
 
-"**fields**" accepts any attributes (a.k.a fields) available from the variant object. Multiple attributes should be seperated by commas. If an attribute is not available for a specific variant object, it will be ignored. Note that the attribute names are case-sensitive.
+"**fields**" accepts any attributes (a.k.a fields) available from the variant object. Multiple attributes should be separated by commas. If an attribute is not available for a specific variant object, it will be ignored. Note that the attribute names are case-sensitive.
 
 Just like the `variant query service <variant_query_service.html>`_, you can also pass a "**callback**" parameter to make a `JSONP <http://ajaxian.com/archives/jsonp-json-with-padding>`_ call.
 
