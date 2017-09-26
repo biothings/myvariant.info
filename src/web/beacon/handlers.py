@@ -79,12 +79,11 @@ class BeaconHandler(BaseHandler):
                 q = self.format_query_string(q_type, chrom, start, ref, alt, assembly, dataset)
                 # perform query and format result
                 # for now always search against hg19 index...
-                res = self.web_settings.es_client.search(index='_'.join([self.web_settings.ES_INDEX_BASE, 'hg19']),
+                res = self.web_settings.es_client.search(index='_'.join([self.web_settings.ES_INDEX_BASE, assembly]),
                     doc_type=self.web_settings.ES_DOC_TYPE, body={"query":{"query_string":{"query":q}}}, 
                     _source=[dataset])
-                _transformer = ESResultTransformer(options=dotdict({'dotfield': True}), host=self.request.host)
+                _transformer = ESResultTransformer(options=dotdict({'dotfield': True, 'assembly': assembly}), host=self.request.host, source_metadata=self.web_settings.source_metadata())
                 res = _transformer.clean_query_GET_response(res)
-                
                 if res and res.get('total') > 0:
                     out = self.format_output(res, out, q_type)
         return out
