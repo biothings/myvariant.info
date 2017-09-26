@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import asyncio, asyncssh, sys
+import asyncio, asyncssh, sys, os
 import concurrent.futures
 from functools import partial
 from collections import OrderedDict
@@ -33,24 +33,34 @@ import biothings.hub.databuild.builder as builder
 import biothings.hub.databuild.differ as differ
 import biothings.hub.databuild.syncer as syncer
 import biothings.hub.dataindex.indexer as indexer
-from hub.databuild.builder import MyVariantDataBuilder
+from hub.databuild.builder import MyVariantDataBuilder, MyVariantDemoDataBuilder
 from hub.databuild.mapper import TagObserved
 from hub.dataindex.indexer import VariantIndexer
 
 # will check every 10 seconds for sources to upload
 upload_manager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=job_manager)
 upload_manager.register_sources(hub.dataload.__sources_dict__)
-#upload_manager.poll()
+upload_manager.poll()
 
 dmanager = dumper.DumperManager(job_manager=job_manager)
 dmanager.register_sources(hub.dataload.__sources_dict__)
-#dmanager.schedule_all()
+dmanager.schedule_all()
 
 observed = TagObserved(name="observed")
 build_manager = builder.BuilderManager(
         builder_class=partial(MyVariantDataBuilder,mappers=[observed]),
         job_manager=job_manager)
 build_manager.configure()
+
+ids_files = {
+        "hg19":os.path.join(config.DATA_ARCHIVE_ROOT,"demo/hg19_ids.txt"),
+        "hg38":os.path.join(config.DATA_ARCHIVE_ROOT,"demo/hg38_ids.txt"),
+        }
+demo_build_manager = builder.BuilderManager(
+        builder_class=partial(MyVariantDemoDataBuilder,
+            ids_files=ids_files,mappers=[observed]),
+        job_manager=job_manager)
+demo_build_manager.configure()
 
 differ_manager = differ.DifferManager(job_manager=job_manager)
 differ_manager.configure()
@@ -146,6 +156,7 @@ COMMANDS["snpeff"] = snpeff
 COMMANDS["rebuild_cache"] = rebuild_cache
 # building/merging
 COMMANDS["merge"] = build_manager.merge
+COMMANDS["demo_merge"] = demo_build_manager.merge
 COMMANDS["premerge"] = partial(build_manager.merge,steps=["merge","metadata"])
 COMMANDS["es_sync_hg19_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_HG19)
 COMMANDS["es_sync_hg38_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_HG38)
@@ -170,6 +181,7 @@ EXTRA_NS = {
         "dm" : dmanager,
         "um" : upload_manager,
         "bm" : build_manager,
+        "dbm" : demo_build_manager,
         "dim" : differ_manager,
         "sm" : syncer_manager,
         "im" : index_manager,
