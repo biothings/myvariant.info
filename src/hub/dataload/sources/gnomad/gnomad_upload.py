@@ -458,94 +458,94 @@ class GnomadExomesUploader(GnomadBaseUploader):
                         "type": "string",
                         "analyzer": "string_lowercase"
                     },
-                    "gc": {
-                        "properties": {
-                            "gc_eas_male": {
-                                "type": "integer"
-                            },
-                            "gc_asj_female": {
-                                "type": "integer"
-                            },
-                            "gc_oth": {
-                                "type": "integer"
-                            },
-                            "gc_amr_female": {
-                                "type": "integer"
-                            },
-                            "gc_fin_male": {
-                                "type": "integer"
-                            },
-                            "gc_nfe_male": {
-                                "type": "integer"
-                            },
-                            "gc_fin_female": {
-                                "type": "integer"
-                            },
-                            "gc_eas_female": {
-                                "type": "integer"
-                            },
-                            "gc_amr": {
-                                "type": "integer"
-                            },
-                            "gc_raw": {
-                                "type": "integer"
-                            },
-                            "gc": {
-                                "type": "integer"
-                            },
-                            "gc_nfe": {
-                                "type": "integer"
-                            },
-                            "gc_sas_male": {
-                                "type": "integer"
-                            },
-                            "gc_oth_female": {
-                                "type": "integer"
-                            },
-                            "gc_eas": {
-                                "type": "integer"
-                            },
-                            "gc_afr": {
-                                "type": "integer"
-                            },
-                            "gc_sas": {
-                                "type": "integer"
-                            },
-                            "gc_afr_male": {
-                                "type": "integer"
-                            },
-                            "gc_amr_male": {
-                                "type": "integer"
-                            },
-                            "gc_fin": {
-                                "type": "integer"
-                            },
-                            "gc_nfe_female": {
-                                "type": "integer"
-                            },
-                            "gc_afr_female": {
-                                "type": "integer"
-                            },
-                            "gc_asj": {
-                                "type": "integer"
-                            },
-                            "gc_asj_male": {
-                                "type": "integer"
-                            },
-                            "gc_male": {
-                                "type": "integer"
-                            },
-                            "gc_female": {
-                                "type": "integer"
-                            },
-                            "gc_sas_female": {
-                                "type": "integer"
-                            },
-                            "gc_oth_male": {
-                                "type": "integer"
-                            }
-                        }
-                    }
+                    #"gc": {
+                    #    "properties": {
+                    #        "gc_eas_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_asj_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_oth": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_amr_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_fin_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_nfe_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_fin_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_eas_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_amr": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_raw": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_nfe": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_sas_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_oth_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_eas": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_afr": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_sas": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_afr_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_amr_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_fin": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_nfe_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_afr_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_asj": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_asj_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_sas_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_oth_male": {
+                    #            "type": "integer"
+                    #        }
+                    #    }
+                    #}
                 }
             }
         }
@@ -691,85 +691,85 @@ class GnomadGenomesUploader(GnomadBaseUploader, uploader.ParallelizedSourceUploa
                         "type": "string",
                         "analyzer": "string_lowercase"
                     },
-                    "gc": {
-                        "properties": {
-                            "gc_nfe": {
-                                "type": "integer"
-                            },
-                            "gc": {
-                                "type": "integer"
-                            },
-                            "gc_eas": {
-                                "type": "integer"
-                            },
-                            "gc_eas_male": {
-                                "type": "integer"
-                            },
-                            "gc_eas_female": {
-                                "type": "integer"
-                            },
-                            "gc_fin_female": {
-                                "type": "integer"
-                            },
-                            "gc_raw": {
-                                "type": "integer"
-                            },
-                            "gc_afr_female": {
-                                "type": "integer"
-                            },
-                            "gc_oth_male": {
-                                "type": "integer"
-                            },
-                            "gc_female": {
-                                "type": "integer"
-                            },
-                            "gc_fin_male": {
-                                "type": "integer"
-                            },
-                            "gc_oth": {
-                                "type": "integer"
-                            },
-                            "gc_asj_male": {
-                                "type": "integer"
-                            },
-                            "gc_amr_female": {
-                                "type": "integer"
-                            },
-                            "gc_oth_female": {
-                                "type": "integer"
-                            },
-                            "gc_asj": {
-                                "type": "integer"
-                            },
-                            "gc_nfe_male": {
-                                "type": "integer"
-                            },
-                            "gc_fin": {
-                                "type": "integer"
-                            },
-                            "gc_amr_male": {
-                                "type": "integer"
-                            },
-                            "gc_male": {
-                                "type": "integer"
-                            },
-                            "gc_afr_male": {
-                                "type": "integer"
-                            },
-                            "gc_asj_female": {
-                                "type": "integer"
-                            },
-                            "gc_afr": {
-                                "type": "integer"
-                            },
-                            "gc_nfe_female": {
-                                "type": "integer"
-                            },
-                            "gc_amr": {
-                                "type": "integer"
-                            }
-                        }
-                    },
+                    #"gc": {
+                    #    "properties": {
+                    #        "gc_nfe": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_eas": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_eas_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_eas_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_fin_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_raw": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_afr_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_oth_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_fin_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_oth": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_asj_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_amr_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_oth_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_asj": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_nfe_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_fin": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_amr_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_afr_male": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_asj_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_afr": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_nfe_female": {
+                    #            "type": "integer"
+                    #        },
+                    #        "gc_amr": {
+                    #            "type": "integer"
+                    #        }
+                    #    }
+                    #},
                     "filter": {
                         "type": "string",
                         "analyzer": "string_lowercase"

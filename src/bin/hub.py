@@ -165,7 +165,7 @@ COMMANDS["es_sync_hg38_prod"] = partial(syncer_manager.sync,"es",target_backend=
 COMMANDS["es_prod"] = {"hg19":config.ES_PROD_HG19,"hg38":config.ES_PROD_HG38}
 COMMANDS["es_test"] = {"hg19":config.ES_TEST_HG19,"hg38":config.ES_TEST_HG38}
 # diff
-COMMANDS["diff"] = partial(differ_manager.diff,"jsondiff")
+COMMANDS["diff"] = partial(differ_manager.diff,"jsondiff-selfcontained")
 COMMANDS["report"] = differ_manager.diff_report
 COMMANDS["release_note"] = differ_manager.release_note
 COMMANDS["publish_diff_hg19"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER % "hg19")
