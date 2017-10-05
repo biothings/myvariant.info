@@ -110,13 +110,6 @@ class MyVariantDataBuilder(builder.DataBuilder):
         return {}
 
 
-class MyVariantDemoDataBuilder(builder.DemoDataBuilder,MyVariantDataBuilder):
-    """
-    Add demo features (build from list of _ids)
-    """
-    pass
-
-
 def get_chrom(doc):
     chrom_keys = set()
     this_chrom = {"chrom" : None, "agreed" : False}
