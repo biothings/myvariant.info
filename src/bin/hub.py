@@ -57,7 +57,9 @@ differ_manager.configure()
 syncer_manager = syncer.SyncerManager(job_manager=job_manager)
 syncer_manager.configure()
 
-pindexer = partial(VariantIndexer,es_host=config.ES_HOST)
+pindexer = partial(VariantIndexer,es_host=config.ES_HOST,
+                   timeout=config.ES_TIMEOUT,max_retries=config.ES_MAX_RETRY,
+                   retry_on_timeout=config.ES_RETRY)
 index_manager = indexer.IndexerManager(pindexer=pindexer,
         job_manager=job_manager)
 index_manager.configure()

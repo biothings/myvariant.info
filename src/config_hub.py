@@ -90,6 +90,10 @@ ES_PROD_HOST = 'prodserver:9200'
 ES_PROD_HG19 = (ES_PROD_HOST,"myvariant_current_hg19","variant")
 ES_PROD_HG38 = (ES_PROD_HOST,"myvariant_current_hg38","variant")
 
+ES_TIMEOUT = 300
+ES_RETRY = True
+ES_MAX_RETRY = 10
+
 
 # fill with "token", "roomid" and "from" keys
 # to broadcast message to a Hipchat room
