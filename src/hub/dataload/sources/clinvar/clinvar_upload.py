@@ -11,8 +11,8 @@ SRC_META = {
 
 class ClinvarBaseUploader(SnpeffPostUpdateUploader):
 
-    def get_pinfo(self):
-        pinfo = super(ClinvarBaseUploader,self).get_pinfo()
+    def get_pinfo(self, job_manager=None):
+        pinfo = super(ClinvarBaseUploader,self).get_pinfo(job_manager)
         # clinvar parser has some memory requirements, ~1.5G
         pinfo.setdefault("__reqs__",{})["mem"] = 1.5 * (1024**3)
         return pinfo
