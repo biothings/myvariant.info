@@ -7,7 +7,7 @@ tornado==4.2.1
 elasticsearch>=2.0.0,<3.0.0
 
 # biothings
-git+https://github.com/biothings/biothings.api.git@3933f82392042b1446456e13700f51dea9b4c975#egg=biothings
+git+https://github.com/biothings/biothings.api.git@a37827e13ebfc919bc5116a6adce46f527adb54f#egg=biothings
 
 # optional
 msgpack-python==0.4.6
@@ -18,3 +18,6 @@ psutil
 # for nosetests
 nose>=1.3.7
 httplib2>=0.8
+
+# for sentry monitoring
+raven
