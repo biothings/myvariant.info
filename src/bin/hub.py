@@ -36,6 +36,7 @@ import biothings.hub.databuild.builder as builder
 import biothings.hub.databuild.differ as differ
 import biothings.hub.databuild.syncer as syncer
 import biothings.hub.dataindex.indexer as indexer
+import biothings.hub.dataindex.idcache as idcache
 from hub.databuild.builder import MyVariantDataBuilder
 from hub.databuild.mapper import TagObserved
 from hub.dataindex.indexer import VariantIndexer
@@ -60,12 +61,13 @@ differ_manager.configure()
 syncer_manager = syncer.SyncerManager(job_manager=job_manager)
 syncer_manager.configure()
 
+index_manager = indexer.IndexerManager(job_manager=job_manager)
 pindexer = partial(VariantIndexer,es_host=config.ES_HOST,
                    timeout=config.ES_TIMEOUT,max_retries=config.ES_MAX_RETRY,
                    retry_on_timeout=config.ES_RETRY)
-index_manager = indexer.IndexerManager(pindexer=pindexer,
-        job_manager=job_manager)
-index_manager.configure()
+pidcacher = partial(idcache.RedisIDCache,connection_params=config.REDIS_CONNECTION_PARAMS)
+coldhot_pindexer = partial(indexer.ColdHotIndexer,pidcacher=pidcacher,es_host=config.ES_HOST)
+index_manager.configure([{"default":pindexer},{"cold_hot":coldhot_pindexer}])
 
 import biothings.utils.mongo as mongo
 def snpeff(build_name=None,sources=[], force_use_cache=True):
@@ -162,13 +164,20 @@ COMMANDS["es_test"] = {"hg19":config.ES_TEST_HG19,"hg38":config.ES_TEST_HG38}
 COMMANDS["diff"] = partial(differ_manager.diff,"jsondiff-selfcontained")
 COMMANDS["report"] = differ_manager.diff_report
 COMMANDS["release_note"] = differ_manager.release_note
-COMMANDS["publish_diff_hg19"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER % "hg19")
-COMMANDS["publish_diff_hg38"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER % "hg38")
+COMMANDS["publish_diff_hg19"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-hg19")
+COMMANDS["publish_diff_hg38"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-hg38")
 # indexing commands
 COMMANDS["index"] = index_manager.index
 COMMANDS["snapshot"] = index_manager.snapshot
-COMMANDS["publish_snapshot_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER % "hg19")
-COMMANDS["publish_snapshot_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER % "hg38")
+COMMANDS["publish_snapshot_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-hg19")
+COMMANDS["publish_snapshot_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-hg38")
+# demo
+COMMANDS["publish_diff_demo_hg19"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-demo_hg19",
+                                        s3_bucket=config.S3_DIFF_BUCKET + "-demo")
+COMMANDS["publish_diff_demo_hg38"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-demo_hg38",
+                                        s3_bucket=config.S3_DIFF_BUCKET + "-demo")
+COMMANDS["publish_snapshot_demo_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg19")
+COMMANDS["publish_snapshot_demo_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg38")
 
 # admin/advanced
 EXTRA_NS = {

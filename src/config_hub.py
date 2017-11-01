@@ -10,6 +10,9 @@ DATA_SRC_BUILD_COLLECTION = 'src_build'     # for src data build information
 
 DATA_TARGET_MASTER_COLLECTION = 'db_master'
 
+# Redis config to cache IDs when doing cold/hot merge
+REDIS_CONNECTION_PARAMS = {}
+
 # where to store info about processes launched by the hub
 RUN_DIR = './run'
 
@@ -78,7 +81,7 @@ S3_RELEASE_BUCKET = "biothings-releases"
 # S3 bucket, root of all biothings diffs
 S3_DIFF_BUCKET = "biothings-diffs"
 # what sub-folder should be used within diff bucket to upload diff files
-S3_APP_FOLDER = "myvariant.info-%s" # hg19/hg38
+S3_APP_FOLDER = "myvariant.info" # hg19/hg38 will be concat
 
 # Pre-prod/test ES definitions
 # (see bt.databuild.backend.create_backend() for the notation)
