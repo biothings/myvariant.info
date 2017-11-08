@@ -57,7 +57,7 @@ build_manager = builder.BuilderManager(
 build_manager.configure()
 
 differ_manager = differ.DifferManager(job_manager=job_manager)
-differ_manager.configure()
+differ_manager.configure([differ.ColdHotSelfContainedJsonDiffer,differ.SelfContainedJsonDiffer])
 syncer_manager = syncer.SyncerManager(job_manager=job_manager)
 syncer_manager.configure()
 
@@ -161,7 +161,8 @@ COMMANDS["es_sync_hg38_prod"] = partial(syncer_manager.sync,"es",target_backend=
 COMMANDS["es_prod"] = {"hg19":config.ES_PROD_HG19,"hg38":config.ES_PROD_HG38}
 COMMANDS["es_test"] = {"hg19":config.ES_TEST_HG19,"hg38":config.ES_TEST_HG38}
 # diff
-COMMANDS["diff"] = partial(differ_manager.diff,"jsondiff-selfcontained")
+COMMANDS["diff_hg38"] = partial(differ_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
+COMMANDS["diff_hg19"] = partial(differ_manager.diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
 COMMANDS["report"] = differ_manager.diff_report
 COMMANDS["release_note"] = differ_manager.release_note
 COMMANDS["publish_diff_hg19"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-hg19")
