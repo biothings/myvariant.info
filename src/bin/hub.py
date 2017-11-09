@@ -58,8 +58,16 @@ build_manager.configure()
 
 differ_manager = differ.DifferManager(job_manager=job_manager)
 differ_manager.configure([differ.ColdHotSelfContainedJsonDiffer,differ.SelfContainedJsonDiffer])
+
+from biothings.hub.databuild.syncer import ThrottledESColdHotJsonDiffSelfContainedSyncer, ThrottledESJsonDiffSelfContainedSyncer, \
+                                           ESColdHotJsonDiffSelfContainedSyncer, ESJsonDiffSelfContainedSyncer
 syncer_manager = syncer.SyncerManager(job_manager=job_manager)
-syncer_manager.configure()
+syncer_manager.configure(klasses=[ESColdHotJsonDiffSelfContainedSyncer,ESJsonDiffSelfContainedSyncer])
+
+syncer_manager_prod = syncer.SyncerManager(job_manager=job_manager)
+syncer_manager_prod.configure(klasses=[partial(ThrottledESColdHotJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS),
+                                       partial(ThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
+
 
 index_manager = indexer.IndexerManager(job_manager=job_manager)
 pindexer = partial(VariantIndexer,es_host=config.ES_HOST,
