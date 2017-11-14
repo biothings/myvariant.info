@@ -19,8 +19,8 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
 
     SNPEFF_BATCH_SIZE = 1000000
 
-    def get_pinfo(self, job_manager=None):
-        pinfo = super(SnpeffPostUpdateUploader,self).get_pinfo(job_manager)
+    def get_pinfo(self):
+        pinfo = super(SnpeffPostUpdateUploader,self).get_pinfo()
         # mem depends in the batch size and doc size, but snpeff consumes a lot
         # (here, asumming 1 doc will weigh 1kB)
         pinfo.setdefault("__reqs__",{})["mem"] = (self.__class__.SNPEFF_BATCH_SIZE/100000.) * (1024**3)

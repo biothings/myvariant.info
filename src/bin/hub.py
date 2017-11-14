@@ -36,7 +36,7 @@ import biothings.hub.databuild.builder as builder
 import biothings.hub.databuild.differ as differ
 import biothings.hub.databuild.syncer as syncer
 import biothings.hub.dataindex.indexer as indexer
-import biothings.hub.dataindex.idcache as idcache
+#import biothings.hub.dataindex.idcache as idcache
 from hub.databuild.builder import MyVariantDataBuilder
 from hub.databuild.mapper import TagObserved
 from hub.dataindex.indexer import VariantIndexer
@@ -73,9 +73,9 @@ index_manager = indexer.IndexerManager(job_manager=job_manager)
 pindexer = partial(VariantIndexer,es_host=config.ES_HOST,
                    timeout=config.ES_TIMEOUT,max_retries=config.ES_MAX_RETRY,
                    retry_on_timeout=config.ES_RETRY)
-pidcacher = partial(idcache.RedisIDCache,connection_params=config.REDIS_CONNECTION_PARAMS)
-coldhot_pindexer = partial(indexer.ColdHotIndexer,pidcacher=pidcacher,es_host=config.ES_HOST)
-index_manager.configure([{"default":pindexer},{"cold_hot":coldhot_pindexer}])
+#pidcacher = partial(idcache.RedisIDCache,connection_params=config.REDIS_CONNECTION_PARAMS)
+#coldhot_pindexer = partial(indexer.ColdHotIndexer,pidcacher=pidcacher,es_host=config.ES_HOST)
+index_manager.configure([{"default":pindexer}])
 
 import biothings.utils.mongo as mongo
 def snpeff(build_name=None,sources=[], force_use_cache=True):
@@ -169,6 +169,7 @@ COMMANDS["es_sync_hg38_prod"] = partial(syncer_manager_prod.sync,"es",target_bac
 COMMANDS["es_prod"] = {"hg19":config.ES_PROD_HG19,"hg38":config.ES_PROD_HG38}
 COMMANDS["es_test"] = {"hg19":config.ES_TEST_HG19,"hg38":config.ES_TEST_HG38}
 # diff
+COMMANDS["diff"] = differ_manager.diff
 COMMANDS["diff_hg38"] = partial(differ_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
 COMMANDS["diff_hg19"] = partial(differ_manager.diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
 COMMANDS["report"] = differ_manager.diff_report
