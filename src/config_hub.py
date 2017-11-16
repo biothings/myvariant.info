@@ -14,7 +14,7 @@ DATA_TARGET_MASTER_COLLECTION = 'db_master'
 REDIS_CONNECTION_PARAMS = {}
 
 # where to store info about processes launched by the hub
-RUN_DIR = './run'
+RUN_DIR = '/tmp/run'
 
 # define valid sources to get chrom from, and for each, name of the chrom field
 CHROM_FIELDS = {'cadd':'chrom', 'clinvar':'chrom', 'cosmic':'chrom', 'dbnsfp':'chrom',
@@ -110,7 +110,8 @@ HIPCHAT_CONFIG = {
 }
 
 # SSH port for hub console
-HUB_SSH_PORT = 8022
+HUB_SSH_PORT = 7022
+HUB_API_PORT = 7080
 
 # cached data (it None, caches won't be used at all)
 CACHE_FOLDER = None
