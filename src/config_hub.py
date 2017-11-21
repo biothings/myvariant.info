@@ -30,12 +30,8 @@ MAX_REF_ALT_LEN = 1000
 MAX_REPORTED_IDS = 1000
 # for diff updates, number of IDs randomly picked as examples when rendering the report
 MAX_RANDOMLY_PICKED = 10
-# size in bytes for data contained in a diff file (uncompressed, usually size is 10x smaller
-# at least when compressed)
-MAX_DIFF_SIZE = 50 * 1024**2 # 50MiB
-
-# size of a diff file when in memory (used when merged/reduced)
-MAX_DIFF_SIZE = 50 * 1024**2  # 50MiB (~1MiB on disk when compressed)
+# size in bytes for a diff file (used in diff/reduce step)
+MAX_DIFF_SIZE = 10 * 1024**2
 
 # ES s3 repository to use snapshot/restore (must be pre-configured in ES)
 SNAPSHOT_REPOSITORY = "variant_repository"
@@ -56,6 +52,8 @@ HUB_MAX_MEM_USAGE = None
 
 # Max number of *processes* hub can access to run jobs
 HUB_MAX_WORKERS = int(os.cpu_count() / 4)
+# Max number of *threads* hub can use (will default to HUB_MAX_WORKERS if undefined)
+#HUB_MAX_THREADS = HUB_MAX_WORKERS
 MAX_SYNC_WORKERS = HUB_MAX_WORKERS
 
 # Max queued jobs in job manager

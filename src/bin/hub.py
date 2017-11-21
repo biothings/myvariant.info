@@ -23,10 +23,8 @@ logging.info("Hub database: %s" % biothings.config.DATA_HUB_DB_DATABASE)
 
 from biothings.utils.manager import JobManager
 loop = asyncio.get_event_loop()
-process_queue = concurrent.futures.ProcessPoolExecutor(max_workers=config.HUB_MAX_WORKERS)
-thread_queue = concurrent.futures.ThreadPoolExecutor()
-loop.set_default_executor(process_queue)
 job_manager = JobManager(loop,num_workers=config.HUB_MAX_WORKERS,
+                      num_threads=config.HUB_MAX_THREADS,
                       max_memory_usage=config.HUB_MAX_MEM_USAGE)
 
 import hub.dataload
@@ -160,6 +158,7 @@ COMMANDS["upload_all"] = upload_manager.upload_all
 COMMANDS["snpeff"] = snpeff
 COMMANDS["rebuild_cache"] = rebuild_cache
 # building/merging
+COMMANDS["lsmerge"] = build_manager.list_merge
 COMMANDS["merge"] = build_manager.merge
 COMMANDS["premerge"] = partial(build_manager.merge,steps=["merge","metadata"])
 COMMANDS["es_sync_hg19_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_HG19)
@@ -179,6 +178,7 @@ COMMANDS["publish_diff_hg38"] = partial(differ_manager.publish_diff,config.S3_AP
 # indexing commands
 COMMANDS["index"] = index_manager.index
 COMMANDS["snapshot"] = index_manager.snapshot
+COMMANDS["snapshot_demo"] = partial(index_manager.snapshot,repository=config.SNAPSHOT_REPOSITORY + "-demo")
 COMMANDS["publish_snapshot_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-hg19")
 COMMANDS["publish_snapshot_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-hg38")
 # demo
@@ -186,8 +186,10 @@ COMMANDS["publish_diff_demo_hg19"] = partial(differ_manager.publish_diff,config.
                                         s3_bucket=config.S3_DIFF_BUCKET + "-demo")
 COMMANDS["publish_diff_demo_hg38"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-demo_hg38",
                                         s3_bucket=config.S3_DIFF_BUCKET + "-demo")
-COMMANDS["publish_snapshot_demo_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg19")
-COMMANDS["publish_snapshot_demo_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg38")
+COMMANDS["publish_snapshot_demo_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg19",
+                                                                                ro_repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
+COMMANDS["publish_snapshot_demo_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg38",
+                                                                                ro_repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
 
 # admin/advanced
 EXTRA_NS = {
@@ -201,8 +203,8 @@ EXTRA_NS = {
         "mongo_sync" : partial(syncer_manager.sync,"mongo"),
         "es_sync" : partial(syncer_manager.sync,"es"),
         "loop" : loop,
-        "pqueue" : process_queue,
-        "tqueue" : thread_queue,
+        "pqueue" : job_manager.process_queue,
+        "tqueue" : job_manager.thread_queue,
         "g": globals(),
         "sch" : partial(schedule,loop),
         "top" : job_manager.top,
