@@ -10,8 +10,11 @@ DATA_SRC_BUILD_COLLECTION = 'src_build'     # for src data build information
 
 DATA_TARGET_MASTER_COLLECTION = 'db_master'
 
+# Redis config to cache IDs when doing cold/hot merge
+REDIS_CONNECTION_PARAMS = {}
+
 # where to store info about processes launched by the hub
-RUN_DIR = './run'
+RUN_DIR = '/tmp/run'
 
 # define valid sources to get chrom from, and for each, name of the chrom field
 CHROM_FIELDS = {'cadd':'chrom', 'clinvar':'chrom', 'cosmic':'chrom', 'dbnsfp':'chrom',
@@ -27,12 +30,8 @@ MAX_REF_ALT_LEN = 1000
 MAX_REPORTED_IDS = 1000
 # for diff updates, number of IDs randomly picked as examples when rendering the report
 MAX_RANDOMLY_PICKED = 10
-# size in bytes for data contained in a diff file (uncompressed, usually size is 10x smaller
-# at least when compressed)
-MAX_DIFF_SIZE = 50 * 1024**2 # 50MiB
-
-# size of a diff file when in memory (used when merged/reduced)
-MAX_DIFF_SIZE = 50 * 1024**2  # 50MiB (~1MiB on disk when compressed)
+# size in bytes for a diff file (used in diff/reduce step)
+MAX_DIFF_SIZE = 10 * 1024**2
 
 # ES s3 repository to use snapshot/restore (must be pre-configured in ES)
 SNAPSHOT_REPOSITORY = "variant_repository"
@@ -53,6 +52,9 @@ HUB_MAX_MEM_USAGE = None
 
 # Max number of *processes* hub can access to run jobs
 HUB_MAX_WORKERS = int(os.cpu_count() / 4)
+# Max number of *threads* hub can use (will default to HUB_MAX_WORKERS if undefined)
+#HUB_MAX_THREADS = HUB_MAX_WORKERS
+MAX_SYNC_WORKERS = HUB_MAX_WORKERS
 
 # Max queued jobs in job manager
 # this shouldn't be 0 to make sure a job is pending and ready to be processed
@@ -78,7 +80,7 @@ S3_RELEASE_BUCKET = "biothings-releases"
 # S3 bucket, root of all biothings diffs
 S3_DIFF_BUCKET = "biothings-diffs"
 # what sub-folder should be used within diff bucket to upload diff files
-S3_APP_FOLDER = "myvariant.info-%s" # hg19/hg38
+S3_APP_FOLDER = "myvariant.info" # hg19/hg38 will be concat
 
 # Pre-prod/test ES definitions
 # (see bt.databuild.backend.create_backend() for the notation)
@@ -106,7 +108,8 @@ HIPCHAT_CONFIG = {
 }
 
 # SSH port for hub console
-HUB_SSH_PORT = 8022
+HUB_SSH_PORT = 7022
+HUB_API_PORT = 7080
 
 # cached data (it None, caches won't be used at all)
 CACHE_FOLDER = None

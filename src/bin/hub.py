@@ -23,10 +23,8 @@ logging.info("Hub database: %s" % biothings.config.DATA_HUB_DB_DATABASE)
 
 from biothings.utils.manager import JobManager
 loop = asyncio.get_event_loop()
-process_queue = concurrent.futures.ProcessPoolExecutor(max_workers=config.HUB_MAX_WORKERS)
-thread_queue = concurrent.futures.ThreadPoolExecutor()
-loop.set_default_executor(process_queue)
 job_manager = JobManager(loop,num_workers=config.HUB_MAX_WORKERS,
+                      num_threads=config.HUB_MAX_THREADS,
                       max_memory_usage=config.HUB_MAX_MEM_USAGE)
 
 import hub.dataload
@@ -36,6 +34,7 @@ import biothings.hub.databuild.builder as builder
 import biothings.hub.databuild.differ as differ
 import biothings.hub.databuild.syncer as syncer
 import biothings.hub.dataindex.indexer as indexer
+#import biothings.hub.dataindex.idcache as idcache
 from hub.databuild.builder import MyVariantDataBuilder
 from hub.databuild.mapper import TagObserved
 from hub.dataindex.indexer import VariantIndexer
@@ -56,16 +55,25 @@ build_manager = builder.BuilderManager(
 build_manager.configure()
 
 differ_manager = differ.DifferManager(job_manager=job_manager)
-differ_manager.configure()
-syncer_manager = syncer.SyncerManager(job_manager=job_manager)
-syncer_manager.configure()
+differ_manager.configure([differ.ColdHotSelfContainedJsonDiffer,differ.SelfContainedJsonDiffer])
 
+from biothings.hub.databuild.syncer import ThrottledESColdHotJsonDiffSelfContainedSyncer, ThrottledESJsonDiffSelfContainedSyncer, \
+                                           ESColdHotJsonDiffSelfContainedSyncer, ESJsonDiffSelfContainedSyncer
+syncer_manager = syncer.SyncerManager(job_manager=job_manager)
+syncer_manager.configure(klasses=[ESColdHotJsonDiffSelfContainedSyncer,ESJsonDiffSelfContainedSyncer])
+
+syncer_manager_prod = syncer.SyncerManager(job_manager=job_manager)
+syncer_manager_prod.configure(klasses=[partial(ThrottledESColdHotJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS),
+                                       partial(ThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
+
+
+index_manager = indexer.IndexerManager(job_manager=job_manager)
 pindexer = partial(VariantIndexer,es_host=config.ES_HOST,
                    timeout=config.ES_TIMEOUT,max_retries=config.ES_MAX_RETRY,
                    retry_on_timeout=config.ES_RETRY)
-index_manager = indexer.IndexerManager(pindexer=pindexer,
-        job_manager=job_manager)
-index_manager.configure()
+#pidcacher = partial(idcache.RedisIDCache,connection_params=config.REDIS_CONNECTION_PARAMS)
+#coldhot_pindexer = partial(indexer.ColdHotIndexer,pidcacher=pidcacher,es_host=config.ES_HOST)
+index_manager.configure([{"default":pindexer}])
 
 import biothings.utils.mongo as mongo
 def snpeff(build_name=None,sources=[], force_use_cache=True):
@@ -150,25 +158,38 @@ COMMANDS["upload_all"] = upload_manager.upload_all
 COMMANDS["snpeff"] = snpeff
 COMMANDS["rebuild_cache"] = rebuild_cache
 # building/merging
+COMMANDS["lsmerge"] = build_manager.list_merge
 COMMANDS["merge"] = build_manager.merge
 COMMANDS["premerge"] = partial(build_manager.merge,steps=["merge","metadata"])
 COMMANDS["es_sync_hg19_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_HG19)
 COMMANDS["es_sync_hg38_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_HG38)
-COMMANDS["es_sync_hg19_prod"] = partial(syncer_manager.sync,"es",target_backend=config.ES_PROD_HG19)
-COMMANDS["es_sync_hg38_prod"] = partial(syncer_manager.sync,"es",target_backend=config.ES_PROD_HG38)
+COMMANDS["es_sync_hg19_prod"] = partial(syncer_manager_prod.sync,"es",target_backend=config.ES_PROD_HG19)
+COMMANDS["es_sync_hg38_prod"] = partial(syncer_manager_prod.sync,"es",target_backend=config.ES_PROD_HG38)
 COMMANDS["es_prod"] = {"hg19":config.ES_PROD_HG19,"hg38":config.ES_PROD_HG38}
 COMMANDS["es_test"] = {"hg19":config.ES_TEST_HG19,"hg38":config.ES_TEST_HG38}
 # diff
-COMMANDS["diff"] = partial(differ_manager.diff,"jsondiff-selfcontained")
+COMMANDS["diff"] = differ_manager.diff
+COMMANDS["diff_hg38"] = partial(differ_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
+COMMANDS["diff_hg19"] = partial(differ_manager.diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
 COMMANDS["report"] = differ_manager.diff_report
 COMMANDS["release_note"] = differ_manager.release_note
-COMMANDS["publish_diff_hg19"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER % "hg19")
-COMMANDS["publish_diff_hg38"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER % "hg38")
+COMMANDS["publish_diff_hg19"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-hg19")
+COMMANDS["publish_diff_hg38"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-hg38")
 # indexing commands
 COMMANDS["index"] = index_manager.index
 COMMANDS["snapshot"] = index_manager.snapshot
-COMMANDS["publish_snapshot_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER % "hg19")
-COMMANDS["publish_snapshot_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER % "hg38")
+COMMANDS["snapshot_demo"] = partial(index_manager.snapshot,repository=config.SNAPSHOT_REPOSITORY + "-demo")
+COMMANDS["publish_snapshot_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-hg19")
+COMMANDS["publish_snapshot_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-hg38")
+# demo
+COMMANDS["publish_diff_demo_hg19"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-demo_hg19",
+                                        s3_bucket=config.S3_DIFF_BUCKET + "-demo")
+COMMANDS["publish_diff_demo_hg38"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-demo_hg38",
+                                        s3_bucket=config.S3_DIFF_BUCKET + "-demo")
+COMMANDS["publish_snapshot_demo_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg19",
+                                                                                ro_repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
+COMMANDS["publish_snapshot_demo_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg38",
+                                                                                ro_repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
 
 # admin/advanced
 EXTRA_NS = {
@@ -178,11 +199,12 @@ EXTRA_NS = {
         "dim" : differ_manager,
         "sm" : syncer_manager,
         "im" : index_manager,
+        "jm" : job_manager,
         "mongo_sync" : partial(syncer_manager.sync,"mongo"),
         "es_sync" : partial(syncer_manager.sync,"es"),
         "loop" : loop,
-        "pqueue" : process_queue,
-        "tqueue" : thread_queue,
+        "pqueue" : job_manager.process_queue,
+        "tqueue" : job_manager.thread_queue,
         "g": globals(),
         "sch" : partial(schedule,loop),
         "top" : job_manager.top,

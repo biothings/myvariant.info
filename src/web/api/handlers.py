@@ -37,6 +37,8 @@ class VariantHandler(CommonHandlerMixin, BiothingHandler):
             de = m.group('delim')
             if de and de != ':g.':
                 self.redirect(':g.'.join(self.request.uri.split(de)), permanent=True)
+                return True
+        return False
 
 
 class QueryHandler(CommonHandlerMixin, QueryHandler):
