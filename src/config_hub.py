@@ -27,6 +27,9 @@ MAX_REF_ALT_LEN = 1000
 MAX_REPORTED_IDS = 1000
 # for diff updates, number of IDs randomly picked as examples when rendering the report
 MAX_RANDOMLY_PICKED = 10
+# size in bytes for data contained in a diff file (uncompressed, usually size is 10x smaller
+# at least when compressed)
+MAX_DIFF_SIZE = 50 * 1024**2 # 50MiB
 
 # size of a diff file when in memory (used when merged/reduced)
 MAX_DIFF_SIZE = 50 * 1024**2  # 50MiB (~1MiB on disk when compressed)
@@ -86,6 +89,10 @@ ES_TEST_HG38 = (ES_TEST_HOST,"myvariant_current_hg38","variant")
 ES_PROD_HOST = 'prodserver:9200'
 ES_PROD_HG19 = (ES_PROD_HOST,"myvariant_current_hg19","variant")
 ES_PROD_HG38 = (ES_PROD_HOST,"myvariant_current_hg38","variant")
+
+ES_TIMEOUT = 300
+ES_RETRY = True
+ES_MAX_RETRY = 10
 
 
 # fill with "token", "roomid" and "from" keys

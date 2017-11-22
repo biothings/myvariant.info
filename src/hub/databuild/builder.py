@@ -3,7 +3,7 @@ import asyncio
 from functools import partial
 import datetime, pickle
 
-from biothings.utils.common import iter_n
+from biothings.utils.common import iter_n, open_compressed_file
 from biothings.utils.mongo import id_feeder
 import biothings.utils.mongo as mongo
 import biothings.hub.databuild.builder as builder
@@ -154,3 +154,4 @@ def chrom_worker(col_name, ids):
     at_least_one and bob.execute()
 
     return {"missing": missing, "disagreed" : disagreed, "root_keys" : root_keys}
+

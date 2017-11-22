@@ -1,5 +1,6 @@
 import vcf
 import glob
+import math
 
 from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
 from utils.hgvs import get_hgvs_from_vcf
@@ -15,7 +16,7 @@ def _map_line_to_json(item, keys):
     # the following value could be missing in the vcf record
     # check first if the key exists in the vcf record
     # if not, return None
-    vqslod = info['VQSLOD'] if 'VQSLOD' in info else None
+    vqslod = info['VQSLOD'] if 'VQSLOD' in info and info['VQSLOD'] != math.inf else None
     vqsr_culprit = info['VQSR_culprit'] if 'VQSR_culprit' in info else None
     baseqranksum = info['BaseQRankSum'] if 'BaseQRankSum' in info else None
     clippingranksum = info['ClippingRankSum'] if 'ClippingRankSum' in info else None
@@ -85,10 +86,3 @@ def load_data(input_file):
         for record_mapped in _map_line_to_json(record, keys):
             yield record_mapped
 
-def test():    
-    file_list = glob.glob("/home/kevinxin/gnomad_data/vcf/genomes/*.vcf.gz")
-    for input_file in file_list:
-        print(input_file)
-        vcf_reader = vcf.Reader(filename=input_file)
-        data = next(vcf_reader)
-        print(list(_map_line_to_json(data)))
