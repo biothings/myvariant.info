@@ -65,6 +65,12 @@ GA_ACTION_ANNOTATION_POST = 'variant_post'
 GA_TRACKER_URL = 'MyVariant.info'
 URL_BASE = 'http://myvariant.info'
 
+# for logo on format=html
+HTML_OUT_HEADER_IMG = "/static/favicon.ico"
+
+# for title line on format=html
+HTML_OUT_TITLE = """<p style="font-family:'Open Sans',sans-serif;font-weight:bold; font-size:16px;">MyVariant.info</p>"""
+
 STATUS_CHECK = {
     'id': 'chr1:g.218631822G>A',
     'index': 'myvariant_current_hg19',
