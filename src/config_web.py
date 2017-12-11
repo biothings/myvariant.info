@@ -69,7 +69,11 @@ URL_BASE = 'http://myvariant.info'
 HTML_OUT_HEADER_IMG = "/static/favicon.ico"
 
 # for title line on format=html
-HTML_OUT_TITLE = """<p style="font-family:'Open Sans',sans-serif;font-weight:bold; font-size:16px;">MyVariant.info</p>"""
+HTML_OUT_TITLE = """<p style="font-family:'Open Sans',sans-serif;font-weight:bold; font-size:16px;"><a href="http://myvariant.info" target="_blank" style="text-decoration: none; color: black">MyVariant.info - Variant Annotation as a Service</a></p>"""
+
+METADATA_DOCS_URL = "http://docs.myvariant.info/en/latest/doc/data.html"
+QUERY_DOCS_URL = "http://docs.myvariant.info/en/latest/doc/variant_query_service.html"
+ANNOTATION_DOCS_URL = "http://docs.myvariant.info/en/latest/doc/variant_annotation_service.html"
 
 # kwargs for status check get
 STATUS_CHECK = {
