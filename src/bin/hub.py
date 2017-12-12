@@ -168,7 +168,7 @@ COMMANDS["es_sync_hg38_prod"] = partial(syncer_manager_prod.sync,"es",target_bac
 COMMANDS["es_prod"] = {"hg19":config.ES_PROD_HG19,"hg38":config.ES_PROD_HG38}
 COMMANDS["es_test"] = {"hg19":config.ES_TEST_HG19,"hg38":config.ES_TEST_HG38}
 # diff
-COMMANDS["diff"] = differ_manager.diff
+COMMANDS["diff_demo"] = partial(differ_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
 COMMANDS["diff_hg38"] = partial(differ_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
 COMMANDS["diff_hg19"] = partial(differ_manager.diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
 COMMANDS["report"] = differ_manager.diff_report
