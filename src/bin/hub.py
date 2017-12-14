@@ -158,6 +158,7 @@ COMMANDS["upload_all"] = upload_manager.upload_all
 COMMANDS["snpeff"] = snpeff
 COMMANDS["rebuild_cache"] = rebuild_cache
 # building/merging
+COMMANDS["whatsnew"] = build_manager.whatsnew
 COMMANDS["lsmerge"] = build_manager.list_merge
 COMMANDS["merge"] = build_manager.merge
 COMMANDS["premerge"] = partial(build_manager.merge,steps=["merge","metadata"])
@@ -212,13 +213,9 @@ EXTRA_NS = {
         "done" : done,
         }
 
-passwords = {
-        'guest': '', # guest account with no password
-        }
-
 from biothings.utils.hub import start_server
 
-server = start_server(loop,"MyVariant hub",passwords=passwords,
+server = start_server(loop,"MyVariant hub",passwords=config.HUB_PASSWD,
     port=config.HUB_SSH_PORT,commands=COMMANDS,extra_ns=EXTRA_NS)
 
 try:
