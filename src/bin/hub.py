@@ -205,8 +205,6 @@ COMMANDS["publish_snapshot_demo_hg38"] = partial(index_manager.publish_snapshot,
 # data plugins
 COMMANDS["register_url"] = assistant_manager.register_url
 COMMANDS["unregister_url"] = assistant_manager.unregister_url
-# test
-COMMANDS["dd"] = CompositeCommand("dump('cgi') && dump('cgi')")
 
 # admin/advanced
 EXTRA_NS = {
@@ -237,9 +235,18 @@ shell.set_commands(COMMANDS,EXTRA_NS)
 
 import tornado.web
 from biothings.hub.api import generate_api_routes
+methods = {}
+# all commands are POST (because they act on the data) except...:
+allow_get = ["whatsnew","lsmerge","es_prod","es_test","help"]
+for cmd in COMMANDS:
+    if cmd in allow_get:
+        methods[cmd] = "GET"
+    else:
+        methods[cmd] = "POST"
+
 settings = {'debug': True}
-routes = generate_api_routes(shell,COMMANDS,{},settings=settings)
-routes_extra = generate_api_routes(shell,EXTRA_NS,{},settings=settings)
+routes = generate_api_routes(shell,shell.commands,methods,settings=settings)
+routes_extra = [] #generate_api_routes(shell,EXTRA_NS,{},settings=settings)
 app = tornado.web.Application(routes + routes_extra,settings=settings)
 EXTRA_NS["app"] = app
 
@@ -251,8 +258,7 @@ app_server.listen(config.HUB_API_PORT)
 app_server.start()
 
 server = start_server(loop,"MyVariant hub",passwords=config.HUB_PASSWD,
-                      port=config.HUB_SSH_PORT,commands=COMMANDS,
-                      extra_ns=EXTRA_NS,shell=shell)
+                      port=config.HUB_SSH_PORT,shell=shell)
 
 try:
     loop.run_until_complete(server)
