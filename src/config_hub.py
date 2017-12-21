@@ -3,10 +3,11 @@
 # ######### #
 import os
 
-DATA_HUB_DB_DATABASE = "variant_hubdb"         # db containing the following (internal use)
-DATA_SRC_MASTER_COLLECTION = 'src_master'   # for metadata of each src collections
-DATA_SRC_DUMP_COLLECTION = 'src_dump'       # for src data download information
-DATA_SRC_BUILD_COLLECTION = 'src_build'     # for src data build information
+DATA_HUB_DB_DATABASE = "variant_hubdb"     # db containing the following (internal use)
+DATA_SRC_MASTER_COLLECTION = 'src_master'  # for metadata of each src collections
+DATA_SRC_DUMP_COLLECTION = 'src_dump'      # for src data download information
+DATA_SRC_BUILD_COLLECTION = 'src_build'    # for src data build information
+DATA_PLUGIN_COLLECTION = 'data_plugin'     # for data plugins information
 
 DATA_TARGET_MASTER_COLLECTION = 'db_master'
 
@@ -53,7 +54,7 @@ HUB_MAX_MEM_USAGE = None
 # Max number of *processes* hub can access to run jobs
 HUB_MAX_WORKERS = int(os.cpu_count() / 4)
 # Max number of *threads* hub can use (will default to HUB_MAX_WORKERS if undefined)
-#HUB_MAX_THREADS = HUB_MAX_WORKERS
+HUB_MAX_THREADS = HUB_MAX_WORKERS
 MAX_SYNC_WORKERS = HUB_MAX_WORKERS
 
 # Max queued jobs in job manager
@@ -178,6 +179,9 @@ ES_HOST = ConfigurationError("Define ElasticSearch host used for index creation 
 
 # Path to a folder to store all downloaded files, logs, caches, etc...
 DATA_ARCHIVE_ROOT = ConfigurationError("Define path to folder which will contain all downloaded data, cache files, etc...")
+
+# Path to a folder to store all 3rd party parsers, dumpers, etc...
+DATA_PLUGIN_FOLDER = ConfigurationError("Define path to folder which will contain all 3rd party parsers, dumpers, etc...")
 
 # Path to folder containing diff files
 DIFF_PATH = ConfigurationError("Define path to folder which will contain output files from diff")

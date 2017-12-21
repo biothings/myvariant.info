@@ -48,6 +48,19 @@ dmanager = dumper.DumperManager(job_manager=job_manager)
 dmanager.register_sources(hub.dataload.__sources_dict__)
 dmanager.schedule_all()
 
+# deal with 3rdparty datasources
+import biothings.hub.dataplugin.assistant as assistant
+from biothings.hub.dataplugin.manager import DataPluginManager
+dp_manager = DataPluginManager(job_manager=job_manager)
+assistant_manager = assistant.AssistantManager(data_plugin_manager=dp_manager,
+                                               dumper_manager=dmanager,
+                                               uploader_manager=upload_manager,
+                                               job_manager=job_manager)
+# register available plugin assitant
+assistant_manager.configure()
+# load existing plugins
+assistant_manager.load()
+
 observed = TagObserved(name="observed")
 build_manager = builder.BuilderManager(
         builder_class=partial(MyVariantDataBuilder,mappers=[observed]),
@@ -65,7 +78,6 @@ syncer_manager.configure(klasses=[ESColdHotJsonDiffSelfContainedSyncer,ESJsonDif
 syncer_manager_prod = syncer.SyncerManager(job_manager=job_manager)
 syncer_manager_prod.configure(klasses=[partial(ThrottledESColdHotJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS),
                                        partial(ThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
-
 
 index_manager = indexer.IndexerManager(job_manager=job_manager)
 pindexer = partial(VariantIndexer,es_host=config.ES_HOST,
@@ -145,8 +157,7 @@ def rebuild_cache(build_name=None,sources=None,target=None,force_build=False):
     task = asyncio.ensure_future(do(sources,target))
     return task
 
-
-from biothings.utils.hub import schedule, pending, done
+from biothings.utils.hub import schedule, pending, done, CompositeCommand
 
 COMMANDS = OrderedDict()
 # dump commands
@@ -191,10 +202,17 @@ COMMANDS["publish_snapshot_demo_hg19"] = partial(index_manager.publish_snapshot,
                                                                                 ro_repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
 COMMANDS["publish_snapshot_demo_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg38",
                                                                                 ro_repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
+# data plugins
+COMMANDS["register_url"] = assistant_manager.register_url
+COMMANDS["unregister_url"] = assistant_manager.unregister_url
+# test
+COMMANDS["dd"] = CompositeCommand("dump('cgi') && dump('cgi')")
 
 # admin/advanced
 EXTRA_NS = {
         "dm" : dmanager,
+        "dpm" : dp_manager,
+        "am" : assistant_manager,
         "um" : upload_manager,
         "bm" : build_manager,
         "dim" : differ_manager,
@@ -213,10 +231,28 @@ EXTRA_NS = {
         "done" : done,
         }
 
-from biothings.utils.hub import start_server
+from biothings.utils.hub import start_server, HubShell
+shell = HubShell()
+shell.set_commands(COMMANDS,EXTRA_NS)
+
+import tornado.web
+from biothings.hub.api import generate_api_routes
+settings = {'debug': True}
+routes = generate_api_routes(shell,COMMANDS,{},settings=settings)
+routes_extra = generate_api_routes(shell,EXTRA_NS,{},settings=settings)
+app = tornado.web.Application(routes + routes_extra,settings=settings)
+EXTRA_NS["app"] = app
+
+# register app into current event loop
+import tornado.platform.asyncio
+tornado.platform.asyncio.AsyncIOMainLoop().install()
+app_server = tornado.httpserver.HTTPServer(app)
+app_server.listen(config.HUB_API_PORT)
+app_server.start()
 
 server = start_server(loop,"MyVariant hub",passwords=config.HUB_PASSWD,
-    port=config.HUB_SSH_PORT,commands=COMMANDS,extra_ns=EXTRA_NS)
+                      port=config.HUB_SSH_PORT,commands=COMMANDS,
+                      extra_ns=EXTRA_NS,shell=shell)
 
 try:
     loop.run_until_complete(server)
