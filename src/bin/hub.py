@@ -30,6 +30,7 @@ job_manager = JobManager(loop,num_workers=config.HUB_MAX_WORKERS,
 import hub.dataload
 import biothings.hub.dataload.uploader as uploader
 import biothings.hub.dataload.dumper as dumper
+import biothings.hub.dataload.source as source
 import biothings.hub.databuild.builder as builder
 import biothings.hub.databuild.differ as differ
 import biothings.hub.databuild.syncer as syncer
@@ -41,12 +42,11 @@ from hub.dataindex.indexer import VariantIndexer
 
 # will check every 10 seconds for sources to upload
 upload_manager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=job_manager)
-upload_manager.register_sources(hub.dataload.__sources_dict__)
-upload_manager.poll('upload',lambda doc: upload_manager.upload_src(doc["_id"]))
-
 dmanager = dumper.DumperManager(job_manager=job_manager)
-dmanager.register_sources(hub.dataload.__sources_dict__)
+smanager = source.SourceManager(hub.dataload.__sources_dict__,dmanager,upload_manager)
+
 dmanager.schedule_all()
+upload_manager.poll('upload',lambda doc: upload_manager.upload_src(doc["_id"]))
 
 # deal with 3rdparty datasources
 import biothings.hub.dataplugin.assistant as assistant
@@ -160,6 +160,8 @@ def rebuild_cache(build_name=None,sources=None,target=None,force_build=False):
 from biothings.utils.hub import schedule, pending, done, CompositeCommand
 
 COMMANDS = OrderedDict()
+# getting info
+COMMANDS["info"] = smanager.get_source
 # dump commands
 COMMANDS["dump"] = dmanager.dump_src
 COMMANDS["dump_all"] = dmanager.dump_all
@@ -227,6 +229,10 @@ EXTRA_NS = {
         "top" : job_manager.top,
         "pending" : pending,
         "done" : done,
+        # extra commands for API
+        "source" : smanager.get_sources,
+        "job_manager" : job_manager.job_info,
+        "dump_manager" : dmanager.dump_info,
         }
 
 from biothings.utils.hub import start_server, HubShell
@@ -246,7 +252,7 @@ for cmd in COMMANDS:
 
 settings = {'debug': True}
 routes = generate_api_routes(shell,shell.commands,methods,settings=settings)
-routes_extra = [] #generate_api_routes(shell,EXTRA_NS,{},settings=settings)
+routes_extra = generate_api_routes(shell,EXTRA_NS,{},settings=settings)
 app = tornado.web.Application(routes + routes_extra,settings=settings)
 EXTRA_NS["app"] = app
 
