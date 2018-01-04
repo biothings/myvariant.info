@@ -157,7 +157,9 @@ def rebuild_cache(build_name=None,sources=None,target=None,force_build=False):
     task = asyncio.ensure_future(do(sources,target))
     return task
 
-from biothings.utils.hub import schedule, pending, done, CompositeCommand
+from biothings.utils.hub import schedule, pending, done, CompositeCommand, \
+                                start_server, HubShell
+shell = HubShell()
 
 COMMANDS = OrderedDict()
 # getting info
@@ -233,10 +235,9 @@ EXTRA_NS = {
         "source" : smanager.get_sources,
         "job_manager" : job_manager.job_info,
         "dump_manager" : dmanager.dump_info,
+        "commands" : shell.command_info,
         }
 
-from biothings.utils.hub import start_server, HubShell
-shell = HubShell()
 shell.set_commands(COMMANDS,EXTRA_NS)
 
 import tornado.web
