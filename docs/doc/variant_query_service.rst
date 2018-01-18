@@ -62,9 +62,17 @@ facets
 """"""
     Optional, a single field or comma-separated fields to return facets, for example, "facets=cadd", "facets=cadd,dbsnp.vartype". See `examples of faceted queries here <#faceted-queries>`_.
 
+facet_size
+""""""""""
+    Optional, an integer (1 <= **facet_size <= 1000) that specifies how many buckets to return in a faceted query.
+
 callback
 """"""""
     Optional, you can pass a "**callback**" parameter to make a `JSONP <http://ajaxian.com/archives/jsonp-json-with-padding>`_ call.
+
+dotfield
+""""""""
+    Optional, can be used to control the format of the returned variant object.  If "dotfield" is true, the returned data object is returned flattened (no nested objects) using dotfield notation for key names.  Default: false.
 
 email
 """"""
@@ -138,13 +146,17 @@ Returns the following object:
 
     {
       "_scroll_id": "c2NhbjsxMDs5MjQ2OTc2Ok5nM0d0czYzUlcyU0dUU1dFemo5Mmc7MTE1NTgyNjA6RV9La1c5WklSQy16cVFuRXFzcEV3dzs5MjQ2ODc0Ok5uQkVpaEg5Uk9pYjA4ZVQ3RVh5TWc7OTI0Njg3MTpObkJFaWhIOVJPaWIwOGVUN0VYeU1nOzkyNDY4NzI6Tm5CRWloSDlST2liMDhlVDdFWHlNZzs5MjQ3Mjc3OjRNV2NtY1A5VFdPLUotSmM4a0w1Z0E7OTI0Njk3NzpOZzNHdHM2M1JXMlNHVFNXRXpqOTJnOzkyNDY4NzM6Tm5CRWloSDlST2liMDhlVDdFWHlNZzs5MjQ3MDgxOjE3MEZxVWRXU3BTdC1DMmdYeHdHNXc7MTE1NTgyNTk6RV9La1c5WklSQy16cVFuRXFzcEV3dzsxO3RvdGFsX2hpdHM6NTg3NTk7",
-      "hits": [],
+      "hits": [
+        .
+        .
+        .
+      ],
       "max_score": 0.0,
       "took": 84,
       "total": 58759
     }
 
-At this point a scroll has been set up for your query.  To get the next batch of 1000 unordered results, simply execute a GET request to the following address, supplying the _scroll_id from the first step into the **scroll_id** parameter in the second step::
+At this point, the first 1000 hits have been returned (of ~58,000 total), and a scroll has been set up for your query.  To get the next batch of 1000 unordered results, simply execute a GET request to the following address, supplying the _scroll_id from the first step into the **scroll_id** parameter in the second step::
 
     http://myvariant.info/v1/query?scroll_id=c2NhbjsxMDsxMTU1NjY5MTpxSnFkTFdVQlJ6T1dRVzNQaWRzQkhROzExNTU4MjYxOkVfS2tXOVpJUkMtenFRbkVxc3BFd3c7MTE1NTY2OTI6cUpxZExXVUJSek9XUVczUGlkc0JIUTsxMTU1NjY5MDpxSnFkTFdVQlJ6T1dRVzNQaWRzQkhROzkyNDcyNzg6NE1XY21jUDlUV08tSi1KYzhrTDVnQTs5MjQ2OTc4Ok5nM0d0czYzUlcyU0dUU1dFemo5Mmc7OTI0NzI3OTo0TVdjbWNQOVRXTy1KLUpjOGtMNWdBOzkyNDY4NzU6Tm5CRWloSDlST2liMDhlVDdFWHlNZzs5MjQ3MTEyOlpQb3M5cDh6VDMyNnczenFhMW1hcVE7OTI0NzA4MjoxNzBGcVVkV1NwU3QtQzJnWHh3RzV3OzE7dG90YWxfaGl0czo1ODc1OTs=
 
