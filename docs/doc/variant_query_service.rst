@@ -64,7 +64,7 @@ facets
 
 facet_size
 """"""""""
-    Optional, an integer (1 <= **facet_size <= 1000) that specifies how many buckets to return in a faceted query.
+    Optional, an integer (1 <= **facet_size** <= 1000) that specifies how many buckets to return in a faceted query.
 
 callback
 """"""""
