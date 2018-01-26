@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import asyncio, asyncssh, sys, os
+import asyncio, asyncssh, sys, os, copy
 import concurrent.futures
 import multiprocessing_on_dill
 concurrent.futures.process.multiprocessing = multiprocessing_on_dill
@@ -35,10 +35,15 @@ import biothings.hub.databuild.builder as builder
 import biothings.hub.databuild.differ as differ
 import biothings.hub.databuild.syncer as syncer
 import biothings.hub.dataindex.indexer as indexer
+import biothings.hub.datainspect.inspector as inspector
 #import biothings.hub.dataindex.idcache as idcache
 from hub.databuild.builder import MyVariantDataBuilder
 from hub.databuild.mapper import TagObserved
 from hub.dataindex.indexer import VariantIndexer
+from biothings.utils.hub import schedule, pending, done, CompositeCommand, \
+                                start_server, HubShell, CommandDefinition
+
+shell = HubShell()
 
 # will check every 10 seconds for sources to upload
 upload_manager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=job_manager)
@@ -46,7 +51,7 @@ dmanager = dumper.DumperManager(job_manager=job_manager)
 smanager = source.SourceManager(hub.dataload.__sources_dict__,dmanager,upload_manager)
 
 dmanager.schedule_all()
-upload_manager.poll('upload',lambda doc: upload_manager.upload_src(doc["_id"]))
+upload_manager.poll('upload',lambda doc: shell.launch(partial(upload_manager.upload_src,doc["_id"])))
 
 # deal with 3rdparty datasources
 import biothings.hub.dataplugin.assistant as assistant
@@ -69,6 +74,10 @@ build_manager.configure()
 
 differ_manager = differ.DifferManager(job_manager=job_manager)
 differ_manager.configure([differ.ColdHotSelfContainedJsonDiffer,differ.SelfContainedJsonDiffer])
+
+inspector = inspector.InspectorManager(upload_manager=upload_manager,
+                                       build_manager=build_manager,
+                                       job_manager=job_manager)
 
 from biothings.hub.databuild.syncer import ThrottledESColdHotJsonDiffSelfContainedSyncer, ThrottledESJsonDiffSelfContainedSyncer, \
                                            ESColdHotJsonDiffSelfContainedSyncer, ESJsonDiffSelfContainedSyncer
@@ -157,13 +166,9 @@ def rebuild_cache(build_name=None,sources=None,target=None,force_build=False):
     task = asyncio.ensure_future(do(sources,target))
     return task
 
-from biothings.utils.hub import schedule, pending, done, CompositeCommand, \
-                                start_server, HubShell
-shell = HubShell()
-
 COMMANDS = OrderedDict()
 # getting info
-COMMANDS["info"] = smanager.get_source
+COMMANDS["source_info"] = CommandDefinition(command=smanager.get_source,tracked=False)
 # dump commands
 COMMANDS["dump"] = dmanager.dump_src
 COMMANDS["dump_all"] = dmanager.dump_all
@@ -175,6 +180,7 @@ COMMANDS["rebuild_cache"] = rebuild_cache
 # building/merging
 COMMANDS["whatsnew"] = build_manager.whatsnew
 COMMANDS["lsmerge"] = build_manager.list_merge
+COMMANDS["rmmerge"] = build_manager.delete_merge
 COMMANDS["merge"] = build_manager.merge
 COMMANDS["premerge"] = partial(build_manager.merge,steps=["merge","metadata"])
 COMMANDS["es_sync_hg19_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_HG19)
@@ -197,6 +203,8 @@ COMMANDS["snapshot"] = index_manager.snapshot
 COMMANDS["snapshot_demo"] = partial(index_manager.snapshot,repository=config.SNAPSHOT_REPOSITORY + "-demo")
 COMMANDS["publish_snapshot_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-hg19")
 COMMANDS["publish_snapshot_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-hg38")
+# inspector
+COMMANDS["inspect"] = inspector.inspect
 # demo
 COMMANDS["publish_diff_demo_hg19"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-demo_hg19",
                                         s3_bucket=config.S3_DIFF_BUCKET + "-demo")
@@ -207,54 +215,73 @@ COMMANDS["publish_snapshot_demo_hg19"] = partial(index_manager.publish_snapshot,
 COMMANDS["publish_snapshot_demo_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg38",
                                                                                 ro_repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
 # data plugins
-COMMANDS["register_url"] = assistant_manager.register_url
-COMMANDS["unregister_url"] = assistant_manager.unregister_url
+COMMANDS["register_url"] = partial(assistant_manager.register_url)
+COMMANDS["unregister_url"] = partial(assistant_manager.unregister_url)
 
 # admin/advanced
 EXTRA_NS = {
-        "dm" : dmanager,
-        "dpm" : dp_manager,
-        "am" : assistant_manager,
-        "um" : upload_manager,
-        "bm" : build_manager,
-        "dim" : differ_manager,
-        "sm" : syncer_manager,
-        "im" : index_manager,
-        "jm" : job_manager,
-        "mongo_sync" : partial(syncer_manager.sync,"mongo"),
-        "es_sync" : partial(syncer_manager.sync,"es"),
-        "loop" : loop,
-        "pqueue" : job_manager.process_queue,
-        "tqueue" : job_manager.thread_queue,
-        "g": globals(),
-        "sch" : partial(schedule,loop),
-        "top" : job_manager.top,
-        "pending" : pending,
-        "done" : done,
+        "dm" : CommandDefinition(command=dmanager,tracked=False),
+        "dpm" : CommandDefinition(command=dp_manager,tracked=False),
+        "am" : CommandDefinition(command=assistant_manager,tracked=False),
+        "um" : CommandDefinition(command=upload_manager,tracked=False),
+        "bm" : CommandDefinition(command=build_manager,tracked=False),
+        "dim" : CommandDefinition(command=differ_manager,tracked=False),
+        "sm" : CommandDefinition(command=syncer_manager,tracked=False),
+        "im" : CommandDefinition(command=index_manager,tracked=False),
+        "jm" : CommandDefinition(command=job_manager,tracked=False),
+        "ism" : CommandDefinition(command=inspector,tracked=False),
+        "mongo_sync" : CommandDefinition(command=partial(syncer_manager.sync,"mongo"),tracked=False),
+        "es_sync" : CommandDefinition(command=partial(syncer_manager.sync,"es"),tracked=False),
+        "loop" : CommandDefinition(command=loop,tracked=False),
+        "pqueue" : CommandDefinition(command=job_manager.process_queue,tracked=False),
+        "tqueue" : CommandDefinition(command=job_manager.thread_queue,tracked=False),
+        "g" : CommandDefinition(command=globals(),tracked=False),
+        "sch" : CommandDefinition(command=partial(schedule,loop),tracked=False),
+        "top" : CommandDefinition(command=job_manager.top,tracked=False),
+        "pending" : CommandDefinition(command=pending,tracked=False),
+        "done" : CommandDefinition(command=done,tracked=False),
+        # required by API only (just fyi)
+        "builds" : CommandDefinition(command=build_manager.build_info,tracked=False),
+        "build" : CommandDefinition(command=lambda id,*args,**kwargs: build_manager.build_info(id=id,*args,**kwargs),tracked=False),
+        "job_info" : CommandDefinition(command=job_manager.job_info,tracked=False),
+        "dump_info" : CommandDefinition(command=dmanager.dump_info,tracked=False),
+        "upload_info" : CommandDefinition(command=upload_manager.upload_info,tracked=False),
+        "build_config_info" : CommandDefinition(command=build_manager.build_config_info,tracked=False),
+        "commands" : CommandDefinition(command=shell.command_info,tracked=False),
+        "command" : CommandDefinition(command=lambda id,*args,**kwargs: shell.command_info(id=id,*args,**kwargs),tracked=False),
+        "sources" : CommandDefinition(command=smanager.get_sources,tracked=False),
+}
+
+import tornado.web
+from biothings.hub.api import generate_api_routes, EndpointDefinition
+
+API_ENDPOINTS = {
         # extra commands for API
-        "source" : smanager.get_sources,
-        "job_manager" : job_manager.job_info,
-        "dump_manager" : dmanager.dump_info,
-        "commands" : shell.command_info,
+        "builds" : EndpointDefinition(name="builds",method="get"),
+        "build" : [EndpointDefinition(method="get",name="build"),
+                   EndpointDefinition(method="delete",name="rmmerge"),
+                   EndpointDefinition(method="post",name="merge",)],
+        "job_manager" : EndpointDefinition(name="job_info",method="get"),
+        "dump_manager": EndpointDefinition(name="dump_info", method="get"),
+        "upload_manager" : EndpointDefinition(name="upload_info",method="get"),
+        "build_manager" : EndpointDefinition(name="build_config_info",method="get"),
+        "commands" : EndpointDefinition(name="commands",method="get"),
+        "command" : EndpointDefinition(name="command",method="get"),
+        "sources" : EndpointDefinition(name="sources",method="get"),
+        "source" : [EndpointDefinition(name="source_info",method="get"),
+                    EndpointDefinition(name="dump",method="put",suffix="dump"),
+                    EndpointDefinition(name="upload",method="put",suffix="upload")],
+        "inspect" : EndpointDefinition(name="inspect",method="put",force_bodyargs=True),
+        "dataplugin/register_url" : EndpointDefinition(name="register_url",method="post",force_bodyargs=True),
+        "dataplugin/unregister_url" : EndpointDefinition(name="unregister_url",method="delete",force_bodyargs=True)
         }
 
 shell.set_commands(COMMANDS,EXTRA_NS)
 
-import tornado.web
-from biothings.hub.api import generate_api_routes
-methods = {}
-# all commands are POST (because they act on the data) except...:
-allow_get = ["whatsnew","lsmerge","es_prod","es_test","help"]
-for cmd in COMMANDS:
-    if cmd in allow_get:
-        methods[cmd] = "GET"
-    else:
-        methods[cmd] = "POST"
-
 settings = {'debug': True}
-routes = generate_api_routes(shell,shell.commands,methods,settings=settings)
-routes_extra = generate_api_routes(shell,EXTRA_NS,{},settings=settings)
-app = tornado.web.Application(routes + routes_extra,settings=settings)
+routes = generate_api_routes(shell, API_ENDPOINTS,settings=settings)
+#routes = generate_api_routes(shell, {"source" : API_ENDPOINTS["source"]},settings=settings)
+app = tornado.web.Application(routes,settings=settings)
 EXTRA_NS["app"] = app
 
 # register app into current event loop
