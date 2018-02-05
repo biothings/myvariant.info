@@ -92,7 +92,6 @@ class MyVariantDataBuilder(builder.DataBuilder):
             src_build = self.source_backend.build
             src_build.update({'_id': self.target_backend.target_name},{"$set":{"_meta.stats":root_keys}})
 
-
         return results
 
     def post_merge(self, source_names, batch_size, job_manager):
@@ -148,8 +147,11 @@ def chrom_worker(col_name, ids):
             at_least_one = True
         # count root keys for later metadata
         for k in doc:
-            root_keys.setdefault(k,0)
-            root_keys[k] += 1
+            # other root keys are actual sources and
+            # are counted under "src" key while merge_stats
+            if k in ["_id","vcf","total","hg19","hg38","observed"]:
+                root_keys.setdefault(k,0)
+                root_keys[k] += 1
 
     at_least_one and bob.execute()
 
