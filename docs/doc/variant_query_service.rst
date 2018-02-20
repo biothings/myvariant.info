@@ -7,7 +7,7 @@ Variant query service
              :alt: information!
 
 
-This page describes the reference for MyVariant.info variant query web service. It's also recommended to try it live on our `interactive API page <http://myvariant.info/v1/api>`_.
+This page describes the reference for MyVariant.info variant query web service. It's also recommended to try it live on our `interactive API page <http://myvariant.info/tryapi/>`_.
 
 
 Service endpoint

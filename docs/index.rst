@@ -27,7 +27,7 @@ Documentation
 .. toctree::
     :maxdepth: 3
 
-    Try it live on interactive API page <http://myvariant.info/v1/api>
+    Try it live on interactive API page <http://myvariant.info/tryapi/>
     doc/data    
     doc/release_changes
     doc/variant_query_service
