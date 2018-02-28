@@ -23,7 +23,8 @@ class VariantIndexer(indexer.Indexer):
         return mapping
 
     def get_index_creation_settings(self):
-        return {"codec" : "best_compression"}
+        settings = super(VariantIndexer,self).get_index_creation_settings()
+        return settings
 
     # TODO: that should done during release publishing, whether it's from an index or diff
     #def post_index(self, target_name, index_name, job_manager, steps=["index","post"], batch_size=10000, ids=None, mode=None):

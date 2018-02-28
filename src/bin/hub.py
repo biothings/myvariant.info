@@ -89,12 +89,15 @@ syncer_manager_prod.configure(klasses=[partial(ThrottledESColdHotJsonDiffSelfCon
                                        partial(ThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
 
 index_manager = indexer.IndexerManager(job_manager=job_manager)
-pindexer = partial(VariantIndexer,es_host=config.ES_HOST,
+test_pindexer = partial(VariantIndexer,es_host=config.ES_TEST_HOST,
+                   timeout=config.ES_TIMEOUT,max_retries=config.ES_MAX_RETRY,
+                   retry_on_timeout=config.ES_RETRY)
+prod_pindexer = partial(VariantIndexer,es_host=config.ES_PROD_HOST,
                    timeout=config.ES_TIMEOUT,max_retries=config.ES_MAX_RETRY,
                    retry_on_timeout=config.ES_RETRY)
 #pidcacher = partial(idcache.RedisIDCache,connection_params=config.REDIS_CONNECTION_PARAMS)
 #coldhot_pindexer = partial(indexer.ColdHotIndexer,pidcacher=pidcacher,es_host=config.ES_HOST)
-index_manager.configure([{"default":pindexer}])
+index_manager.configure([{"test":test_pindexer},{"prod":prod_pindexer}])
 
 import biothings.utils.mongo as mongo
 def snpeff(build_name=None,sources=[], force_use_cache=True):
@@ -219,6 +222,7 @@ COMMANDS["register_url"] = partial(assistant_manager.register_url)
 COMMANDS["unregister_url"] = partial(assistant_manager.unregister_url)
 
 # admin/advanced
+from biothings.utils.jsondiff import make as jsondiff
 EXTRA_NS = {
         "dm" : CommandDefinition(command=dmanager,tracked=False),
         "dpm" : CommandDefinition(command=dp_manager,tracked=False),
@@ -247,9 +251,15 @@ EXTRA_NS = {
         "dump_info" : CommandDefinition(command=dmanager.dump_info,tracked=False),
         "upload_info" : CommandDefinition(command=upload_manager.upload_info,tracked=False),
         "build_config_info" : CommandDefinition(command=build_manager.build_config_info,tracked=False),
+        "index_info" : CommandDefinition(command=index_manager.index_info,tracked=False),
         "commands" : CommandDefinition(command=shell.command_info,tracked=False),
         "command" : CommandDefinition(command=lambda id,*args,**kwargs: shell.command_info(id=id,*args,**kwargs),tracked=False),
         "sources" : CommandDefinition(command=smanager.get_sources,tracked=False),
+        "save_mapping" : CommandDefinition(command=smanager.save_mapping),
+        "validate_mapping" : CommandDefinition(command=index_manager.validate_mapping),
+        "jsondiff" : CommandDefinition(command=jsondiff,tracked=False),
+        "create_build_conf" : CommandDefinition(command=build_manager.create_build_configuration),
+        "delete_build_conf" : CommandDefinition(command=build_manager.delete_build_configuration),
 }
 
 import tornado.web
@@ -260,20 +270,26 @@ API_ENDPOINTS = {
         "builds" : EndpointDefinition(name="builds",method="get"),
         "build" : [EndpointDefinition(method="get",name="build"),
                    EndpointDefinition(method="delete",name="rmmerge"),
-                   EndpointDefinition(method="post",name="merge",)],
+                   EndpointDefinition(name="merge",method="put",suffix="new"),],
         "job_manager" : EndpointDefinition(name="job_info",method="get"),
         "dump_manager": EndpointDefinition(name="dump_info", method="get"),
         "upload_manager" : EndpointDefinition(name="upload_info",method="get"),
         "build_manager" : EndpointDefinition(name="build_config_info",method="get"),
+        "index_manager" : EndpointDefinition(name="index_info",method="get"),
         "commands" : EndpointDefinition(name="commands",method="get"),
         "command" : EndpointDefinition(name="command",method="get"),
         "sources" : EndpointDefinition(name="sources",method="get"),
         "source" : [EndpointDefinition(name="source_info",method="get"),
                     EndpointDefinition(name="dump",method="put",suffix="dump"),
-                    EndpointDefinition(name="upload",method="put",suffix="upload")],
+                    EndpointDefinition(name="upload",method="put",suffix="upload"),
+                    EndpointDefinition(name="save_mapping",method="put",suffix="mapping")],
         "inspect" : EndpointDefinition(name="inspect",method="put",force_bodyargs=True),
         "dataplugin/register_url" : EndpointDefinition(name="register_url",method="post",force_bodyargs=True),
-        "dataplugin/unregister_url" : EndpointDefinition(name="unregister_url",method="delete",force_bodyargs=True)
+        "dataplugin/unregister_url" : EndpointDefinition(name="unregister_url",method="delete",force_bodyargs=True),
+        "jsondiff" : EndpointDefinition(name="jsondiff",method="post",force_bodyargs=True),
+        "mapping/validate" : EndpointDefinition(name="validate_mapping",method="post",force_bodyargs=True),
+        "buildconf" : [EndpointDefinition(name="create_build_conf",method="post",force_bodyargs=True),
+                       EndpointDefinition(name="delete_build_conf",method="delete",force_bodyargs=True)],
         }
 
 shell.set_commands(COMMANDS,EXTRA_NS)
