@@ -9,16 +9,14 @@ from biothings.utils.aws import send_s3_file
 
 class VariantIndexer(indexer.Indexer):
 
-    def get_mapping(self, enable_timestamp=True):
-        mapping = super(VariantIndexer,self).get_mapping(enable_timestamp=enable_timestamp)
+    def get_mapping(self):
+        mapping = super(VariantIndexer,self).get_mapping()
         # enrich with myvariant specific stuff
         mapping["properties"]["chrom"] = {
             'analyzer': 'string_lowercase',
-            'include_in_all': False,
-            'type': 'string'}
+            'type': 'text'}
         mapping["properties"]["observed"] = {
-            "type": "boolean",
-            'include_in_all': False}
+            "type": "boolean"}
 
         return mapping
 
