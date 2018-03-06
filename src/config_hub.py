@@ -84,19 +84,32 @@ S3_DIFF_BUCKET = "biothings-diffs"
 S3_APP_FOLDER = "myvariant.info" # hg19/hg38 will be concat
 
 # Pre-prod/test ES definitions
-# (see bt.databuild.backend.create_backend() for the notation)
-ES_TEST_HOST = 'localhost:9200'
-ES_TEST_HG19 = (ES_TEST_HOST,"myvariant_current_hg19","variant")
-ES_TEST_HG38 = (ES_TEST_HOST,"myvariant_current_hg38","variant")
-# Prod ES definitions
-ES_PROD_HOST = 'prodserver:9200'
-ES_PROD_HG19 = (ES_PROD_HOST,"myvariant_current_hg19","variant")
-ES_PROD_HG38 = (ES_PROD_HOST,"myvariant_current_hg38","variant")
-
-ES_TIMEOUT = 300
-ES_RETRY = True
-ES_MAX_RETRY = 10
-
+ES_CONFIG = {
+        "build_config_key" : "assembly", # used to select proper idxr/syncer
+        "env" : {
+            "prod" : {
+                "host" : "prodserver:9200",
+                "timeout" : 300,
+                "retry" : True,
+                "max_retry" : 10,
+                "index" : {
+                    # keys match build_config_key value
+                    "hg19" : {"index": "myvariant_current_hg19", "doc_type": "variant"},
+                    "hg38" : {"index": "myvariant_current_hg38", "doc_type": "variant"},
+                    },
+                },
+            "test" : {
+                "host" : "localhost:9200",
+                "timeout" : 300,
+                "retry" : True,
+                "max_retry" : 10,
+                "index" : {
+                    "hg19" : {"index" : "myvariant_current_hg19", "doc_type": "variant"},
+                    "hg38" : {"index" : "myvariant_current_hg38", "doc_type": "variant"},
+                    },
+                }
+            },
+        }
 
 # fill with "token", "roomid" and "from" keys
 # to broadcast message to a Hipchat room
