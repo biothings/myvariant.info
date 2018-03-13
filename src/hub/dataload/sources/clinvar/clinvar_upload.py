@@ -43,31 +43,31 @@ class ClinvarBaseUploader(SnpeffPostUpdateUploader):
                         }
                     },
                     "omim": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "uniprot": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "cosmic": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "dbvar": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "chrom": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "gene": {
                         "properties": {
                             "symbol": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase",
-                                "include_in_all": True
+                                "copy_to" : ["all"],
                             },
                             "id": {
                                 "type": "long"
@@ -77,91 +77,91 @@ class ClinvarBaseUploader(SnpeffPostUpdateUploader):
                     "genotypeset": {
                         "properties": {
                             "type": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "genotype": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             }
                         }
                     },
                     "type": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "rsid": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase",
-                        "include_in_all": True
+                        "copy_to" : ["all"],
                     },
                     "rcv": {
                         #"type": "nested",
                         #"include_in_parent": True,     # NOTE: this is not available in ES 2.x
                         "properties": {
                             "accession": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase",
-                                "include_in_all": True
+                                "copy_to" : ["all"],
                             },
                             "clinical_significance": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "number_submitters": {
                                 "type": "byte"
                             },
                             "review_status": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "last_evaluated": {
                                 "type": "date"
                             },
                             "preferred_name": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "origin": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "conditions": {
                                 "properties": {
                                     "name": {
-                                        "type": "string"
+                                        "type": "text"
                                     },
                                     "synonyms": {
-                                        "type": "string"
+                                        "type": "text"
                                     },
                                     "identifiers": {
                                         "properties": {
                                             "efo": {
-                                                "type": "string",
+                                                "type": "text",
                                                 "analyzer": "string_lowercase"
                                             },
                                             "gene": {
-                                                "type": "string",
+                                                "type": "text",
                                                 "analyzer": "string_lowercase"
                                             },
                                             "medgen": {
-                                                "type": "string",
+                                                "type": "text",
                                                 "analyzer": "string_lowercase"
                                             },
                                             "omim": {
-                                                "type": "string",
+                                                "type": "text",
                                                 "analyzer": "string_lowercase"
                                             },
                                             "orphanet": {
-                                                "type": "string",
+                                                "type": "text",
                                                 "analyzer": "string_lowercase"
                                             },
                                             "human_phenotype_ontology": {
-                                                "type": "string",
+                                                "type": "text",
                                                 "analyzer": "string_lowercase"
                                             }
                                         }
                                     },
                                     "age_of_onset": {
-                                        "type": "string",
+                                        "type": "text",
                                         "analyzer": "string_lowercase"
                                     }
                                 }
@@ -169,7 +169,7 @@ class ClinvarBaseUploader(SnpeffPostUpdateUploader):
                         }
                     },
                     "cytogenic": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "allele_id": {
@@ -182,34 +182,34 @@ class ClinvarBaseUploader(SnpeffPostUpdateUploader):
                         "type": "boolean"
                     },
                     "ref": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "alt": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "hgvs": {
                         "properties": {
                             "genomic": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase",
-                                "include_in_all": True
+                                "copy_to" : ["all"],
                             },
                             "coding": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase",
-                                "include_in_all": True
+                                "copy_to" : ["all"],
                             },
                             "non-coding": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase",
-                                "include_in_all": True
+                                "copy_to" : ["all"],
                             },
                             "protein": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase",
-                                "include_in_all": True
+                                "copy_to" : ["all"],
                             }
                         }
                     }

@@ -14,56 +14,56 @@ class DOCMUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
             "docm": {
                 "properties": {
                     "domain": {
-                        "type": "string"
+                        "type": "text"
                     },
                     "all_domains": {
-                        "type": "string"
+                        "type": "text"
                     },
                     "ref": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "alt": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "primary": {
                         "type": "byte"           # just 0 or 1
                     },
                     "transcript_species": {
-                        "type": "string",
-                        "index": "no"
+                        "type": "text",
+                        "index" : False
                     },
                     "ensembl_gene_id": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "transcript_version": {
-                        "type": "string",
-                        "index": "no"
+                        "type": "text",
+                        "index" : False
                     },
                     "transcript_source": {
-                        "type": "string",
-                        "index": "no"
+                        "type": "text",
+                        "index" : False
                     },
                     "source": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "pubmed_id": {
-                        "type": "string",
-                        "index": "not_analyzed"
+                        # not_analyzed
+                        "type":"keyword",
                     },
                     "type": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "doid": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "c_position": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "hg19": {
@@ -78,56 +78,56 @@ class DOCMUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                     },
                     "strand": {
                         "type": "byte",
-                        "index": "no"
+                        "index" : False
                     },
                     "deletion_substructures": {
-                        "type": "string",
-                        "index": "no"
+                        "type": "text",
+                        "index" : False
                     },
                     "genename_source": {
-                        "type": "string",
-                        "index": "no"
+                        "type": "text",
+                        "index" : False
                     },
                     "default_gene_name": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "aa_change": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "url": {
-                        "type": "string",
-                        "index": "no"
+                        "type": "text",
+                        "index" : False
                     },
                     "transcript_status": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "trv_type": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "disease": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "transcript_name": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "chrom": {
-                        "type": "string",                 # actual value is integer
+                        "type": "text",                 # actual value is integer
                         "analyzer": "string_lowercase"
                     },
                     "transcript_error": {
-                        "type": "string",
-                        "index": "no"
+                        "type": "text",
+                        "index" : False
                     },
                     "genename": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase",
-                        "include_in_all": True
+                        "copy_to" : ["all"]
                     },
                     "ucsc_cons": {
                         "type": "double"

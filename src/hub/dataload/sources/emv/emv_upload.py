@@ -35,32 +35,32 @@ class EMVUploader(SnpeffPostUpdateUploader):
             "emv": {
                 "properties": {
                     "gene": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase",
-                        "include_in_all": True
+                        "copy_to" : ["all"]
                     },
                     "egl_variant": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase",
-                        "include_in_all": True
+                        "copy_to" : ["all"]
                     },
                     "egl_protein": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "egl_classification": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "hgvs": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase",
-                        "include_in_all": True
+                        "copy_to" : ["all"]
                     },
                     "clinvar_rcv": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase",
-                        "include_in_all": True
+                        "copy_to" : ["all"]
                     }
                 }
             }

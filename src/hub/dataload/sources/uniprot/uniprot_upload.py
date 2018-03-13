@@ -20,36 +20,36 @@ class UniprotUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
             "uniprot": {
                 "properties": {
                     "source_db_id": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "clinical_significance": {
-                        "type": "string",
+                        "type": "text",
                     },
                     "phenotype_disease": {
-                        "type": "string",
+                        "type": "text",
                     },
                     "phenotype_disease_source": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "humsavar": {
                         "properties": {
                             "swiss_prot_ac": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "ftid": {
-                                "include_in_all": True,
-                                "type": "string",
+                                "copy_to" : ["all"],
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "type_of_variant": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "disease_name": {
-                                "type": "string",
+                                "type": "text",
                             }
                         }
                     }

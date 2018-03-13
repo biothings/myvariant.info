@@ -46,7 +46,7 @@ class GraspUploader(uploader.IgnoreDuplicatedSourceUploader,
                     "hg19": {
                         "properties": {
                             "chr": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "pos": {
@@ -58,70 +58,70 @@ class GraspUploader(uploader.IgnoreDuplicatedSourceUploader,
                         "type": "long"
                     },
                     "hugfield": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "publication": {
                         "properties": {
                             "journal": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "title": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "pmid": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "snpid": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "location_within_paper": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "p_value": {
                                 "type": "float"
                             },
                             "phenotype": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "paper_phenotype_description": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "paper_phenotype_categories": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             }
                         }
                     },
                     "includes_male_female_only_analyses": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "exclusively_male_female": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "initial_sample_description": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "replication_sample_description": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "platform_snps_passing_qc": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "gwas_ancestry_description": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "discovery": {
@@ -211,47 +211,47 @@ class GraspUploader(uploader.IgnoreDuplicatedSourceUploader,
                         }
                     },
                     "in_gene": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "nearest_gene": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "in_mirna": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "in_mirna_bs": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "oreg_anno": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "human_enhancer": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "rna_edit": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "polyphen2": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "sift": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "uniprot": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "eqtl_meth_metab_study": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     }
                 }

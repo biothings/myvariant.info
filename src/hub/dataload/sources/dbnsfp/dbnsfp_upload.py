@@ -29,12 +29,12 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
             "dbnsfp": {
                 "properties": {
                     "rsid": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase",
-                        "include_in_all": True
+                        "copy_to" : ["all"]
                     },
                     "chrom": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "hg18": {
@@ -68,26 +68,26 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                         }
                     },
                     "ref": {
-                        "type": "string"
+                        "type": "text"
                     },
                     "alt": {
-                        "type": "string"
+                        "type": "text"
                     },
                     "aa": {
                         "properties": {
                             "alt": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "ref": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "pos": {
                                 "type": "integer"
                             },
                             "refcodon": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "codonpos": {
                                 "type": "integer"
@@ -98,39 +98,39 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                         }
                     },
                     "genename": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase",
-                        "include_in_all": True
+                        "copy_to" : ["all"]
                     },
                     "uniprot": {
                         "properties": {
                             "acc": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "pos": {
-                                "type": "string"
+                                "type": "text"
                             }
                         }
                     },
                     "interpro_domain": {
-                        "type": "string"
+                        "type": "text"
                     },
                     "cds_strand": {
-                        "type": "string"
+                        "type": "text"
                     },
                     "ancestral_allele": {
-                        "type": "string"
+                        "type": "text"
                     },
                     "ensembl": {
                         "properties": {
                             "transcriptid": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "geneid": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "proteinid": {
-                                "type": "string"
+                                "type": "text"
                             }
                         }
                     },
@@ -140,7 +140,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "pred": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "score": {
                                 "type": "float"
@@ -152,7 +152,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "hdiv": {
                                 "properties": {
                                     "pred": {
-                                        "type": "string"
+                                        "type": "text"
                                     },
                                     "score": {
                                         "type": "float"
@@ -165,7 +165,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "hvar": {
                                 "properties": {
                                     "pred": {
-                                        "type": "string"
+                                        "type": "text"
                                     },
                                     "score": {
                                         "type": "float"
@@ -183,7 +183,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "pred": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "score": {
                                 "type": "float"
@@ -199,24 +199,24 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "pred": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "score": {
                                 "type": "float"
                             },
                             "model": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "AAE": {
-                                "type": "string"
+                                "type": "text"
                             }
                         }
                     },
                     "mutationassessor": {
                         "properties": {
                             "pred": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "score": {
                                 "type": "float"
@@ -229,7 +229,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                     "fathmm": {
                         "properties": {
                             "pred": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "score": {
                                 "type": "float"
@@ -248,7 +248,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "pred": {
-                                "type": "string"
+                                "type": "text"
                             }
                         }
                     },
@@ -261,10 +261,10 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "transcriptid": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "transcriptvar": {
-                                "type": "string"
+                                "type": "text"
                             }
                         }
                     },
@@ -277,11 +277,11 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "coding_pred": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "coding_group": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             }
                         }
@@ -328,7 +328,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "pred": {
-                                "type": "string"
+                                "type": "text"
                             }
                         }
                     },
@@ -341,7 +341,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "pred": {
-                                "type": "string"
+                                "type": "text"
                             }
                         }
                     },
@@ -390,15 +390,15 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "accession": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "aa_change": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "pred": {
                                 "properties": {
                                     "mechanism": {
-                                        "type": "string"
+                                        "type": "text"
                                     },
                                     "p_val": {
                                         "type": "float"
@@ -762,8 +762,8 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                     "clinvar": {
                         "properties": {
                             "rs": {
-                                "type": "string",
-                                "include_in_all": True
+                                "type": "text",
+                                "copy_to" : ["all"]
                             },
                              "clinsig": {
                                  "type": "integer"
@@ -772,17 +772,17 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                  "type" : "integer"
                              },
                             "trait": {
-                                "type": "string"
+                                "type": "text"
                             }
                         }
                     },
                     "gtex": {
                         "properties": {
                             "gene": {
-                                "type": "string"
+                                "type": "text"
                             },
                             "tissue": {
-                                "type": "string"
+                                "type": "text"
                             }
                         }
                     }

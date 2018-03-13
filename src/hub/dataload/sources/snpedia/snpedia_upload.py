@@ -22,7 +22,7 @@ class SnpediaUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
             "snpedia": {
                 "properties": {
                     "text": {
-                        "type": "string"
+                        "type": "text"
                     }
                 }
             }

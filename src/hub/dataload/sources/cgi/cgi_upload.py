@@ -30,43 +30,43 @@ class CGIUploader(SnpeffPostUpdateUploader):
                 "properties": {
                     'association': {
                         'analyzer': 'string_lowercase',
-                        'type': 'string'
+                        'type': 'text'
                     },
                     'cdna': {
                         'analyzer': 'string_lowercase',
-                        'type': 'string'
+                        'type': 'text'
                     },
                     'drug': {
                         'analyzer': 'string_lowercase',
-                        'type': 'string'
+                        'type': 'text'
                     },
                     'evidence_level': {
                         'analyzer': 'string_lowercase',
-                        'type': 'string'
+                        'type': 'text'
                     },
                     'gene': {
                         'analyzer': 'string_lowercase',
-                        'type': 'string'
+                        'type': 'text'
                     },
                     'primary_tumor_type': {
                         'analyzer': 'string_lowercase',
-                        'type': 'string'
+                        'type': 'text'
                     },
                     'protein_change': {
                         'analyzer': 'string_lowercase',
-                        'type': 'string'
+                        'type': 'text'
                     },
                     'region': {
                         'analyzer': 'string_lowercase',
-                        'type': 'string'
+                        'type': 'text'
                     },
                     'source': {
                         'analyzer': 'string_lowercase',
-                        'type': 'string'
+                        'type': 'text'
                     },
                     'transcript': {
                         'analyzer': 'string_lowercase',
-                        'type': 'string'
+                        'type': 'text'
                     }
                 }
             }

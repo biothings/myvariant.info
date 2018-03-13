@@ -21,7 +21,7 @@ class CosmicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
             "cosmic": {
                 "properties": {
                     "chrom": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "hg19": {
@@ -35,25 +35,25 @@ class CosmicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                         }
                     },
                     "tumor_site": {
-                        "type": "string"
+                        "type": "text"
                     },
                     "cosmic_id": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "mut_nt": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "mut_freq": {
                         "type": "float"
                     },
                     "ref": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "alt": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     }
                 }

@@ -236,7 +236,7 @@ class GnomadExomesUploader(GnomadBaseUploader):
                         }
                     },
                     "type": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "an": {
@@ -331,15 +331,15 @@ class GnomadExomesUploader(GnomadBaseUploader):
                         }
                     },
                     "filter": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "vqsr_culprit": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "ref": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "clippingranksum": {
@@ -433,7 +433,7 @@ class GnomadExomesUploader(GnomadBaseUploader):
                         "type": "float"
                     },
                     "alt": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "qd": {
@@ -443,19 +443,19 @@ class GnomadExomesUploader(GnomadBaseUploader):
                         "type": "float"
                     },
                     "alleles": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "chrom": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "multi-allelic": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "rsid": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     #"gc": {
@@ -688,7 +688,7 @@ class GnomadGenomesUploader(GnomadBaseUploader, uploader.ParallelizedSourceUploa
                         }
                     },
                     "rsid": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     #"gc": {
@@ -771,14 +771,14 @@ class GnomadGenomesUploader(GnomadBaseUploader, uploader.ParallelizedSourceUploa
                     #    }
                     #},
                     "filter": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "vqslod": {
                         "type": "float"
                     },
                     "ref": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "mq": {
@@ -795,7 +795,7 @@ class GnomadGenomesUploader(GnomadBaseUploader, uploader.ParallelizedSourceUploa
                         "type": "float"
                     },
                     "multi-allelic": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "clippingranksum": {
@@ -805,11 +805,11 @@ class GnomadGenomesUploader(GnomadBaseUploader, uploader.ParallelizedSourceUploa
                         "type": "float"
                     },
                     "type": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "alt": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "ac": {
@@ -980,11 +980,11 @@ class GnomadGenomesUploader(GnomadBaseUploader, uploader.ParallelizedSourceUploa
                         }
                     },
                     "chrom": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "alleles": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "pos": {
@@ -994,7 +994,7 @@ class GnomadGenomesUploader(GnomadBaseUploader, uploader.ParallelizedSourceUploa
                         "type": "float"
                     },
                     "vqsr_culprit": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "hom": {

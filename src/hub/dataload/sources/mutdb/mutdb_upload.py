@@ -20,31 +20,31 @@ class MutDBUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
             "mutdb": {
                 "properties": {
                     "rsid": {
-                        "type": "string",
-                        "include_in_all": True,
+                        "type": "text",
+                        "copy_to" : ["all"],
                         "analyzer": "string_lowercase",
                     },
                     "ref": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "alt": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "uniprot_id": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "mutpred_score": {
                         "type": "double"
                     },
                     "cosmic_id": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "chrom": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "hg19": {
@@ -58,8 +58,8 @@ class MutDBUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                         }
                     },
                     "strand": {
-                        "type": "string",
-                        "index": "not_analyzed"
+                        # not_analyzed
+                        "type": "keyword",
                     }
                 }
             }

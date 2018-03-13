@@ -19,41 +19,41 @@ class GwassnpsUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
             "gwassnps": {
                 "properties": {
                     "trait": {
-                        "type": "string"
+                        "type": "text"
                     },
                     "pubmed": {
-                        "type": "string",
-                        "index": "not_analyzed"
+                        # not_analyzed
+                        "type": "keyword",
                     },
                     "rsid": {
-                        "type": "string",
-                        "include_in_all": True,
+                        "type": "text",
+                        "copy_to" : ["all"],
                         "analyzer": "string_lowercase"
                     },
                     "title": {
-                        "type": "string"
+                        "type": "text"
                     },
                     "region": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "genename": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "risk_allele": {
-                        "type": "string"
+                        "type": "text"
                     },
                     "risk_allele_freq": {
                         "type": "float"
                     },
                     "pvalue": {
                         "type": "float",
-                        "index": "no"
+                        "index" : False
                     },
                     "pvalue_desc": {
-                        "type": "string",
-                        "index": "no"
+                        "type": "text",
+                        "index" : False
                     }
                 }
             }

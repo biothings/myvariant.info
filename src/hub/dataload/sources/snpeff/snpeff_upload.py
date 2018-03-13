@@ -25,31 +25,31 @@ class SnpeffBaseUploader(uploader.NoDataSourceUploader):
                     "ann": {
                         "properties": {
                             "effect": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "putative_impact": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "genename": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "gene_id": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "feature_type": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "feature_id": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "transcript_biotype": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "rank": {
@@ -59,11 +59,11 @@ class SnpeffBaseUploader(uploader.NoDataSourceUploader):
                                 "type": "integer"
                             },
                             "hgvs_c": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "hgvs_p": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "cdna": {
@@ -104,11 +104,11 @@ class SnpeffBaseUploader(uploader.NoDataSourceUploader):
                     "lof": {
                         "properties": {
                             "gene_id": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "genename": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "number_of_transcripts_in_gene": {
@@ -122,11 +122,11 @@ class SnpeffBaseUploader(uploader.NoDataSourceUploader):
                     "nmd": {
                         "properties": {
                             "gene_id": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "genename": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "number_of_transcripts_in_gene": {
@@ -142,11 +142,11 @@ class SnpeffBaseUploader(uploader.NoDataSourceUploader):
             "vcf": {
                 "properties": {
                     "alt": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "ref": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "position": {

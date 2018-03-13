@@ -35,7 +35,7 @@ class WellderlyFactoryUploader(uploader.DummySourceUploader,SnpeffPostUpdateUplo
             "wellderly": {
                 "properties": {
                     "chrom": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "pos": {
@@ -52,21 +52,21 @@ class WellderlyFactoryUploader(uploader.DummySourceUploader,SnpeffPostUpdateUplo
                         }
                     },
                     "ref": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "alt": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "vartype": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     # "alleles": {
                     #     "properties": {
                     #         "allele": {
-                    #             "type": "string",
+                    #             "type": "text",
                     #             "analyzer": "string_lowercase"
                     #         },
                     #         "allele": {
@@ -75,20 +75,20 @@ class WellderlyFactoryUploader(uploader.DummySourceUploader,SnpeffPostUpdateUplo
                     #     }
                     # },
                     "gene": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase",
-                        "include_in_all": True
+                        "copy_to" : ["all"]
                     },
                     "coding_impact": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "polyphen": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "sift": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     }
                 }

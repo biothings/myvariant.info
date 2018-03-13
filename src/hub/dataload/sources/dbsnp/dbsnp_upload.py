@@ -40,23 +40,23 @@ class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
             "dbsnp": {
                 "properties": {
                     "allele_origin": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "alt": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "chrom": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "class": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "flags": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "gmaf": {
@@ -73,20 +73,20 @@ class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                         }
                     },
                     "ref": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "rsid": {
-                        "type": "string",
-                        "include_in_all": True,
+                        "type": "text",
+                        "copy_to" : ["all"],
                         "analyzer": "string_lowercase"
                     },
                     "var_subtype": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "vartype": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "validated": {
@@ -95,12 +95,12 @@ class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                     "gene": {
                         "properties": {
                             "symbol": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase",
-                                "include_in_all": True
+                                "copy_to" : ["all"]
                             },
                             "geneid": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             }
                         }

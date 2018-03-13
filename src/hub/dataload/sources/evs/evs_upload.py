@@ -31,7 +31,7 @@ class EVSBaseUploader(SnpeffPostUpdateUploader):
             "evs": {
                 "properties": {
                     "chrom": {
-                        "type": "string"
+                        "type": "text"
                     },
                     "hg19": {
                         "properties": {
@@ -54,22 +54,22 @@ class EVSBaseUploader(SnpeffPostUpdateUploader):
                         }
                     },
                     "ref": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "alt": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "gene": {
                         "properties": {
                             "symbol": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase",
-                                "include_in_all": True
+                                "copy_to" : ["all"]
                             },
                             "accession": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase"
                             }
                         }
@@ -77,32 +77,32 @@ class EVSBaseUploader(SnpeffPostUpdateUploader):
                     "hgvs": {
                         "properties": {
                             "coding": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase",
-                                "include_in_all": True
+                                "copy_to" : ["all"]
                             },
                             "protein": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase",
-                                "include_in_all": True
+                                "copy_to" : ["all"]
                             }
                         }
                     },
                     "clinical_info": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "function_gvs": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase"
                     },
                     "grantham_score": {
                         "type": "float"
                     },
                     "rsid": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase",
-                        "include_in_all": True
+                        "copy_to" : ["all"]
                     }
                 }
             }
