@@ -36,7 +36,7 @@ import biothings.hub.databuild.differ as differ
 import biothings.hub.databuild.syncer as syncer
 import biothings.hub.dataindex.indexer as indexer
 import biothings.hub.datainspect.inspector as inspector
-#import biothings.hub.dataindex.idcache as idcache
+from biothings.hub.api.manager import APIManager
 from hub.databuild.builder import MyVariantDataBuilder
 from hub.databuild.mapper import TagObserved
 from hub.dataindex.indexer import VariantIndexer
@@ -89,17 +89,10 @@ syncer_manager_prod.configure(klasses=[partial(ThrottledESColdHotJsonDiffSelfCon
                                        partial(ThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
 
 index_manager = indexer.IndexerManager(job_manager=job_manager)
-test_pindexer = partial(VariantIndexer,
-                        es_host=config.ES_CONFIG["env"]["test"]["host"],
-                        timeout=config.ES_CONFIG["env"]["test"]["timeout"],
-                        retry_on_timeout=config.ES_CONFIG["env"]["test"]["retry"])
-prod_pindexer = partial(VariantIndexer,
-                        es_host=config.ES_CONFIG["env"]["prod"]["host"],
-                        timeout=config.ES_CONFIG["env"]["prod"]["timeout"],
-                        retry_on_timeout=config.ES_CONFIG["env"]["prod"]["retry"])
-#pidcacher = partial(idcache.RedisIDCache,connection_params=config.REDIS_CONNECTION_PARAMS)
-#coldhot_pindexer = partial(indexer.ColdHotIndexer,pidcacher=pidcacher,es_host=config.ES_HOST)
-index_manager.configure([{"test":test_pindexer},{"prod":prod_pindexer}])
+index_manager.configure(config.ES_CONFIG)
+
+# API manager: used to run API instances from the hub
+api_manager = APIManager()
 
 import biothings.utils.mongo as mongo
 def snpeff(build_name=None,sources=[], force_use_cache=True):
@@ -190,20 +183,20 @@ COMMANDS["merge"] = build_manager.merge
 COMMANDS["premerge"] = partial(build_manager.merge,steps=["merge","metadata"])
 COMMANDS["es_sync_hg19_test"] = partial(syncer_manager.sync,"es",
                                         target_backend=(config.ES_CONFIG["env"]["test"]["host"],
-                                                        config.ES_CONFIG["env"]["test"]["index"]["hg19"]["index"],
-                                                        config.ES_CONFIG["env"]["test"]["index"]["hg19"]["doc_type"]))
+                                                        config.ES_CONFIG["env"]["test"]["index"]["hg19"][0]["index"],
+                                                        config.ES_CONFIG["env"]["test"]["index"]["hg19"][0]["doc_type"]))
 COMMANDS["es_sync_hg38_test"] = partial(syncer_manager.sync,"es",
                                         target_backend=(config.ES_CONFIG["env"]["test"]["host"],
-                                                        config.ES_CONFIG["env"]["test"]["index"]["hg38"]["index"],
-                                                        config.ES_CONFIG["env"]["test"]["index"]["hg38"]["doc_type"]))
+                                                        config.ES_CONFIG["env"]["test"]["index"]["hg38"][0]["index"],
+                                                        config.ES_CONFIG["env"]["test"]["index"]["hg38"][0]["doc_type"]))
 COMMANDS["es_sync_hg19_prod"] = partial(syncer_manager_prod.sync,"es",
                                         target_backend=(config.ES_CONFIG["env"]["prod"]["host"],
-                                                        config.ES_CONFIG["env"]["prod"]["index"]["hg19"]["index"],
-                                                        config.ES_CONFIG["env"]["prod"]["index"]["hg19"]["doc_type"]))
+                                                        config.ES_CONFIG["env"]["prod"]["index"]["hg19"][0]["index"],
+                                                        config.ES_CONFIG["env"]["prod"]["index"]["hg19"][0]["doc_type"]))
 COMMANDS["es_sync_hg38_prod"] = partial(syncer_manager_prod.sync,"es",
                                         target_backend=(config.ES_CONFIG["env"]["prod"]["host"],
-                                                        config.ES_CONFIG["env"]["prod"]["index"]["hg38"]["index"],
-                                                        config.ES_CONFIG["env"]["prod"]["index"]["hg38"]["doc_type"]))
+                                                        config.ES_CONFIG["env"]["prod"]["index"]["hg38"][0]["index"],
+                                                        config.ES_CONFIG["env"]["prod"]["index"]["hg38"][0]["doc_type"]))
 COMMANDS["es_config"] = config.ES_CONFIG
 # diff
 COMMANDS["diff"] = differ_manager.diff
@@ -235,6 +228,10 @@ COMMANDS["publish_snapshot_demo_hg38"] = partial(index_manager.publish_snapshot,
 COMMANDS["register_url"] = partial(assistant_manager.register_url)
 COMMANDS["unregister_url"] = partial(assistant_manager.unregister_url)
 
+# api
+COMMANDS["start_api"] = api_manager.start_api
+COMMANDS["stop_api"] = api_manager.stop_api
+
 # admin/advanced
 from biothings.utils.jsondiff import make as jsondiff
 EXTRA_NS = {
@@ -248,6 +245,7 @@ EXTRA_NS = {
         "im" : CommandDefinition(command=index_manager,tracked=False),
         "jm" : CommandDefinition(command=job_manager,tracked=False),
         "ism" : CommandDefinition(command=inspector,tracked=False),
+        "api" : CommandDefinition(command=api_manager,tracked=False),
         "mongo_sync" : CommandDefinition(command=partial(syncer_manager.sync,"mongo"),tracked=False),
         "sync" : CommandDefinition(command=syncer_manager.sync),
         "loop" : CommandDefinition(command=loop,tracked=False),
@@ -260,7 +258,7 @@ EXTRA_NS = {
         "done" : CommandDefinition(command=done,tracked=False),
         # required by API only (just fyi)
         "builds" : CommandDefinition(command=build_manager.build_info,tracked=False),
-        "build" : CommandDefinition(command=lambda id,*args,**kwargs: build_manager.build_info(id=id,*args,**kwargs),tracked=False),
+        "build" : CommandDefinition(command=lambda id: build_manager.build_info(id=id),tracked=False),
         "job_info" : CommandDefinition(command=job_manager.job_info,tracked=False),
         "dump_info" : CommandDefinition(command=dmanager.dump_info,tracked=False),
         "upload_info" : CommandDefinition(command=upload_manager.upload_info,tracked=False),
@@ -275,6 +273,9 @@ EXTRA_NS = {
         "jsondiff" : CommandDefinition(command=jsondiff,tracked=False),
         "create_build_conf" : CommandDefinition(command=build_manager.create_build_configuration),
         "delete_build_conf" : CommandDefinition(command=build_manager.delete_build_configuration),
+        "get_apis" : CommandDefinition(command=api_manager.get_apis,tracked=False),
+        "delete_api" : CommandDefinition(command=api_manager.delete_api),
+        "create_api" : CommandDefinition(command=api_manager.create_api),
 }
 
 import tornado.web
@@ -310,6 +311,11 @@ API_ENDPOINTS = {
                        EndpointDefinition(name="delete_build_conf",method="delete",force_bodyargs=True)],
         "index" : EndpointDefinition(name="index",method="put",force_bodyargs=True),
         "sync" : EndpointDefinition(name="sync",method="post",force_bodyargs=True),
+        "api" : [EndpointDefinition(name="start_api",method="put",suffix="start"),
+                 EndpointDefinition(name="stop_api",method="put",suffix="stop"),
+                 EndpointDefinition(name="delete_api",method="delete",force_bodyargs=True),
+                 EndpointDefinition(name="create_api",method="post",force_bodyargs=True)],
+        "api/list" : EndpointDefinition(name="get_apis",method="get"),
         }
 
 shell.set_commands(COMMANDS,EXTRA_NS)

@@ -54,3 +54,5 @@ class VariantIndexer(indexer.Indexer):
     #        self.logger.error("Failed to upload cache file '%s' to s3: %s" % (cache_file,e), extra={"notify":True})
     #        raise
 
+class ColdHotVariantIndexer(indexer.ColdHotIndexer, VariantIndexer):
+    pass

@@ -8,6 +8,7 @@ DATA_SRC_MASTER_COLLECTION = 'src_master'  # for metadata of each src collection
 DATA_SRC_DUMP_COLLECTION = 'src_dump'      # for src data download information
 DATA_SRC_BUILD_COLLECTION = 'src_build'    # for src data build information
 DATA_PLUGIN_COLLECTION = 'data_plugin'     # for data plugins information
+API_COLLECTION = 'api'                           # for api information (running under hub control)
 
 DATA_TARGET_MASTER_COLLECTION = 'db_master'
 
@@ -86,28 +87,42 @@ S3_APP_FOLDER = "myvariant.info" # hg19/hg38 will be concat
 # Pre-prod/test ES definitions
 ES_CONFIG = {
         "build_config_key" : "assembly", # used to select proper idxr/syncer
+        "indexer_select": {
+            # default
+            None : "hub.dataindex.indexer.VariantIndexer",
+            # when there's a cold_collection definition
+            "build_config.cold_collection" : "hub.dataindex.indexer.ColdHotVariantIndexer",
+            },
         "env" : {
             "prod" : {
                 "host" : "prodserver:9200",
-                "timeout" : 300,
-                "retry" : True,
-                "max_retry" : 10,
+                "indexer" : {
+                    "args" : {
+                        "timeout" : 300,
+                        "retry" : True,
+                        "max_retry" : 10,
+                        },
+                    },
                 "index" : {
                     # keys match build_config_key value
-                    "hg19" : {"index": "myvariant_current_hg19", "doc_type": "variant"},
-                    "hg38" : {"index": "myvariant_current_hg38", "doc_type": "variant"},
+                    "hg19" : [{"index": "myvariant_current_hg19", "doc_type": "variant"}],
+                    "hg38" : [{"index": "myvariant_current_hg38", "doc_type": "variant"}],
                     },
                 },
             "test" : {
                 "host" : "localhost:9200",
-                "timeout" : 300,
-                "retry" : True,
-                "max_retry" : 10,
-                "index" : {
-                    "hg19" : {"index" : "myvariant_current_hg19", "doc_type": "variant"},
-                    "hg38" : {"index" : "myvariant_current_hg38", "doc_type": "variant"},
+                "indexer" : {
+                    "args" : {
+                        "timeout" : 300,
+                        "retry" : True,
+                        "max_retry" : 10,
+                        },
                     },
-                }
+                "index" : {
+                    "hg19" : [{"index": "myvariant_current_hg19", "doc_type": "variant"}],
+                    "hg38" : [{"index": "myvariant_current_hg38", "doc_type": "variant"}],
+                    },
+                },
             },
         }
 
