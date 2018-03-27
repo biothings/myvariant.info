@@ -99,8 +99,8 @@ ES_CONFIG = {
                 "indexer" : {
                     "args" : {
                         "timeout" : 300,
-                        "retry" : True,
-                        "max_retry" : 10,
+                        "retry_on_timeout" : True,
+                        "max_retries" : 10,
                         },
                     },
                 "index" : {
@@ -114,8 +114,8 @@ ES_CONFIG = {
                 "indexer" : {
                     "args" : {
                         "timeout" : 300,
-                        "retry" : True,
-                        "max_retry" : 10,
+                        "retry_on_timeout" : True,
+                        "max_retries" : 10,
                         },
                     },
                 "index" : {

@@ -227,10 +227,7 @@ COMMANDS["publish_snapshot_demo_hg38"] = partial(index_manager.publish_snapshot,
 # data plugins
 COMMANDS["register_url"] = partial(assistant_manager.register_url)
 COMMANDS["unregister_url"] = partial(assistant_manager.unregister_url)
-
-# api
-COMMANDS["start_api"] = api_manager.start_api
-COMMANDS["stop_api"] = api_manager.stop_api
+COMMANDS["dump_plugin"] = dp_manager.dump_src
 
 # admin/advanced
 from biothings.utils.jsondiff import make as jsondiff
@@ -268,7 +265,8 @@ EXTRA_NS = {
         "commands" : CommandDefinition(command=shell.command_info,tracked=False),
         "command" : CommandDefinition(command=lambda id,*args,**kwargs: shell.command_info(id=id,*args,**kwargs),tracked=False),
         "sources" : CommandDefinition(command=smanager.get_sources,tracked=False),
-        "save_mapping" : CommandDefinition(command=smanager.save_mapping),
+        "source_save_mapping" : CommandDefinition(command=smanager.save_mapping),
+        "build_save_mapping" : CommandDefinition(command=build_manager.save_mapping),
         "validate_mapping" : CommandDefinition(command=index_manager.validate_mapping),
         "jsondiff" : CommandDefinition(command=jsondiff,tracked=False),
         "create_build_conf" : CommandDefinition(command=build_manager.create_build_configuration),
@@ -276,6 +274,9 @@ EXTRA_NS = {
         "get_apis" : CommandDefinition(command=api_manager.get_apis,tracked=False),
         "delete_api" : CommandDefinition(command=api_manager.delete_api),
         "create_api" : CommandDefinition(command=api_manager.create_api),
+        "start_api" : CommandDefinition(command=api_manager.start_api),
+        "stop_api" : api_manager.stop_api,
+
 }
 
 import tornado.web
@@ -287,6 +288,7 @@ API_ENDPOINTS = {
         "build" : [EndpointDefinition(method="get",name="build"),
                    EndpointDefinition(method="delete",name="rmmerge"),
                    EndpointDefinition(name="merge",method="put",suffix="new"),
+                   EndpointDefinition(name="build_save_mapping",method="put",suffix="mapping"),
                    ],
         "diff" : EndpointDefinition(name="diff",method="put",force_bodyargs=True),
         "job_manager" : EndpointDefinition(name="job_info",method="get"),
@@ -301,10 +303,11 @@ API_ENDPOINTS = {
         "source" : [EndpointDefinition(name="source_info",method="get"),
                     EndpointDefinition(name="dump",method="put",suffix="dump"),
                     EndpointDefinition(name="upload",method="put",suffix="upload"),
-                    EndpointDefinition(name="save_mapping",method="put",suffix="mapping")],
+                    EndpointDefinition(name="source_save_mapping",method="put",suffix="mapping")],
         "inspect" : EndpointDefinition(name="inspect",method="put",force_bodyargs=True),
         "dataplugin/register_url" : EndpointDefinition(name="register_url",method="post",force_bodyargs=True),
         "dataplugin/unregister_url" : EndpointDefinition(name="unregister_url",method="delete",force_bodyargs=True),
+        "dataplugin" : [EndpointDefinition(name="dump_plugin",method="put",suffix="dump")],
         "jsondiff" : EndpointDefinition(name="jsondiff",method="post",force_bodyargs=True),
         "mapping/validate" : EndpointDefinition(name="validate_mapping",method="post",force_bodyargs=True),
         "buildconf" : [EndpointDefinition(name="create_build_conf",method="post",force_bodyargs=True),
