@@ -323,15 +323,21 @@ API_ENDPOINTS = {
 
 shell.set_commands(COMMANDS,EXTRA_NS)
 
+import tornado.platform.asyncio
+tornado.platform.asyncio.AsyncIOMainLoop().install()
+
 settings = {'debug': True}
 routes = generate_api_routes(shell, API_ENDPOINTS,settings=settings)
-#routes = generate_api_routes(shell, {"source" : API_ENDPOINTS["source"]},settings=settings)
+# add websocket endpoint
+import biothings.hub.api.handlers.ws as ws
+import sockjs.tornado
+ws_router = sockjs.tornado.SockJSRouter(ws.WebSocketConnection, '/ws')
+routes.extend(ws_router.urls)
+
 app = tornado.web.Application(routes,settings=settings)
 EXTRA_NS["app"] = app
 
 # register app into current event loop
-import tornado.platform.asyncio
-tornado.platform.asyncio.AsyncIOMainLoop().install()
 app_server = tornado.httpserver.HTTPServer(app)
 app_server.listen(config.HUB_API_PORT)
 app_server.start()
