@@ -1,6 +1,5 @@
-
 import biothings.hub.dataload.uploader as uploader
-from ...uploader import SnpeffPostUpdateUploader
+from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 class WellderlyFactoryUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
     """Data originally coming from: http://www.stsiweb.org/wellderly"""

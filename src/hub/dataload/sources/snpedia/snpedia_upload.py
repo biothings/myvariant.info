@@ -1,5 +1,5 @@
 import biothings.hub.dataload.uploader as uploader
-from ...uploader import SnpeffPostUpdateUploader
+from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 class SnpediaUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
     """Originally downloaded from: http://www.snpedia.org/"""

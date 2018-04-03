@@ -1,5 +1,5 @@
 import biothings.hub.dataload.uploader as uploader
-from ...uploader import SnpeffPostUpdateUploader
+from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 class MutDBUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
     """Originally downloaded from: http://www.mutdb.org/"""

@@ -3,7 +3,7 @@ import itertools, glob, os
 from .dbsnp_dump import main as download
 from .dbsnp_vcf_parser import load_data
 import biothings.hub.dataload.uploader as uploader
-from ...uploader import SnpeffPostUpdateUploader
+from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 
 SRC_META = {

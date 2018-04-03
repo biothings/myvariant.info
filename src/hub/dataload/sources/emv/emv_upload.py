@@ -4,7 +4,7 @@ import zipfile
 
 from .emv_parser import load_data
 import biothings.hub.dataload.uploader as uploader
-from ...uploader import SnpeffPostUpdateUploader
+from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 
 class EMVUploader(SnpeffPostUpdateUploader):

@@ -2,7 +2,7 @@ import glob, os
 
 from .exac_parser import load_data
 import biothings.hub.dataload.uploader as uploader
-from ...uploader import SnpeffPostUpdateUploader
+from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 class ExacBaseUploader(SnpeffPostUpdateUploader):
 

@@ -27,6 +27,7 @@ job_manager = JobManager(loop,num_workers=config.HUB_MAX_WORKERS,
                       num_threads=config.HUB_MAX_THREADS,
                       max_memory_usage=config.HUB_MAX_MEM_USAGE)
 
+
 import hub.dataload
 import biothings.hub.dataload.uploader as uploader
 import biothings.hub.dataload.dumper as dumper
@@ -48,7 +49,8 @@ shell = HubShell()
 # will check every 10 seconds for sources to upload
 upload_manager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=job_manager)
 dmanager = dumper.DumperManager(job_manager=job_manager)
-smanager = source.SourceManager(hub.dataload.__sources_dict__,dmanager,upload_manager)
+sources_path = hub.dataload.__sources_dict__ #"hub/dataload/sources"
+smanager = source.SourceManager(sources_path,dmanager,upload_manager)
 
 dmanager.schedule_all()
 upload_manager.poll('upload',lambda doc: shell.launch(partial(upload_manager.upload_src,doc["_id"])))
@@ -93,6 +95,10 @@ index_manager.configure(config.ES_CONFIG)
 
 # API manager: used to run API instances from the hub
 api_manager = APIManager()
+
+from biothings.utils.hub import HubReloader
+reloader = HubReloader(["hub/dataload/sources","plugins"],[smanager])
+reloader.monitor()
 
 import biothings.utils.mongo as mongo
 def snpeff(build_name=None,sources=[], force_use_cache=True):

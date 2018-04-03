@@ -1,6 +1,6 @@
 from .clinvar_xml_parser import load_data as load_common
 import biothings.hub.dataload.uploader as uploader
-from ...uploader import SnpeffPostUpdateUploader
+from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 
 SRC_META = {

@@ -7,7 +7,7 @@ import logging
 from .dbnsfp_parser import load_data_file as load_common
 import biothings.hub.dataload.uploader as uploader
 from biothings.hub.dataload.storage import IgnoreDuplicatedStorage
-from ...uploader import SnpeffPostUpdateUploader
+from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 
 SRC_META = {

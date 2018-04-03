@@ -4,7 +4,7 @@ import zipfile
 
 from .evs_parser import load_data
 import biothings.hub.dataload.storage as storage
-from ...uploader import SnpeffPostUpdateUploader
+from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 
 # common to both hg19 and hg38

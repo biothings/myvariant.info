@@ -5,7 +5,7 @@ import zipfile
 from .grasp_parser import load_data
 import biothings.hub.dataload.uploader as uploader
 import biothings.hub.dataload.storage as storage
-from ...uploader import SnpeffPostUpdateUploader
+from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 class GraspUploader(uploader.IgnoreDuplicatedSourceUploader,
                     SnpeffPostUpdateUploader):

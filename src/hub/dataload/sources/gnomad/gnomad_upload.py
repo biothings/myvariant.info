@@ -7,7 +7,7 @@ import biothings.hub.dataload.storage as storage
 
 from .gnomad_parser_genomes import load_data as load_data_genomes
 from .gnomad_parser_exomes import load_data as load_data_exomes
-from ...uploader import SnpeffPostUpdateUploader
+from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 
 class GnomadBaseUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUploader):
