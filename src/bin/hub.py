@@ -337,7 +337,11 @@ routes = generate_api_routes(shell, API_ENDPOINTS,settings=settings)
 # add websocket endpoint
 import biothings.hub.api.handlers.ws as ws
 import sockjs.tornado
-ws_router = sockjs.tornado.SockJSRouter(ws.WebSocketConnection, '/ws')
+from biothings.utils.hub_db import ChangeWatcher
+listener = ws.HubDBListener()
+ChangeWatcher.add(listener)
+ChangeWatcher.publish()
+ws_router = sockjs.tornado.SockJSRouter(partial(ws.WebSocketConnection,listener=listener), '/ws')
 routes.extend(ws_router.urls)
 
 app = tornado.web.Application(routes,settings=settings)
