@@ -52,7 +52,7 @@ dmanager = dumper.DumperManager(job_manager=job_manager)
 sources_path = hub.dataload.__sources_dict__ #"hub/dataload/sources"
 smanager = source.SourceManager(sources_path,dmanager,upload_manager)
 
-dmanager.schedule_all()
+#dmanager.schedule_all()
 upload_manager.poll('upload',lambda doc: shell.launch(partial(upload_manager.upload_src,doc["_id"])))
 
 # deal with 3rdparty datasources
