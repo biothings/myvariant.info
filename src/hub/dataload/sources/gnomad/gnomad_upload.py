@@ -17,6 +17,8 @@ class GnomadBaseUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdat
             "src_meta" : {
                 "url" : "http://gnomad.broadinstitute.org",
                 "license_url" : "http://gnomad.broadinstitute.org/terms",
+                "license_url_short": "http://bit.ly/2I1cl1I",
+                "license" : "ODbL"
                 }
             }
 
