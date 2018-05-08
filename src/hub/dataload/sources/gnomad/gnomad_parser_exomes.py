@@ -70,9 +70,9 @@ def _map_line_to_json(item, keys):
                 # loop through each prefix
                 for _start in key_start:
                     # "ac", "af" value is related to multi-allelic, need to deal with separately
-                    if _key.startswith(_start) and _start in ['AC', 'AF']:
+                    if _key.startswith(_start) and _start in ['AC', 'AF', 'Hom', 'Hemi']:
                         one_snp_json['gnomad_exome'][_start.lower()][_key.lower()] = info[_key][i]
-                    elif _key.startswith(_start) and _start not in ['AC', 'AF']:
+                    elif _key.startswith(_start) and _start not in ['AC', 'AF', 'Hom', 'Hemi']:
                         one_snp_json['gnomad_exome'][_start.lower()][_key.lower()] = info[_key]
         obj = (dict_sweep(unlist(value_convert_to_number(one_snp_json, skipped_keys=['chrom'])), [None]))
         yield obj
