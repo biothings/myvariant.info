@@ -44,7 +44,7 @@ from hub.dataindex.indexer import VariantIndexer
 from biothings.utils.hub import schedule, pending, done, CompositeCommand, \
                                 start_server, HubShell, CommandDefinition
 
-shell = HubShell()
+shell = HubShell(job_manager)
 
 # will check every 10 seconds for sources to upload
 upload_manager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=job_manager)
@@ -97,7 +97,9 @@ index_manager.configure(config.ES_CONFIG)
 api_manager = APIManager()
 
 from biothings.utils.hub import HubReloader
-reloader = HubReloader(["hub/dataload/sources","plugins"],[smanager])
+reloader = HubReloader(["hub/dataload/sources","plugins"],
+                       [smanager,assistant_manager],
+                       reload_func=partial(shell.restart,force=True))
 reloader.monitor()
 
 import biothings.utils.mongo as mongo
@@ -325,6 +327,8 @@ API_ENDPOINTS = {
                  EndpointDefinition(name="delete_api",method="delete",force_bodyargs=True),
                  EndpointDefinition(name="create_api",method="post",force_bodyargs=True)],
         "api/list" : EndpointDefinition(name="get_apis",method="get"),
+        "stop" : EndpointDefinition(name="stop",method="put"),
+        "restart" : EndpointDefinition(name="restart",method="put"),
         }
 
 shell.set_commands(COMMANDS,EXTRA_NS)
