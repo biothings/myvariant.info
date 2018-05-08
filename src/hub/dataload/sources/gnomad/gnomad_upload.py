@@ -15,8 +15,8 @@ class GnomadBaseUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdat
     __metadata__ = {"mapper" : 'observed',
             "assembly" : "hg19",
             "src_meta" : {
-                "url" : "",
-                "license_url" : "",
+                "url" : "http://gnomad.broadinstitute.org",
+                "license_url" : "http://gnomad.broadinstitute.org/terms",
                 }
             }
 
