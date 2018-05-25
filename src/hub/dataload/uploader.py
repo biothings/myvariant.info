@@ -34,7 +34,7 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
         snpeff_main_source = snpeff_class.main_source
         snpeff_doc = self.src_dump.find_one({"_id" : snpeff_main_source})
         assert snpeff_doc, "No snpeff information found, has it been dumped & uploaded ?"
-        snpeff_dir = snpeff_doc["download"]["data_folder"]
+        snpeff_dir = snpeff_doc.get("download",{}).get("data_folder",snpeff_doc["data_folder"])
         # -q: when there's an update, there's a message on stderr....
         cmd = "java -Xmx4g -jar %s/snpEff/snpEff.jar -t -noStats -noExpandIUB %s" % (snpeff_dir,version)
         # genome files are in "data_folder"/../data
