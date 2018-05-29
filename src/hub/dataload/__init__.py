@@ -5,6 +5,7 @@ __sources_dict__ = [
         'hub.dataload.sources.dbsnp',
         'hub.dataload.sources.dbnsfp',
         'hub.dataload.sources.exac',
+        'hub.dataload.sources.clingen',
 
         # manually-updated
         'hub.dataload.sources.cadd',
