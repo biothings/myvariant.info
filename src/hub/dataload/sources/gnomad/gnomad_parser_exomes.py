@@ -3,10 +3,13 @@ import vcf
 from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
 from utils.hgvs import get_hgvs_from_vcf
 
+CHROM_VALID_VALUES = [str(_chr) for _chr in list(range(1, 23)) + ['X', 'Y', 'MT']]
+
 def _map_line_to_json(item, keys):
     key_start = ["AC", "AF", "AN", "Hom", "GC", "Hemi"]
     chrom = str(item.CHROM)
-    # test on chrom 22 only for the momment, need to remove '22' later
+    if chrom not in CHROM_VALID_VALUES:
+        return
     chromStart = item.POS
     ref = item.REF
     info = item.INFO

@@ -5,7 +5,7 @@ import math
 from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
 from utils.hgvs import get_hgvs_from_vcf
 
-CHROM_VALID_VALUES = [str(_chr) for _chr in list(range(1, 23)) + ['X', 'Y' + 'MT']]
+CHROM_VALID_VALUES = [str(_chr) for _chr in list(range(1, 23)) + ['X', 'Y', 'MT']]
 
 def _map_line_to_json(item, keys):
     key_start = ["AC", "AF", "AN", "Hom", "GC", "Hemi"]
