@@ -23,7 +23,7 @@ class ClingenDumper(LastModifiedHTTPDumper):
 
     def post_dump(self, *args, **kwargs):
         self.logger.info("Unzipping files in '%s'" % self.new_data_folder) 
-        #gunzipall(self.new_data_folder)
+        gunzipall(self.new_data_folder)
         input_file = os.path.join(self.new_data_folder,"mvi_ca")
         self.logger.info("Split file in chunks")
         subprocess.check_call(["split","-l","%s" % self.__class__.CHUNK_SIZE,input_file,"%s.split." % input_file])
