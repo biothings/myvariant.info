@@ -1,20 +1,18 @@
 import os, glob
 
 import biothings.hub.dataload.uploader as uploader
-
-from ...uploader import SnpeffPostUpdateUploader
 from .parser import load_data
 
 
-class ClingenUploader(SnpeffPostUpdateUploader,uploader.ParallelizedSourceUploader):
+class ClingenUploader(uploader.BaseSourceUploader,uploader.ParallelizedSourceUploader):
     name = "clingen"
     __metadata__ = {"mapper": 'observed',
             "assembly": "hg38",
             "src_meta": {
                 "url": "https://www.clinicalgenome.org",
                 "license_url": "https://www.clinicalgenome.org/about/terms-of-use",
-                "license_url_short": "",
-                "licence": "CC0 1.0",
+                "license_url_short": "http://bit.ly/2kAtyoH",
+                "licence": "CC0 1.0 Universal",
                 }
             }
 
