@@ -343,6 +343,9 @@ class ExacNonTCGAUploader(ExacBaseUploader):
                             },
                             "ac_female": {
                                 "type": "integer"
+                            },
+                            "ac_hom": {
+                                "type": "integer"
                             }
                         }
                     },
@@ -447,9 +450,6 @@ class ExacNonTCGAUploader(ExacBaseUploader):
                                 "type": "integer"
                             },
                             "hom_sas": {
-                                "type": "integer"
-                            },
-                            "ac_hom": {
                                 "type": "integer"
                             }
                         }
