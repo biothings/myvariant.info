@@ -22,6 +22,7 @@ class VariantIndexer(indexer.Indexer):
 
     def get_index_creation_settings(self):
         settings = super(VariantIndexer,self).get_index_creation_settings()
+        settings.setdefault("mapping",{}).setdefault("total_fields",{})["limit"] = 2000
         return settings
 
     # TODO: that should done during release publishing, whether it's from an index or diff
