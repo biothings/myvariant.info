@@ -107,6 +107,9 @@ class ExacUploader(ExacBaseUploader):
                             },
                             "ac_female": {
                                 "type": "integer"
+                            },
+                            "ac_hom": {
+                                "type": "integer"
                             }
                         }
                     },
@@ -211,9 +214,6 @@ class ExacUploader(ExacBaseUploader):
                                 "type": "integer"
                             },
                             "hom_sas": {
-                                "type": "integer"
-                            },
-                            "ac_hom": {
                                 "type": "integer"
                             }
                         }
