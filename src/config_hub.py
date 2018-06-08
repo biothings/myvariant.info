@@ -81,7 +81,7 @@ HUB_ENV = ""
 
 # Hub name/icon url/version, for display purpose
 HUB_NAME = "MyVariant"
-HUB_ICON = "http://18.237.6.45/static/img/myvariant-logo-shiny.svg"
+HUB_ICON = "http://biothings.io/static/img/myvariant-logo-shiny.svg"
 HUB_VERSION = "0.2"
 
 # S3 bucket, root of all biothings releases information

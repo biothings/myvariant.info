@@ -2,8 +2,9 @@
 
 import asyncio, asyncssh, sys, os, copy
 import concurrent.futures
-import multiprocessing_on_dill
-concurrent.futures.process.multiprocessing = multiprocessing_on_dill
+# see https://github.com/biothings/biothings.api/issues/5 (trying...)
+#import multiprocessing_on_dill
+#concurrent.futures.process.multiprocessing = multiprocessing_on_dill
 from functools import partial
 
 from collections import OrderedDict
@@ -74,8 +75,8 @@ build_manager = builder.BuilderManager(
         job_manager=job_manager)
 build_manager.configure()
 
-differ_manager = differ.DifferManager(job_manager=job_manager)
-differ_manager.configure([differ.ColdHotSelfContainedJsonDiffer,differ.SelfContainedJsonDiffer])
+diff_manager = differ.DifferManager(job_manager=job_manager)
+diff_manager.configure([differ.ColdHotSelfContainedJsonDiffer,differ.SelfContainedJsonDiffer])
 
 inspector = inspector.InspectorManager(upload_manager=upload_manager,
                                        build_manager=build_manager,
@@ -83,11 +84,11 @@ inspector = inspector.InspectorManager(upload_manager=upload_manager,
 
 from biothings.hub.databuild.syncer import ThrottledESColdHotJsonDiffSelfContainedSyncer, ThrottledESJsonDiffSelfContainedSyncer, \
                                            ESColdHotJsonDiffSelfContainedSyncer, ESJsonDiffSelfContainedSyncer
-syncer_manager = syncer.SyncerManager(job_manager=job_manager)
-syncer_manager.configure(klasses=[ESColdHotJsonDiffSelfContainedSyncer,ESJsonDiffSelfContainedSyncer])
+sync_manager = syncer.SyncerManager(job_manager=job_manager)
+sync_manager.configure(klasses=[ESColdHotJsonDiffSelfContainedSyncer,ESJsonDiffSelfContainedSyncer])
 
-syncer_manager_prod = syncer.SyncerManager(job_manager=job_manager)
-syncer_manager_prod.configure(klasses=[partial(ThrottledESColdHotJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS),
+sync_manager_prod = syncer.SyncerManager(job_manager=job_manager)
+sync_manager_prod.configure(klasses=[partial(ThrottledESColdHotJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS),
                                        partial(ThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
 
 index_manager = indexer.IndexerManager(job_manager=job_manager)
@@ -95,6 +96,22 @@ index_manager.configure(config.ES_CONFIG)
 
 # API manager: used to run API instances from the hub
 api_manager = APIManager()
+
+# let's glue everything together
+managers = {
+        "dump_manager" : dmanager,
+        "upload_manager" : upload_manager,
+        "source_manager" : smanager,
+        "build_manager" : build_manager,
+        "diff_manager" : diff_manager,
+        "index_manager" : index_manager,
+        "dataplugin_manager" : dp_manager,
+        "assistant_manager" : assistant_manager,
+        "inspect_manager" : inspector,
+        "sync_manager" : sync_manager,
+        "api_manager" : api_manager,
+        }
+shell.register_managers(managers)
 
 from biothings.utils.hub import HubReloader
 reloader = HubReloader(["hub/dataload/sources","plugins"],
@@ -175,6 +192,7 @@ def rebuild_cache(build_name=None,sources=None,target=None,force_build=False):
 COMMANDS = OrderedDict()
 # getting info
 COMMANDS["source_info"] = CommandDefinition(command=smanager.get_source,tracked=False)
+COMMANDS["status"] = CommandDefinition(command=shell.status,tracked=False)
 # dump commands
 COMMANDS["dump"] = dmanager.dump_src
 COMMANDS["dump_all"] = dmanager.dump_all
@@ -189,32 +207,32 @@ COMMANDS["lsmerge"] = build_manager.list_merge
 COMMANDS["rmmerge"] = build_manager.delete_merge
 COMMANDS["merge"] = build_manager.merge
 COMMANDS["premerge"] = partial(build_manager.merge,steps=["merge","metadata"])
-COMMANDS["es_sync_hg19_test"] = partial(syncer_manager.sync,"es",
+COMMANDS["es_sync_hg19_test"] = partial(sync_manager.sync,"es",
                                         target_backend=(config.ES_CONFIG["env"]["test"]["host"],
                                                         config.ES_CONFIG["env"]["test"]["index"]["hg19"][0]["index"],
                                                         config.ES_CONFIG["env"]["test"]["index"]["hg19"][0]["doc_type"]))
-COMMANDS["es_sync_hg38_test"] = partial(syncer_manager.sync,"es",
+COMMANDS["es_sync_hg38_test"] = partial(sync_manager.sync,"es",
                                         target_backend=(config.ES_CONFIG["env"]["test"]["host"],
                                                         config.ES_CONFIG["env"]["test"]["index"]["hg38"][0]["index"],
                                                         config.ES_CONFIG["env"]["test"]["index"]["hg38"][0]["doc_type"]))
-COMMANDS["es_sync_hg19_prod"] = partial(syncer_manager_prod.sync,"es",
+COMMANDS["es_sync_hg19_prod"] = partial(sync_manager_prod.sync,"es",
                                         target_backend=(config.ES_CONFIG["env"]["prod"]["host"],
                                                         config.ES_CONFIG["env"]["prod"]["index"]["hg19"][0]["index"],
                                                         config.ES_CONFIG["env"]["prod"]["index"]["hg19"][0]["doc_type"]))
-COMMANDS["es_sync_hg38_prod"] = partial(syncer_manager_prod.sync,"es",
+COMMANDS["es_sync_hg38_prod"] = partial(sync_manager_prod.sync,"es",
                                         target_backend=(config.ES_CONFIG["env"]["prod"]["host"],
                                                         config.ES_CONFIG["env"]["prod"]["index"]["hg38"][0]["index"],
                                                         config.ES_CONFIG["env"]["prod"]["index"]["hg38"][0]["doc_type"]))
 COMMANDS["es_config"] = config.ES_CONFIG
 # diff
-COMMANDS["diff"] = differ_manager.diff
-COMMANDS["diff_demo"] = partial(differ_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
-COMMANDS["diff_hg38"] = partial(differ_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
-COMMANDS["diff_hg19"] = partial(differ_manager.diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
-COMMANDS["report"] = differ_manager.diff_report
-COMMANDS["release_note"] = differ_manager.release_note
-COMMANDS["publish_diff_hg19"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-hg19")
-COMMANDS["publish_diff_hg38"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-hg38")
+COMMANDS["diff"] = diff_manager.diff
+COMMANDS["diff_demo"] = partial(diff_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
+COMMANDS["diff_hg38"] = partial(diff_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
+COMMANDS["diff_hg19"] = partial(diff_manager.diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
+COMMANDS["report"] = diff_manager.diff_report
+COMMANDS["release_note"] = diff_manager.release_note
+COMMANDS["publish_diff_hg19"] = partial(diff_manager.publish_diff,config.S3_APP_FOLDER + "-hg19")
+COMMANDS["publish_diff_hg38"] = partial(diff_manager.publish_diff,config.S3_APP_FOLDER + "-hg38")
 # indexing commands
 COMMANDS["index"] = index_manager.index
 COMMANDS["snapshot"] = index_manager.snapshot
@@ -224,9 +242,9 @@ COMMANDS["publish_snapshot_hg38"] = partial(index_manager.publish_snapshot,confi
 # inspector
 COMMANDS["inspect"] = inspector.inspect
 # demo
-COMMANDS["publish_diff_demo_hg19"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-demo_hg19",
+COMMANDS["publish_diff_demo_hg19"] = partial(diff_manager.publish_diff,config.S3_APP_FOLDER + "-demo_hg19",
                                         s3_bucket=config.S3_DIFF_BUCKET + "-demo")
-COMMANDS["publish_diff_demo_hg38"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-demo_hg38",
+COMMANDS["publish_diff_demo_hg38"] = partial(diff_manager.publish_diff,config.S3_APP_FOLDER + "-demo_hg38",
                                         s3_bucket=config.S3_DIFF_BUCKET + "-demo")
 COMMANDS["publish_snapshot_demo_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg19",
                                                                                 ro_repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
@@ -245,14 +263,14 @@ EXTRA_NS = {
         "am" : CommandDefinition(command=assistant_manager,tracked=False),
         "um" : CommandDefinition(command=upload_manager,tracked=False),
         "bm" : CommandDefinition(command=build_manager,tracked=False),
-        "dim" : CommandDefinition(command=differ_manager,tracked=False),
-        "sm" : CommandDefinition(command=syncer_manager,tracked=False),
+        "dim" : CommandDefinition(command=diff_manager,tracked=False),
+        "sm" : CommandDefinition(command=sync_manager,tracked=False),
         "im" : CommandDefinition(command=index_manager,tracked=False),
         "jm" : CommandDefinition(command=job_manager,tracked=False),
         "ism" : CommandDefinition(command=inspector,tracked=False),
         "api" : CommandDefinition(command=api_manager,tracked=False),
-        "mongo_sync" : CommandDefinition(command=partial(syncer_manager.sync,"mongo"),tracked=False),
-        "sync" : CommandDefinition(command=syncer_manager.sync),
+        "mongo_sync" : CommandDefinition(command=partial(sync_manager.sync,"mongo"),tracked=False),
+        "sync" : CommandDefinition(command=sync_manager.sync),
         "loop" : CommandDefinition(command=loop,tracked=False),
         "pqueue" : CommandDefinition(command=job_manager.process_queue,tracked=False),
         "tqueue" : CommandDefinition(command=job_manager.thread_queue,tracked=False),
@@ -269,7 +287,7 @@ EXTRA_NS = {
         "upload_info" : CommandDefinition(command=upload_manager.upload_info,tracked=False),
         "build_config_info" : CommandDefinition(command=build_manager.build_config_info,tracked=False),
         "index_info" : CommandDefinition(command=index_manager.index_info,tracked=False),
-        "diff_info" : CommandDefinition(command=differ_manager.diff_info,tracked=False),
+        "diff_info" : CommandDefinition(command=diff_manager.diff_info,tracked=False),
         "commands" : CommandDefinition(command=shell.command_info,tracked=False),
         "command" : CommandDefinition(command=lambda id,*args,**kwargs: shell.command_info(id=id,*args,**kwargs),tracked=False),
         "sources" : CommandDefinition(command=smanager.get_sources,tracked=False),
@@ -322,6 +340,8 @@ API_ENDPOINTS = {
                        EndpointDefinition(name="delete_build_conf",method="delete",force_bodyargs=True)],
         "index" : EndpointDefinition(name="index",method="put",force_bodyargs=True),
         "sync" : EndpointDefinition(name="sync",method="post",force_bodyargs=True),
+        "whatsnew" : EndpointDefinition(name="whatsnew",method="get"),
+        "status" : EndpointDefinition(name="status",method="get"),
         "api" : [EndpointDefinition(name="start_api",method="put",suffix="start"),
                  EndpointDefinition(name="stop_api",method="put",suffix="stop"),
                  EndpointDefinition(name="delete_api",method="delete",force_bodyargs=True),
