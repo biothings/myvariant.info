@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from biothings.web.api.es.transform import ESResultTransformer
+import logging
 
 class ESResultTransformer(ESResultTransformer):
     # Add app specific result transformations
@@ -8,13 +9,13 @@ class ESResultTransformer(ESResultTransformer):
             if source in doc:
                 if isinstance(doc[source], dict):
                     try:
-                        doc[source]['_license'] = val.get('license_url_short', val.get('license_url'))
+                        doc[source]['_license'] = val.get('license_url_short') if val.get('license_url_short', False) else val.get('license_url', '')
                     except:
                         pass
                 elif isinstance(doc[source], list):
                     for d in doc[source]:
                         try:
-                            d['_license'] = val.get('license_url_short', val.get('license_url'))
+                            d['_license'] = val.get('license_url_short') if val.get('license_url_short', False) else val.get('license_url', '')
                         except:
                             pass                            
         #if 'cadd' in doc:
