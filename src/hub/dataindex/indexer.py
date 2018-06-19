@@ -7,21 +7,20 @@ import biothings.hub.dataindex.indexer as indexer
 from biothings.utils.aws import send_s3_file
 
 
-class VariantIndexer(indexer.Indexer):
 
-    def get_mapping(self):
-        mapping = super(VariantIndexer,self).get_mapping()
+class BaseVariantIndexer(indexer.Indexer):
+    
+    def enrich_final_mapping(self,final_mapping):
         # enrich with myvariant specific stuff
-        mapping["properties"]["chrom"] = {
+        final_mapping["properties"]["chrom"] = {
             'analyzer': 'string_lowercase',
             'type': 'text'}
-        mapping["properties"]["observed"] = {
+        final_mapping["properties"]["observed"] = {
             "type": "boolean"}
-
-        return mapping
+        return final_mapping
 
     def get_index_creation_settings(self):
-        settings = super(VariantIndexer,self).get_index_creation_settings()
+        settings = super(BaseVariantIndexer,self).get_index_creation_settings()
         settings.setdefault("mapping",{}).setdefault("total_fields",{})["limit"] = 2000
         return settings
 
@@ -55,5 +54,10 @@ class VariantIndexer(indexer.Indexer):
     #        self.logger.error("Failed to upload cache file '%s' to s3: %s" % (cache_file,e), extra={"notify":True})
     #        raise
 
-class ColdHotVariantIndexer(indexer.ColdHotIndexer, VariantIndexer):
+class VariantIndexer(BaseVariantIndexer):
     pass
+
+class ColdHotVariantIndexer(indexer.ColdHotIndexer,BaseVariantIndexer):
+    pass
+    
+    

@@ -41,7 +41,6 @@ import biothings.hub.datainspect.inspector as inspector
 from biothings.hub.api.manager import APIManager
 from hub.databuild.builder import MyVariantDataBuilder
 from hub.databuild.mapper import TagObserved
-from hub.dataindex.indexer import VariantIndexer
 from biothings.utils.hub import schedule, pending, done, CompositeCommand, \
                                 start_server, HubShell, CommandDefinition
 
