@@ -4,7 +4,7 @@ import biothings.hub.dataload.uploader as uploader
 from .parser import load_data
 
 
-class ClingenUploader(uploader.BaseSourceUploader,uploader.ParallelizedSourceUploader):
+class ClingenUploader(uploader.ParallelizedSourceUploader):
     name = "clingen"
     __metadata__ = {"mapper": 'observed',
             "assembly": "hg38",
