@@ -236,8 +236,8 @@ COMMANDS["publish_diff_hg38"] = partial(diff_manager.publish_diff,config.S3_APP_
 COMMANDS["index"] = index_manager.index
 COMMANDS["snapshot"] = index_manager.snapshot
 COMMANDS["snapshot_demo"] = partial(index_manager.snapshot,repository=config.SNAPSHOT_REPOSITORY + "-demo")
-COMMANDS["publish_snapshot_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-hg19")
-COMMANDS["publish_snapshot_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-hg38")
+COMMANDS["publish_snapshot_hg19"] = partial(index_manager.publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-hg19")
+COMMANDS["publish_snapshot_hg38"] = partial(index_manager.publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-hg38")
 # inspector
 COMMANDS["inspect"] = inspector.inspect
 # demo
