@@ -245,10 +245,10 @@ COMMANDS["publish_diff_demo_hg19"] = partial(diff_manager.publish_diff,config.S3
                                         s3_bucket=config.S3_DIFF_BUCKET + "-demo")
 COMMANDS["publish_diff_demo_hg38"] = partial(diff_manager.publish_diff,config.S3_APP_FOLDER + "-demo_hg38",
                                         s3_bucket=config.S3_DIFF_BUCKET + "-demo")
-COMMANDS["publish_snapshot_demo_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg19",
-                                                                                ro_repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
-COMMANDS["publish_snapshot_demo_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg38",
-                                                                                ro_repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
+COMMANDS["publish_snapshot_demo_hg19"] = partial(index_manager.publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-demo_hg19",
+                                                                                repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
+COMMANDS["publish_snapshot_demo_hg38"] = partial(index_manager.publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-demo_hg38",
+                                                                                repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
 # data plugins
 COMMANDS["register_url"] = partial(assistant_manager.register_url)
 COMMANDS["unregister_url"] = partial(assistant_manager.unregister_url)
