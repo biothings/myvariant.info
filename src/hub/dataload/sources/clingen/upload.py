@@ -31,5 +31,14 @@ class ClingenUploader(uploader.ParallelizedSourceUploader):
 
     @classmethod
     def get_mapping(self):
-        mapping = {}
+        mapping = {
+            "clingen": {
+                "properties": {
+                    "caid": {
+                        "type": "text",
+                        "analyzer": "string_lowercase"
+                    }
+                }
+            }
+        }
         return mapping
