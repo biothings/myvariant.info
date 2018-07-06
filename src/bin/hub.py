@@ -40,6 +40,7 @@ import biothings.hub.dataindex.indexer as indexer
 import biothings.hub.datainspect.inspector as inspector
 from biothings.hub.api.manager import APIManager
 from hub.databuild.builder import MyVariantDataBuilder
+from hub.dataindex.indexer import MyVariantIndexerManager
 from hub.databuild.mapper import TagObserved
 from biothings.utils.hub import schedule, pending, done, CompositeCommand, \
                                 start_server, HubShell, CommandDefinition
@@ -90,7 +91,7 @@ sync_manager_prod = syncer.SyncerManager(job_manager=job_manager)
 sync_manager_prod.configure(klasses=[partial(ThrottledESColdHotJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS),
                                        partial(ThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
 
-index_manager = indexer.IndexerManager(job_manager=job_manager)
+index_manager = MyVariantIndexerManager(job_manager=job_manager)
 index_manager.configure(config.ES_CONFIG)
 
 # API manager: used to run API instances from the hub

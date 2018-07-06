@@ -233,6 +233,8 @@ LOG_FOLDER = ConfigurationError("Define path to folder which will contain log fi
 # Usually inside DATA_ARCHIVE_ROOT
 #LOG_FOLDER = os.path.join(DATA_ARCHIVE_ROOT,'logs')
 
+IDS_S3_BUCKET = ConfigurationError("Define a bucket name to upload myvariant _ids to")
+
 # default hub logger
 logger = ConfigurationError("Provider a default hub logger instance (use setup_default_log(name,log_folder)")
 # Usually use default setup
