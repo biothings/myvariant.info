@@ -1,4 +1,4 @@
-import os
+import os, time
 import asyncio
 
 import config
@@ -27,6 +27,8 @@ class BaseVariantIndexer(indexer.Indexer):
 
     def post_index(self, target_name, index_name, job_manager, steps=["index","post"], batch_size=10000, ids=None, mode=None): 
         # TODO: not tested yet
+        self.logger.info("Sleeping for a bit while index is being fully updated...")
+        time.sleep(3*60)
         idxer = ESIndexer(index=index_name,doc_type=self.doc_type,es_host=self.host)
         self.logger.info("Updating 'stats' by querying index '%s'" % index_name)
         assembly = self.build_config["assembly"]
