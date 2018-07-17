@@ -36,7 +36,8 @@ class ClingenUploader(uploader.ParallelizedSourceUploader):
                 "properties": {
                     "caid": {
                         "type": "text",
-                        "analyzer": "string_lowercase"
+                        "analyzer": "string_lowercase",
+                        "copy_to": ["all"],
                     }
                 }
             }
