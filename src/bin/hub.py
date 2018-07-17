@@ -82,14 +82,14 @@ inspector = inspector.InspectorManager(upload_manager=upload_manager,
                                        build_manager=build_manager,
                                        job_manager=job_manager)
 
-from biothings.hub.databuild.syncer import ThrottledESColdHotJsonDiffSelfContainedSyncer, ThrottledESJsonDiffSelfContainedSyncer, \
-                                           ESColdHotJsonDiffSelfContainedSyncer, ESJsonDiffSelfContainedSyncer
+from hub.databuild.syncer import MyVariantThrottledESColdHotJsonDiffSelfContainedSyncer, MyVariantThrottledESJsonDiffSelfContainedSyncer, \
+                                           MyVariantESColdHotJsonDiffSelfContainedSyncer, MyVariantESJsonDiffSelfContainedSyncer
 sync_manager = syncer.SyncerManager(job_manager=job_manager)
-sync_manager.configure(klasses=[ESColdHotJsonDiffSelfContainedSyncer,ESJsonDiffSelfContainedSyncer])
+sync_manager.configure(klasses=[MyVariantESColdHotJsonDiffSelfContainedSyncer,MyVariantESJsonDiffSelfContainedSyncer])
 
 sync_manager_prod = syncer.SyncerManager(job_manager=job_manager)
-sync_manager_prod.configure(klasses=[partial(ThrottledESColdHotJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS),
-                                       partial(ThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
+sync_manager_prod.configure(klasses=[partial(MyVariantThrottledESColdHotJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS),
+                                       partial(MyVariantThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
 
 index_manager = MyVariantIndexerManager(job_manager=job_manager)
 index_manager.configure(config.ES_CONFIG)
@@ -227,7 +227,7 @@ COMMANDS["es_config"] = config.ES_CONFIG
 # diff
 COMMANDS["diff"] = diff_manager.diff
 COMMANDS["diff_demo"] = partial(diff_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
-COMMANDS["diff_hg38"] = partial(diff_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
+COMMANDS["diff_hg38"] = partial(diff_manager.diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
 COMMANDS["diff_hg19"] = partial(diff_manager.diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
 COMMANDS["report"] = diff_manager.diff_report
 COMMANDS["release_note"] = diff_manager.release_note

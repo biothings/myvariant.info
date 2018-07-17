@@ -5,6 +5,8 @@ import config
 import biothings.hub.dataindex.indexer as indexer
 from biothings.hub.dataexport.ids import export_ids, upload_ids
 from biothings.utils.hub_db import get_src_build
+from biothings.utils.es import ESIndexer
+from utils.stats import update_stats
 
 
 class BaseVariantIndexer(indexer.Indexer):
@@ -22,6 +24,13 @@ class BaseVariantIndexer(indexer.Indexer):
         settings = super(BaseVariantIndexer,self).get_index_creation_settings()
         settings.setdefault("mapping",{}).setdefault("total_fields",{})["limit"] = 2000
         return settings
+
+    def post_index(self, target_name, index_name, job_manager, steps=["index","post"], batch_size=10000, ids=None, mode=None): 
+        # TODO: not tested yet
+        idxer = ESIndexer(index=index_name,doc_type=self.doc_type,es_host=self.host)
+        self.logger.info("Updating 'stats' by querying index '%s'" % index_name)
+        assembly = self.build_config["assembly"]
+        return update_stats(idxer,assembly)
 
 
 class MyVariantIndexerManager(indexer.IndexerManager):
