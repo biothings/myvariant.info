@@ -41,6 +41,7 @@ import biothings.hub.datainspect.inspector as inspector
 from biothings.hub.api.manager import APIManager
 from hub.databuild.builder import MyVariantDataBuilder
 from hub.dataindex.indexer import MyVariantIndexerManager
+from hub.databuild.differ import MyVariantDifferManager
 from hub.databuild.mapper import TagObserved
 from biothings.utils.hub import schedule, pending, done, CompositeCommand, \
                                 start_server, HubShell, CommandDefinition
@@ -75,7 +76,7 @@ build_manager = builder.BuilderManager(
         job_manager=job_manager)
 build_manager.configure()
 
-diff_manager = differ.DifferManager(job_manager=job_manager)
+diff_manager = MyVariantDifferManager(job_manager=job_manager)
 diff_manager.configure([differ.ColdHotSelfContainedJsonDiffer,differ.SelfContainedJsonDiffer])
 
 inspector = inspector.InspectorManager(upload_manager=upload_manager,
@@ -225,10 +226,8 @@ COMMANDS["es_sync_hg38_prod"] = partial(sync_manager_prod.sync,"es",
                                                         config.ES_CONFIG["env"]["prod"]["index"]["hg38"][0]["doc_type"]))
 COMMANDS["es_config"] = config.ES_CONFIG
 # diff
-COMMANDS["diff"] = diff_manager.diff
+COMMANDS["diff"] = partial(diff_manager.diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
 COMMANDS["diff_demo"] = partial(diff_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
-COMMANDS["diff_hg38"] = partial(diff_manager.diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
-COMMANDS["diff_hg19"] = partial(diff_manager.diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
 COMMANDS["report"] = diff_manager.diff_report
 COMMANDS["release_note"] = diff_manager.release_note
 COMMANDS["publish_diff_hg19"] = partial(diff_manager.publish_diff,config.S3_APP_FOLDER + "-hg19")
