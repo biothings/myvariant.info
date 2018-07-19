@@ -40,6 +40,8 @@ import biothings.hub.dataindex.indexer as indexer
 import biothings.hub.datainspect.inspector as inspector
 from biothings.hub.api.manager import APIManager
 from hub.databuild.builder import MyVariantDataBuilder
+from hub.dataindex.indexer import MyVariantIndexerManager
+from hub.databuild.differ import MyVariantDifferManager
 from hub.databuild.mapper import TagObserved
 from biothings.utils.hub import schedule, pending, done, CompositeCommand, \
                                 start_server, HubShell, CommandDefinition
@@ -74,23 +76,23 @@ build_manager = builder.BuilderManager(
         job_manager=job_manager)
 build_manager.configure()
 
-diff_manager = differ.DifferManager(job_manager=job_manager)
+diff_manager = MyVariantDifferManager(job_manager=job_manager)
 diff_manager.configure([differ.ColdHotSelfContainedJsonDiffer,differ.SelfContainedJsonDiffer])
 
 inspector = inspector.InspectorManager(upload_manager=upload_manager,
                                        build_manager=build_manager,
                                        job_manager=job_manager)
 
-from biothings.hub.databuild.syncer import ThrottledESColdHotJsonDiffSelfContainedSyncer, ThrottledESJsonDiffSelfContainedSyncer, \
-                                           ESColdHotJsonDiffSelfContainedSyncer, ESJsonDiffSelfContainedSyncer
+from hub.databuild.syncer import MyVariantThrottledESColdHotJsonDiffSelfContainedSyncer, MyVariantThrottledESJsonDiffSelfContainedSyncer, \
+                                           MyVariantESColdHotJsonDiffSelfContainedSyncer, MyVariantESJsonDiffSelfContainedSyncer
 sync_manager = syncer.SyncerManager(job_manager=job_manager)
-sync_manager.configure(klasses=[ESColdHotJsonDiffSelfContainedSyncer,ESJsonDiffSelfContainedSyncer])
+sync_manager.configure(klasses=[MyVariantESColdHotJsonDiffSelfContainedSyncer,MyVariantESJsonDiffSelfContainedSyncer])
 
 sync_manager_prod = syncer.SyncerManager(job_manager=job_manager)
-sync_manager_prod.configure(klasses=[partial(ThrottledESColdHotJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS),
-                                       partial(ThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
+sync_manager_prod.configure(klasses=[partial(MyVariantThrottledESColdHotJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS),
+                                       partial(MyVariantThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
 
-index_manager = indexer.IndexerManager(job_manager=job_manager)
+index_manager = MyVariantIndexerManager(job_manager=job_manager)
 index_manager.configure(config.ES_CONFIG)
 
 # API manager: used to run API instances from the hub
@@ -224,10 +226,8 @@ COMMANDS["es_sync_hg38_prod"] = partial(sync_manager_prod.sync,"es",
                                                         config.ES_CONFIG["env"]["prod"]["index"]["hg38"][0]["doc_type"]))
 COMMANDS["es_config"] = config.ES_CONFIG
 # diff
-COMMANDS["diff"] = diff_manager.diff
+COMMANDS["diff"] = partial(diff_manager.diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
 COMMANDS["diff_demo"] = partial(diff_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
-COMMANDS["diff_hg38"] = partial(diff_manager.diff,differ.SelfContainedJsonDiffer.diff_type)
-COMMANDS["diff_hg19"] = partial(diff_manager.diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
 COMMANDS["report"] = diff_manager.diff_report
 COMMANDS["release_note"] = diff_manager.release_note
 COMMANDS["publish_diff_hg19"] = partial(diff_manager.publish_diff,config.S3_APP_FOLDER + "-hg19")
@@ -236,8 +236,8 @@ COMMANDS["publish_diff_hg38"] = partial(diff_manager.publish_diff,config.S3_APP_
 COMMANDS["index"] = index_manager.index
 COMMANDS["snapshot"] = index_manager.snapshot
 COMMANDS["snapshot_demo"] = partial(index_manager.snapshot,repository=config.SNAPSHOT_REPOSITORY + "-demo")
-COMMANDS["publish_snapshot_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-hg19")
-COMMANDS["publish_snapshot_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-hg38")
+COMMANDS["publish_snapshot_hg19"] = partial(index_manager.publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-hg19")
+COMMANDS["publish_snapshot_hg38"] = partial(index_manager.publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-hg38")
 # inspector
 COMMANDS["inspect"] = inspector.inspect
 # demo
@@ -245,10 +245,10 @@ COMMANDS["publish_diff_demo_hg19"] = partial(diff_manager.publish_diff,config.S3
                                         s3_bucket=config.S3_DIFF_BUCKET + "-demo")
 COMMANDS["publish_diff_demo_hg38"] = partial(diff_manager.publish_diff,config.S3_APP_FOLDER + "-demo_hg38",
                                         s3_bucket=config.S3_DIFF_BUCKET + "-demo")
-COMMANDS["publish_snapshot_demo_hg19"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg19",
-                                                                                ro_repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
-COMMANDS["publish_snapshot_demo_hg38"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo_hg38",
-                                                                                ro_repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
+COMMANDS["publish_snapshot_demo_hg19"] = partial(index_manager.publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-demo_hg19",
+                                                                                repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
+COMMANDS["publish_snapshot_demo_hg38"] = partial(index_manager.publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-demo_hg38",
+                                                                                repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
 # data plugins
 COMMANDS["register_url"] = partial(assistant_manager.register_url)
 COMMANDS["unregister_url"] = partial(assistant_manager.unregister_url)

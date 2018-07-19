@@ -177,7 +177,7 @@ from biothings.utils.loggers import setup_default_log
 # any other variables in this file as required. Variables defined as ValueError() exceptions
 # *must* be defined
 #
-from biothings import ConfigurationError
+from biothings import ConfigurationError, ConfigurationDefault, ConfigurationValue
 
 # Individual source database connection
 DATA_SRC_SERVER = ConfigurationError("Define hostname for source database")
@@ -216,24 +216,30 @@ HUB_DB_BACKEND = ConfigurationError("Define Hub DB connection")
 DATA_ARCHIVE_ROOT = ConfigurationError("Define path to folder which will contain all downloaded data, cache files, etc...")
 
 # Path to a folder to store all 3rd party parsers, dumpers, etc...
-DATA_PLUGIN_FOLDER = ConfigurationError("Define path to folder which will contain all 3rd party parsers, dumpers, etc...")
+DATA_PLUGIN_FOLDER = ConfigurationDefault(
+        default="./plugins",
+        desc="Define path to folder which will contain all 3rd party parsers, dumpers, etc...")
 
 # Path to folder containing diff files
-DIFF_PATH = ConfigurationError("Define path to folder which will contain output files from diff")
-# Usually inside DATA_ARCHIVE_ROOT
-#DIFF_PATH = os.path.join(DATA_ARCHIVE_ROOT,"diff")
+DIFF_PATH = ConfigurationDefault(
+        default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"diff")"""),
+        desc="Define path to folder which will contain output files from diff")
 
 # Path to folder containing release note files
-RELEASE_PATH = ConfigurationError("Define path to folder which will contain release files")
-# Usually inside DATA_ARCHIVE_ROOT
-#RELEASE_PATH = os.path.join(DATA_ARCHIVE_ROOT,"release")
+RELEASE_PATH = ConfigurationDefault(
+        default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"release")"""),
+        desc="Define path to folder which will contain release files")
 
 # this dir must be created manually
-LOG_FOLDER = ConfigurationError("Define path to folder which will contain log files")
-# Usually inside DATA_ARCHIVE_ROOT
-#LOG_FOLDER = os.path.join(DATA_ARCHIVE_ROOT,'logs')
+LOG_FOLDER = ConfigurationDefault(
+        default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"logs")"""),
+        desc="Define path to folder which will contain log files")
+
+IDS_S3_BUCKET =  ConfigurationDefault(
+        default="myvariant-ids",
+        desc="Define a bucket name to upload myvariant _ids to")
 
 # default hub logger
-logger = ConfigurationError("Provider a default hub logger instance (use setup_default_log(name,log_folder)")
-# Usually use default setup
-#logger = setup_default_log("hub", LOG_FOLDER)
+logger = ConfigurationDefault(
+        default=logging,
+        desc="Provide a default hub logger instance (use setup_default_log(name,log_folder)")
