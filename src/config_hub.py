@@ -236,6 +236,8 @@ LOG_FOLDER = ConfigurationDefault(
         default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"logs")"""),
         desc="Define path to folder which will contain log files")
 
+STANDALONE_VERSION = ConfigurationError("Define standalone version targetted by this Hub")
+
 IDS_S3_BUCKET =  ConfigurationDefault(
         default="myvariant-ids",
         desc="Define a bucket name to upload myvariant _ids to")
