@@ -11,8 +11,7 @@ class MyVariantDifferManager(differ.DifferManager):
                       release_folder, steps, s3_bucket, *args, **kwargs):
         bdoc = get_src_build().find_one({"_id" : new_db_col_names})
         assert bdoc, "Can't find build doc associated with index '%s' (should be named the same)" % new_db_col_names
-        #ids_file = export_ids(new_db_col_names)
-        ids_file = "/opt/variantdoc-hub/export/ids/hot_hg19_20180709_dm47vtlr_ids.xz"
+        ids_file = export_ids(new_db_col_names)
         redir = "%s_ids.xz" % bdoc["build_config"]["assembly"]
         if "demo" in new_db_col_names:
             redir = "demo_%s" % redir
