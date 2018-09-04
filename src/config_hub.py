@@ -142,6 +142,7 @@ HIPCHAT_CONFIG = {
 #    'from': '',
 #    'host': '',
 }
+SLACK_WEBHOOK = None
 
 # SSH port for hub console
 HUB_SSH_PORT = 7022
