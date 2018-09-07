@@ -3,7 +3,7 @@
 #    pip install -r requirements_web.txt
 
 # required
-tornado
+tornado>4.5
 elasticsearch<6.2,>=6.0
 
 # biothings
