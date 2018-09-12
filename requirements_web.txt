@@ -3,11 +3,11 @@
 #    pip install -r requirements_web.txt
 
 # required
-tornado
+tornado>4.5
 elasticsearch<6.2,>=6.0
 
 # biothings
-git+https://github.com/biothings/biothings.api.git@76d4d123cd03cfbcfe641294e13be4aaa425f528#egg=biothings
+git+https://github.com/biothings/biothings.api.git@f840ab54b9e7910d1250b9312fa34d7cafcbe3a6#egg=biothings
 
 # optional
 msgpack-python==0.4.6
@@ -18,6 +18,10 @@ psutil
 # for nosetests
 nose>=1.3.7
 httplib2>=0.8
+
+#should be in biothings...
+pytz
+gitpython
 
 # for sentry monitoring
 raven
