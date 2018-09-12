@@ -66,8 +66,7 @@ def generate_clinvar_lib(data_folder):
         logging.info("Generate XM parser")
         ret = os.system('''generateDS.py -f -o "clinvar_tmp.py" -s "clinvarsubs.py" clinvar_public.xsd''')
         if ret != 0:
-            logging.error("Unable to generate parser, return code: %s" % ret)
-            raise
+            raise Exception("Unable to generate parser, return code: %s" % ret)
         try:
             py = open("clinvar_tmp.py").read()
             # convert py2 to py3 (though they claim it support both versions)

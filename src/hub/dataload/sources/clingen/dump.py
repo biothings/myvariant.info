@@ -16,7 +16,7 @@ class ClingenDumper(LastModifiedHTTPDumper):
 
     SRC_NAME = "clingen"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
-    SCHEDULE = "0 9 * * *"
+    ###SCHEDULE = "0 9 * * *"
     SRC_URLS = ["http://reg.genome.network/temp/mvi_ca.gz"]
     CHUNK_SIZE = 10000000 # number of lines
 
