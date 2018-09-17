@@ -240,6 +240,8 @@ IDS_S3_BUCKET =  ConfigurationDefault(
         default="myvariant-ids",
         desc="Define a bucket name to upload myvariant _ids to")
 
+STANDALONE_VERSION = ConfigurationError("Define standalone version targetted by this Hub")
+
 # default hub logger
 logger = ConfigurationDefault(
         default=logging,
