@@ -2,12 +2,12 @@
 # To install all requirement, run
 #    pip install -r requirements_web.txt
 
+# biothings
+git+https://github.com/biothings/biothings.api.git@f840ab54b9e7910d1250b9312fa34d7cafcbe3a6#egg=biothings
+
 # required
 tornado>4.5
 elasticsearch<6.2,>=6.0
-
-# biothings
-git+https://github.com/biothings/biothings.api.git@f840ab54b9e7910d1250b9312fa34d7cafcbe3a6#egg=biothings
 
 # optional
 msgpack-python==0.4.6
