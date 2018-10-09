@@ -9,5 +9,5 @@ web_settings = MyVariantWebSettings(config='config')
 if __name__ == '__main__':
     # set debug level on app settings
     web_settings.set_debug_level(options.debug)
-    main(web_settings.generate_app_list(), debug_settings={"STATIC_PATH": web_settings.STATIC_PATH},
+    main(web_settings.generate_app_list(), debug_settings={"STATIC_PATH": web_settings.STATIC_PATH, "debug": True},
          sentry_client_key=web_settings.SENTRY_CLIENT_KEY)
