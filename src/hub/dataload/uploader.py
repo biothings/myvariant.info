@@ -38,7 +38,7 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
         # -q: when there's an update, there's a message on stderr....
         cmd = "java -Xmx4g -jar %s/snpEff/snpEff.jar -t -noStats -noExpandIUB %s" % (snpeff_dir,version)
         # genome files are in "data_folder"/../data
-        genomes = glob.glob(os.path.join(snpeff_dir,"..","data","%s_genome.*" % version))
+        genomes = glob.glob(os.path.join(snpeff_dir,"%s_genome.*" % version))
         assert len(genomes) == 1, "Expected only one genome files for '%s', got: %s" % (version,genomes)
         genome = genomes[0]
         annotator = snpeff_parser.SnpeffAnnotator(cmd,logger=self.logger)
