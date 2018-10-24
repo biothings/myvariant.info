@@ -3,6 +3,7 @@ import os.path
 import subprocess
 import sys
 import time
+import re
 
 import biothings, config
 biothings.config_for_app(config)
@@ -18,7 +19,14 @@ class SnpeffDumper(LastModifiedHTTPDumper):
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     SRC_URLS = ["http://myvariant-ids.s3-website-us-west-2.amazonaws.com/hg19_genome.pyobj",
                 "http://myvariant-ids.s3-website-us-west-2.amazonaws.com/hg38_genome.pyobj",
-                "https://sourceforge.net/projects/snpeff/files/snpEff_latest_core.zip"]
+                #"https://sourceforge.net/projects/snpeff/files/snpEff_latest_core.zip",
+                "https://sourceforge.net/projects/snpeff/files/snpEff_v4_3k_core.zip",
+               ]
+
+    def set_release(self):
+        self.release = re.match(".*v(.*)_core.*",
+                                self.__class__.SRC_URLS[-1].split("/")[-1]
+                          ).groups()[0].replace("_",".")
 
     def post_dump(self, *args, **kwargs):
         self.logger.info("Uncompressing files in '%s'" % self.new_data_folder) 
