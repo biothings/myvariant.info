@@ -17,8 +17,8 @@ class SnpeffDumper(LastModifiedHTTPDumper):
 
     SRC_NAME = "snpeff"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
-    SRC_URLS = ["http://myvariant-ids.s3-website-us-west-2.amazonaws.com/hg19_genome.pyobj",
-                "http://myvariant-ids.s3-website-us-west-2.amazonaws.com/hg38_genome.pyobj",
+    SRC_URLS = ["http://biothings-data.s3-website-us-west-2.amazonaws.com/myvariant.info/hg19_genome.pyobj",
+                "http://biothings-data.s3-website-us-west-2.amazonaws.com/myvariant.info/hg38_genome.pyobj",
                 #"https://sourceforge.net/projects/snpeff/files/snpEff_latest_core.zip",
                 "https://sourceforge.net/projects/snpeff/files/snpEff_v4_3k_core.zip",
                ]
