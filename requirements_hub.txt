@@ -16,11 +16,4 @@
 #       __METADATA__ setting for required modules.
 
 
-elasticsearch==2.0.0
-requests==2.8.1
-mongokit>=0.9.1.1
-pymongo>=3.2
 bitarray==0.8.1    # used in utils.validate module
-asyncssh==1.7.1 # ssh hub console
-boto # interaction with AWS
-jsonpointer==1.10 # applying JSON patches
