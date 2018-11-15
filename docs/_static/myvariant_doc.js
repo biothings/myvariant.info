@@ -24,8 +24,7 @@ jQuery(document).ready(function() {
                     var thisSrc = data['src'][thisSrcKey];
                     if ('stats' in thisSrc) {
                         for (collection in thisSrc['stats']) {
-                            var tmp = collection;
-                            tmp.replace('_hg19', '');
+                            var tmp = collection.replace('_hg19', '');
                             versionMap[tmp] = {'total': thisSrc['stats'][collection]};
                             if ('version' in thisSrc) {
                                 versionMap[tmp]['version'] = thisSrc['version'];
@@ -62,8 +61,7 @@ jQuery(document).ready(function() {
                             var thisSrc = data['src'][thisSrcKey];
                             if ('stats' in thisSrc) {
                                 for (collection in thisSrc['stats']) {
-                                    var tmp = collection;
-                                    tmp.replace('_hg38', '');
+                                    var tmp = collection.replace('_hg38', '');
                                     versionMap[tmp] = {'total': thisSrc['stats'][collection]};
                                     if ('version' in thisSrc) {
                                         versionMap[tmp]['version'] = thisSrc['version'];
