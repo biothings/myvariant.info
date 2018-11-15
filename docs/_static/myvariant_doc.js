@@ -25,6 +25,9 @@ jQuery(document).ready(function() {
                     if ('stats' in thisSrc) {
                         for (collection in thisSrc['stats']) {
                             var tmp = collection.replace('_hg19', '');
+                            // hard coded for now
+                            if (tmp == 'gnomad_exomes') {tmp = 'gnomad_exome';}
+                            if (tmp == 'gnomad_genomes') {tmp = 'gnomad_genome';}
                             versionMap[tmp] = {'total': thisSrc['stats'][collection]};
                             if ('version' in thisSrc) {
                                 versionMap[tmp]['version'] = thisSrc['version'];
@@ -62,6 +65,9 @@ jQuery(document).ready(function() {
                             if ('stats' in thisSrc) {
                                 for (collection in thisSrc['stats']) {
                                     var tmp = collection.replace('_hg38', '');
+                                    // hard coded for now
+                                    if (tmp == 'gnomad_exomes') {tmp = 'gnomad_exome';}
+                                    if (tmp == 'gnomad_genomes') {tmp = 'gnomad_genome';}
                                     versionMap[tmp] = {'total': thisSrc['stats'][collection]};
                                     if ('version' in thisSrc) {
                                         versionMap[tmp]['version'] = thisSrc['version'];
