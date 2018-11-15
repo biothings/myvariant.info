@@ -20,7 +20,8 @@ jQuery(document).ready(function() {
                 }
                 // get all keys and stats from object
                 var versionMap = {};
-                for (thisSrc in data['src']) {
+                for (thisSrcKey in data['src']) {
+                    var thisSrc = data['src'][thisSrcKey];
                     if ('stats' in thisSrc) {
                         for (collection in thisSrc['stats']) {
                             var tmp = collection;
@@ -57,7 +58,8 @@ jQuery(document).ready(function() {
                         }
                         // get all keys and stats from object
                         var versionMap = {};
-                        for (thisSrc in data['src']) {
+                        for (thisSrcKey in data['src']) {
+                            var thisSrc = data['src'][thisSrcKey];
                             if ('stats' in thisSrc) {
                                 for (collection in thisSrc['stats']) {
                                     var tmp = collection;
