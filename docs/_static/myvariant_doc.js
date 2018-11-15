@@ -40,7 +40,7 @@ jQuery(document).ready(function() {
                             thisRow.children(' :nth-child(2) ').html(versionMap[thisKey]["version"]);
                         }
                         if ('total' in versionMap[thisKey]) {
-                            thisRow.children(' :nth-child(3) ').html(numberWithCommas(data['src'][thisKey]["stats"][thisKey]));
+                            thisRow.children(' :nth-child(3) ').html(numberWithCommas(versionMap[thisKey]["total"]));
                         }
                     }
                 });
@@ -77,7 +77,7 @@ jQuery(document).ready(function() {
                                     thisRow.children(' :nth-child(2) ').html(versionMap[thisKey]["version"]);
                                 }
                                 if ('total' in versionMap[thisKey]) {
-                                    thisRow.children(' :nth-child(3) ').html(numberWithCommas(data['src'][thisKey]["stats"][thisKey]));
+                                    thisRow.children(' :nth-child(3) ').html(numberWithCommas(versionMap[thisKey]["total"]));
                                 }
                             }
                         });
