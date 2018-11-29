@@ -7,48 +7,116 @@ var DATA_FORMAT_VERSION = "1.0";
 
 jQuery(document).ready(function() {
     if( jQuery(' .metadata-table ').length ) {
-        // get the metadata information
+        // get the hg19 metadata information
         jQuery.ajax({
-            url: "http://myvariant.info/v1/metadata",
+            url: "//myvariant.info/v1/metadata",
             dataType: "JSONP",
             jsonpCallback: "callback",
             type: "GET",
             success: function(data) {
                 // Set the total number of variants
-                jQuery(' .metadata-table p strong ').html(numberWithCommas(data["stats"]["total"]));
-                jQuery.each(jQuery(' .metadata-table tbody tr '), function(index, row) {
-                    var thisRow = jQuery(' .metadata-table tbody tr:nth-child(' + (index + 1).toString() + ')');
+                if (('stats' in data) && ('total' in data['stats'])) {
+                    jQuery(' .hg19-table p strong ').html(numberWithCommas(data["stats"]["total"]));
+                }
+                // get all keys and stats from object
+                var versionMap = {};
+                for (thisSrcKey in data['src']) {
+                    var thisSrc = data['src'][thisSrcKey];
+                    if ('stats' in thisSrc) {
+                        for (collection in thisSrc['stats']) {
+                            var tmp = collection.replace('_hg19', '');
+                            // hard coded for now
+                            if (tmp == 'gnomad_exomes') {tmp = 'gnomad_exome';}
+                            if (tmp == 'gnomad_genomes') {tmp = 'gnomad_genome';}
+                            versionMap[tmp] = {'total': thisSrc['stats'][collection]};
+                            if ('version' in thisSrc) {
+                                versionMap[tmp]['version'] = thisSrc['version'];
+                            }
+                        }
+                    }
+                }
+                jQuery.each(jQuery(' .hg19-table tbody tr '), function(index, row) {
+                    var thisRow = jQuery(' .hg19-table tbody tr:nth-child(' + (index + 1).toString() + ')');
                     var thisKey = thisRow.children(' :nth-child(4) ').text();
-                    if(thisKey in data["src_version"]) {thisRow.children(' :nth-child(2) ').html(data["src_version"][thisKey]);}
-                    if(thisKey in data["stats"]) {thisRow.children(' :nth-child(3) ').html(numberWithCommas(data["stats"][thisKey]));}
+                    if (thisKey in versionMap) {
+                        if  ('version' in versionMap[thisKey]) {
+                            thisRow.children(' :nth-child(2) ').html(versionMap[thisKey]["version"]);
+                        }
+                        if ('total' in versionMap[thisKey]) {
+                            thisRow.children(' :nth-child(3) ').html(numberWithCommas(versionMap[thisKey]["total"]));
+                        }
+                    }
                 });
+                // get the hg38 metadata information
                 jQuery.ajax({
-                    url: "http://myvariant.info/v1/metadata/fields",
+                    url: "//myvariant.info/v1/metadata?assembly=hg38",
                     dataType: "JSONP",
                     jsonpCallback: "callback",
                     type: "GET",
                     success: function(data) {
-                        jQuery.each(data, function(field, d) {
-                            var notes = indexed = '&nbsp;';
-                            if(d.notes) {notes=d.notes;}
-                            if(d.indexed) {indexed='&#x2714';}
-                            jQuery('.indexed-field-table > tbody:last').append('<tr><td>' + field + '</td><td>' + indexed + '</td><td><span class="italic">' + d.type + '</span></td><td>' + notes + '</td>');
+                        // Set the total number of variants
+                        if (('stats' in data) && ('total' in data['stats'])) {
+                            jQuery(' .hg38-table p strong ').html(numberWithCommas(data["stats"]["total"]));
+                        }
+                        // get all keys and stats from object
+                        var versionMap = {};
+                        for (thisSrcKey in data['src']) {
+                            var thisSrc = data['src'][thisSrcKey];
+                            if ('stats' in thisSrc) {
+                                for (collection in thisSrc['stats']) {
+                                    var tmp = collection.replace('_hg38', '');
+                                    // hard coded for now
+                                    if (tmp == 'gnomad_exomes') {tmp = 'gnomad_exome';}
+                                    if (tmp == 'gnomad_genomes') {tmp = 'gnomad_genome';}
+                                    versionMap[tmp] = {'total': thisSrc['stats'][collection]};
+                                    if ('version' in thisSrc) {
+                                        versionMap[tmp]['version'] = thisSrc['version'];
+                                    }
+                                }
+                            }
+                        }
+                        jQuery.each(jQuery(' .hg38-table tbody tr '), function(index, row) {
+                            var thisRow = jQuery(' .hg38-table tbody tr:nth-child(' + (index + 1).toString() + ')');
+                            var thisKey = thisRow.children(' :nth-child(4) ').text();
+                            if (thisKey in versionMap) {
+                                if  ('version' in versionMap[thisKey]) {
+                                    thisRow.children(' :nth-child(2) ').html(versionMap[thisKey]["version"]);
+                                }
+                                if ('total' in versionMap[thisKey]) {
+                                    thisRow.children(' :nth-child(3) ').html(numberWithCommas(versionMap[thisKey]["total"]));
+                                }
+                            }
                         });
-                        jQuery('.indexed-field-table').DataTable({
-                            "iDisplayLength": 50,
-                            "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-                            "columns": [
-                                {"width":"290px"},
-                                null,
-                                null,
-                                null
-                            ],
-                            "autoWidth": false,
-                            "dom": "flrtip"
-                        });
+                        jQuery.ajax({
+                            url: "//myvariant.info/v1/metadata/fields",
+                            dataType: "JSONP",
+                            jsonpCallback: "callback",
+                            type: "GET",
+                            success: function(data) {
+                                jQuery.each(data, function(field, d) {
+                                    var notes = indexed = '&nbsp;';
+                                    if(d.notes) {notes=d.notes;}
+                                    if(d.indexed) {indexed='&#x2714';}
+                                    jQuery('.indexed-field-table > tbody:last').append('<tr><td>' + field + '</td><td>' + indexed + '</td><td><span class="italic">' + d.type + '</span></td><td>' + notes + '</td>');
+                                });
+                                jQuery('.indexed-field-table').DataTable({
+                                    "iDisplayLength": 50,
+                                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                                    "columns": [
+                                        {"width":"290px"},
+                                        null,
+                                        null,
+                                        null
+                                    ],
+                                    "autoWidth": false,
+                                    "dom": "flrtip"
+                                });
+                            }
+                        });            
+                        
                     }
                 });
-                
+
             }
         });
     }

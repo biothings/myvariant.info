@@ -1,6 +1,6 @@
 import os
 
-from ...uploader import SnpeffPostUpdateUploader
+from hub.dataload.uploader import SnpeffPostUpdateUploader
 from .cgi_parser import load_data
 
 
