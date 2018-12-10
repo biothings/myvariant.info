@@ -107,8 +107,13 @@ class MyVariantHubServer(HubServer):
         self.logger.info("Using custom builder %s" % MyVariantDataBuilder)
 
     def configure_diff_manager(self):
-        diff_manager = MyVariantDifferManager(job_manager=self.managers["job_manager"])
+        diff_manager = MyVariantDifferManager(job_manager=self.managers["job_manager"],
+                poll_schedule="* * * * * */10")
         diff_manager.configure([differ.ColdHotSelfContainedJsonDiffer,differ.SelfContainedJsonDiffer])
+        # autmoate release note generation when a diff has been generated,
+        # but don't necessarily trigger a diff once a merge has been built, it may be too big
+        # and may not qualify for a diff release
+        diff_manager.poll("release_note",lambda doc: diff_manager.release_note(old=None,new=doc["_id"]))
         self.managers["diff_manager"] = diff_manager
         self.logger.info("Using custom diff_manager %s" % diff_manager)
 
@@ -148,6 +153,8 @@ class MyVariantHubServer(HubServer):
                                                                 config.ES_CONFIG["env"]["prod"]["index"]["hg38"][0]["doc_type"]))
         # snapshot, diff & publish
         self.commands["snapshot_demo"] = partial(self.managers["index_manager"].snapshot,repository=config.SNAPSHOT_REPOSITORY + "-demo")
+        # override with diff type
+        self.commands["diff"] = partial(self.managers["diff_manager"].diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
         self.commands["diff_demo"] = partial(self.managers["diff_manager"].diff,differ.SelfContainedJsonDiffer.diff_type)
         self.commands["publish_diff_hg19"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-hg19")
         self.commands["publish_diff_hg38"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-hg38")
