@@ -12,13 +12,13 @@ from biothings.utils.dataload import unlist, dict_sweep, \
                                      value_convert_to_number, rec_handler
 
 GLOB_PATTERN = "ClinVarFullRelease_*.xml.gz"
-clinvar = None
+clinvarlib = None
 
 def import_clinvar_lib(data_folder):
     sys.path.insert(0,data_folder)
-    import clinvar as clinvar_mod
-    global clinvar
-    clinvar = clinvar_mod
+    import genclinvar as clinvar_mod
+    global clinvarlib
+    clinvarlib = clinvar_mod
 
 def merge_rcv_accession(generator):
     groups = []
@@ -369,7 +369,7 @@ def rcv_feeder(input_file, hg19):
         if record.startswith('\n</ReleaseSet>'):
             continue
         try:
-            record_parsed = clinvar.parseString(record, silence=1)
+            record_parsed = clinvarlib.parseString(record, silence=1)
         except:
             logging.debug(record)
             raise

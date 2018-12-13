@@ -71,7 +71,7 @@ def generate_clinvar_lib(data_folder):
             py = open("clinvar_tmp.py").read()
             # convert py2 to py3 (though they claim it support both versions)
             py = py.replace("from StringIO import StringIO","from io import StringIO")
-            fout = open("clinvar.py","w")
+            fout = open("genclinvar.py","w")
             fout.write(py)
             fout.close()
             os.unlink("clinvar_tmp.py")
