@@ -4,14 +4,15 @@ from hub.dataload.uploader import SnpeffPostUpdateUploader
 class GwassnpsUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
 
     name = "gwassnps"
-    __metadata__ = {"mapper" : 'observed',
-            "assembly" : "hg19",
-            "src_meta" : {
-                "url" : "http://www.ebi.ac.uk/gwas/",
-                "license_url" : "http://www.ebi.ac.uk/gwas/docs/about",
-                "license_url_short": "https://goo.gl/Zy0C5e"
-                }
-            }
+    __metadata__ = {
+        "mapper" : 'observed',
+        "assembly" : "hg19",
+        "src_meta" : {
+            "url" : "http://www.ebi.ac.uk/gwas/",
+            "license_url" : "http://www.ebi.ac.uk/gwas/docs/about",
+            "license_url_short": "http://bit.ly/2M3dDMC"
+        }
+    }
 
     @classmethod
     def get_mapping(klass):

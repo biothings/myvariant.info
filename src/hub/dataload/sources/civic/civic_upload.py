@@ -4,15 +4,16 @@ from hub.dataload.uploader import SnpeffPostUpdateUploader
 class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
 
     name = "civic"
-    __metadata__ = {"mapper" : 'observed',
-            "assembly" : "hg19",
-            "src_meta" : {
-                "url" : "https://civic.genome.wustl.edu/home",
-                "license_url" : "https://civic.genome.wustl.edu/faq",
-                "license_url_short": "https://goo.gl/gPCAyH",
-                "licence" : "CC0 1.0 Universal",
-                }
-            }
+    __metadata__ = {
+        "mapper" : 'observed',
+        "assembly" : "hg19",
+        "src_meta" : {
+            "url" : "https://civicdb.org",
+            "license_url" : "https://creativecommons.org/publicdomain/zero/1.0/",
+            "license_url_short": "http://bit.ly/2FqS871",
+            "licence" : "CC0 1.0 Universal"
+        }
+    }
 
     @classmethod
     def get_mapping(klass):
@@ -609,6 +610,6 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
                 }
             }
         }
-        
+
         return mapping
 

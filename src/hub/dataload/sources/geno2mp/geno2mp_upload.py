@@ -9,14 +9,15 @@ from hub.dataload.uploader import SnpeffPostUpdateUploader
 class Geno2MPUploader(SnpeffPostUpdateUploader):
 
     name = "geno2mp"
-    __metadata__ = {"mapper" : 'observed',
-            "assembly" : "hg19",
-            "src_meta" : {
-                "url" : "http://geno2mp.gs.washington.edu",
-                "license_url" : "http://geno2mp.gs.washington.edu/Geno2MP/#/terms",
-                "license_url_short": "https://goo.gl/D6Edka"
-                }
-            }
+    __metadata__ = {
+        "mapper" : 'observed',
+        "assembly" : "hg19",
+        "src_meta" : {
+            "url" : "http://geno2mp.gs.washington.edu",
+            "license_url" : "http://geno2mp.gs.washington.edu/Geno2MP/#/terms",
+            "license_url_short": "http://bit.ly/2QyGCIN"
+        }
+    }
 
     def load_data(self,data_folder):
         # there's one vcf file there, let's get it

@@ -4,15 +4,16 @@ from hub.dataload.uploader import SnpeffPostUpdateUploader
 class UniprotUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
 
     name = "uniprot"
-    __metadata__ = {"mapper" : 'observed',
-            "assembly" : "hg38",
-            "src_meta" : {
-                "url" : "http://www.uniprot.org/",
-                "license" : "CC BY-ND 3.0",
-                "license_url" : "http://www.uniprot.org/help/license",
-                "license_url_short": "https://goo.gl/4CUyQv"
-                }
-            }
+    __metadata__ = {
+        "mapper" : 'observed',
+        "assembly" : "hg38",
+        "src_meta" : {
+            "url" : "http://www.uniprot.org/",
+            "license" : "CC BY 4.0",
+            "license_url" : "http://www.uniprot.org/help/license",
+            "license_url_short": "http://bit.ly/2RMp2Wa"
+        }
+    }
 
     @classmethod
     def get_mapping(klass):

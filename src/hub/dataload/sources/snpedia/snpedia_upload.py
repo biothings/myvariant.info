@@ -6,15 +6,15 @@ class SnpediaUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
 
     name = "snpedia"
     __metadata__ = {
-            "mapper" : 'observed',
-            "assembly" : "hg19",
-            "src_meta" : {
-                "url" : "https://www.snpedia.com/",
-                "license" : "CC BY-NC-SA",
-                "license_url" : "https://www.snpedia.com/index.php/SNPedia:General_disclaimer",
-                "license_url_short": "https://goo.gl/3DZUWK"
-                }
-            }
+        "mapper" : 'observed',
+        "assembly" : "hg19",
+        "src_meta" : {
+            "url" : "https://www.snpedia.com/",
+            "license" : "CC BY-NC-SA",
+            "license_url" : "https://www.snpedia.com/index.php/SNPedia:General_disclaimer",
+            "license_url_short": "http://bit.ly/2VJ3TeR"
+        }
+    }
 
     @classmethod
     def get_mapping(klass):
