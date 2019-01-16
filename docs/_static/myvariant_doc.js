@@ -98,7 +98,7 @@ jQuery(document).ready(function() {
                                     if(d.notes) {notes=d.notes;}
                                     if(d.index) {indexed='&#x2714';}
                                     if(d['searched_by_default']) {searchedByDefault='&#x2714';}
-                                    jQuery('.indexed-field-table > tbody:last').append('<tr><td>' + field + '</td><td>' + indexed + '</td><td>' + searchedByDefault + '</td><td><span class="italic">' + d.type + '</span></td><td>' + notes + '</td>');
+                                    jQuery('.indexed-field-table > tbody:last').append('<tr><td>' + field + '</td><td>' + indexed + '</td><td>' + searchedByDefault + '</td><td><span class="italic">' + d.type + '</span></td><td>' + notes + '</td></tr>');
                                 });
                                 jQuery('.indexed-field-table').DataTable({
                                     "iDisplayLength": 50,
