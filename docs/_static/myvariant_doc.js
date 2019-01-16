@@ -107,6 +107,7 @@ jQuery(document).ready(function() {
                                         {"width":"290px"},
                                         null,
                                         null,
+                                        null,
                                         null
                                     ],
                                     "autoWidth": false,
