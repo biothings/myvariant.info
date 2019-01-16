@@ -104,3 +104,4 @@ QUERY_GET_TRANSFORM_KWARGS.update(ASSEMBLY_TYPEDEF)
 QUERY_POST_TRANSFORM_KWARGS.update(ASSEMBLY_TYPEDEF)
 
 JSONLD_CONTEXT_PATH = 'web/context/context.json'
+AVAILABLE_FIELDS_NOTES_PATH = 'web/context/myvariant_field_table_notes.json'

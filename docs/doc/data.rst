@@ -243,7 +243,8 @@ or as inputs to the fields parameter, e.g.
         <thead>
             <tr>
                 <th>Field</th>
-                <th>Indexed</th>
+                <th>Index</th>
+                <th>Searched by default</th>
                 <th>Type</th>
                 <th>Notes</th>
             </tr>
