@@ -9,10 +9,10 @@ from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 # common to both hg19 and hg38
 SRC_META = {
-        "url" : "http://evs.gs.washington.edu/EVS/",
-        "license_url" : "http://evs.gs.washington.edu/EVS/",
-        "license_url_short": "https://goo.gl/okv78q"
-        }
+    "url" : "http://evs.gs.washington.edu/EVS/",
+    "license_url" : "http://evs.gs.washington.edu/EVS/",
+    "license_url_short": "http://bit.ly/2QAcvkh"
+}
 
 
 class EVSBaseUploader(SnpeffPostUpdateUploader):

@@ -5,14 +5,15 @@ class MutDBUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
     """Originally downloaded from: http://www.mutdb.org/"""
 
     name = "mutdb"
-    __metadata__ = {"mapper" : 'observed',
-            "assembly" : "hg19",
-            "src_meta" : {
-                "url" : "http://www.mutdb.org/",
-                "license_url" : "http://www.mutdb.org/",
-                "license_url_short": "https://goo.gl/I4Ipa2"
-                }
-            }
+    __metadata__ = {
+        "mapper" : 'observed',
+        "assembly" : "hg19",
+        "src_meta" : {
+            "url" : "http://www.mutdb.org/",
+            "license_url" : "http://www.mutdb.org/",
+            "license_url_short": "http://bit.ly/2SQ6fXA"
+        }
+    }
 
     @classmethod
     def get_mapping(klass):

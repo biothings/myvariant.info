@@ -5,7 +5,7 @@ SRC_META = {
         "url" : "http://snpeff.sourceforge.net/",
         "license" : "LGPLv3",
         "license_url" : "http://snpeff.sourceforge.net/download.html",
-        "license_url_short": "https://goo.gl/VGqAMT"
+        "license_url_short": "http://bit.ly/2suyRKt"
         }
 
 

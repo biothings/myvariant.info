@@ -6,15 +6,16 @@ from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 class ExacBaseUploader(SnpeffPostUpdateUploader):
 
-    __metadata__ = {"mapper" : 'observed',
-            "assembly" : "hg19",
-            "src_meta" : {
-                "url" : "http://exac.broadinstitute.org/",
-                "license" : "ODbL",
-                "license_url" : "http://exac.broadinstitute.org/terms",
-                "license_url_short": "https://goo.gl/MH8b34"
-                }
-            }
+    __metadata__ = {
+        "mapper" : 'observed',
+        "assembly" : "hg19",
+        "src_meta" : {
+            "url" : "http://exac.broadinstitute.org/",
+            "license" : "ODbL",
+            "license_url" : "http://exac.broadinstitute.org/terms",
+            "license_url_short": "http://bit.ly/2H9c4hg"
+        }
+    }
 
 
 class ExacUploader(ExacBaseUploader):

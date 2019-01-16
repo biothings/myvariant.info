@@ -5,14 +5,15 @@ class WellderlyFactoryUploader(uploader.DummySourceUploader,SnpeffPostUpdateUplo
     """Data originally coming from: http://www.stsiweb.org/wellderly"""
 
     name = "wellderly"
-    __metadata__ = {"mapper" : 'observed',
-            "assembly" : "hg19",
-            "src_meta" : {
-                "url" : "https://genomics.scripps.edu/browser/",
-                "license_url" : "https://genomics.scripps.edu/browser/page-help.html",
-                "license_url_short": "https://goo.gl/e8OO17"
-                }
-            }
+    __metadata__ = {
+        "mapper" : 'observed',
+        "assembly" : "hg19",
+        "src_meta" : {
+            "url" : "https://genomics.scripps.edu/browser/",
+            "license_url" : "https://genomics.scripps.edu/browser/page-help.html",
+            "license_url_short": "http://bit.ly/2VE6gj7"
+        }
+    }
 
     #split_collections = ["wellderly_cg1","wellderly_cg10","wellderly_cg11",
     #                     "wellderly_cg12","wellderly_cg13","wellderly_cg14",

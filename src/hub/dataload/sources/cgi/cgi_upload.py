@@ -6,15 +6,16 @@ from .cgi_parser import load_data
 
 class CGIUploader(SnpeffPostUpdateUploader):
     name = "cgi"
-    __metadata__ = {"mapper": 'observed',
-                    "assembly": "hg19",
-                    "src_meta": {
-                        "url": "https://www.cancergenomeinterpreter.org/home",
-                        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
-                        "license_url_short": "https://goo.gl/pBW3vj",
-                        "licence": "CC0 1.0 Universal",
-                    }
-                    }
+    __metadata__ = {
+        "mapper": 'observed',
+        "assembly": "hg19",
+        "src_meta": {
+            "url": "https://www.cancergenomeinterpreter.org/home",
+            "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+            "license_url_short": "http://bit.ly/2FqS871",
+            "licence": "CC0 1.0 Universal"
+        }
+    }
 
     def load_data(self,data_folder):
         # there's one vcf file there, let's get it
@@ -71,5 +72,5 @@ class CGIUploader(SnpeffPostUpdateUploader):
                 }
             }
         }
-        
+
         return mapping

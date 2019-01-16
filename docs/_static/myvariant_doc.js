@@ -94,10 +94,11 @@ jQuery(document).ready(function() {
                             type: "GET",
                             success: function(data) {
                                 jQuery.each(data, function(field, d) {
-                                    var notes = indexed = '&nbsp;';
+                                    var notes = indexed = searchedByDefault = '&nbsp;';
                                     if(d.notes) {notes=d.notes;}
-                                    if(d.indexed) {indexed='&#x2714';}
-                                    jQuery('.indexed-field-table > tbody:last').append('<tr><td>' + field + '</td><td>' + indexed + '</td><td><span class="italic">' + d.type + '</span></td><td>' + notes + '</td>');
+                                    if(d.index) {indexed='&#x2714';}
+                                    if(d['searched_by_default']) {searchedByDefault='&#x2714';}
+                                    jQuery('.indexed-field-table > tbody:last').append('<tr><td>' + field + '</td><td>' + indexed + '</td><td>' + searchedByDefault + '</td><td><span class="italic">' + d.type + '</span></td><td>' + notes + '</td>');
                                 });
                                 jQuery('.indexed-field-table').DataTable({
                                     "iDisplayLength": 50,

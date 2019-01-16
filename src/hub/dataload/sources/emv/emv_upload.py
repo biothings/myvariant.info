@@ -15,7 +15,7 @@ class EMVUploader(SnpeffPostUpdateUploader):
             "src_meta" : {
                 "url" : "http://www.egl-eurofins.com/emvclass/emvclass.php",
                 "license_url" : "http://www.egl-eurofins.com/emvclass/emvclass.php",
-                "license_url_short": "https://goo.gl/oX3jov"
+                "license_url_short": "http://bit.ly/2RieoY1"
                 }
             }
 

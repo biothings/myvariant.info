@@ -11,10 +11,10 @@ from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 
 SRC_META = {
-        "url" : "https://sites.google.com/site/jpopgen/dbNSFP",
-        "license_url" : "https://sites.google.com/site/jpopgen/dbNSFP",
-        "license_url_short": "https://goo.gl/vZCbeQ"
-        }
+    "url" : "https://sites.google.com/site/jpopgen/dbNSFP",
+    "license_url" : "https://sites.google.com/site/jpopgen/dbNSFP",
+    "license_url_short": "http://bit.ly/2VLnQBz"
+}
 
 
 class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
