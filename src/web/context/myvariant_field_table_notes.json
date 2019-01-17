@@ -1,4 +1,10 @@
 {
 "cadd":"From the <a href='http://cadd.gs.washington.edu' target='_blank'>CADD</a> database.",
-"dbsnp":"From the <a href='http://www.ncbi.nlm.nih.gov/SNP/' target='_blank'>dbSNP</a> database."
+"dbsnp":"From the <a href='http://www.ncbi.nlm.nih.gov/SNP/' target='_blank'>dbSNP</a> database.",
+"snpeff": "Computed <a href='http://snpeff.sourceforge.net' target='_blank'>SnpEff</a> annotations",
+"observed": "True when a variant is \"real\" instead of computed",
+"chrom": "Chromosome number: 1-22, X, Y or MT",
+"hg19": "Variant position on hg19",
+"hg38": "Variant position on hg38",
+"vcf": "Variant position in VCF format"
 }
