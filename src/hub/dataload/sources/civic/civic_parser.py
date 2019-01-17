@@ -1,14 +1,14 @@
 import requests
 import json
 import time
+import glob
+import os
+import logging
 from utils.hgvs import get_hgvs_from_vcf
 from biothings.utils.dataload import unlist, dict_sweep
 
 
-# max internal variant id from civic, currently set to 2000, could change in the future
-MAX_VARIANT_NUMBER = 2000
-
-def load_data():
+def load_data(data_folder):
     # number of civic ids with ref, alt, chrom
     no_case1 = 0
     # number of civic ids with chrom, ref, but no alt
@@ -17,17 +17,11 @@ def load_data():
     no_case3 = 0
     # number of civic ids with no alt and ref
     no_case4 = 0
-    for variant_id in range(MAX_VARIANT_NUMBER):
-        if variant_id % 200 == 0:
-            print("scanned {} variants".format(variant_id))
-        civic_url = 'https://civic.genome.wustl.edu/api/variants/'
-        url = civic_url + str(variant_id)
-        doc = requests.get(url).json()
-        # time delay for 0.5s
-        time.sleep(0.5)
+    for infile in glob.glob(os.path.join(data_folder,"variant_*.json")):
+        doc = json.load(open(infile))
         if set(['error', 'status']) != set(doc.keys()):
             [chrom, pos, ref, alt] = [doc['coordinates'][x] for x in ['chromosome', 'start', 'reference_bases', 'variant_bases']]
-            doc.pop("id")
+            variant_id = doc.pop("id")
             new_doc = {}
             doc['variant_id'] = variant_id
             if chrom and ref and alt:
@@ -35,7 +29,7 @@ def load_data():
                 try:
                   new_doc['_id'] = get_hgvs_from_vcf(chrom, pos, ref, alt)
                 except ValueError:
-                  print("id has ref,alt, but coudn't be converted to hgvs id: {}".format(variant_id))
+                  logging.warning("id has ref,alt, but coudn't be converted to hgvs id: {}".format(variant_id))
                   continue
             # handle cases of deletions where only ref info is provided
             elif chrom and ref and not alt:
@@ -63,8 +57,8 @@ def load_data():
             # change doid into its formal representation, which should be sth like DOID:1
         else:
             continue
-    print("number of ids with ref, alt, chrom: {}".format(no_case1))
-    print("number of ids with chrom, ref but no alt: {}".format(no_case2))
-    print("number of ids with chrom, alt but no ref: {}".format(no_case3))
-    print("number of ids with no ref and alt: {}".format(no_case4))
+    logging.info("number of ids with ref, alt, chrom: {}".format(no_case1))
+    logging.info("number of ids with chrom, ref but no alt: {}".format(no_case2))
+    logging.info("number of ids with chrom, alt but no ref: {}".format(no_case3))
+    logging.info("number of ids with no ref and alt: {}".format(no_case4))
 

@@ -1,7 +1,11 @@
+import glob, os
+
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
 
-class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
+from .civic_parser import load_data
+
+class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUploader):
 
     name = "civic"
     __metadata__ = {
@@ -14,6 +18,10 @@ class CivicUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
             "licence" : "CC0 1.0 Universal"
         }
     }
+
+    def load_data(self, data_folder):
+        self.logger.info("Load data from '%s'" % data_folder)
+        return load_data(data_folder)
 
     @classmethod
     def get_mapping(klass):
