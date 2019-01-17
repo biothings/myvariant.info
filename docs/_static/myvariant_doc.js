@@ -9,7 +9,7 @@ jQuery(document).ready(function() {
     if( jQuery(' .metadata-table ').length ) {
         // get the hg19 metadata information
         jQuery.ajax({
-            url: "//myvariant.info/v1/metadata",
+            url: "http://myvariant.info/v1/metadata",
             dataType: "JSONP",
             jsonpCallback: "callback",
             type: "GET",
@@ -49,7 +49,7 @@ jQuery(document).ready(function() {
                 });
                 // get the hg38 metadata information
                 jQuery.ajax({
-                    url: "//myvariant.info/v1/metadata?assembly=hg38",
+                    url: "http://myvariant.info/v1/metadata?assembly=hg38",
                     dataType: "JSONP",
                     jsonpCallback: "callback",
                     type: "GET",
@@ -88,39 +88,59 @@ jQuery(document).ready(function() {
                             }
                         });
                         jQuery.ajax({
-                            url: "//myvariant.info/v1/metadata/fields",
+                            url: "http://myvariant.info/v1/metadata/fields",
                             dataType: "JSONP",
                             jsonpCallback: "callback",
                             type: "GET",
-                            success: function(data) {
-                                jQuery.each(data, function(field, d) {
-                                    var notes = indexed = searchedByDefault = '&nbsp;';
-                                    if(d.notes) {notes=d.notes;}
-                                    if(d.index) {indexed='&#x2714';}
-                                    if(d['searched_by_default']) {searchedByDefault='&#x2714';}
-                                    jQuery('.indexed-field-table > tbody:last').append('<tr><td>' + field + '</td><td>' + indexed + '</td><td>' + searchedByDefault + '</td><td><span class="italic">' + d.type + '</span></td><td>' + notes + '</td></tr>');
+                            success: function(hg19_data) {
+                                var allFields = {}
+                                jQuery.each(hg19_data, function(field, d) {
+                                    d['hg19'] = true;
+                                    allFields[field] = d;
                                 });
-                                jQuery('.indexed-field-table').DataTable({
-                                    "iDisplayLength": 50,
-                                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-                                    "columns": [
-                                        {"width":"290px"},
-                                        null,
-                                        null,
-                                        null,
-                                        null
-                                    ],
-                                    "autoWidth": false,
-                                    "dom": "flrtip"
-                                });
+                                jQuery.ajax({
+                                    url: "http://myvariant.info/v1/metadata/fields?assembly=hg38",
+                                    dataType: "JSONP",
+                                    jsonpCallback: "callback",
+                                    type: "GET",
+                                    success: function(hg38_data) {
+                                        jQuery.each(hg38_data, function(field, d) {
+                                            if(field in allFields) {allFields[field]['hg38'] = true;}
+                                            else {
+                                                d['hg38'] = true;
+                                                allFields[field] = d;
+                                            }
+                                        });
+                                        jQuery.each(allFields, function(field, d) {
+                                            var notes = searchedByDefault = hg19 = hg38 = '&nbsp;';
+                                            if(d.notes) {notes=d.notes;}
+                                            if(d.hg19) {hg19='&#x2714';}
+                                            if(d.hg38) {hg38='&#x2714';}
+                                            if(d.searched_by_default) {searchedByDefault='&#x2714';}
+                                            jQuery('.indexed-field-table > tbody:last').append('<tr><td>' + field + '</td><td><span class="italic">' + d.type + '</span></td><td>' + searchedByDefault + '</td><td>' + hg19 + '</td><td>' + hg38 + '</td><td>' + notes + '</td></tr>');
+                                        });
+                                        jQuery('.indexed-field-table').DataTable({
+                                            "iDisplayLength": 50,
+                                            "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                                            "columns": [
+                                                {"width":"290px"},
+                                                null,
+                                                {"width": "60px", "className": "dt-center", "targets": "_all"},
+                                                {"width": "45px", "className": "dt-center", "targets": "_all"},
+                                                {"width": "45px", "className": "dt-center", "targets": "_all"},
+                                                null
+                                            ],
+                                            "autoWidth": false,
+                                            "dom": "flrtip"
+                                        });
+                                    }
+                                });            
                             }
-                        });            
-                        
-                    }
-                });
-
-            }
-        });
+                        });
+                    }  // call
+                });    // back
+            }          // hell
+        });            // should be rewritten to avoid
     }
     if ((jQuery('#all-releases').length)) {
         // load releases

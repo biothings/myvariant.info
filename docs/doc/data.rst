@@ -243,9 +243,10 @@ or as inputs to the fields parameter, e.g.
         <thead>
             <tr>
                 <th>Field</th>
-                <th>Index</th>
-                <th>Searched by default</th>
                 <th>Type</th>
+                <th>Searched by default</th>
+                <th>hg19</th>
+                <th>hg38</th>
                 <th>Notes</th>
             </tr>
         </thead>
