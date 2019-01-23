@@ -28,20 +28,15 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
         mapping = {
             "civic": {
                 "properties": {
-                    "variant_id": {
-                        "type": "integer"
-                    },
                     "entrez_name": {
-                        "type": "text",
-                        "analyzer": "string_lowercase",
-                        "copy_to": ["all"],
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
                     },
                     "entrez_id": {
                         "type": "integer"
                     },
                     "name": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
+                        "type": "text"
                     },
                     "description": {
                         "type": "text"
@@ -50,8 +45,8 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                         "type": "integer"
                     },
                     "type": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
                     },
                     "variant_types": {
                         "properties": {
@@ -59,30 +54,33 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                 "type": "integer"
                             },
                             "name": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "so_id": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "url": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "display_name": {
                                 "type": "text"
                             },
-                            "so_id": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
-                            },
                             "description": {
                                 "type": "text"
-                            },
-                            "url": {
-                                "index" : False,
-                                "type": "text",
                             }
                         }
+                    },
+                    "civic_actionability_score": {
+                        "type": "float"
                     },
                     "coordinates": {
                         "properties": {
                             "chromosome": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "start": {
                                 "type": "integer"
@@ -90,21 +88,13 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                             "stop": {
                                 "type": "integer"
                             },
-                            "reference_bases": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
-                            },
-                            "variant_bases": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
-                            },
                             "representative_transcript": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "chromosome2": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "start2": {
                                 "type": "integer"
@@ -113,15 +103,23 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                 "type": "integer"
                             },
                             "representative_transcript2": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "ensembl_version": {
                                 "type": "integer"
                             },
                             "reference_build": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "reference_bases": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "variant_bases": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             }
                         }
                     },
@@ -131,11 +129,8 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                 "type": "integer"
                             },
                             "name": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
-                            },
-                            "description": {
-                                "type": "text"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "disease": {
                                 "properties": {
@@ -149,12 +144,12 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                         "type": "text"
                                     },
                                     "doid": {
-                                        "type": "text",
-                                        "analyzer": "string_lowercase"
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
                                     },
                                     "url": {
-                                        "index" : False,
-                                        "type": "text"
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
                                     }
                                 }
                             },
@@ -165,10 +160,6 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                     },
                                     "name": {
                                         "type": "text"
-                                    },
-                                    "pubchem_id": {
-                                        "type": "text",
-                                        "analyzer": "string_lowercase"
                                     }
                                 }
                             },
@@ -176,34 +167,23 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                 "type": "integer"
                             },
                             "evidence_level": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
-                            "clinical_siginificance": {
-                                "type": "text"
-                            },
-                            "evidence_direction": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
-                            },
-                            "variant_origin": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
-                            },
-                            "drug_interaction_type": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                            "evidence_type": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "status": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "open_change_count": {
                                 "type": "integer"
                             },
                             "type": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "source": {
                                 "properties": {
@@ -214,23 +194,15 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                         "type": "text"
                                     },
                                     "citation": {
-                                        "type": "text",
-                                        "analyzer": "string_lowercase"
+                                        "type": "text"
                                     },
                                     "pubmed_id": {
-                                        "type": "text",
-                                        "analyzer": "string_lowercase"
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
                                     },
                                     "source_url": {
-                                        "index" : False,
-                                        "type": "text",
-                                    },
-                                    "open_access": {
-                                        "type": "boolean"
-                                    },
-                                    "pmc_id": {
-                                        "type": "text",
-                                        "analyzer": "string_lowercase"
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
                                     },
                                     "publication_date": {
                                         "properties": {
@@ -246,24 +218,241 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                         }
                                     },
                                     "journal": {
-                                        "type": "text",
-                                        "analyzer": "string_lowercase"
+                                        "type": "text"
                                     },
                                     "full_journal_title": {
-                                        "type": "text",
-                                        "analyzer": "string_lowercase"
+                                        "type": "text"
                                     },
                                     "status": {
-                                        "type": "text",
-                                        "analyzer": "string_lowercase"
+                                        "type": "text"
                                     },
                                     "is_review": {
                                         "type": "boolean"
+                                    },
+                                    "open_access": {
+                                        "type": "boolean"
+                                    },
+                                    "pmc_id": {
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
+                                    },
+                                    "clinical_trials": {
+                                        "properties": {
+                                            "nct_id": {
+                                                "type": "keyword",
+                                                "normalizer": "keyword_lowercase_normalizer"
+                                            },
+                                            "name": {
+                                                "type": "text"
+                                            },
+                                            "description": {
+                                                "type": "text"
+                                            },
+                                            "clinical_trial_url": {
+                                                "type": "keyword",
+                                                "normalizer": "keyword_lowercase_normalizer"
+                                            }
+                                        }
                                     }
                                 }
                             },
                             "variant_id": {
                                 "type": "integer"
+                            },
+                            "drug_interaction_type": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "phenotypes": {
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "hpo_id": {
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
+                                    },
+                                    "url": {
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
+                                    },
+                                    "hpo_class": {
+                                        "type": "text"
+                                    }
+                                }
+                            },
+                            "evidence_direction": {
+                                "type": "text"
+                            },
+                            "clinical_significance": {
+                                "type": "text"
+                            },
+                            "description": {
+                                "type": "text"
+                            },
+                            "variant_origin": {
+                                "type": "text"
+                            }
+                        }
+                    },
+                    "variant_aliases": {
+                        "type": "text"
+                    },
+                    "sources": {
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "pubmed_id": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "source_url": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "publication_date": {
+                                "properties": {
+                                    "year": {
+                                        "type": "integer"
+                                    },
+                                    "month": {
+                                        "type": "integer"
+                                    },
+                                    "day": {
+                                        "type": "integer"
+                                    }
+                                }
+                            },
+                            "is_review": {
+                                "type": "boolean"
+                            },
+                            "open_access": {
+                                "type": "boolean"
+                            },
+                            "pmc_id": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "name": {
+                                "type": "text"
+                            },
+                            "citation": {
+                                "type": "text"
+                            },
+                            "journal": {
+                                "type": "text"
+                            },
+                            "full_journal_title": {
+                                "type": "text"
+                            },
+                            "status": {
+                                "type": "text"
+                            }
+                        }
+                    },
+                    "variant_id": {
+                        "type": "integer"
+                    },
+                    "assertions": {
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "type": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "name": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "gene": {
+                                "properties": {
+                                    "name": {
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    }
+                                }
+                            },
+                            "variant": {
+                                "properties": {
+                                    "name": {
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    }
+                                }
+                            },
+                            "disease": {
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "text"
+                                    },
+                                    "display_name": {
+                                        "type": "text"
+                                    },
+                                    "doid": {
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
+                                    },
+                                    "url": {
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
+                                    }
+                                }
+                            },
+                            "drugs": {
+                                "properties": {
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
+                                    }
+                                }
+                            },
+                            "evidence_type": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "evidence_direction": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "clinical_significance": {
+                                "type": "text"
+                            },
+                            "evidence_item_count": {
+                                "type": "integer"
+                            },
+                            "fda_regulatory_approval": {
+                                "type": "boolean"
+                            },
+                            "status": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "open_change_count": {
+                                "type": "integer"
+                            },
+                            "pending_evidence_count": {
+                                "type": "integer"
+                            },
+                            "summary": {
+                                "type": "text"
+                            },
+                            "description": {
+                                "type": "text"
                             }
                         }
                     },
@@ -272,38 +461,24 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                             "id": {
                                 "type": "integer"
                             },
-                            "name": {
-                                "type": "text"
-                            },
-                            "description": {
-                                "type": "text"
-                            },
                             "variants": {
                                 "properties": {
                                     "id": {
                                         "type": "integer"
                                     },
                                     "entrez_name": {
-                                        "type": "text",
-                                        "analyzer": "string_lowercase",
-                                        "copy_to": ["all"],
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
                                     },
                                     "entrez_id": {
                                         "type": "integer"
-                                    },
-                                    "name": {
-                                        "type": "text",
-                                        "analyzer": "string_lowercase"
-                                    },
-                                    "description": {
-                                        "type": "text"
                                     },
                                     "gene_id": {
                                         "type": "integer"
                                     },
                                     "type": {
-                                        "type": "text",
-                                        "analyzer": "string_lowercase"
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
                                     },
                                     "variant_types": {
                                         "properties": {
@@ -311,32 +486,33 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                                 "type": "integer"
                                             },
                                             "name": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "display_name": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
+                                                "type": "keyword",
+                                                "normalizer": "keyword_lowercase_normalizer"
                                             },
                                             "so_id": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "description": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
+                                                "type": "keyword",
+                                                "normalizer": "keyword_lowercase_normalizer"
                                             },
                                             "url": {
-                                                "index": False,
-                                                "type": "text",
+                                                "type": "keyword",
+                                                "normalizer": "keyword_lowercase_normalizer"
+                                            },
+                                            "display_name": {
+                                                "type": "text"
+                                            },
+                                            "description": {
+                                                "type": "text"
                                             }
                                         }
+                                    },
+                                    "civic_actionability_score": {
+                                        "type": "float"
                                     },
                                     "coordinates": {
                                         "properties": {
                                             "chromosome": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
+                                                "type": "keyword",
+                                                "normalizer": "keyword_lowercase_normalizer"
                                             },
                                             "start": {
                                                 "type": "integer"
@@ -344,21 +520,13 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                             "stop": {
                                                 "type": "integer"
                                             },
-                                            "reference_bases": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "variant_bases": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
                                             "representative_transcript": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
+                                                "type": "keyword",
+                                                "normalizer": "keyword_lowercase_normalizer"
                                             },
                                             "chromosome2": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
+                                                "type": "keyword",
+                                                "normalizer": "keyword_lowercase_normalizer"
                                             },
                                             "start2": {
                                                 "type": "integer"
@@ -367,253 +535,71 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                                 "type": "integer"
                                             },
                                             "representative_transcript2": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
+                                                "type": "keyword",
+                                                "normalizer": "keyword_lowercase_normalizer"
                                             },
                                             "ensembl_version": {
                                                 "type": "integer"
                                             },
                                             "reference_build": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
+                                                "type": "keyword",
+                                                "normalizer": "keyword_lowercase_normalizer"
+                                            },
+                                            "reference_bases": {
+                                                "type": "keyword",
+                                                "normalizer": "keyword_lowercase_normalizer"
+                                            },
+                                            "variant_bases": {
+                                                "type": "keyword",
+                                                "normalizer": "keyword_lowercase_normalizer"
                                             }
                                         }
+                                    },
+                                    "name": {
+                                        "type": "text"
+                                    },
+                                    "description": {
+                                        "type": "text"
                                     }
                                 }
                             },
                             "type": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "name": {
+                                "type": "text"
+                            },
+                            "description": {
+                                "type": "text"
                             }
                         }
-                    },
-                    "variant_aliases": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
-                    },
-                    "hgvs_expressions": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
                     },
                     "clinvar_entries": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
                     },
-                    "lifecycle_actions": {
+                    "provisional_values": {
                         "properties": {
-                            "last_modified": {
+                            "description": {
                                 "properties": {
-                                    "order": {
+                                    "value": {
+                                        "type": "text"
+                                    },
+                                    "revision_id": {
                                         "type": "integer"
-                                    },
-                                    "timestamp": {
-                                        "type": "text",
-                                        "analyzer": "string_lowercase"
-                                    },
-                                    "user": {
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer"
-                                            },
-                                            "name": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "last_seen_at": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "username": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "role": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "avatar_url": {
-                                                "index" : False,
-                                                "type": "text",
-                                            },
-                                            #"avatars": {
-                                            #    "index" : False,
-                                            #},
-                                            "area_of_expertise": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "orcid": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "display_name": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "created_at": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "url": {
-                                                "index" : False,
-                                                "type": "text",
-                                            },
-                                            "twitter_handle": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "facebook_profile": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "linkedin_profile": {
-                                                "index" : False,
-                                                "type":"text",
-                                            },
-                                            "bio": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "featured_expert": {
-                                                "type": "boolean"
-                                            },
-                                            "affiliation": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "organization": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "name": {
-                                                        "type": "text",
-                                                        "analyzer": "string_lowercase"
-                                                    },
-                                                    "url": {
-                                                        "index" : False,
-                                                        "type": "text",
-                                                    },
-                                                    "description": {
-                                                        "type": "text",
-                                                        "analyzer": "string_lowercase"
-                                                    },
-                                                    #"profile_image": {
-                                                    #    "index":"no",
-                                                    #}
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            "last_reviewed": {
-                                "properties": {
-                                    "order": {
-                                        "type": "integer"
-                                    },
-                                    "timestamp": {
-                                        "type": "text",
-                                        "analyzer": "string_lowercase"
-                                    },
-                                    "user": {
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer"
-                                            },
-                                            "name": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "last_seen_at": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "username": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "role": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "avatar_url": {
-                                                "index" : False,
-                                                "type": "text",
-                                            },
-                                            #"avatars": {
-                                            #    "index" : False,
-                                            #},
-                                            "area_of_expertise": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "orcid": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "display_name": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "created_at": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "url": {
-                                                "index" : False,
-                                                "type":"text",
-                                            },
-                                            "twitter_handle": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "facebook_profile": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "linkedin_profile": {
-                                                "index" : False,
-                                                "type":"text",
-                                            },
-                                            "bio": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "featured_expert": {
-                                                "type": "boolean"
-                                            },
-                                            "affiliation": {
-                                                "type": "text",
-                                                "analyzer": "string_lowercase"
-                                            },
-                                            "organization": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "name": {
-                                                        "type": "text",
-                                                        "analyzer": "string_lowercase"
-                                                    },
-                                                    "url": {
-                                                        "index" : False,
-                                                        "type":"text",
-                                                    },
-                                                    "description": {
-                                                        "type": "text",
-                                                        "analyzer": "string_lowercase"
-                                                    },
-                                                    #"profile_image": {
-                                                    #    "index":False,
-                                                    #}
-                                                }
-                                            }
-                                        }
                                     }
                                 }
                             }
                         }
+                    },
+                    "hgvs_expressions": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "allele_registry_id": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
                     }
                 }
             }
