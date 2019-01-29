@@ -270,7 +270,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
             },
             "genocanyon": {
                 "score": df["GenoCanyon_score"],
-                "rankscore": df["GenoCanyon_score_rankscore"]
+                "rankscore": df["GenoCanyon_rankscore"]
             },
             "metasvm": {
                 "score": metasvm_score,
@@ -310,22 +310,22 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
             },
             "integrated": {
                 "fitcons_score": df["integrated_fitCons_score"],
-                "fitcons_rankscore": df["integrated_fitCons_score_rankscore"],
+                "fitcons_rankscore": df["integrated_fitCons_rankscore"],
                 "confidence_value": df["integrated_confidence_value"]
             },
             "gm12878": {
                 "fitcons_score": df["GM12878_fitCons_score"],
-                "fitcons_rankscore": df["GM12878_fitCons_score_rankscore"],
+                "fitcons_rankscore": df["GM12878_fitCons_rankscore"],
                 "confidence_value": df["GM12878_confidence_value"]
             },
             "h1-hesc": {
                 "fitcons_score": df["H1-hESC_fitCons_score"],
-                "fitcons_rankscore": df["H1-hESC_fitCons_score_rankscore"],
+                "fitcons_rankscore": df["H1-hESC_fitCons_rankscore"],
                 "confidence_value": df["H1-hESC_confidence_value"]
             },
             "huvec": {
                 "fitcons_score": df["HUVEC_fitCons_score"],
-                "fitcons_rankscore": df["HUVEC_fitCons_score_rankscore"],
+                "fitcons_rankscore": df["HUVEC_fitCons_rankscore"],
                 "confidence_value": df["HUVEC_confidence_value"]
             },
             "phylo": {
@@ -333,9 +333,9 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                     "vertebrate": df["phyloP100way_vertebrate"],
                     "vertebrate_rankscore": df["phyloP100way_vertebrate_rankscore"]
                 },
-                "p20way": {
-                    "mammalian": df["phyloP20way_mammalian"],
-                    "mammalian_rankscore": df["phyloP20way_mammalian_rankscore"]
+                "p30way": {
+                    "mammalian": df["phyloP30way_mammalian"],
+                    "mammalian_rankscore": df["phyloP30way_mammalian_rankscore"]
                 }
             },
             "phastcons": {
@@ -343,9 +343,9 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                     "vertebrate": df["phastCons100way_vertebrate"],
                     "vertebrate_rankscore": df["phastCons100way_vertebrate_rankscore"]
                 },
-                "20way": {
-                    "mammalian": df["phastCons20way_mammalian"],
-                    "mammalian_rankscore": df["phastCons20way_mammalian_rankscore"]
+                "30way": {
+                    "mammalian": df["phastCons30way_mammalian"],
+                    "mammalian_rankscore": df["phastCons30way_mammalian_rankscore"]
                 }
             },
             "siphy_29way": {

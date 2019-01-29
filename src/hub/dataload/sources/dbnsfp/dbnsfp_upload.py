@@ -465,7 +465,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                     }
                                 }
                             },
-                            "p20way": {
+                            "p30way": {
                                 "properties": {
                                     "mammalian": {
                                         "type": "float"
@@ -489,7 +489,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                     }
                                 }
                             },
-                            "20way": {
+                            "30way": {
                                 "properties": {
                                     "mammalian": {
                                         "type": "float"
