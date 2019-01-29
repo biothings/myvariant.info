@@ -55,7 +55,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
     m_cap_score = df["M-CAP_score"].split(';')
     mutationtaster_score = df["MutationTaster_score"].split(';')
     mutationassessor_score = df["MutationAssessor_score"].split(';')
-    vest3_score = df["VEST3_score"].split(';')
+    vest3_score = df["VEST4_score"].split(';')
     metasvm_score = df["MetaSVM_score"].split(';')
     fathmm_score = df["FATHMM_score"].split(';')
     metalr_score = df["MetaLR_score"].split(';')
@@ -235,7 +235,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
             },
             "mutationassessor": {
                 "score": mutationassessor_score,
-                "rankscore": df["MutationAssessor_score_rankscore"],
+                "rankscore": df["MutationAssessor_rankscore"],
                 "pred": df["MutationAssessor_pred"]
             },
             "fathmm": {
@@ -248,11 +248,9 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "rankscore": df["PROVEAN_converted_rankscore"],
                 "pred": df["PROVEAN_pred"]
             },
-            "vest3": {
+            "vest4": {
                 "score": vest3_score,
-                "rankscore": df["VEST3_rankscore"],
-                "transcriptid": df["Transcript_id_VEST3"],
-                "transcriptvar": df["Transcript_var_VEST3"]
+                "rankscore": df["VEST4_rankscore"]
             },
             "fathmm-mkl": {
                 "coding_score": df["fathmm-MKL_coding_score"],

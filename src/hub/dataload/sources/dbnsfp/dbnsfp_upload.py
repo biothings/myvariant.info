@@ -252,19 +252,13 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             }
                         }
                     },
-                    "vest3": {
+                    "vest4": {
                         "properties": {
                             "score": {
                                 "type": "float"
                             },
                             "rankscore": {
                                 "type": "float"
-                            },
-                            "transcriptid": {
-                                "type": "text"
-                            },
-                            "transcriptvar": {
-                                "type": "text"
                             }
                         }
                     },
