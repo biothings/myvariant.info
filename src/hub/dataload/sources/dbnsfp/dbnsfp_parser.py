@@ -44,6 +44,9 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
     gtex_gene = df["GTEx_V7p_gene"].split('|')
     gtex_tissue = df["GTEx_V7p_tissue"].split('|')
     gtex = map(dict, map(lambda t: zip(('gene', 'tissue'), t), zip(gtex_gene, gtex_tissue)))
+    acc = df["Uniprot_acc"].rstrip().rstrip(';').split(";")
+    entry = df["Uniprot_entry"].rstrip().rstrip(';').split(";")
+    uniprot = map(dict, map(lambda t: zip(('acc', 'entry'), t), zip(acc, entry)))
     provean_score = df["PROVEAN_score"].split(';')
     sift_score = df["SIFT_score"].split(';')
     hdiv_score = df["Polyphen2_HDIV_score"].split(';')
@@ -126,10 +129,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "nfe_an": df["gnomAD_exomes_NFE_AN"],
                 "sas_ac": df["gnomAD_exomes_SAS_AC"],
                 "sas_af": df["gnomAD_exomes_SAS_AF"],
-                "sas_an": df["gnomAD_exomes_SAS_AN"],
-                "oth_ac": df["gnomAD_exomes_OTH_AC"],
-                "oth_af": df["gnomAD_exomes_OTH_AF"],
-                "oth_an": df["gnomAD_exomes_OTH_AN"]
+                "sas_an": df["gnomAD_exomes_SAS_AN"]
             },
             "gnomad_genomes": {
                 "ac": df["gnomAD_genomes_AC"],
@@ -152,10 +152,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "fin_an": df["gnomAD_genomes_FIN_AN"],
                 "nfe_ac": df["gnomAD_genomes_NFE_AC"],
                 "nfe_af": df["gnomAD_genomes_NFE_AF"],
-                "nfe_an": df["gnomAD_genomes_NFE_AN"],
-                "oth_ac": df["gnomAD_genomes_OTH_AC"],
-                "oth_af": df["gnomAD_genomes_OTH_AF"],
-                "oth_an": df["gnomAD_genomes_OTH_AN"]
+                "nfe_an": df["gnomAD_genomes_NFE_AN"]
             }
         }
 
@@ -189,6 +186,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "codon_degeneracy": df["codon_degeneracy"],
             },
             "genename": df["genename"],
+            "uniprot": list(uniprot),
             "interpro_domain": df["Interpro_domain"],
             "cds_strand": df["cds_strand"],
             "ancestral_allele": df["Ancestral_allele"],
@@ -255,7 +253,6 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "coding_group": df["fathmm-MKL_coding_group"]
             },
             "eigen": {
-                "coding_or_noncoding": df["Eigen_coding_or_noncoding"],
                 "raw_coding": df["Eigen-raw_coding"],
                 "phred_coding": df["Eigen-phred_coding"]
             },
