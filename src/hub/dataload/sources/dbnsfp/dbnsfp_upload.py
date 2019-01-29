@@ -102,16 +102,6 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                         "analyzer": "string_lowercase",
                         "copy_to" : ["all"]
                     },
-                    "uniprot": {
-                        "properties": {
-                            "acc": {
-                                "type": "text"
-                            },
-                            "pos": {
-                                "type": "text"
-                            }
-                        }
-                    },
                     "interpro_domain": {
                         "type": "text"
                     },

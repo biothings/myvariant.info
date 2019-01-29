@@ -44,9 +44,6 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
     gtex_gene = df["GTEx_V7p_gene"].split('|')
     gtex_tissue = df["GTEx_V7p_tissue"].split('|')
     gtex = map(dict, map(lambda t: zip(('gene', 'tissue'), t), zip(gtex_gene, gtex_tissue)))
-    acc = df["Uniprot_acc_Polyphen2"].rstrip().rstrip(';').split(";")
-    pos = df["Uniprot_aapos_Polyphen2"].rstrip().rstrip(';').split(";")
-    uniprot = map(dict, map(lambda t: zip(('acc', 'pos'), t), zip(acc, pos)))
     provean_score = df["PROVEAN_score"].split(';')
     sift_score = df["SIFT_score"].split(';')
     hdiv_score = df["Polyphen2_HDIV_score"].split(';')
@@ -192,7 +189,6 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "codon_degeneracy": df["codon_degeneracy"],
             },
             "genename": df["genename"],
-            "uniprot": list(uniprot),
             "interpro_domain": df["Interpro_domain"],
             "cds_strand": df["cds_strand"],
             "ancestral_allele": df["Ancestral_allele"],
