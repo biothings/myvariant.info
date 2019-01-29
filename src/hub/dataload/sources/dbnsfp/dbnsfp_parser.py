@@ -41,8 +41,8 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
     else:
         freq = siphy_29way_pi.split(":")
         siphy = {'a': freq[0], 'c': freq[1], 'g': freq[2], 't': freq[3]}
-    gtex_gene = df["GTEx_V6p_gene"].split('|')
-    gtex_tissue = df["GTEx_V6p_tissue"].split('|')
+    gtex_gene = df["GTEx_V7p_gene"].split('|')
+    gtex_tissue = df["GTEx_V7p_tissue"].split('|')
     gtex = map(dict, map(lambda t: zip(('gene', 'tissue'), t), zip(gtex_gene, gtex_tissue)))
     acc = df["Uniprot_acc_Polyphen2"].rstrip().rstrip(';').split(";")
     pos = df["Uniprot_aapos_Polyphen2"].rstrip().rstrip(';').split(";")
@@ -260,12 +260,12 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
             },
             "eigen": {
                 "coding_or_noncoding": df["Eigen_coding_or_noncoding"],
-                "raw": df["Eigen-raw"],
-                "phred": df["Eigen-phred"]
+                "raw_coding": df["Eigen-raw_coding"],
+                "phred_coding": df["Eigen-phred_coding"]
             },
             "eigen-pc": {
-                "raw": df["Eigen-PC-raw"],
-                "phred": df["Eigen-PC-phred"],
+                "raw_coding": df["Eigen-PC-raw_coding"],
+                "phred_coding": df["Eigen-PC-phred_coding"],
                 "raw_rankscore": df["Eigen-PC-raw_rankscore"]
             },
             "genocanyon": {
@@ -439,7 +439,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "rs": df["clinvar_rs"],
                 "clinsig": list(map(int,[i for i in df["clinvar_clnsig"].split("|") if i != "."])),
                 "trait": [i for i in df["clinvar_trait"].split("|") if i != "."],
-                "golden_stars": list(map(int,[i for i in df["clinvar_golden_stars"].split("|") if i != "."]))
+                "golden_stars": list(map(int,[i for i in df["clinvar_review"].split("|") if i != "."]))
             },
             "gtex": list(gtex)
         }

@@ -282,10 +282,10 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                     },
                     "eigen": {
                         "properties": {
-                            "raw": {
+                            "raw_coding": {
                                 "type": "float"
                             },
-                            "phred": {
+                            "phred_coding": {
                                 "type": "float"
                             },
                             "raw_rankscore": {
@@ -295,7 +295,10 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                     },
                     "eigen-pc": {
                         "properties": {
-                            "raw": {
+                            "raw_coding": {
+                                "type": "float"
+                            },
+                            "phred_coding": {
                                 "type": "float"
                             },
                             "raw_rankscore": {
