@@ -52,8 +52,17 @@ def load_data(data_folder):
             for _evidence in doc['evidence_items']:
                 if 'disease' in _evidence and 'doid' in _evidence['disease'] and _evidence['disease']['doid']:
                     _evidence['disease']['doid'] = 'DOID:' + _evidence['disease']['doid']
-                if 'source' in _evidence and 'citation_id' in _evidence['source'] and _evidence['source']['source_type'] == "PubMed":
-                _evidence['source']['citation_id'] = to_int(_evidence['source']['citation_id'])
+                if 'source' in _evidence and 'citation_id' in _evidence['source']:
+                    if _evidence['source']['source_type'] == "PubMed":
+                        _evidence['source']['pubmed'] = to_int(_evidence['source']['citation_id'])
+                        _evidence['source'].pop('source_type')
+                        _evidence['source'].pop('citation_id')
+                    elif _evidence['source']['source_type'] == "ASCO":
+                        _evidence['source']['asco'] = to_int(_evidence['source']['citation_id'])
+                        _evidence['source'].pop('source_type')
+                        _evidence['source'].pop('citation_id')
+                    else:
+                        raise ValueError("The value of source_type is not one of PubMed or ASCO, it's {}, need to restructure parser".format(_evidence['source']['source_type']))
             new_doc['civic'] = doc
             yield dict_sweep(unlist(new_doc),['','null', 'N/A', None, [], {}])
             # change doid into its formal representation, which should be sth like DOID:1
