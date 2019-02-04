@@ -25,7 +25,9 @@ class DBNSFPDumper(GoogleDriveDumper):
 
     SRC_NAME = "dbnsfp"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
-    RELEASE_PAT = "dbNSFPv(\d+\.\d+a)\.zip" # "a" is for academic, not "c"ommercial
+    # "a" is for academic, not "c"ommercial
+    # also, sometimes there's a "v", sometimes not...
+    RELEASE_PAT = "dbNSFPv?(\d+\..*\d+a)\.zip"
 
     #SCHEDULE = "0 9 * * *" # disabled until we have a new parser for rel. 4.0
 
@@ -35,12 +37,14 @@ class DBNSFPDumper(GoogleDriveDumper):
         releases = ftp.nlst()
         # get rid of readme files
         pat = re.compile(self.RELEASE_PAT)
-        releases = [x for x in releases if pat.match(x)]
+        releases = [(x,pat.match(x).groups()[0]) for x in releases if pat.match(x)]
+        drels = {}
+        [drels.setdefault(rel,f) for (f,rel) in releases]
         # sort items based on date
-        releases = sorted(releases)
+        releases = sorted(drels.keys())
         # get the last item in the list, which is the latest version
-        self.newest_file = releases[-1]
-        self.release = pat.match(releases[-1]).groups()[0]
+        self.newest_file = drels[releases[-1]]
+        self.release = releases[-1]
 
     def new_release_available(self):
         current_release = self.src_doc.get("download",{}).get("release")
