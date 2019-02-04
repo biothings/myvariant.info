@@ -5,7 +5,7 @@ import glob
 import os
 import logging
 from utils.hgvs import get_hgvs_from_vcf
-from biothings.utils.dataload import unlist, dict_sweep
+from biothings.utils.dataload import unlist, dict_sweep, to_int
 
 
 def load_data(data_folder):
@@ -52,6 +52,8 @@ def load_data(data_folder):
             for _evidence in doc['evidence_items']:
                 if 'disease' in _evidence and 'doid' in _evidence['disease'] and _evidence['disease']['doid']:
                     _evidence['disease']['doid'] = 'DOID:' + _evidence['disease']['doid']
+                if 'source' in _evidence and 'citation_id' in _evidence['source'] and _evidence['source']['source_type'] == "PubMed":
+                _evidence['source']['citation_id'] = to_int(_evidence['source']['citation_id'])
             new_doc['civic'] = doc
             yield dict_sweep(unlist(new_doc),['','null', 'N/A', None, [], {}])
             # change doid into its formal representation, which should be sth like DOID:1
