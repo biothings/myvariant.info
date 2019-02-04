@@ -13,17 +13,18 @@ Need to run under src folder as:
     MV_HOST="http://localhost:9000";nosetests tests.tests.MyVariantTest -vv
 
 '''
-import httplib2
-import sys
 import os
-from nose.tools import ok_, eq_
+import sys
 
+from nose.tools import eq_, ok_
 from tornado.testing import AsyncHTTPTestCase
 from tornado.web import Application
 
-from .variant_list import VARIANT_POST_LIST
-from biothings.tests.test_helper import BiothingTestHelperMixin, TornadoRequestHelper
+from biothings.tests.test_helper import (BiothingTestHelperMixin,
+                                         TornadoRequestHelper)
 from web.settings import MyVariantWebSettings
+
+from .variant_list import VARIANT_POST_LIST
 
 
 class MyVariantTest(BiothingTestHelperMixin):
@@ -35,7 +36,6 @@ class MyVariantTest(BiothingTestHelperMixin):
         sys.stderr.write("Testing on host: {}...\n".format(api))
     else:
         sys.stderr.write("Testing on build-in server: {}...\n".format(api))
-    h = httplib2.Http()
 
     def test_variant_object(self):
         #test all fields are loaded in variant objects

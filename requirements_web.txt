@@ -10,7 +10,6 @@ msgpack-python==0.4.6
 
 # for nosetests
 nose>=1.3.7
-httplib2>=0.8
 
 # for sentry monitoring
 raven
