@@ -107,7 +107,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "acc": {
                                 "type": "text"
                             },
-                            "pos": {
+                            "entry": {
                                 "type": "text"
                             }
                         }
@@ -252,19 +252,13 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             }
                         }
                     },
-                    "vest3": {
+                    "vest4": {
                         "properties": {
                             "score": {
                                 "type": "float"
                             },
                             "rankscore": {
                                 "type": "float"
-                            },
-                            "transcriptid": {
-                                "type": "text"
-                            },
-                            "transcriptvar": {
-                                "type": "text"
                             }
                         }
                     },
@@ -288,10 +282,10 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                     },
                     "eigen": {
                         "properties": {
-                            "raw": {
+                            "raw_coding": {
                                 "type": "float"
                             },
-                            "phred": {
+                            "phred_coding": {
                                 "type": "float"
                             },
                             "raw_rankscore": {
@@ -301,7 +295,10 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                     },
                     "eigen-pc": {
                         "properties": {
-                            "raw": {
+                            "raw_coding": {
+                                "type": "float"
+                            },
+                            "phred_coding": {
                                 "type": "float"
                             },
                             "raw_rankscore": {
@@ -471,7 +468,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                     }
                                 }
                             },
-                            "p20way": {
+                            "p30way": {
                                 "properties": {
                                     "mammalian": {
                                         "type": "float"
@@ -495,7 +492,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                     }
                                 }
                             },
-                            "20way": {
+                            "30way": {
                                 "properties": {
                                     "mammalian": {
                                         "type": "float"
