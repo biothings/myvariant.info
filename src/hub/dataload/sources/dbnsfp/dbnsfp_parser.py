@@ -2,8 +2,6 @@ import csv
 import glob
 from biothings.utils.dataload import list_split, dict_sweep, unlist, value_convert_to_number
 
-
-
 VALID_COLUMN_NO = 367
 
 '''this parser is for dbNSFP v3.5a beta2 downloaded from
@@ -295,7 +293,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
             },
             "genename": df["genename"],
             "uniprot": list(uniprot),
-            "vindijia_neandertal": df["VindijiaNeandertal"],
+            "vindijia_neandertal": [i for i in df["VindijiaNeandertal"].split("|") if i != "."],
             "interpro_domain": df["Interpro_domain"],
             "cds_strand": df["cds_strand"],
             "ancestral_allele": df["Ancestral_allele"],
@@ -596,11 +594,11 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
             },
             "clinvar": {
                 "rs": df["clinvar_rs"],
-                "clinsig": df["clinvar_clnsig"],
+                "clinsig": [i for i in df["clinvar_clnsig"].split("/") if i != "."],
                 "trait": [i for i in df["clinvar_trait"].split("|") if i != "."],
-                "review": df["clinvar_review"],
+                "review": [i for i in df["clinvar_review"].split(",") if i != "."],
                 "hgvs": df["clinvar_hgvs"],
-                "var_source": df["clinvar_var_source"]
+                "var_source": [i for i in df["clinvar_var_source"].split("|") if i != "."]
 
             },
             "gtex": list(gtex),
