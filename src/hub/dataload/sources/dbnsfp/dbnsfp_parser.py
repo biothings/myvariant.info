@@ -66,6 +66,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
     mvp_score = df["MVP_score"].split(';')
     tsl = df["TSL"].split(';')
     vep_canonical = df["VEP_canonical"].split(';')
+    deogen2_score = df["DEOGEN2_score"].split(';')
     '''
     parse mutpred top 5 features
     '''
@@ -294,7 +295,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
             },
             "genename": df["genename"],
             "uniprot": list(uniprot),
-            "vindijia_neandertal": [i for i in df["VindijiaNeandertal"].split("|") if i != "."],
+            "vindijia_neandertal": [i for i in df["VindijiaNeandertal"].split("/") if i != "."],
             "interpro_domain": df["Interpro_domain"],
             "cds_strand": df["cds_strand"],
             "ancestral_allele": df["Ancestral_allele"],
@@ -389,7 +390,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "rankscore": df["VEST4_rankscore"]
             },
             "deogen2": {
-                "score": df["DEOGEN2_score"],
+                "score": deogen2_score,
                 "rankscore": df["DEOGEN2_rankscore"],
                 "pred": df["DEOGEN2_pred"]
             },
