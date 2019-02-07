@@ -196,10 +196,6 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                     "citation": {
                                         "type": "text"
                                     },
-                                    "pubmed_id": {
-                                        "type": "keyword",
-                                        "normalizer": "keyword_lowercase_normalizer"
-                                    },
                                     "source_url": {
                                         "type": "keyword",
                                         "normalizer": "keyword_lowercase_normalizer"
@@ -229,6 +225,9 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                     "is_review": {
                                         "type": "boolean"
                                     },
+                                    "pubmed": {
+                                        "type": "integer"
+                                    },
                                     "open_access": {
                                         "type": "boolean"
                                     },
@@ -253,6 +252,12 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                                                 "normalizer": "keyword_lowercase_normalizer"
                                             }
                                         }
+                                    },
+                                    "asco_abstract_id": {
+                                        "type": "integer"
+                                    },
+                                    "asco": {
+                                        "type": "integer"
                                     }
                                 }
                             },
@@ -303,7 +308,11 @@ class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUplo
                             "id": {
                                 "type": "integer"
                             },
-                            "pubmed_id": {
+                            "citation_id": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "source_type": {
                                 "type": "keyword",
                                 "normalizer": "keyword_lowercase_normalizer"
                             },

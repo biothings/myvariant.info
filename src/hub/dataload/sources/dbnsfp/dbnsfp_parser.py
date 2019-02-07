@@ -1,6 +1,7 @@
 import csv
 import glob
 from biothings.utils.dataload import list_split, dict_sweep, unlist, value_convert_to_number
+from biothings.utils.common import anyfile
 
 VALID_COLUMN_NO = 367
 
@@ -608,14 +609,14 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
     }
     if include_gnomad:
         one_snp_json['dbnsfp'].update(gnomad)
-    one_snp_json = list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=[".", '-', None], remove_invalid_list=True), ";")
+    one_snp_json = list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=[".", '-', "NA", None], remove_invalid_list=True), ";")
     one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"])
     return one_snp_json
 
 
 # open file, parse, pass to json mapper
 def data_generator(input_file, version, include_gnomad):
-    open_file = open(input_file)
+    open_file = anyfile(input_file)
     db_nsfp = csv.reader(open_file, delimiter="\t")
     index = next(db_nsfp)
     assert len(index) == VALID_COLUMN_NO, "Expecting %s columns, but got %s" % (VALID_COLUMN_NO, len(index))
