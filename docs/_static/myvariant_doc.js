@@ -9,7 +9,7 @@ jQuery(document).ready(function() {
     if( jQuery(' .metadata-table ').length ) {
         // get the hg19 metadata information
         jQuery.ajax({
-            url: "http://myvariant.info/v1/metadata",
+            url: "//myvariant.info/v1/metadata",
             dataType: "JSONP",
             jsonpCallback: "callback",
             type: "GET",
@@ -49,7 +49,7 @@ jQuery(document).ready(function() {
                 });
                 // get the hg38 metadata information
                 jQuery.ajax({
-                    url: "http://myvariant.info/v1/metadata?assembly=hg38",
+                    url: "//myvariant.info/v1/metadata?assembly=hg38",
                     dataType: "JSONP",
                     jsonpCallback: "callback",
                     type: "GET",
@@ -88,7 +88,7 @@ jQuery(document).ready(function() {
                             }
                         });
                         jQuery.ajax({
-                            url: "http://myvariant.info/v1/metadata/fields",
+                            url: "//myvariant.info/v1/metadata/fields",
                             dataType: "JSONP",
                             jsonpCallback: "callback",
                             type: "GET",
@@ -99,7 +99,7 @@ jQuery(document).ready(function() {
                                     allFields[field] = d;
                                 });
                                 jQuery.ajax({
-                                    url: "http://myvariant.info/v1/metadata/fields?assembly=hg38",
+                                    url: "//myvariant.info/v1/metadata/fields?assembly=hg38",
                                     dataType: "JSONP",
                                     jsonpCallback: "callback",
                                     type: "GET",
