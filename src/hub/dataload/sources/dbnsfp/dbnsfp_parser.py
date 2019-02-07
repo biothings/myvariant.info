@@ -607,7 +607,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
     }
     if include_gnomad:
         one_snp_json['dbnsfp'].update(gnomad)
-    one_snp_json = list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=[".", '-', None]), ";")
+    one_snp_json = list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=[".", '-', None], remove_invalid_list=True), ";")
     one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"])
     return one_snp_json
 
