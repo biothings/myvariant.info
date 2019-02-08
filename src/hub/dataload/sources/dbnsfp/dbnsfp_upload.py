@@ -28,16 +28,11 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
         mapping = {
             "dbnsfp": {
                 "properties": {
-                    "rsid": {
-                        "type": "text",
-                        "analyzer": "string_lowercase",
-                        "copy_to" : ["all"]
-                    },
                     "chrom": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
                     },
-                    "hg18": {
+                    "hg19": {
                         "properties": {
                             "start": {
                                 "type": "integer"
@@ -47,7 +42,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             }
                         }
                     },
-                    "hg19": {
+                    "hg18": {
                         "properties": {
                             "start": {
                                 "type": "integer"
@@ -68,186 +63,119 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                         }
                     },
                     "ref": {
-                        "type": "text"
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
                     },
                     "alt": {
-                        "type": "text"
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
                     },
                     "aa": {
                         "properties": {
-                            "alt": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
-                            },
                             "ref": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "alt": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "pos": {
-                                "type": "integer"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "refcodon": {
-                                "type": "text"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "codonpos": {
-                                "type": "integer"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "codon_degeneracy": {
-                                "type": "integer"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             }
                         }
                     },
                     "genename": {
-                        "type": "text",
-                        "analyzer": "string_lowercase",
-                        "copy_to" : ["all"]
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
                     },
                     "uniprot": {
                         "properties": {
                             "acc": {
-                                "type": "text"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "entry": {
-                                "type": "text"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             }
                         }
                     },
-                    "interpro_domain": {
-                        "type": "text"
-                    },
-                    "cds_strand": {
-                        "type": "text"
-                    },
                     "ancestral_allele": {
-                        "type": "text"
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "appris": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "genecode_basic": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "tsl": {
+                        "type": "integer"
+                    },
+                    "vep_canonical": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
                     },
                     "ensembl": {
                         "properties": {
-                            "transcriptid": {
-                                "type": "text"
-                            },
                             "geneid": {
-                                "type": "text"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "transcriptid": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "proteinid": {
-                                "type": "text"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             }
                         }
                     },
-                    "sift": {
+                    "bstatistic": {
                         "properties": {
-                            "converted_rankscore": {
-                                "type": "float"
-                            },
-                            "pred": {
-                                "type": "text"
-                            },
                             "score": {
-                                "type": "float"
-                            }
-                        }
-                    },
-                    "polyphen2": {
-                        "properties": {
-                            "hdiv": {
-                                "properties": {
-                                    "pred": {
-                                        "type": "text"
-                                    },
-                                    "score": {
-                                        "type": "float"
-                                    },
-                                    "rankscore": {
-                                        "type": "float"
-                                    }
-                                }
+                                "type": "integer"
                             },
-                            "hvar": {
-                                "properties": {
-                                    "pred": {
-                                        "type": "text"
-                                    },
-                                    "score": {
-                                        "type": "float"
-                                    },
-                                    "rankscore": {
-                                        "type": "float"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "lrt": {
-                        "properties": {
-                            "converted_rankscore": {
-                                "type": "float"
-                            },
-                            "pred": {
-                                "type": "text"
-                            },
-                            "score": {
-                                "type": "float"
-                            },
-                            "omega": {
+                            "rankscore": {
                                 "type": "float"
                             }
                         }
                     },
                     "mutationtaster": {
                         "properties": {
+                            "score": {
+                                "type": "float"
+                            },
                             "converted_rankscore": {
                                 "type": "float"
                             },
                             "pred": {
-                                "type": "text"
-                            },
-                            "score": {
-                                "type": "float"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "model": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "AAE": {
-                                "type": "text"
-                            }
-                        }
-                    },
-                    "mutationassessor": {
-                        "properties": {
-                            "pred": {
-                                "type": "text"
-                            },
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            }
-                        }
-                    },
-                    "fathmm": {
-                        "properties": {
-                            "pred": {
-                                "type": "text"
-                            },
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            }
-                        }
-                    },
-                    "provean": {
-                        "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "pred": {
                                 "type": "text"
                             }
                         }
@@ -271,12 +199,12 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "coding_pred": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "coding_group": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             }
                         }
                     },
@@ -285,10 +213,10 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "raw_coding": {
                                 "type": "float"
                             },
-                            "phred_coding": {
+                            "raw_coding_rankscore": {
                                 "type": "float"
                             },
-                            "raw_rankscore": {
+                            "phred_coding": {
                                 "type": "float"
                             }
                         }
@@ -316,35 +244,6 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             }
                         }
                     },
-                    "metasvm": {
-                        "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "pred": {
-                                "type": "text"
-                            }
-                        }
-                    },
-                    "metalr": {
-                        "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "pred": {
-                                "type": "text"
-                            }
-                        }
-                    },
-                    "reliability_index": {
-                        "type": "integer"
-                    },
                     "dann": {
                         "properties": {
                             "score": {
@@ -352,55 +251,6 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             },
                             "rankscore": {
                                 "type": "float"
-                            }
-                        }
-                    },
-                    "gerp++": {
-                        "properties": {
-                            "rs_rankscore": {
-                                "type": "float"
-                            },
-                            "nr": {
-                                "type": "float"
-                            },
-                            "rs": {
-                                "type": "float"
-                            }
-                        }
-                    },
-                    "revel": {
-                        "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            }
-                        }
-                    },
-                    "mutpred": {
-                        "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "accession": {
-                                "type": "text"
-                            },
-                            "aa_change": {
-                                "type": "text"
-                            },
-                            "pred": {
-                                "properties": {
-                                    "mechanism": {
-                                        "type": "text"
-                                    },
-                                    "p_val": {
-                                        "type": "float"
-                                    }
-                                }
                             }
                         }
                     },
@@ -413,7 +263,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "confidence_value": {
-                                "type": "float"
+                                "type": "integer"
                             }
                         }
                     },
@@ -426,7 +276,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "confidence_value": {
-                                "type": "float"
+                                "type": "integer"
                             }
                         }
                     },
@@ -439,7 +289,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "confidence_value": {
-                                "type": "float"
+                                "type": "integer"
                             }
                         }
                     },
@@ -452,7 +302,7 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                 "type": "float"
                             },
                             "confidence_value": {
-                                "type": "float"
+                                "type": "integer"
                             }
                         }
                     },
@@ -474,6 +324,16 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                         "type": "float"
                                     },
                                     "mammalian_rankscore": {
+                                        "type": "float"
+                                    }
+                                }
+                            },
+                            "p17way": {
+                                "properties": {
+                                    "primate": {
+                                        "type": "float"
+                                    },
+                                    "primate_rankscore": {
                                         "type": "float"
                                     }
                                 }
@@ -501,6 +361,16 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                                         "type": "float"
                                     }
                                 }
+                            },
+                            "p17way": {
+                                "properties": {
+                                    "primate": {
+                                        "type": "float"
+                                    },
+                                    "primate_rankscore": {
+                                        "type": "float"
+                                    }
+                                }
                             }
                         }
                     },
@@ -509,17 +379,17 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "pi": {
                                 "properties": {
                                     "a": {
-                                        "type": "float",
+                                        "type": "float"
                                     },
                                     "c": {
-                                        "type": "float",
-                                    },
-                                    "t": {
-                                        "type": "float",
+                                        "type": "float"
                                     },
                                     "g": {
-                                        "type": "float",
+                                        "type": "float"
                                     },
+                                    "t": {
+                                        "type": "float"
+                                    }
                                 }
                             },
                             "logodds": {
@@ -530,6 +400,10 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             }
                         }
                     },
+                    "rsid": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
                     "1000gp3": {
                         "properties": {
                             "ac": {
@@ -538,11 +412,11 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "af": {
                                 "type": "float"
                             },
-                            "afr_af": {
-                                "type": "float"
-                            },
                             "afr_ac": {
                                 "type": "integer"
+                            },
+                            "afr_af": {
+                                "type": "float"
                             },
                             "eur_ac": {
                                 "type": "integer"
@@ -556,18 +430,18 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "amr_af": {
                                 "type": "float"
                             },
-                            "eas_af": {
-                                "type": "float"
-                            },
                             "eas_ac": {
                                 "type": "integer"
                             },
-                            "sas_af": {
+                            "eas_af": {
                                 "type": "float"
                             },
                             "sas_ac": {
                                 "type": "integer"
                             },
+                            "sas_af": {
+                                "type": "float"
+                            }
                         }
                     },
                     "exac": {
@@ -578,11 +452,11 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "af": {
                                 "type": "float"
                             },
-                            "adj_af": {
-                                "type": "float"
-                            },
                             "adj_ac": {
                                 "type": "integer"
+                            },
+                            "adj_af": {
+                                "type": "float"
                             },
                             "afr_ac": {
                                 "type": "integer"
@@ -596,11 +470,11 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "amr_af": {
                                 "type": "float"
                             },
-                            "eas_af": {
-                                "type": "float"
-                            },
                             "eas_ac": {
                                 "type": "integer"
+                            },
+                            "eas_af": {
+                                "type": "float"
                             },
                             "fin_ac": {
                                 "type": "integer"
@@ -614,12 +488,12 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "nfe_af": {
                                 "type": "float"
                             },
-                            "sas_af": {
-                                "type": "float"
-                            },
                             "sas_ac": {
                                 "type": "integer"
                             },
+                            "sas_af": {
+                                "type": "float"
+                            }
                         }
                     },
                     "exac_nontcga": {
@@ -630,11 +504,11 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "af": {
                                 "type": "float"
                             },
-                            "adj_af": {
-                                "type": "float"
-                            },
                             "adj_ac": {
                                 "type": "integer"
+                            },
+                            "adj_af": {
+                                "type": "float"
                             },
                             "afr_ac": {
                                 "type": "integer"
@@ -648,11 +522,11 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "amr_af": {
                                 "type": "float"
                             },
-                            "eas_af": {
-                                "type": "float"
-                            },
                             "eas_ac": {
                                 "type": "integer"
+                            },
+                            "eas_af": {
+                                "type": "float"
                             },
                             "fin_ac": {
                                 "type": "integer"
@@ -666,12 +540,12 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "nfe_af": {
                                 "type": "float"
                             },
-                            "sas_af": {
-                                "type": "float"
-                            },
                             "sas_ac": {
                                 "type": "integer"
                             },
+                            "sas_af": {
+                                "type": "float"
+                            }
                         }
                     },
                     "exac_nonpsych": {
@@ -682,11 +556,11 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "af": {
                                 "type": "float"
                             },
-                            "adj_af": {
-                                "type": "float"
-                            },
                             "adj_ac": {
                                 "type": "integer"
+                            },
+                            "adj_af": {
+                                "type": "float"
                             },
                             "afr_ac": {
                                 "type": "integer"
@@ -700,11 +574,11 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             "amr_af": {
                                 "type": "float"
                             },
-                            "eas_af": {
-                                "type": "float"
-                            },
                             "eas_ac": {
                                 "type": "integer"
+                            },
+                            "eas_af": {
+                                "type": "float"
                             },
                             "fin_ac": {
                                 "type": "integer"
@@ -717,8 +591,384 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             },
                             "nfe_af": {
                                 "type": "float"
+                            },
+                            "sas_ac": {
+                                "type": "integer"
+                            },
+                            "sas_af": {
+                                "type": "float"
                             }
                         }
+                    },
+                    "sift4g": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "converted_rankscore": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "mvp": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "primateai": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "deogen2": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "fathmm-xf": {
+                        "properties": {
+                            "coding_score": {
+                                "type": "float"
+                            },
+                            "coding_rankscore": {
+                                "type": "float"
+                            },
+                            "coding_pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "metasvm": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "metalr": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "reliability_index": {
+                        "type": "integer"
+                    },
+                    "m_cap_score": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "revel": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "clinvar": {
+                        "properties": {
+                            "rs": {
+                                "type": "integer"
+                            },
+                            "clinsig": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "trait": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "review": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "hgvs": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "var_source": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "gtex": {
+                        "properties": {
+                            "gene": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "tissue": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "esp6500": {
+                        "properties": {
+                            "aa_ac": {
+                                "type": "integer"
+                            },
+                            "aa_af": {
+                                "type": "float"
+                            },
+                            "ea_ac": {
+                                "type": "integer"
+                            },
+                            "ea_af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "gerp++": {
+                        "properties": {
+                            "nr": {
+                                "type": "float"
+                            },
+                            "rs": {
+                                "type": "float"
+                            },
+                            "rs_rankscore": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "mutationassessor": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "mutpred": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "accession": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "aa_change": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "pred": {
+                                "properties": {
+                                    "p_val": {
+                                        "type": "float"
+                                    },
+                                    "mechanism": {
+                                        "type": "text"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "polyphen2": {
+                        "properties": {
+                            "hdiv": {
+                                "properties": {
+                                    "score": {
+                                        "type": "float"
+                                    },
+                                    "rankscore": {
+                                        "type": "float"
+                                    },
+                                    "pred": {
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
+                                    }
+                                }
+                            },
+                            "hvar": {
+                                "properties": {
+                                    "score": {
+                                        "type": "float"
+                                    },
+                                    "rankscore": {
+                                        "type": "float"
+                                    },
+                                    "pred": {
+                                        "type": "keyword",
+                                        "normalizer": "keyword_lowercase_normalizer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "sift": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "converted_rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "mpc": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "fathmm": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "provean": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "interpro_domain": {
+                        "type": "text"
+                    },
+                    "cds_strand": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "lrt": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "converted_rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "omega": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "aloft": {
+                        "properties": {
+                            "prob_tolerant": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "prob_recessive": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "prob_dominant": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "fraction_transcripts_affected": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "confidence": {
+                                "type": "text"
+                            }
+                        }
+                    },
+                    "vindijia_neandertal": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
                     },
                     "twinsuk": {
                         "properties": {
@@ -740,52 +990,24 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             }
                         }
                     },
-                    "esp6500": {
+                    "uk10k": {
                         "properties": {
-                            "ea_af": {
-                                "type": "float"
-                            },
-                            "aa_af": {
-                                "type": "float"
-                            },
-                            "ea_ac": {
+                            "ac": {
                                 "type": "integer"
                             },
-                            "aa_ac": {
-                                "type": "integer"
+                            "af": {
+                                "type": "float"
                             }
                         }
                     },
-                    "clinvar": {
-                        "properties": {
-                            "rs": {
-                                "type": "text",
-                                "copy_to" : ["all"]
-                            },
-                             "clinsig": {
-                                 "type": "integer"
-                             },
-                             'golden_stars': {
-                                 "type" : "integer"
-                             },
-                            "trait": {
-                                "type": "text"
-                            }
-                        }
-                    },
-                    "gtex": {
-                        "properties": {
-                            "gene": {
-                                "type": "text"
-                            },
-                            "tissue": {
-                                "type": "text"
-                            }
-                        }
+                    "geuvadis_eqtl_target_gene": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
                     }
                 }
             }
         }
+
         return mapping
 
     def jobs(self):
