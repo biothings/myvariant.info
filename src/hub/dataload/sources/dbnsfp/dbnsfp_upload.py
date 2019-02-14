@@ -724,7 +724,8 @@ class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                     "clinvar": {
                         "properties": {
                             "rs": {
-                                "type": "integer"
+                                "type": "integer",
+                                "copy_to": ["all"]
                             },
                             "clinsig": {
                                 "type": "keyword",
