@@ -56,7 +56,7 @@ class MyVariantTest(BiothingTestHelperMixin):
         self.has_hits('rs58991260')
         self.has_hits('rcv000149017')
         self.has_hits('RCV000149017')
-        self.has_hits('BTK', morethan=8000)
+        self.has_hits('BTK', morethan=7000)
 
         self.has_hits('chr1:69000-70000', morethan=2000)
         self.has_hits('dbsnp.vartype:snp')
@@ -143,8 +143,8 @@ class MyVariantTest(BiothingTestHelperMixin):
         eq_(set(res), set(['_id', '_version', 'wellderly']))
         res = self.json_ok(self.get_ok(self.api + '/variant/chr9:g.107620835G>A?fields=dbsnp'))
         eq_(set(res), set(['_id', '_version', 'dbsnp']))
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr1:g.31349647C>T?fields=dbnsfp.clinvar,dbsnp.gmaf,clinvar.hgvs.coding'))
-        eq_(set(res), set(['_id', '_version', 'dbsnp', 'clinvar']))
+        res = self.json_ok(self.get_ok(self.api + '/variant/chr1:g.31349647C>T?fields=dbnsfp.clinvar,dbsnp.gmaf,clinvar.hgvs'))
+        eq_(set(res), set(['_id', '_version', 'dbsnp', 'clinvar', 'dbnsfp']))
 
         self.get_404(self.api + '/variant')
         self.get_404(self.api + '/variant/')
