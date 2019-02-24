@@ -1,48 +1,34 @@
-# -*- coding: utf-8 -*-
-'''
-Nose tests
-Need to run under src folder as:
-
-    nosetests tests.tests
-    nosetests tests.tests -vv
-
-    # to run a single test
-    nosetests tests.tests:MyVariantTestTornadoClient.test_status_endpoint -vv
-
-    # to run using an alternative myvariant api server
-    MV_HOST="http://localhost:9000";nosetests tests.tests.MyVariantTest -vv
-
+''' MyVariant Data-Aware Tests
+    nosetests tests
+    nosetests tests:MyVariantTest
 '''
 import os
-import sys
 
 from nose.tools import eq_, ok_
-from tornado.testing import AsyncHTTPTestCase
-from tornado.web import Application
 
-from biothings.tests.test_helper import (BiothingTestHelperMixin,
-                                         TornadoRequestHelper)
-from web.settings import MyVariantWebSettings
-
-from .variant_list import VARIANT_POST_LIST
+from biothings.tests.test_helper import BiothingsTestCase
 
 
-class MyVariantTest(BiothingTestHelperMixin):
+class MyVariantTest(BiothingsTestCase):
+    '''
+        Test against server specified in environment variable MV_HOST
+        or MyVariant.info production server if MV_HOST is not specified
+        MV_HOST must start with its protocol like http://myvariant.info
+    '''
+    __test__ = True
 
-    host = os.getenv("MV_HOST", "")
+    host = os.getenv("MV_HOST", "http://myvariant.info")
     host = host.rstrip('/')
     api = host + '/v1'
-    if host:
-        sys.stderr.write("Testing on host: {}...\n".format(api))
-    else:
-        sys.stderr.write("Testing on build-in server: {}...\n".format(api))
 
     def test_variant_object(self):
-        #test all fields are loaded in variant objects
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr1:g.218631822G>A'))
+        # test all fields are loaded in variant objects
+        res = self.json_ok(self.get_ok(
+            self.api + '/variant/chr1:g.218631822G>A'))
         attr_li = ['_id']
         for attr in attr_li:
-            assert res.get(attr, None) is not None, 'Missing field "{}" in variant "chr1:g.218631822G>A"'.format(attr)
+            assert res.get(
+                attr, None) is not None, 'Missing field "{}" in variant "chr1:g.218631822G>A"'.format(attr)
 
         # test for specific databases
 
@@ -52,7 +38,7 @@ class MyVariantTest(BiothingTestHelperMixin):
         ok_('_id' in d['hits'][0])
 
     def test_query(self):
-        #public query self.api at /query via get
+        # public query self.api at /query via get
         self.has_hits('rs58991260')
         self.has_hits('rcv000149017')
         self.has_hits('RCV000149017')
@@ -61,22 +47,24 @@ class MyVariantTest(BiothingTestHelperMixin):
         self.has_hits('chr1:69000-70000', morethan=2000)
         self.has_hits('dbsnp.vartype:snp')
         # Too slow
-        ##self.has_hits('_exists_:dbnsfp')
+        # self.has_hits('_exists_:dbnsfp')
         self.has_hits('dbnsfp.genename:BTK', morethan=5000)
         self.has_hits('snpeff.ann.genename:BTK', morethan=8000)
-        self.has_hits('_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen')
+        self.has_hits(
+            '_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen')
 
         con = self.get_ok(self.api + '/query?q=rs58991260&callback=mycallback')
         ok_(con.startswith('mycallback('.encode('utf-8')))
 
         # testing non-ascii character
-        res = self.json_ok(self.get_ok(self.api + '/query?q=54097\xef\xbf\xbd\xef\xbf\xbdmouse'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/query?q=54097\xef\xbf\xbd\xef\xbf\xbdmouse'))
         eq_(res['hits'], [])
 
-        self.get_status_code(self.api + '/query', status_code=400)        
+        self.get_status_match(self.api + '/query', status_code=400)
 
     def test_query_post(self):
-        #/query via post
+        # /query via post
         self.json_ok(self.post_ok(self.api + '/query', {'q': 'rs58991260'}))
 
         res = self.json_ok(self.post_ok(self.api + '/query', {'q': 'rs58991260',
@@ -94,11 +82,11 @@ class MyVariantTest(BiothingTestHelperMixin):
                                                               'scopes': 'dbsnp.rsid',
                                                               'fields': 'dbsnp.chrom,dbsnp.alleles'}))
         assert len(res) == 1, (res, len(res))
-        
-        self.post_status_code(self.api + '/query', {}, status_code=400)
+
+        self.post_status_match(self.api + '/query', {}, status_code=400)
 
         # TODO fix this test query
-        #res = self.json_ok(self.post_ok(self.api + '/query', {'q': '[rs58991260, "chr11:66397000-66398000"]',
+        # res = self.json_ok(self.post_ok(self.api + '/query', {'q': '[rs58991260, "chr11:66397000-66398000"]',
         #                                       'scopes': 'dbsnp.rsid'}))
         #eq_(len(res), 2)
         #eq_(res[0]['_id'], 'chr1:g.218631822G>A')
@@ -124,48 +112,59 @@ class MyVariantTest(BiothingTestHelperMixin):
 
     def test_variant(self):
         # TODO
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr16:g.28883241A>G'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/variant/chr16:g.28883241A>G'))
         eq_(res['_id'], "chr16:g.28883241A>G")
 
         res = self.json_ok(self.get_ok(self.api + '/variant/chr1:g.35367G>A'))
         eq_(res['_id'], "chr1:g.35367G>A")
 
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr7:g.55241707G>T'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/variant/chr7:g.55241707G>T'))
         eq_(res['_id'], "chr7:g.55241707G>T")
 
         # testing non-ascii character
-        self.get_404(self.api + '/variant/' + 'chr7:g.55241707G>T\xef\xbf\xbd\xef\xbf\xbdmouse')
+        self.get_404(self.api + '/variant/' +
+                     'chr7:g.55241707G>T\xef\xbf\xbd\xef\xbf\xbdmouse')
 
         # testing filtering parameters
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr16:g.28883241A>G?fields=dbsnp,dbnsfp,cadd'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/variant/chr16:g.28883241A>G?fields=dbsnp,dbnsfp,cadd'))
         eq_(set(res), set(['_id', '_version', 'dbnsfp', 'cadd', 'dbsnp']))
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr16:g.28883241A>G?fields=wellderly'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/variant/chr16:g.28883241A>G?fields=wellderly'))
         eq_(set(res), set(['_id', '_version', 'wellderly']))
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr9:g.107620835G>A?fields=dbsnp'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/variant/chr9:g.107620835G>A?fields=dbsnp'))
         eq_(set(res), set(['_id', '_version', 'dbsnp']))
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr1:g.31349647C>T?fields=dbnsfp.clinvar,dbsnp.gmaf,clinvar.hgvs.coding'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/variant/chr1:g.31349647C>T?fields=dbnsfp.clinvar,dbsnp.gmaf,clinvar.hgvs.coding'))
         eq_(set(res), set(['_id', '_version', 'dbsnp', 'clinvar']))
 
         self.get_404(self.api + '/variant')
         self.get_404(self.api + '/variant/')
 
     def test_variant_post(self):
-        res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'chr16:g.28883241A>G'}))
+        res = self.json_ok(self.post_ok(
+            self.api + '/variant', {'ids': 'chr16:g.28883241A>G'}))
         eq_(len(res), 1)
         eq_(res[0]['_id'], "chr16:g.28883241A>G")
 
-        res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G'}))
+        res = self.json_ok(self.post_ok(self.api + '/variant',
+                                        {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G'}))
         eq_(len(res), 2)
         eq_(res[0]['_id'], 'chr16:g.28883241A>G')
         eq_(res[1]['_id'], 'chr11:g.66397320A>G')
 
-        res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'fields': 'dbsnp'}))
+        res = self.json_ok(self.post_ok(
+            self.api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'fields': 'dbsnp'}))
         eq_(len(res), 2)
         for _g in res:
             eq_(set(_g), set(['_id', 'query', 'dbsnp']))
 
         # TODO redo this test, doesn't test much really....
-        res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'chr16:g.28883241A>G,chr11:g.66397320A>G', 'filter': 'dbsnp.chrom'}))
+        res = self.json_ok(self.post_ok(
+            self.api + '/variant', {'ids': 'chr16:g.28883241A>G,chr11:g.66397320A>G', 'filter': 'dbsnp.chrom'}))
         eq_(len(res), 2)
         for _g in res:
             eq_(set(_g), set(['_id', 'query', 'dbsnp']))
@@ -179,7 +178,8 @@ class MyVariantTest(BiothingTestHelperMixin):
         self.get_ok(self.api + '/metadata')
 
     def test_query_facets(self):
-        res = self.json_ok(self.get_ok(self.api + '/query?q=cadd.gene.gene_id:ENSG00000113368&facets=cadd.polyphen.cat&size=0'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/query?q=cadd.gene.gene_id:ENSG00000113368&facets=cadd.polyphen.cat&size=0'))
         assert 'facets' in res and 'cadd.polyphen.cat' in res['facets']
 
     def test_unicode(self):
@@ -190,18 +190,21 @@ class MyVariantTest(BiothingTestHelperMixin):
         res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': s}))
         eq_(res[0]['notfound'], True)
         eq_(len(res), 1)
-        res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'rs2500, ' + s}))
+        res = self.json_ok(self.post_ok(
+            self.api + '/variant', {'ids': 'rs2500, ' + s}))
         eq_(res[1]['notfound'], True)
         eq_(len(res), 2)
 
         res = self.json_ok(self.get_ok(self.api + '/query?q=' + s))
         eq_(res['hits'], [])
 
-        res = self.json_ok(self.post_ok(self.api + '/query', {"q": s, "scopes": 'dbsnp'}))
+        res = self.json_ok(self.post_ok(
+            self.api + '/query', {"q": s, "scopes": 'dbsnp'}))
         eq_(res[0]['notfound'], True)
         eq_(len(res), 1)
 
-        res = self.json_ok(self.post_ok(self.api + '/query', {"q": 'rs2500+' + s}))
+        res = self.json_ok(self.post_ok(
+            self.api + '/query', {"q": 'rs2500+' + s}))
         eq_(res[1]['notfound'], True)
         eq_(len(res), 2)
 
@@ -223,27 +226,33 @@ class MyVariantTest(BiothingTestHelperMixin):
         assert '_scroll_id' in res
 
         # get one set of results
-        res2 = self.json_ok(self.get_ok(self.api + '/query?scroll_id=' + res['_scroll_id']))
+        res2 = self.json_ok(self.get_ok(
+            self.api + '/query?scroll_id=' + res['_scroll_id']))
         assert 'hits' in res2
         ok_(len(res2['hits']) == 1000)
 
     def test_msgpack(self):
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr11:g.66397320A>G'))
-        res2 = self.msgpack_ok(self.get_ok(self.api + '/variant/chr11:g.66397320A>G?msgpack=true'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/variant/chr11:g.66397320A>G'))
+        res2 = self.msgpack_ok(self.get_ok(
+            self.api + '/variant/chr11:g.66397320A>G?msgpack=true'))
         ok_(res, res2)
 
         res = self.json_ok(self.get_ok(self.api + '/query?q=rs2500'))
-        res2 = self.msgpack_ok(self.get_ok(self.api + '/query?q=rs2500&msgpack=true'))
+        res2 = self.msgpack_ok(self.get_ok(
+            self.api + '/query?q=rs2500&msgpack=true'))
         ok_(res, res2)
 
         res = self.json_ok(self.get_ok(self.api + '/metadata'))
-        res2 = self.msgpack_ok(self.get_ok(self.api + '/metadata?msgpack=true'))
+        res2 = self.msgpack_ok(self.get_ok(
+            self.api + '/metadata?msgpack=true'))
         ok_(res, res2)
 
     # Too slow
     def test_licenses(self):
         # cadd license
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr17:g.61949543G>A'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/variant/chr17:g.61949543G>A'))
         if 'cadd' in res:
             assert '_license' in res['cadd']
             assert res['cadd']['_license']
@@ -258,7 +267,8 @@ class MyVariantTest(BiothingTestHelperMixin):
             assert res['snpeff']['_license']
 
     def test_jsonld(self):
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr11:g.66397320A>G?jsonld=true'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/variant/chr11:g.66397320A>G?jsonld=true'))
         assert '@context' in res
         assert '@id' in res
 
@@ -268,13 +278,15 @@ class MyVariantTest(BiothingTestHelperMixin):
         #assert 'ann' in res['snpeff'] and '@context' in res['snpeff']['ann'][0]
 
         # Check a post with jsonld
-        res = self.json_ok(self.post_ok(self.api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'jsonld': 'true'}))
+        res = self.json_ok(self.post_ok(
+            self.api + '/variant', {'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'jsonld': 'true'}))
         for r in res:
             assert '@context' in r
             assert '@id' in r
 
         # Check a query get with jsonld
-        res = self.json_ok(self.get_ok(self.api + '/query?q=_exists_:clinvar&fields=clinvar&size=1&jsonld=true'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/query?q=_exists_:clinvar&fields=clinvar&size=1&jsonld=true'))
 
         assert '@context' in res['hits'][0]
         assert '@id' in res['hits'][0]
@@ -296,14 +308,19 @@ class MyVariantTest(BiothingTestHelperMixin):
         #assert 'ann' in res[1]['snpeff'] and '@context' in res[1]['snpeff']['ann'][0]
 
     def test_genome_assembly(self):
-        res = self.json_ok(self.get_ok(self.api + '/query?q=clinvar.ref:C%20AND%20chr11:56319006%20AND%20clinvar.alt:A&assembly=hg38'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/query?q=clinvar.ref:C%20AND%20chr11:56319006%20AND%20clinvar.alt:A&assembly=hg38'))
         eq_(res["hits"][0]["_id"], "chr11:g.56319006C>A")
 
     def test_HGVS_redirect(self):
-        res = self.json_ok(self.get_ok(self.api + '/variant/chr11:66397320A>G'))
-        res2 = self.json_ok(self.get_ok(self.api + '/variant/chr11:g66397320A>G'))
-        res3 = self.json_ok(self.get_ok(self.api + '/variant/chr11:.66397320A>G'))
-        res4 = self.json_ok(self.get_ok(self.api + '/variant/chr11:g.66397320A>G'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/variant/chr11:66397320A>G'))
+        res2 = self.json_ok(self.get_ok(
+            self.api + '/variant/chr11:g66397320A>G'))
+        res3 = self.json_ok(self.get_ok(
+            self.api + '/variant/chr11:.66397320A>G'))
+        res4 = self.json_ok(self.get_ok(
+            self.api + '/variant/chr11:g.66397320A>G'))
 
         eq_(res, res2)
         eq_(res2, res3)
@@ -314,15 +331,3 @@ class MyVariantTest(BiothingTestHelperMixin):
         self.get_ok(self.host + '/status')
         # (testing failing status would require actually loading tornado app from there
         #  and deal with config params...)
-
-
-class MyVariantTestTornadoClient(AsyncHTTPTestCase, MyVariantTest):
-    __test__ = True
-
-    def __init__(self, methodName='runTest', **kwargs):
-        super(AsyncHTTPTestCase, self).__init__(methodName, **kwargs)
-        self.h = TornadoRequestHelper(self)
-        self._settings = MyVariantWebSettings(config='config')
-
-    def get_app(self):
-        return Application(self._settings.generate_app_list())
