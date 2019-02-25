@@ -1,6 +1,7 @@
 import csv
 import glob
 from biothings.utils.dataload import list_split, dict_sweep, unlist, value_convert_to_number
+from biothings.utils.common import anyfile
 
 VALID_COLUMN_NO = 367
 
@@ -65,6 +66,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
     mvp_score = df["MVP_score"].split(';')
     tsl = df["TSL"].split(';')
     vep_canonical = df["VEP_canonical"].split(';')
+    deogen2_score = df["DEOGEN2_score"].split(';')
     '''
     parse mutpred top 5 features
     '''
@@ -293,7 +295,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
             },
             "genename": df["genename"],
             "uniprot": list(uniprot),
-            "vindijia_neandertal": [i for i in df["VindijiaNeandertal"].split("|") if i != "."],
+            "vindijia_neandertal": [i for i in df["VindijiaNeandertal"].split("/") if i != "."],
             "interpro_domain": df["Interpro_domain"],
             "cds_strand": df["cds_strand"],
             "ancestral_allele": df["Ancestral_allele"],
@@ -388,7 +390,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "rankscore": df["VEST4_rankscore"]
             },
             "deogen2": {
-                "score": df["DEOGEN2_score"],
+                "score": deogen2_score,
                 "rankscore": df["DEOGEN2_rankscore"],
                 "pred": df["DEOGEN2_pred"]
             },
@@ -607,14 +609,14 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
     }
     if include_gnomad:
         one_snp_json['dbnsfp'].update(gnomad)
-    one_snp_json = list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=[".", '-', None]), ";")
+    one_snp_json = list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=[".", '-', "NA", None], remove_invalid_list=True), ";")
     one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"])
     return one_snp_json
 
 
 # open file, parse, pass to json mapper
 def data_generator(input_file, version, include_gnomad):
-    open_file = open(input_file)
+    open_file = anyfile(input_file)
     db_nsfp = csv.reader(open_file, delimiter="\t")
     index = next(db_nsfp)
     assert len(index) == VALID_COLUMN_NO, "Expecting %s columns, but got %s" % (VALID_COLUMN_NO, len(index))

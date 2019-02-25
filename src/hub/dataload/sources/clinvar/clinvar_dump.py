@@ -76,8 +76,8 @@ def generate_clinvar_lib(data_folder):
             fout.close()
             os.unlink("clinvar_tmp.py")
             # can we import it ?
-            import clinvar
-            logging.info("Found generated clinvar module: %s" % clinvar)
+            import genclinvar
+            logging.info("Found generated clinvar module: %s" % genclinvar)
         except Exception as e:
             logging.error("Cannot convert to py3: %s" % e)
             raise
