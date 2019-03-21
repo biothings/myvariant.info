@@ -11,7 +11,6 @@ Introduction
 .. image:: _static/myvariant.png
     :align: left
     :height: 100pt
-    :width: 100pt
     :alt: myvariant.info
 
 .. cssclass:: head-paragraph
