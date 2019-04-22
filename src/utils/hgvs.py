@@ -140,6 +140,8 @@ def get_pos_start_end(chr, pos, ref, alt):
         pos = int(pos)
     except ValueError:
         raise ValueError("Invalid position %s" % repr(pos))
+    if not alt:
+        raise ValueError("Cannot decide start/end from {}.".format((chr, pos, ref, alt)))
     if len(ref) == len(alt) == 1:
         # end is the same as start for snp
         start = end = pos
