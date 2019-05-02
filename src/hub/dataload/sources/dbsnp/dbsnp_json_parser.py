@@ -12,6 +12,10 @@ from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
 # rs16442   => novel patch
 #               NC_000021.8:g.34821649_34821650delAA
 #               NW_003315970.1:g.43915_43916delAA
+# geneid is going to be integer (previously string)
+# fields gone: allele_origin, gmaf, alleles/allele/freq, class, flags, validated, var_subtype
+# current code unable to get assembly start/end position based on vcf for indel/del/is
+
 def parse_one_rec(assembly, record):
     """Restructure JSON
     """
