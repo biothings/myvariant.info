@@ -1,0 +1,1549 @@
+{
+  "refsnp_id": "3028017",
+  "create_date": "2002-01-5T23:44Z",
+  "last_update_date": "2018-10-13T00:13Z",
+  "last_update_build_id": "152",
+  "dbsnp1_merges": [
+    {
+      "merged_rsid": "3831208",
+      "revision": "108",
+      "merge_date": "2002-10-9T08:37Z"
+    },
+    {
+      "merged_rsid": "59800922",
+      "revision": "130",
+      "merge_date": "2008-05-24T02:49Z"
+    },
+    {
+      "merged_rsid": "74278019",
+      "revision": "131",
+      "merge_date": "2009-12-2T15:53Z"
+    },
+    {
+      "merged_rsid": "150847622",
+      "revision": "135",
+      "merge_date": "2011-09-17T04:07Z"
+    }
+  ],
+  "citations": [],
+  "lost_obs_movements": [],
+  "present_obs_movements": [
+    {
+      "component_ids": [
+        {
+          "type": "subsnp",
+          "value": "289438735"
+        },
+        {
+          "type": "subsnp",
+          "value": "327994480"
+        },
+        {
+          "type": "subsnp",
+          "value": "328097350"
+        },
+        {
+          "type": "subsnp",
+          "value": "552704897"
+        },
+        {
+          "type": "subsnp",
+          "value": "553126750"
+        },
+        {
+          "type": "subsnp",
+          "value": "553697885"
+        }
+      ],
+      "observation": {
+        "seq_id": "NC_000021.7",
+        "position": 45739949,
+        "deleted_sequence": "",
+        "inserted_sequence": ""
+      },
+      "allele_in_cur_release": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": ""
+      },
+      "other_rsids_in_cur_release": [],
+      "previous_release": {
+        "allele": {
+          "seq_id": "NC_000021.8",
+          "position": 46915521,
+          "deleted_sequence": "",
+          "inserted_sequence": ""
+        },
+        "rsids": [
+          "3028017"
+        ]
+      },
+      "last_added_to_this_rs": "151"
+    },
+    {
+      "component_ids": [
+        {
+          "type": "frequency",
+          "value": "1000Genomes.1:80069642"
+        },
+        {
+          "type": "frequency",
+          "value": "Estonian.1:31310230"
+        },
+        {
+          "type": "subsnp",
+          "value": "566383294"
+        },
+        {
+          "type": "subsnp",
+          "value": "666765040"
+        },
+        {
+          "type": "subsnp",
+          "value": "1378855171"
+        },
+        {
+          "type": "subsnp",
+          "value": "1536925494"
+        },
+        {
+          "type": "subsnp",
+          "value": "1809719048"
+        },
+        {
+          "type": "subsnp",
+          "value": "1969240008"
+        },
+        {
+          "type": "subsnp",
+          "value": "2031458977"
+        },
+        {
+          "type": "subsnp",
+          "value": "2629571267"
+        },
+        {
+          "type": "subsnp",
+          "value": "3018996084"
+        },
+        {
+          "type": "subsnp",
+          "value": "3644457169"
+        }
+      ],
+      "observation": {
+        "seq_id": "NC_000021.8",
+        "position": 46915521,
+        "deleted_sequence": "",
+        "inserted_sequence": ""
+      },
+      "allele_in_cur_release": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": ""
+      },
+      "other_rsids_in_cur_release": [],
+      "previous_release": {
+        "allele": {
+          "seq_id": "NC_000021.8",
+          "position": 46915521,
+          "deleted_sequence": "",
+          "inserted_sequence": "ACAT"
+        },
+        "rsids": [
+          "3028017"
+        ]
+      },
+      "last_added_to_this_rs": "151"
+    },
+    {
+      "component_ids": [
+        {
+          "type": "subsnp",
+          "value": "3064019136"
+        },
+        {
+          "type": "subsnp",
+          "value": "3064877930"
+        },
+        {
+          "type": "subsnp",
+          "value": "3065845176"
+        },
+        {
+          "type": "subsnp",
+          "value": "3372250632"
+        },
+        {
+          "type": "subsnp",
+          "value": "3372250633"
+        },
+        {
+          "type": "subsnp",
+          "value": "3372250634"
+        },
+        {
+          "type": "subsnp",
+          "value": "3372250635"
+        },
+        {
+          "type": "subsnp",
+          "value": "3645672999"
+        },
+        {
+          "type": "subsnp",
+          "value": "3651130063"
+        }
+      ],
+      "observation": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": ""
+      },
+      "allele_in_cur_release": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": ""
+      },
+      "other_rsids_in_cur_release": [],
+      "previous_release": {
+        "allele": {
+          "seq_id": "NC_000021.8",
+          "position": 46915521,
+          "deleted_sequence": "",
+          "inserted_sequence": "TCAT"
+        },
+        "rsids": [
+          "3028017"
+        ]
+      },
+      "last_added_to_this_rs": "151"
+    },
+    {
+      "component_ids": [
+        {
+          "type": "subsnp",
+          "value": "4259033"
+        },
+        {
+          "type": "subsnp",
+          "value": "5017712"
+        },
+        {
+          "type": "subsnp",
+          "value": "80072943"
+        },
+        {
+          "type": "subsnp",
+          "value": "81665611"
+        },
+        {
+          "type": "subsnp",
+          "value": "82006620"
+        },
+        {
+          "type": "subsnp",
+          "value": "82325471"
+        },
+        {
+          "type": "subsnp",
+          "value": "103865450"
+        }
+      ],
+      "observation": {
+        "seq_id": "NT_011515.12",
+        "position": 3909962,
+        "deleted_sequence": "",
+        "inserted_sequence": ""
+      },
+      "allele_in_cur_release": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": ""
+      },
+      "other_rsids_in_cur_release": [],
+      "previous_release": {
+        "allele": {
+          "seq_id": "NC_000021.8",
+          "position": 46915521,
+          "deleted_sequence": "",
+          "inserted_sequence": "TCAT"
+        },
+        "rsids": [
+          "3028017"
+        ]
+      },
+      "last_added_to_this_rs": "151"
+    },
+    {
+      "component_ids": [
+        {
+          "type": "subsnp",
+          "value": "3372250632"
+        }
+      ],
+      "observation": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": "ACACAT"
+      },
+      "allele_in_cur_release": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": "ACACAT"
+      },
+      "other_rsids_in_cur_release": [],
+      "previous_release": {
+        "allele": {
+          "seq_id": "NC_000021.8",
+          "position": 46915521,
+          "deleted_sequence": "",
+          "inserted_sequence": ""
+        },
+        "rsids": [
+          "3028017"
+        ]
+      },
+      "last_added_to_this_rs": "151"
+    },
+    {
+      "component_ids": [
+        {
+          "type": "subsnp",
+          "value": "289438735"
+        },
+        {
+          "type": "subsnp",
+          "value": "327994480"
+        },
+        {
+          "type": "subsnp",
+          "value": "328097350"
+        },
+        {
+          "type": "subsnp",
+          "value": "552704897"
+        },
+        {
+          "type": "subsnp",
+          "value": "553126750"
+        },
+        {
+          "type": "subsnp",
+          "value": "553697885"
+        }
+      ],
+      "observation": {
+        "seq_id": "NC_000021.7",
+        "position": 45739949,
+        "deleted_sequence": "",
+        "inserted_sequence": "ACAT"
+      },
+      "allele_in_cur_release": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": "ACAT"
+      },
+      "other_rsids_in_cur_release": [],
+      "previous_release": {
+        "allele": {
+          "seq_id": "NC_000021.8",
+          "position": 46915521,
+          "deleted_sequence": "",
+          "inserted_sequence": "ACACAT"
+        },
+        "rsids": [
+          "3028017"
+        ]
+      },
+      "last_added_to_this_rs": "151"
+    },
+    {
+      "component_ids": [
+        {
+          "type": "frequency",
+          "value": "1000Genomes.1:80069642"
+        },
+        {
+          "type": "frequency",
+          "value": "Estonian.1:31310230"
+        },
+        {
+          "type": "subsnp",
+          "value": "566383294"
+        },
+        {
+          "type": "subsnp",
+          "value": "666765040"
+        },
+        {
+          "type": "subsnp",
+          "value": "1378855171"
+        },
+        {
+          "type": "subsnp",
+          "value": "1536925494"
+        },
+        {
+          "type": "subsnp",
+          "value": "1809719048"
+        },
+        {
+          "type": "subsnp",
+          "value": "1969240008"
+        },
+        {
+          "type": "subsnp",
+          "value": "2031458977"
+        },
+        {
+          "type": "subsnp",
+          "value": "2629571267"
+        },
+        {
+          "type": "subsnp",
+          "value": "3018996084"
+        },
+        {
+          "type": "subsnp",
+          "value": "3644457169"
+        }
+      ],
+      "observation": {
+        "seq_id": "NC_000021.8",
+        "position": 46915521,
+        "deleted_sequence": "",
+        "inserted_sequence": "ACAT"
+      },
+      "allele_in_cur_release": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": "ACAT"
+      },
+      "other_rsids_in_cur_release": [],
+      "previous_release": {
+        "allele": {
+          "seq_id": "NC_000021.8",
+          "position": 46915521,
+          "deleted_sequence": "",
+          "inserted_sequence": "AT"
+        },
+        "rsids": [
+          "3028017"
+        ]
+      },
+      "last_added_to_this_rs": "151"
+    },
+    {
+      "component_ids": [
+        {
+          "type": "subsnp",
+          "value": "3064019136"
+        },
+        {
+          "type": "subsnp",
+          "value": "3064877930"
+        },
+        {
+          "type": "subsnp",
+          "value": "3065845176"
+        },
+        {
+          "type": "subsnp",
+          "value": "3372250633"
+        },
+        {
+          "type": "subsnp",
+          "value": "3645672999"
+        },
+        {
+          "type": "subsnp",
+          "value": "3651130063"
+        }
+      ],
+      "observation": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": "ACAT"
+      },
+      "allele_in_cur_release": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": "ACAT"
+      },
+      "other_rsids_in_cur_release": [],
+      "previous_release": {
+        "allele": {
+          "seq_id": "NC_000021.8",
+          "position": 46915521,
+          "deleted_sequence": "",
+          "inserted_sequence": "ACACAT"
+        },
+        "rsids": [
+          "3028017"
+        ]
+      },
+      "last_added_to_this_rs": "151"
+    },
+    {
+      "component_ids": [
+        {
+          "type": "subsnp",
+          "value": "4259033"
+        },
+        {
+          "type": "subsnp",
+          "value": "5017712"
+        },
+        {
+          "type": "subsnp",
+          "value": "80072943"
+        },
+        {
+          "type": "subsnp",
+          "value": "81665611"
+        },
+        {
+          "type": "subsnp",
+          "value": "82006620"
+        },
+        {
+          "type": "subsnp",
+          "value": "82325471"
+        },
+        {
+          "type": "subsnp",
+          "value": "103865450"
+        }
+      ],
+      "observation": {
+        "seq_id": "NT_011515.12",
+        "position": 3909962,
+        "deleted_sequence": "",
+        "inserted_sequence": "ACAT"
+      },
+      "allele_in_cur_release": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": "ACAT"
+      },
+      "other_rsids_in_cur_release": [],
+      "previous_release": {
+        "allele": {
+          "seq_id": "NC_000021.8",
+          "position": 46915521,
+          "deleted_sequence": "",
+          "inserted_sequence": ""
+        },
+        "rsids": [
+          "3028017"
+        ]
+      },
+      "last_added_to_this_rs": "151"
+    },
+    {
+      "component_ids": [
+        {
+          "type": "subsnp",
+          "value": "3372250634"
+        }
+      ],
+      "observation": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": "AT"
+      },
+      "allele_in_cur_release": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": "AT"
+      },
+      "other_rsids_in_cur_release": [],
+      "previous_release": {
+        "allele": {
+          "seq_id": "NC_000021.8",
+          "position": 46915521,
+          "deleted_sequence": "",
+          "inserted_sequence": "ACAT"
+        },
+        "rsids": [
+          "3028017"
+        ]
+      },
+      "last_added_to_this_rs": "151"
+    },
+    {
+      "component_ids": [
+        {
+          "type": "subsnp",
+          "value": "3372250635"
+        }
+      ],
+      "observation": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": "TCAT"
+      },
+      "allele_in_cur_release": {
+        "seq_id": "NC_000021.9",
+        "position": 45495607,
+        "deleted_sequence": "",
+        "inserted_sequence": "TCAT"
+      },
+      "other_rsids_in_cur_release": [],
+      "previous_release": {
+        "allele": {
+          "seq_id": "NC_000021.8",
+          "position": 46915521,
+          "deleted_sequence": "",
+          "inserted_sequence": "AT"
+        },
+        "rsids": [
+          "3028017"
+        ]
+      },
+      "last_added_to_this_rs": "151"
+    }
+  ],
+  "primary_snapshot_data": {
+    "placements_with_allele": [
+      {
+        "seq_id": "NC_000021.9",
+        "is_ptlp": true,
+        "placement_annot": {
+          "seq_type": "refseq_chromosome",
+          "mol_type": "genomic",
+          "seq_id_traits_by_assembly": [
+            {
+              "assembly_name": "GRCh38.p12",
+              "assembly_accession": "GCF_000001405.38",
+              "is_top_level": true,
+              "is_alt": false,
+              "is_patch": false,
+              "is_chromosome": true
+            }
+          ],
+          "is_aln_opposite_orientation": false,
+          "is_mismatch": false
+        },
+        "alleles": [
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NC_000021.9",
+                "position": 45495607,
+                "deleted_sequence": "",
+                "inserted_sequence": ""
+              }
+            },
+            "hgvs": "NC_000021.9:g.45495607_45495608="
+          },
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NC_000021.9",
+                "position": 45495607,
+                "deleted_sequence": "",
+                "inserted_sequence": "ACACAT"
+              }
+            },
+            "hgvs": "NC_000021.9:g.45495607_45495608insACACAT"
+          },
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NC_000021.9",
+                "position": 45495607,
+                "deleted_sequence": "",
+                "inserted_sequence": "ACAT"
+              }
+            },
+            "hgvs": "NC_000021.9:g.45495607_45495608insACAT"
+          },
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NC_000021.9",
+                "position": 45495607,
+                "deleted_sequence": "",
+                "inserted_sequence": "AT"
+              }
+            },
+            "hgvs": "NC_000021.9:g.45495607_45495608insAT"
+          },
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NC_000021.9",
+                "position": 45495607,
+                "deleted_sequence": "",
+                "inserted_sequence": "TCAT"
+              }
+            },
+            "hgvs": "NC_000021.9:g.45495607_45495608insTCAT"
+          }
+        ]
+      },
+      {
+        "seq_id": "NC_000021.8",
+        "is_ptlp": false,
+        "placement_annot": {
+          "seq_type": "refseq_chromosome",
+          "mol_type": "genomic",
+          "seq_id_traits_by_assembly": [
+            {
+              "assembly_name": "GRCh37.p13",
+              "assembly_accession": "GCF_000001405.25",
+              "is_top_level": true,
+              "is_alt": false,
+              "is_patch": false,
+              "is_chromosome": true
+            }
+          ],
+          "is_aln_opposite_orientation": false,
+          "is_mismatch": false
+        },
+        "alleles": [
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NC_000021.8",
+                "position": 46915521,
+                "deleted_sequence": "",
+                "inserted_sequence": ""
+              }
+            },
+            "hgvs": "NC_000021.8:g.46915521_46915522="
+          },
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NC_000021.8",
+                "position": 46915521,
+                "deleted_sequence": "",
+                "inserted_sequence": "ACACAT"
+              }
+            },
+            "hgvs": "NC_000021.8:g.46915521_46915522insACACAT"
+          },
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NC_000021.8",
+                "position": 46915521,
+                "deleted_sequence": "",
+                "inserted_sequence": "ACAT"
+              }
+            },
+            "hgvs": "NC_000021.8:g.46915521_46915522insACAT"
+          },
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NC_000021.8",
+                "position": 46915521,
+                "deleted_sequence": "",
+                "inserted_sequence": "AT"
+              }
+            },
+            "hgvs": "NC_000021.8:g.46915521_46915522insAT"
+          },
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NC_000021.8",
+                "position": 46915521,
+                "deleted_sequence": "",
+                "inserted_sequence": "TCAT"
+              }
+            },
+            "hgvs": "NC_000021.8:g.46915521_46915522insTCAT"
+          }
+        ]
+      },
+      {
+        "seq_id": "NG_011903.1",
+        "is_ptlp": false,
+        "placement_annot": {
+          "seq_type": "refseq_genomic",
+          "mol_type": "genomic",
+          "seq_id_traits_by_assembly": [],
+          "is_aln_opposite_orientation": false,
+          "is_mismatch": false
+        },
+        "alleles": [
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NG_011903.1",
+                "position": 95425,
+                "deleted_sequence": "",
+                "inserted_sequence": ""
+              }
+            },
+            "hgvs": "NG_011903.1:g.95425_95426="
+          },
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NG_011903.1",
+                "position": 95425,
+                "deleted_sequence": "",
+                "inserted_sequence": "ACACAT"
+              }
+            },
+            "hgvs": "NG_011903.1:g.95425_95426insACACAT"
+          },
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NG_011903.1",
+                "position": 95425,
+                "deleted_sequence": "",
+                "inserted_sequence": "ACAT"
+              }
+            },
+            "hgvs": "NG_011903.1:g.95425_95426insACAT"
+          },
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NG_011903.1",
+                "position": 95425,
+                "deleted_sequence": "",
+                "inserted_sequence": "AT"
+              }
+            },
+            "hgvs": "NG_011903.1:g.95425_95426insAT"
+          },
+          {
+            "allele": {
+              "spdi": {
+                "seq_id": "NG_011903.1",
+                "position": 95425,
+                "deleted_sequence": "",
+                "inserted_sequence": "TCAT"
+              }
+            },
+            "hgvs": "NG_011903.1:g.95425_95426insTCAT"
+          }
+        ]
+      }
+    ],
+    "allele_annotations": [
+      {
+        "frequency": [
+          {
+            "study_name": "1000Genomes",
+            "study_version": 1,
+            "local_row_id": 80069642,
+            "observation": {
+              "seq_id": "NC_000021.8",
+              "position": 46915521,
+              "deleted_sequence": "",
+              "inserted_sequence": ""
+            },
+            "allele_count": 791,
+            "total_count": 5008
+          },
+          {
+            "study_name": "Estonian",
+            "study_version": 1,
+            "local_row_id": 31310230,
+            "observation": {
+              "seq_id": "NC_000021.8",
+              "position": 46915521,
+              "deleted_sequence": "",
+              "inserted_sequence": ""
+            },
+            "allele_count": 848,
+            "total_count": 4480
+          }
+        ],
+        "clinical": [],
+        "submissions": [
+          "4259033",
+          "5017712",
+          "80072943",
+          "81665611",
+          "82006620",
+          "82325471",
+          "103865450",
+          "289438735",
+          "327994480",
+          "328097350",
+          "552704897",
+          "553126750",
+          "553697885",
+          "566383294",
+          "666765040",
+          "1378855171",
+          "1536925494",
+          "1809719048",
+          "1969240008",
+          "2031458977",
+          "2629571267",
+          "3018996084",
+          "3064019136",
+          "3064877930",
+          "3065845176",
+          "3372250632",
+          "3372250633",
+          "3372250634",
+          "3372250635",
+          "3644457169",
+          "3645672999",
+          "3651130063"
+        ],
+        "assembly_annotation": [
+          {
+            "seq_id": "NC_000021.9",
+            "annotation_release": "Homo sapiens Annotation Release 109",
+            "genes": [
+              {
+                "name": "collagen type XVIII alpha 1 chain",
+                "id": 80781,
+                "locus": "COL18A1",
+                "is_pseudo": false,
+                "orientation": "plus",
+                "sequence_ontology": [],
+                "rnas": [
+                  {
+                    "id": "NM_030582.3",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_085059.2"
+                  },
+                  {
+                    "id": "NM_130444.2",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_569711.2"
+                  },
+                  {
+                    "id": "NM_130445.3",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_569712.2"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "frequency": [],
+        "clinical": [],
+        "submissions": [
+          "3372250632"
+        ],
+        "assembly_annotation": [
+          {
+            "seq_id": "NC_000021.9",
+            "annotation_release": "Homo sapiens Annotation Release 109",
+            "genes": [
+              {
+                "name": "collagen type XVIII alpha 1 chain",
+                "id": 80781,
+                "locus": "COL18A1",
+                "is_pseudo": false,
+                "orientation": "plus",
+                "sequence_ontology": [],
+                "rnas": [
+                  {
+                    "id": "NM_030582.3",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_085059.2"
+                  },
+                  {
+                    "id": "NM_130444.2",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_569711.2"
+                  },
+                  {
+                    "id": "NM_130445.3",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_569712.2"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "frequency": [
+          {
+            "study_name": "1000Genomes",
+            "study_version": 1,
+            "local_row_id": 80069642,
+            "observation": {
+              "seq_id": "NC_000021.8",
+              "position": 46915521,
+              "deleted_sequence": "",
+              "inserted_sequence": "ACAT"
+            },
+            "allele_count": 4217,
+            "total_count": 5008
+          },
+          {
+            "study_name": "Estonian",
+            "study_version": 1,
+            "local_row_id": 31310230,
+            "observation": {
+              "seq_id": "NC_000021.8",
+              "position": 46915521,
+              "deleted_sequence": "",
+              "inserted_sequence": "ACAT"
+            },
+            "allele_count": 3632,
+            "total_count": 4480
+          }
+        ],
+        "clinical": [],
+        "submissions": [
+          "4259033",
+          "5017712",
+          "80072943",
+          "81665611",
+          "82006620",
+          "82325471",
+          "103865450",
+          "289438735",
+          "327994480",
+          "328097350",
+          "552704897",
+          "553126750",
+          "553697885",
+          "566383294",
+          "666765040",
+          "1378855171",
+          "1536925494",
+          "1809719048",
+          "1969240008",
+          "2031458977",
+          "2629571267",
+          "3018996084",
+          "3064019136",
+          "3064877930",
+          "3065845176",
+          "3372250633",
+          "3644457169",
+          "3645672999",
+          "3651130063"
+        ],
+        "assembly_annotation": [
+          {
+            "seq_id": "NC_000021.9",
+            "annotation_release": "Homo sapiens Annotation Release 109",
+            "genes": [
+              {
+                "name": "collagen type XVIII alpha 1 chain",
+                "id": 80781,
+                "locus": "COL18A1",
+                "is_pseudo": false,
+                "orientation": "plus",
+                "sequence_ontology": [],
+                "rnas": [
+                  {
+                    "id": "NM_030582.3",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_085059.2"
+                  },
+                  {
+                    "id": "NM_130444.2",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_569711.2"
+                  },
+                  {
+                    "id": "NM_130445.3",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_569712.2"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "frequency": [],
+        "clinical": [],
+        "submissions": [
+          "3372250634"
+        ],
+        "assembly_annotation": [
+          {
+            "seq_id": "NC_000021.9",
+            "annotation_release": "Homo sapiens Annotation Release 109",
+            "genes": [
+              {
+                "name": "collagen type XVIII alpha 1 chain",
+                "id": 80781,
+                "locus": "COL18A1",
+                "is_pseudo": false,
+                "orientation": "plus",
+                "sequence_ontology": [],
+                "rnas": [
+                  {
+                    "id": "NM_030582.3",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_085059.2"
+                  },
+                  {
+                    "id": "NM_130444.2",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_569711.2"
+                  },
+                  {
+                    "id": "NM_130445.3",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_569712.2"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "frequency": [],
+        "clinical": [],
+        "submissions": [
+          "3372250635"
+        ],
+        "assembly_annotation": [
+          {
+            "seq_id": "NC_000021.9",
+            "annotation_release": "Homo sapiens Annotation Release 109",
+            "genes": [
+              {
+                "name": "collagen type XVIII alpha 1 chain",
+                "id": 80781,
+                "locus": "COL18A1",
+                "is_pseudo": false,
+                "orientation": "plus",
+                "sequence_ontology": [],
+                "rnas": [
+                  {
+                    "id": "NM_030582.3",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_085059.2"
+                  },
+                  {
+                    "id": "NM_130444.2",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_569711.2"
+                  },
+                  {
+                    "id": "NM_130445.3",
+                    "sequence_ontology": [
+                      {
+                        "name": "intron_variant",
+                        "accession": "SO:0001627"
+                      }
+                    ],
+                    "product_id": "NP_569712.2"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "support": [
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss4259033"
+        },
+        "revision_added": "102",
+        "create_date": "2002-01-5T23:44Z",
+        "submitter_handle": "TSC-CSHL"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss5017712"
+        },
+        "revision_added": "108",
+        "create_date": "2002-08-28T10:40Z",
+        "submitter_handle": "YUSUKE"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss80072943"
+        },
+        "revision_added": "130",
+        "create_date": "2007-12-15T19:07Z",
+        "submitter_handle": "HGSV"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss81665611"
+        },
+        "revision_added": "130",
+        "create_date": "2007-12-15T19:07Z",
+        "submitter_handle": "HGSV"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss82006620"
+        },
+        "revision_added": "130",
+        "create_date": "2007-12-15T19:07Z",
+        "submitter_handle": "HGSV"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss82325471"
+        },
+        "revision_added": "130",
+        "create_date": "2007-12-15T19:07Z",
+        "submitter_handle": "HGSV"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss103865450"
+        },
+        "revision_added": "131",
+        "create_date": "2009-02-23T11:54Z",
+        "submitter_handle": "BCMHGSC_JDW"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss289438735"
+        },
+        "revision_added": "137",
+        "create_date": "2012-05-4T12:43Z",
+        "submitter_handle": "GMI"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss327994480"
+        },
+        "revision_added": "135",
+        "create_date": "2011-05-9T22:27Z",
+        "submitter_handle": "1000GENOMES"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss328097350"
+        },
+        "revision_added": "135",
+        "create_date": "2011-05-9T22:27Z",
+        "submitter_handle": "1000GENOMES"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss552704897"
+        },
+        "revision_added": "138",
+        "create_date": "2013-04-25T23:59Z",
+        "submitter_handle": "LUNTER"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss553126750"
+        },
+        "revision_added": "138",
+        "create_date": "2013-04-25T23:59Z",
+        "submitter_handle": "LUNTER"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss553697885"
+        },
+        "revision_added": "138",
+        "create_date": "2013-04-25T23:59Z",
+        "submitter_handle": "LUNTER"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss566383294"
+        },
+        "revision_added": "138",
+        "create_date": "2013-04-25T23:59Z",
+        "submitter_handle": "TISHKOFF"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss666765040"
+        },
+        "revision_added": "138",
+        "create_date": "2013-04-25T23:59Z",
+        "submitter_handle": "BILGI_BIOE"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss1378855171"
+        },
+        "revision_added": "142",
+        "create_date": "2014-08-21T15:37Z",
+        "submitter_handle": "1000GENOMES"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss1536925494"
+        },
+        "revision_added": "144",
+        "create_date": "2015-04-1T10:43Z",
+        "submitter_handle": "DDI"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss1809719048"
+        },
+        "revision_added": "146",
+        "create_date": "2015-09-8T16:25Z",
+        "submitter_handle": "HAMMER_LAB"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss1969240008"
+        },
+        "revision_added": "147",
+        "create_date": "2016-07-19T13:00Z",
+        "submitter_handle": "GENOMED"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss2031458977"
+        },
+        "revision_added": "149",
+        "create_date": "2016-09-14T10:20Z",
+        "submitter_handle": "JJLAB"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss2629571267"
+        },
+        "revision_added": "151",
+        "create_date": "2017-11-8T11:52Z",
+        "submitter_handle": "SYSTEMSBIOZJU"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss3018996084"
+        },
+        "revision_added": "151",
+        "create_date": "2017-11-8T11:52Z",
+        "submitter_handle": "SWEGEN"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss3064019136"
+        },
+        "revision_added": "151",
+        "create_date": "2017-11-8T11:52Z",
+        "submitter_handle": "MCHAISSO"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss3064877930"
+        },
+        "revision_added": "151",
+        "create_date": "2017-11-8T11:52Z",
+        "submitter_handle": "MCHAISSO"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss3065845176"
+        },
+        "revision_added": "151",
+        "create_date": "2017-11-8T11:52Z",
+        "submitter_handle": "MCHAISSO"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss3372250632"
+        },
+        "revision_added": "151",
+        "create_date": "2017-11-8T11:52Z",
+        "submitter_handle": "TOPMED"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss3372250633"
+        },
+        "revision_added": "151",
+        "create_date": "2017-11-8T11:52Z",
+        "submitter_handle": "TOPMED"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss3372250634"
+        },
+        "revision_added": "151",
+        "create_date": "2017-11-8T11:52Z",
+        "submitter_handle": "TOPMED"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss3372250635"
+        },
+        "revision_added": "151",
+        "create_date": "2017-11-8T11:52Z",
+        "submitter_handle": "TOPMED"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss3644457169"
+        },
+        "revision_added": "152",
+        "create_date": "2018-10-13T00:13Z",
+        "submitter_handle": "BEROUKHIMLAB"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss3645672999"
+        },
+        "revision_added": "152",
+        "create_date": "2018-10-13T00:13Z",
+        "submitter_handle": "BIOINF_KMB_FNS_UNIBA"
+      },
+      {
+        "id": {
+          "type": "subsnp",
+          "value": "ss3651130063"
+        },
+        "revision_added": "152",
+        "create_date": "2018-10-13T00:13Z",
+        "submitter_handle": "URBANLAB"
+      },
+      {
+        "id": {
+          "type": "frequency",
+          "value": "1000Genomes.1:80069642"
+        },
+        "revision_added": "152",
+        "create_date": "2018-10-13T00:13Z",
+        "submitter_handle": "1000Genomes"
+      },
+      {
+        "id": {
+          "type": "frequency",
+          "value": "Estonian.1:31310230"
+        },
+        "revision_added": "152",
+        "create_date": "2018-10-13T00:13Z",
+        "submitter_handle": "Estonian"
+      }
+    ],
+    "anchor": "NC_000021.9:0045495607:0:ins",
+    "variant_type": "ins"
+  }
+}
