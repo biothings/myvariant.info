@@ -1,0 +1,43 @@
+{
+  "_id": "chr21:g.34821649_34821650del",
+  "chrom": "21",
+  "dbsnp": {
+    "_license": "http://bit.ly/2AqoLOc",
+    "allele_origin": "unspecified",
+    "alleles": [
+      {
+        "allele": "CAA",
+        "freq": 0.8846
+      },
+      {
+        "allele": "C",
+        "freq": 0.1154
+      }
+    ],
+    "alt": "C",
+    "chrom": "21",
+    "class": "DIV",
+    "dbsnp_build": 54,
+    "flags": [
+      "ASP",
+      "G5",
+      "KGPhase1",
+      "KGPhase3",
+      "U3"
+    ],
+    "gene": {
+      "geneid": "757",
+      "symbol": "TMEM50B"
+    },
+    "gmaf": 0.1154,
+    "hg19": {
+      "end": 34821650,
+      "start": 34821649
+    },
+    "ref": "CAA",
+    "rsid": "rs16442",
+    "validated": false,
+    "var_subtype": "del",
+    "vartype": "indel"
+  }
+}
