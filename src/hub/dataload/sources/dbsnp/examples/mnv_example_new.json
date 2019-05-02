@@ -1,0 +1,220 @@
+{
+  "_id": "chr21:g.32700176_32700177delCTinsGG",
+  "dbsnp": {
+    "alt": "GG",
+    "dbsnp_build": 152,
+    "vartype": "mnv",
+    "chrom": 21,
+    "gene": {
+      "orientation": "minus",
+      "symbol": "TIAM1",
+      "rnas": [
+        {
+          "sequence_ontology": [
+            {
+              "name": "genic_upstream_transcript_variant",
+              "accession": "SO:0002153"
+            }
+          ],
+          "id": "NM_001353684.1",
+          "product_id": "NP_001340613.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "genic_upstream_transcript_variant",
+              "accession": "SO:0002153"
+            }
+          ],
+          "id": "NM_001353685.1",
+          "product_id": "NP_001340614.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "NM_001353686.1",
+          "product_id": "NP_001340615.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "NM_001353687.1",
+          "product_id": "NP_001340616.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "NM_001353688.1",
+          "product_id": "NP_001340617.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "NM_001353689.1",
+          "product_id": "NP_001340618.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "NM_001353690.1",
+          "product_id": "NP_001340619.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "NM_001353691.1",
+          "product_id": "NP_001340620.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "NM_001353692.1",
+          "product_id": "NP_001340621.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "NM_001353693.1",
+          "product_id": "NP_001340622.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "NM_001353694.1",
+          "product_id": "NP_001340623.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "NM_003253.3",
+          "product_id": "NP_003244.2"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "XM_005261038.3",
+          "product_id": "XP_005261095.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "XM_005261040.2",
+          "product_id": "XP_005261097.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "XM_011529712.1",
+          "product_id": "XP_011528014.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "XM_011529713.1",
+          "product_id": "XP_011528015.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "XM_017028448.1",
+          "product_id": "XP_016883937.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "XM_017028450.1",
+          "product_id": "XP_016883939.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "XM_017028451.2",
+          "product_id": "XP_016883940.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "XM_024452127.1",
+          "product_id": "XP_024307895.1"
+        }
+      ],
+      "name": "T cell lymphoma invasion and metastasis 1",
+      "geneid": 7074,
+      "is_pseudo": "False"
+    },
+    "rsid": "rs34022451",
+    "ref": "CT"
+  }
+}
