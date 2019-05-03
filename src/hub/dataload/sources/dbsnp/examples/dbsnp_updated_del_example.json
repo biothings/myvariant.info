@@ -28,7 +28,7 @@
     "gene": [
       {
         "name": "carbohydrate sulfotransferase 9",
-        "is_pseudo": False,
+        "is_pseudo": "False",
         "rnas": [
           {
             "refseq": "NM_001256316.1",

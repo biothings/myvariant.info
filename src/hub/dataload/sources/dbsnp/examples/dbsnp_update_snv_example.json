@@ -27,7 +27,7 @@
     ],
     "gene": {
       "name": "DCC netrin 1 receptor",
-      "is_pseudo": False,
+      "is_pseudo": "False",
       "rnas": [
         {
           "refseq": "NM_005215.3",

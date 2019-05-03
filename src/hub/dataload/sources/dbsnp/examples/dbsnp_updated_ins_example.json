@@ -19,7 +19,7 @@
     ],
     "gene": {
       "name": "CTD phosphatase subunit 1",
-      "is_pseudo": False,
+      "is_pseudo": "False",
       "rnas": [
         {
           "refseq": "NM_001202504.1",
