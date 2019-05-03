@@ -13,79 +13,45 @@ import glob
 from vcf import Reader
 
 from biothings.utils.common import timesofar
-from config import logger as logging
+from utils.hgvs import get_hgvs_from_vcf, get_pos_start_end
+from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
+#from config import logger as logging
+import logging
 
 
 def get_hgvs_name(record, as_list=False):
     """construct the valid HGVS name as the _id field"""
-    _id_list = []
-    _alt_list = []
-    _pos_list = []
-
     chrom = record.CHROM
+    chromStart = record.POS
+    ref = record.REF
+    _alt_list = []
+
+    _id_list = []
+    _pos_list = []
     for alt in record.ALT:
-        alt = str(alt)
-        _id = None
-        if record.is_snp:
-            assert record.POS == record.INFO['RSPOS']
-            # make a HGVS id
-            _id = 'chr{}:g.{}{}>{}'.format(chrom,
-                                           record.POS,
-                                           record.REF,
-                                           alt)
-            _alt_list.append(alt)
-            _pos_list.append(OrderedDict(start=record.POS, end=record.POS))   # end is the same as start for snp
-
-        elif record.is_indel:
-            if record.is_deletion:
-                if len(record.ALT) == 1 and len(alt) == 1:
-                    # only if ALT is a single allele, that is a simple deletion
-                    assert alt == record.REF[0]
-                    if record.POS + 1 == record.INFO['RSPOS']:
-                        if len(record.REF) == 2:
-                            # this is a single nt deletion
-                            pos = record.INFO['RSPOS']
-                            _pos_list.append(OrderedDict(start=pos, end=pos + 1))   # end is start+1 for single nt deletion
-                        else:
-                            # this is a multiple nt deletion
-                            end = record.INFO['RSPOS'] + len(record.REF) - 2
-                            pos = '{}_{}'.format(record.INFO['RSPOS'], end)
-                            _pos_list.append(OrderedDict(start=record.INFO['RSPOS'], end=end))
-                        _id = 'chr{}:g.{}del'.format(chrom, pos)
-                        _alt_list.append(alt)
-                    else:
-                        # record.POS and RSPOS does not match
-                        # something ambigious here
-                        pass
-                else:
-                    # other cases of deletion currently been ignored
-                    # e.g. rs369371434, rs386822484
-                    pass
-            else:
-                # insertion
-                if len(record.REF) == 1 and alt[0] == record.REF:
-                    # simple insertion cases
-                    if record.POS == record.INFO['RSPOS']:
-                        pos = '{}_{}'.format(record.POS, record.POS + 1)
-                        _id = 'chr{}:g.{}ins{}'.format(chrom, pos, alt[1:])
-                        _alt_list.append(alt)
-                        _pos_list.append(OrderedDict(start=record.POS, end=record.POS + 1))
-                    else:
-                        # record.POS and RSPOS does not match
-                        # something ambigious here
-                        pass
-                else:
-                    # other cases of insertion currently been ignored
-                    # e.g. rs398121698, rs71320640
-                    pass
-        if _id:
-            _id_list.append(_id)
-
-    if not as_list and len(_id_list) == 1:
-        _id_list = _id_list[0]
-        _alt_list = _alt_list[0]
-        _pos_list = _pos_list[0]
-
+        if alt:
+            alt = str(alt)
+        _alt_list.append(alt)
+        try:
+            # NOTE: current get_pos_start_end doesn't handle ALT=None case
+            # TODO: need to remove str(alt) when get_pos_start_end can
+            # handle ALT=None case
+            (start, end) = get_pos_start_end(chrom, chromStart, ref, alt)
+            _pos_list.append(OrderedDict(start=start, end=end))
+        # handle cases where start & end position could not be
+        # inferred from VCF
+        except ValueError:
+            _pos_list.append(OrderedDict(start=None, end=None))
+        try:
+            HGVS = get_hgvs_from_vcf(chrom,
+                                     chromStart,
+                                     ref,
+                                     alt,
+                                     mutant_type=False)
+            _id_list.append(HGVS)
+        # handle cases where hgvs id could not be inferred from vcf
+        except ValueError:
+            pass
     return _id_list, _alt_list, _pos_list
 
 
@@ -201,7 +167,7 @@ def parse_vcf(assembly, vcf_infile, compressed=True, verbose=True, by_id=True, *
     logging.info("Total rs: {}; total docs: {}; skipped rs: {}".format(cnt_1, cnt_2, cnt_3))
 
 
-def load_data(assembly, input_file,chrom):
+def load_data(assembly, input_file, chrom):
     import logging as loggingmod
     global logging
     logging = loggingmod.getLogger("dbsnp_upload")
@@ -211,5 +177,6 @@ def load_data(assembly, input_file,chrom):
         _doc = {'dbsnp': doc}
         _doc['_id'] = doc['_id']
         del doc['_id']
-        yield _doc
+        yield (dict_sweep(unlist(value_convert_to_number(_doc)),
+                                                         [None]))
 
