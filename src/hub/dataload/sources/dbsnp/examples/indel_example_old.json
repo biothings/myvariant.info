@@ -1,0 +1,41 @@
+{
+  "_id": "chr21:g.45195520del",
+  "dbsnp": {
+    "_license": "http://bit.ly/2AqoLOc",
+    "allele_origin": "unspecified",
+    "alleles": [
+      {
+        "allele": "AT",
+        "freq": 0.9994
+      },
+      {
+        "allele": "A",
+        "freq": 0.000599
+      }
+    ],
+    "alt": "A",
+    "chrom": "21",
+    "class": "DIV",
+    "dbsnp_build": 52,
+    "flags": [
+      "ASP",
+      "INT",
+      "KGPhase3",
+      "RV"
+    ],
+    "gene": {
+      "geneid": "1476",
+      "symbol": "CSTB"
+    },
+    "gmaf": 0.000599,
+    "hg19": {
+      "end": 45195521,
+      "start": 45195520
+    },
+    "ref": "AT",
+    "rsid": "rs6376",
+    "validated": false,
+    "var_subtype": "del",
+    "vartype": "indel"
+  }
+}

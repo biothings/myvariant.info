@@ -1,0 +1,141 @@
+{
+  "_id": "chr18:g.50519274A>G",
+  "dbsnp": {
+    "alleles": [
+      {
+        "freq": {
+          "1000g": 0.241,
+          "alspac": 0.286,
+          "estonian": 0.248,
+          "gnomad": 0.24,
+          "topmed": 0.239,
+          "twinsuk": 0.27
+        },
+        "allele": "A"
+      },
+      {
+        "freq": {
+          "1000g": 0.759,
+          "alspac": 0.714,
+          "estonian": 0.752,
+          "gnomad": 0.76,
+          "topmed": 0.761,
+          "twinsuk": 0.73
+        },
+        "allele": "G"
+      }
+    ],
+    "gene": {
+      "name": "DCC netrin 1 receptor",
+      "is_pseudo": "False",
+      "rnas": [
+        {
+          "refseq": "NM_005215.3",
+          "so": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "protein_product": {
+            "refseq": "NP_005206.2"
+          }
+        },
+        {
+          "refseq": "XM_011525843.1",
+          "so": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "protein_product": {
+            "refseq": "XP_011524145.1"
+          }
+        },
+        {
+          "refseq": "XM_011525844.2",
+          "so": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "protein_product": {
+            "refseq": "XP_011524146.1"
+          }
+        },
+        {
+          "refseq": "XM_017025568.1",
+          "so": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "protein_product": {
+            "refseq": "XP_016881057.1"
+          }
+        },
+        {
+          "refseq": "XM_017025569.1",
+          "so": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "protein_product": {
+            "refseq": "XP_016881058.1"
+          }
+        },
+        {
+          "refseq": "XM_017025570.1",
+          "so": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "protein_product": {
+            "refseq": "XP_016881059.1"
+          }
+        }
+      ],
+      "strand": "+",
+      "geneid": 1630,
+      "symbol": "DCC"
+    },
+    "hg19": {
+      "start": 50519274,
+      "end": 50519274
+    },
+    "vartype": "snv",
+    "rsid": "rs714",
+    "dbsnp_build": 152,
+    "dbsnp_merges": [
+      {
+        "rsid": "rs7506401",
+        "date": "2006-03-11T02:21Z",
+        "rv": 126
+      },
+      {
+        "rsid": "rs59967963",
+        "date": "2008-05-25T20:19Z",
+        "rv": 130
+      }
+    ],
+    "citations": [
+      23765761,
+      26602921,
+      26891331,
+      27050280,
+      27127179,
+      28348449,
+      28652652
+    ],
+    "chrom": 18,
+    "ref": "A",
+    "alt": "G"
+  }
+}
