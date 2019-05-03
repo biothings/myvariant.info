@@ -1,0 +1,84 @@
+{
+  "_id": "chr21:g.46915521_46915522insACACAT",
+  "dbsnp": {
+    "dbsnp_merges": [
+      {
+        "merge_date": "2002-10-9T08:37Z",
+        "revision": "108",
+        "merged_rsid": "rs3831208"
+      },
+      {
+        "merge_date": "2008-05-24T02:49Z",
+        "revision": "130",
+        "merged_rsid": "rs59800922"
+      },
+      {
+        "merge_date": "2009-12-2T15:53Z",
+        "revision": "131",
+        "merged_rsid": "rs74278019"
+      },
+      {
+        "merge_date": "2011-09-17T04:07Z",
+        "revision": "135",
+        "merged_rsid": "rs150847622"
+      }
+    ],
+    "alt": "TCAT",
+    "dbsnp_build": 152,
+    "vartype": "ins",
+    "chrom": 21,
+    "gene": {
+      "orientation": "plus",
+      "symbol": "COL18A1",
+      "rnas": [
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "NM_030582.3",
+          "product_id": "NP_085059.2"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "NM_130444.2",
+          "product_id": "NP_569711.2"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "id": "NM_130445.3",
+          "product_id": "NP_569712.2"
+        }
+      ],
+      "name": "collagen type XVIII alpha 1 chain",
+      "geneid": 80781,
+      "is_pseudo": "False"
+    },
+    "alleles": [
+      {
+        "Estonian": 0.189,
+        "allele": "",
+        "1000Genomes": 0.158
+      },
+      {
+        "Estonian": 0.811,
+        "allele": "ACAT",
+        "1000Genomes": 0.842
+      }
+    ],
+    "rsid": "rs3028017",
+    "ref": ""
+  }
+}

@@ -9,6 +9,12 @@ from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
 # rs10577038 => two different hgvs representations
 #               NC_000018.9:g.476589_476590delGC
 #               NC_000018.9:g.476588_476590delCGCinsA
+# rs16442   => novel patch
+#               NC_000021.8:g.34821649_34821650delAA
+#               NW_003315970.1:g.43915_43916delAA
+# geneid is going to be integer (previously string)
+# fields gone: allele_origin, gmaf, alleles/allele/freq, class, flags, validated, var_subtype
+# current code unable to get assembly start/end position based on vcf for indel/del/is
 
 def parse_one_rec(assembly, record):
     """Restructure JSON
@@ -94,7 +100,7 @@ def get_hgvs_and_vcf(assembly, placements):
                 assembly_name = seq[0].get('assembly_name')
                 if assembly_name == ASSEMBLY_NAME_MAPPING[assembly]:
                     for _allele in _placement.get('alleles'):
-                        if _allele.get('allele').get('spdi').get('deleted_sequence') != _allele.get('allele').get('spdi').get('inserted_sequence'):
+                        if _allele.get('allele').get('spdi').get('deleted_sequence') != _allele.get('allele').get('spdi').get('inserted_sequence') and _allele.get('hgvs').startswith('NC'):
                             hgvs = 'chr' + accession_2_chr(_allele.get('hgvs')) + ":" + _allele.get('hgvs').split(':')[-1]
                             vcf = (accession_2_chr(_allele.get('allele').get('spdi').get('seq_id')),
                                    _allele.get("allele").get('spdi').get('position') + 1,

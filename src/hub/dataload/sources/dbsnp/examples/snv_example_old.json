@@ -1,0 +1,41 @@
+{
+  "_id": "chrMT:g.8120C>T",
+  "dbsnp": {
+    "_license": "http://bit.ly/2AqoLOc",
+    "allele_origin": "unspecified",
+    "alleles": [
+      {
+        "allele": "C"
+      },
+      {
+        "allele": "A"
+      },
+      {
+        "allele": "T"
+      }
+    ],
+    "alt": "T",
+    "chrom": "MT",
+    "class": "SNV",
+    "dbsnp_build": 52,
+    "flags": [
+      "ASP",
+      "NSM",
+      "REF",
+      "SYN"
+    ],
+    "gene": {
+      "geneid": "4513",
+      "symbol": "COX2"
+    },
+    "hg19": {
+      "end": 8120,
+      "start": 8120
+    },
+    "ref": "C",
+    "rsid": "rs8936",
+    "validated": false,
+    "var_subtype": "unknown",
+    "vartype": "snp"
+  }
+}

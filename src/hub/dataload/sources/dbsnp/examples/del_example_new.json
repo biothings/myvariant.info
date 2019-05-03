@@ -1,0 +1,73 @@
+{
+  "_id": "chr21:g.34821649_34821650delAA",
+  "dbsnp": {
+    "alt": "",
+    "dbsnp_build": 152,
+    "vartype": "del",
+    "chrom": "MT",
+    "gene": {
+      "orientation": "minus",
+      "symbol": "TMEM50B",
+      "rnas": [
+        {
+          "sequence_ontology": [
+            {
+              "name": "3_prime_UTR_variant",
+              "accession": "SO:0001624"
+            }
+          ],
+          "id": "NM_006134.6",
+          "product_id": "NP_006125.2"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "non_coding_transcript_variant",
+              "accession": "SO:0001619"
+            }
+          ],
+          "codon_aligned_transcript_change": {
+            "seq_id": "NR_040016.1",
+            "deleted_sequence": "TT",
+            "position": 2164,
+            "inserted_sequence": "TT"
+          },
+          "id": "NR_040016.1"
+        },
+        {
+          "sequence_ontology": [
+            {
+              "name": "3_prime_UTR_variant",
+              "accession": "SO:0001624"
+            }
+          ],
+          "id": "XM_011529746.2",
+          "product_id": "XP_011528048.1"
+        }
+      ],
+      "name": "transmembrane protein 50B",
+      "geneid": 757,
+      "is_pseudo": "False"
+    },
+    "alleles": [
+      {
+        "GnomAD": 0.91,
+        "TOPMED": 0.904,
+        "TWINSUK": 0.902,
+        "1000Genomes": 0.885,
+        "ALSPAC": 0.902,
+        "allele": "AA"
+      },
+      {
+        "GnomAD": 0.09,
+        "TOPMED": 0.096,
+        "TWINSUK": 0.098,
+        "1000Genomes": 0.115,
+        "ALSPAC": 0.098,
+        "allele": ""
+      }
+    ],
+    "rsid": "rs16442",
+    "ref": "AA"
+  }
+}
