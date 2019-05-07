@@ -2,7 +2,9 @@ import json
 import glob
 
 from utils.hgvs import get_pos_start_end
-from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
+from biothings.utils.dataload import dict_sweep, unlist, \
+                                     value_convert_to_number
+from biothings.utils.common import open_compressed_file
 
 # QUESTION:
 # rs5823327 => no ref, alt; do we still want to keep it
@@ -147,14 +149,14 @@ def get_hgvs_and_vcf(assembly, placements):
 
 
 def load_data_file(input_file, version):
-    with open(input_file) as f:
-        for line in f:
-            record = parse_one_rec(version, json.loads(line))
-            for _doc in record:
-                new_doc = {}
-                new_doc['_id'] = _doc.pop('_id')
-                new_doc['dbsnp'] = _doc
-                yield new_doc
+    f = open_compressed_file(input_file)
+    for line in f:
+        record = parse_one_rec(version, json.loads(line.decode()))
+        for _doc in record:
+            new_doc = {}
+            new_doc['_id'] = _doc.pop('_id')
+            new_doc['dbsnp'] = _doc
+            yield new_doc
 
 
 # load path and find files, pass to data_generator
