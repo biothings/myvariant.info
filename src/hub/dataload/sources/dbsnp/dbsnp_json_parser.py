@@ -39,8 +39,13 @@ def parse_one_rec(assembly, record):
         hgvs, vcf = _item
         doc["_id"] = hgvs
         if vcf:
-            doc[assembly] = {}
             doc["chrom"], pos, doc["ref"], doc["alt"] = vcf
+            doc["chrom"] = str(doc["chrom"])
+            if doc["chrom"] == "23":
+                doc["chrom"] = "X"
+            elif doc["chrom"] == "24":
+                doc["chrom"] = "Y"
+            doc[assembly] = {}
             try:
                 if doc["vartype"] != "snv":
                     ref = "T" + doc["ref"]
@@ -55,7 +60,7 @@ def parse_one_rec(assembly, record):
             except (ValueError, AssertionError):
                 doc[assembly] = {}
         if hgvs:
-            yield dict_sweep(unlist(value_convert_to_number(doc)), vals=[[], {}, None])
+            yield dict_sweep(unlist(value_convert_to_number(doc, skipped_keys=['chrom'])), vals=[[], {}, None])
 
 
 def restructure_allele_freq_info(allele_annotations):
