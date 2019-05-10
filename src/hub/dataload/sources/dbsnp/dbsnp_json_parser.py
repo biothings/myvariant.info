@@ -39,8 +39,6 @@ def parse_one_rec(assembly, record):
     doc['gene'] = restructure_gene_info(allele_annotations)
     for _item in hgvs_vcf_info:
         hgvs, vcf = _item
-        hgvs = hgvs.replace('chr23', 'chrX').replace('chr24', 'chrY')
-        doc["_id"] = hgvs
         if vcf:
             doc["chrom"], pos, doc["ref"], doc["alt"] = vcf
             doc["chrom"] = str(doc["chrom"])
@@ -63,6 +61,7 @@ def parse_one_rec(assembly, record):
             except (ValueError, AssertionError):
                 doc[assembly] = {}
         if hgvs:
+            doc["_id"] = hgvs.replace('chr23', 'chrX').replace('chr24', 'chrY')
             yield dict_sweep(unlist(value_convert_to_number(doc, skipped_keys=['chrom'])), vals=[[], {}, None])
 
 
