@@ -13,7 +13,7 @@ import glob
 from vcf import Reader
 
 from biothings.utils.common import timesofar
-from utils.hgvs import get_hgvs_from_vcf, get_pos_start_end
+from utils.hgvs import get_hgvs_from_vcf, get_pos_start_end, _normalized_vcf
 from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
 #from config import logger as logging
 import logging
@@ -22,13 +22,14 @@ import logging
 def get_hgvs_name(record, as_list=False):
     """construct the valid HGVS name as the _id field"""
     chrom = record.CHROM
-    chromStart = record.POS
+    chromStart = record.INFO['RSPOS']
     ref = record.REF
     _alt_list = []
 
     _id_list = []
     _pos_list = []
     for alt in record.ALT:
+        # should not make alt a string if alt is None
         if alt:
             alt = str(alt)
         _alt_list.append(alt)
@@ -46,7 +47,7 @@ def get_hgvs_name(record, as_list=False):
             HGVS = get_hgvs_from_vcf(chrom,
                                      chromStart,
                                      ref,
-                                     alt,
+                                     str(alt),
                                      mutant_type=False)
             _id_list.append(HGVS)
         # handle cases where hgvs id could not be inferred from vcf
