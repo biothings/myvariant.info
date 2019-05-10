@@ -39,6 +39,7 @@ def parse_one_rec(assembly, record):
     doc['gene'] = restructure_gene_info(allele_annotations)
     for _item in hgvs_vcf_info:
         hgvs, vcf = _item
+        hgvs = hgvs.replace('chr23', 'chrX').replace('chr24', 'chrY')
         doc["_id"] = hgvs
         if vcf:
             doc["chrom"], pos, doc["ref"], doc["alt"] = vcf
