@@ -210,6 +210,15 @@ _score field
 
 You will often see a “_score” field in the returned variant object, which is the internal score representing how well the query matches the returned variant object. It probably does not mean much in `variant annotation service <doc/data.html>`_ when only one variant object is returned. In `variant query service <doc/variant_query_service.html>`_, by default, the returned variant hits are sorted by the scores in descending order.
 
+_version field
+--------------
+
+Sometime, you will see a `_version` field in the returned variant object, e.g. from the `v1/variant <doc/variant_annotation_service.html>`_ endpoint. This field is basically for our internal information purpose, not very useful to the end users. You can just ignore it.
+
+But for those who are curious, here is the explanation. The value of this `_verions` field can be a small integer like 1, 2, 5 etc. The number indicates the version history of this particular variant object (i.e. how many times this object was updated). Because each variant object is updated independently and incrementally only when the updates to that particular variant are available, the `_version` values differ across variant objects. Of course, from time to time, when we need to make a full-data release (with some huge updates), every variant object will be re-created and their "_version" values will all be reset to 1.
+
+Please also note that we don't keep any older versions of a variant object, the one returned from the API request is always the latest one we have. The `_version` field just indicates how many times it was updated in the past (since our last full data release).
+
 
 .. _available_fields:
 
