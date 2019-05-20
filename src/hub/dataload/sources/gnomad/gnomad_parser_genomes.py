@@ -83,7 +83,7 @@ def _map_line_to_json(item, keys):
         yield obj
 
 def load_data(input_file):
-    vcf_reader = vcf.Reader(filename=input_file)
+    vcf_reader = vcf.Reader(filename=input_file,compressed=True)
     keys = vcf_reader.infos.keys()
     keys = [_key for _key in keys if _key.startswith(("AC", "AF", "AN", "Hom", "GC", "Hemi"))]
     for record in vcf_reader:
