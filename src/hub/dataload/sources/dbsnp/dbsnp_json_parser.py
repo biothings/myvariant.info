@@ -62,7 +62,7 @@ def parse_one_rec(assembly, record):
                 doc[assembly] = {}
         if hgvs:
             doc["_id"] = hgvs.replace('chr23', 'chrX').replace('chr24', 'chrY')
-            yield dict_sweep(unlist(value_convert_to_number(doc, skipped_keys=['chrom'])), vals=[[], {}, None])
+            yield dict_sweep(unlist(value_convert_to_number(doc, skipped_keys=['chrom', 'ref', 'alt', 'allele'])), vals=[[], {}, None])
 
 
 def restructure_allele_freq_info(allele_annotations):
