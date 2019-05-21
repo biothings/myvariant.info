@@ -212,6 +212,10 @@ def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col, skip_unmatched=False):
             yield doc
 
 def trim_delseq_from_hgvs(hgvs, remove_ins=False):
+    """Remove the deleted nucleotides from hgvs ID
+    set remove_ins to be true during snpeff annotation to remove those
+    long inserted nucleotides
+    """
     re_delins = re.compile("(.*del)[A-Z]+(ins.*)")
     re_ins = re.compile("(.*ins)[A-Z]+$")
     re_del = re.compile("(.*del)[A-Z]+$")
