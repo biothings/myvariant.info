@@ -211,14 +211,14 @@ def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col, skip_unmatched=False):
         elif skip_unmatched:
             yield doc
 
-def trim_delseq_from_hgvs(hgvs):
+def trim_delseq_from_hgvs(hgvs, remove_ins=False):
     re_delins = re.compile("(.*del)[A-Z]+(ins.*)")
     re_ins = re.compile("(.*ins)[A-Z]+$")
     re_del = re.compile("(.*del)[A-Z]+$")
     re_dup = re.compile("(.*dup)[A-Z]+$")
     if re_delins.match(hgvs):
         hgvs = "".join(re_delins.match(hgvs).groups())
-    elif re_ins.match(hgvs):
+    elif re_ins.match(hgvs) and remove_ins:
         hgvs = "".join(re_ins.match(hgvs).groups())
     elif re_del.match(hgvs):
         hgvs = "".join(re_del.match(hgvs).groups())
