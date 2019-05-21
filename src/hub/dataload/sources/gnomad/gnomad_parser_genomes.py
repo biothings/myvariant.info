@@ -39,7 +39,7 @@ def _map_line_to_json(item, keys):
         if HGVS is None:
             return
         assert len(item.ALT) == len(info['AC']), "Expecting length of item.ALT= length of info.AC, but not for %s" % (HGVS)
-        assert len(item.ALT) == len(info['AF']), "Expecting length of item.ALT= length of info.AF, but not for %s" % (HGVS)
+        # assert len(item.ALT) == len(info['AF']), "Expecting length of item.ALT= length of info.AF, but not for %s" % (HGVS)
         one_snp_json = {
             "_id": HGVS,
             "gnomad_genome": {
