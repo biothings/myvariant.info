@@ -1,7 +1,7 @@
 import json
 import glob
 
-from utils.hgvs import get_pos_start_end
+from utils.hgvs import get_pos_start_end, trim_delseq_from_hgvs
 from biothings.utils.dataload import dict_sweep, unlist, \
                                      value_convert_to_number
 from biothings.utils.common import open_compressed_file
@@ -84,6 +84,26 @@ def restructure_allele_freq_info(allele_annotations):
             alleles_data.append(freq)
     return alleles_data
 
+"""
+def normalize_delins_hgvs(hgvs):
+    # handle delins, where no deleted nucleotides is specified
+    if 'delins' in hgvs:
+        return hgvs
+    # handle delins, where deleted nucleotides is specified
+    elif 'del' in hgvs and 'ins' in hgvs:
+        prefix, suffix = hgvs.split('del')
+        deleted, inserted = suffix.split('ins')
+        return prefix + 'delins' + inserted
+    # handle deletions
+    elif 'del' in hgvs:
+        return hgvs.split('del')[0] + 'del'
+    # handle snv, ins, dup
+    elif '>' in hgvs or 'ins' in hgvs or 'dup' in hgvs or '[' in hgvs or 'inv' in hgvs:
+        return hgvs
+    else:
+        print('hgvs not delins or snv or dup', hgvs)
+        return hgvs
+"""
 
 def restructure_gene_info(allele_annotations):
     """Restructure information related to gene
@@ -159,7 +179,7 @@ def load_data_file(input_file, version):
         record = parse_one_rec(version, json.loads(line.decode()))
         for _doc in record:
             new_doc = {}
-            new_doc['_id'] = _doc.pop('_id')
+            new_doc['_id'] = trim_delseq_from_hgvs(_doc.pop('_id'))
             new_doc['dbsnp'] = _doc
             yield new_doc
 
