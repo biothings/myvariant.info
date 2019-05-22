@@ -222,7 +222,7 @@ def trim_delseq_from_hgvs(hgvs, remove_ins=False):
     re_dup = re.compile("(.*dup)[A-Z]+$")
     if re_delins.match(hgvs):
         hgvs = "".join(re_delins.match(hgvs).groups())
-    elif re_ins.match(hgvs) and remove_ins:
+    elif remove_ins and re_ins.match(hgvs):
         hgvs = "".join(re_ins.match(hgvs).groups())
     elif re_del.match(hgvs):
         hgvs = "".join(re_del.match(hgvs).groups())
