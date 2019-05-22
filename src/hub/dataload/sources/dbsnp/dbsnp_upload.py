@@ -82,8 +82,8 @@ class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                         "analyzer": "string_lowercase"
                     },
                     "vartype": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
                     },
                     "validated": {
                         "type": "boolean"
