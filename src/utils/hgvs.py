@@ -140,6 +140,8 @@ def get_pos_start_end(chr, pos, ref, alt):
         pos = int(pos)
     except ValueError:
         raise ValueError("Invalid position %s" % repr(pos))
+    if not alt:
+        raise ValueError("Cannot decide start/end from {}.".format((chr, pos, ref, alt)))
     if len(ref) == len(alt) == 1:
         # end is the same as start for snp
         start = end = pos
@@ -209,14 +211,18 @@ def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col, skip_unmatched=False):
         elif skip_unmatched:
             yield doc
 
-def trim_delseq_from_hgvs(hgvs):
+def trim_delseq_from_hgvs(hgvs, remove_ins=False):
+    """Remove the deleted nucleotides from hgvs ID
+    set remove_ins to be true during snpeff annotation to remove those
+    long inserted nucleotides
+    """
     re_delins = re.compile("(.*del)[A-Z]+(ins.*)")
     re_ins = re.compile("(.*ins)[A-Z]+$")
     re_del = re.compile("(.*del)[A-Z]+$")
     re_dup = re.compile("(.*dup)[A-Z]+$")
     if re_delins.match(hgvs):
         hgvs = "".join(re_delins.match(hgvs).groups())
-    elif re_ins.match(hgvs):
+    elif remove_ins and re_ins.match(hgvs):
         hgvs = "".join(re_ins.match(hgvs).groups())
     elif re_del.match(hgvs):
         hgvs = "".join(re_del.match(hgvs).groups())

@@ -4,6 +4,7 @@ import csv
 from itertools import groupby
 
 from biothings.utils.dataload import dict_sweep, value_convert_to_number, unlist, merge_duplicate_rows
+from utils.hgvs import trim_delseq_from_hgvs
 
 #  merge EMV file with genomic ID file
 # def file_merge(emv_file, id_file):
@@ -17,10 +18,9 @@ VALID_COLUMN_NO = 11
 def _map_line_to_json(fields):
     vid = fields[0].split(":")
     chrom = re.search(r'[1-9]+', vid[0]).group()
-
     if chrom == '23':
         chrom = chrom.replace('23', 'X')
-    HGVS = "chr%s:%s" % (chrom, vid[1])
+    HGVS = "chr%s:%s" % (chrom, trim_delseq_from_hgvs(vid[1]))
     # load as json data
     if HGVS is None:
         return

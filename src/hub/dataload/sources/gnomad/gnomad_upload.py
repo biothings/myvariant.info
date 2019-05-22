@@ -56,15 +56,15 @@ class GnomadExomesBaseUploader(GnomadBaseUploader):
 class GnomadExomesHg19Uploader(GnomadBaseHg19Uploader,GnomadExomesBaseUploader):
     main_source = "gnomad"
     name = "gnomad_exomes_hg19"
-    tbi_suffix = ".bgz.tbi"
-    GLOB_PATTERN = "gnomad.exomes.*.vcf"
+    tbi_suffix = ".tbi"
+    GLOB_PATTERN = "gnomad.exomes.*.vcf.bgz"
 
 
 class GnomadExomesHg38Uploader(GnomadBaseHg38Uploader,GnomadExomesBaseUploader):
     main_source = "gnomad"
     name = "gnomad_exomes_hg38"
-    tbi_suffix = ".gz.tbi"
-    GLOB_PATTERN = "liftover_grch38/gnomad.exomes.*.vcf"
+    tbi_suffix = ".tbi"
+    GLOB_PATTERN = "liftover_grch38/gnomad.exomes.*.vcf.bgz"
 
 
 class GnomadGenomesBaseUploader(GnomadBaseUploader, uploader.ParallelizedSourceUploader):
@@ -88,11 +88,11 @@ class GnomadGenomesBaseUploader(GnomadBaseUploader, uploader.ParallelizedSourceU
 class GnomadGenomesHg19Uploader(GnomadBaseHg19Uploader, GnomadGenomesBaseUploader):
     main_source = "gnomad"
     name = "gnomad_genomes_hg19"
-    GLOB_PATTERN = "gnomad.genomes.*.vcf"
+    GLOB_PATTERN = "gnomad.genomes.*.vcf.bgz"
 
 
 class GnomadGenomesHg38Uploader(GnomadBaseHg38Uploader, GnomadGenomesBaseUploader):
     main_source = "gnomad"
     name = "gnomad_genomes_hg38"
-    GLOB_PATTERN = "liftover_grch38/gnomad.genomes.*.vcf"
+    GLOB_PATTERN = "liftover_grch38/gnomad.genomes.*.vcf.bgz"
 

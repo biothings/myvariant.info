@@ -1,0 +1,32 @@
+{
+  "_id": "chr21:g.45195526delT",
+  "dbsnp": {
+    "alt": "TTTTTTTT",
+    "dbsnp_build": 152,
+    "vartype": "delins",
+    "chrom": 21,
+    "gene": {
+      "orientation": "minus",
+      "symbol": "CSTB",
+      "rnas": {
+        "sequence_ontology": [
+          {
+            "name": "intron_variant",
+            "accession": "SO:0001627"
+          }
+        ],
+        "id": "NM_000100.3",
+        "product_id": "NP_000091.1"
+      },
+      "name": "cystatin B",
+      "geneid": 1476,
+      "is_pseudo": "False"
+    },
+    "alleles": {
+      "allele": "",
+      "1000Genomes": 0.001
+    },
+    "rsid": "rs6376",
+    "ref": "TTTTTTT"
+  }
+}

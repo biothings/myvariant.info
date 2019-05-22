@@ -1,7 +1,6 @@
 import itertools, glob, os
 
-from .dbsnp_dump import main as download
-from .dbsnp_vcf_parser import load_data
+from .dbsnp_json_parser import load_data_file
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
 
@@ -18,15 +17,12 @@ class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                     SnpeffPostUpdateUploader):
 
     def jobs(self):
-        files = glob.glob(os.path.join(self.data_folder,self.__class__.GLOB_PATTERN))
-        if len(files) != 1:
-            raise uploader.ResourceError("Expected 1 files, got: %s" % files)
-        chrom_list = [str(i) for i in range(1, 23)] + ['X', 'Y', 'MT']
-        return list(itertools.product(files,chrom_list))
+        files = glob.glob(os.path.join(self.data_folder,"refsnp-chr*.json.bz2"))
+        return [(f,) for f in files]
 
-    def load_data(self,input_file,chrom):
-        self.logger.info("Load data from '%s' for chr %s" % (input_file,chrom))
-        return load_data(self.__class__.__metadata__["assembly"],input_file,chrom)
+    def load_data(self,input_file):
+        self.logger.info("Load data from '%s'",input_file)
+        return load_data_file(input_file,self.__class__.__metadata__["assembly"])
 
     def post_update_data(self, *args, **kwargs):
         super(DBSNPBaseUploader,self).post_update_data(*args,**kwargs)
@@ -120,8 +116,6 @@ class DBSNPHg19Uploader(DBSNPBaseUploader):
             "assembly" : "hg19",
             "src_meta" : SRC_META
             }
-    GLOB_PATTERN = "human_9606_*_GRCh37*/VCF/*.vcf.gz"
-
 
 
 class DBSNPHg38Uploader(DBSNPBaseUploader):
@@ -133,5 +127,4 @@ class DBSNPHg38Uploader(DBSNPBaseUploader):
             "assembly" : "hg38",
             "src_meta" : SRC_META
             }
-    GLOB_PATTERN = "human_9606_*_GRCh38*/VCF/*.vcf.gz"
 

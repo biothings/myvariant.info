@@ -37,7 +37,7 @@ def _map_line_to_json(item, keys):
         if HGVS is None:
             return
         assert len(item.ALT) == len(info['AC']), "Expecting length of item.ALT= length of info.AC, but not for %s" % (HGVS)
-        assert len(item.ALT) == len(info['AF']), "Expecting length of item.ALT= length of info.AF, but not for %s" % (HGVS)
+        # assert len(item.ALT) == len(info['AF']), "Expecting length of item.ALT= length of info.AF, but not for %s" % (HGVS)
         one_snp_json = {
             "_id": HGVS,
             "gnomad_exome": {
@@ -82,7 +82,7 @@ def _map_line_to_json(item, keys):
 
 
 def load_data(input_file):
-    vcf_reader = vcf.Reader(filename=input_file)
+    vcf_reader = vcf.Reader(filename=input_file,compressed=True)
     keys = vcf_reader.infos.keys()
     keys = [_key for _key in keys if _key.startswith(("AC", "AF", "AN", "Hom", "GC", "Hemi"))]
     for record in vcf_reader:
@@ -90,7 +90,7 @@ def load_data(input_file):
             yield record_mapped
 
 def test(input_file):
-    vcf_reader = vcf.Reader(filename=input_file)
+    vcf_reader = vcf.Reader(filename=input_file,compressed=True)
     chrom_li = [str(i) for i in range(1, 23)]
     chrom_li += ['X', 'Y']
     for chrom in chrom_li:

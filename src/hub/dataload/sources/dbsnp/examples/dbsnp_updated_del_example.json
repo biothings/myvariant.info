@@ -1,0 +1,157 @@
+{
+  "_id": "chr18:g.24503507_24503512delAGTGTT",
+  "dbsnp": {
+    "alleles": [
+      {
+        "freq": {
+          "1000g": 0.678,
+          "alspac": 0.724,
+          "estonian": 0.744,
+          "gnomad": 0.729,
+          "topmed": 0.706,
+          "twinsuk": 0.722
+        },
+        "allele": "AGTGTT"
+      },
+      {
+        "freq": {
+          "1000g": 0.322,
+          "alspac": 0.276,
+          "estonian": 0.256,
+          "gnomad": 0.271,
+          "topmed": 0.294,
+          "twinsuk": 0.278
+        },
+        "allele": ""
+      }
+    ],
+    "gene": [
+      {
+        "name": "carbohydrate sulfotransferase 9",
+        "is_pseudo": "False",
+        "rnas": [
+          {
+            "refseq": "NM_001256316.1",
+            "so": [
+              {
+                "name": "intron_variant",
+                "accession": "SO:0001627"
+              }
+            ],
+            "protein_product": {
+              "refseq": "NP_001243245.1"
+            }
+          },
+          {
+            "refseq": "NM_031422.5",
+            "so": [
+              {
+                "name": "intron_variant",
+                "accession": "SO:0001627"
+              }
+            ],
+            "protein_product": {
+              "refseq": "NP_113610.2"
+            }
+          },
+          {
+            "refseq": "XM_005258362.4",
+            "so": [
+              {
+                "name": "intron_variant",
+                "accession": "SO:0001627"
+              }
+            ],
+            "protein_product": {
+              "refseq": "XP_005258419.1"
+            }
+          },
+          {
+            "refseq": "XM_006722555.4",
+            "so": [
+              {
+                "name": "genic_downstream_transcript_variant",
+                "accession": "SO:0002152"
+              }
+            ],
+            "protein_product": {
+              "refseq": "XP_006722618.1"
+            }
+          },
+          {
+            "refseq": "XM_017026033.1",
+            "so": [
+              {
+                "name": "intron_variant",
+                "accession": "SO:0001627"
+              }
+            ],
+            "protein_product": {
+              "refseq": "XP_016881522.1"
+            }
+          },
+          {
+            "refseq": "XM_017026034.1",
+            "so": [
+              {
+                "name": "intron_variant",
+                "accession": "SO:0001627"
+              }
+            ],
+            "protein_product": {
+              "refseq": "XP_016881523.1"
+            }
+          }
+        ],
+        "strand": "-",
+        "geneid": 83539,
+        "symbol": "CHST9"
+      },
+      {
+        "name": "AQP4 antisense RNA 1",
+        "is_pseudo": "False",
+        "rnas": [
+          {
+            "refseq": "NR_026908.1",
+            "so": [
+              {
+                "name": "intron_variant",
+                "accession": "SO:0001627"
+              }
+            ]
+          }
+        ],
+        "strand": "+",
+        "geneid": 147429,
+        "symbol": "AQP4-AS1"
+      }
+    ],
+    "hg19": {
+      "start": 24503507,
+      "end": 24503512
+    },
+    "vartype": "del",
+    "rsid": "rs2307561",
+    "dbsnp_build": 152,
+    "dbsnp_merges": [
+      {
+        "rsid": "rs11278711",
+        "date": "2004-09-24T19:26Z",
+        "rv": 123
+      },
+      {
+        "rsid": "rs33918581",
+        "date": "2006-05-23T12:00Z",
+        "rv": 127
+      },
+      {
+        "rsid": "rs149647389",
+        "date": "2013-04-26T00:07Z",
+        "rv": 138
+      }
+    ],
+    "chrom": 18,
+    "ref": "AGTGTT",
+    "alt": ""
+  }
+}

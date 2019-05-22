@@ -1,0 +1,52 @@
+{
+  "_id": "chr21:g.46915521_46915522insACACAT",
+  "dbsnp": {
+    "_license": "http://bit.ly/2AqoLOc",
+    "allele_origin": "unspecified",
+    "alleles": [
+      {
+        "allele": "C",
+        "freq": 0.1579
+      },
+      {
+        "allele": "CACACAT"
+      },
+      {
+        "allele": "CACAT",
+        "freq": 0.8421
+      },
+      {
+        "allele": "CAT"
+      },
+      {
+        "allele": "CTCAT"
+      }
+    ],
+    "alt": "CACACAT",
+    "chrom": "21",
+    "class": "DIV",
+    "dbsnp_build": 102,
+    "flags": [
+      "ASP",
+      "G5",
+      "INT",
+      "KGPhase3",
+      "NOV",
+      "SLO"
+    ],
+    "gene": {
+      "geneid": "80781",
+      "symbol": "COL18A1"
+    },
+    "gmaf": 0.8421,
+    "hg19": {
+      "end": 46915522,
+      "start": 46915521
+    },
+    "ref": "C",
+    "rsid": "rs3028017",
+    "validated": false,
+    "var_subtype": "unknown",
+    "vartype": "indel"
+  }
+}

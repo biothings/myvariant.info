@@ -1,0 +1,129 @@
+{
+  "_id": "chr18:g.77490464_77490465insGTC",
+  "dbsnp": {
+    "alleles": [
+      {
+        "freq": {
+          "estonian": 0.182,
+          "gnomad": 0.241
+        },
+        "allele": ""
+      },
+      {
+        "freq": {
+          "estonian": 0.818,
+          "gnomad": 0.759
+        },
+        "allele": "GTC"
+      }
+    ],
+    "gene": {
+      "name": "CTD phosphatase subunit 1",
+      "is_pseudo": "False",
+      "rnas": [
+        {
+          "refseq": "NM_001202504.1",
+          "so": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "protein_product": {
+            "refseq": "NP_001189433.1"
+          }
+        },
+        {
+          "refseq": "NM_001318511.1",
+          "so": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "protein_product": {
+            "refseq": "NP_001305440.1"
+          }
+        },
+        {
+          "refseq": "NM_004715.4",
+          "so": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "protein_product": {
+            "refseq": "NP_004706.3"
+          }
+        },
+        {
+          "refseq": "NM_048368.3",
+          "so": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "protein_product": {
+            "refseq": "NP_430255.2"
+          }
+        },
+        {
+          "refseq": "XM_011526261.1",
+          "so": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "protein_product": {
+            "refseq": "XP_011524563.1"
+          }
+        },
+        {
+          "refseq": "XM_017026078.1",
+          "so": [
+            {
+              "name": "intron_variant",
+              "accession": "SO:0001627"
+            }
+          ],
+          "protein_product": {
+            "refseq": "XP_016881567.1"
+          }
+        }
+      ],
+      "strand": "+",
+      "geneid": 9150,
+      "symbol": "CTDP1"
+    },
+    "hg19": {
+      "start": 77490464,
+      "end": 77490465
+    },
+    "vartype": "ins",
+    "rsid": "rs3042255",
+    "dbsnp_build": 152,
+    "dbsnp_merges": [
+      {
+        "rsid": "rs58732177",
+        "date": "2008-05-24T03:56Z",
+        "rv": 130
+      },
+      {
+        "rsid": "rs77571224",
+        "date": "2010-10-26T08:39Z",
+        "rv": 133
+      },
+      {
+        "rsid": "rs201022647",
+        "date": "2013-04-26T00:07Z",
+        "rv": 138
+      }
+    ],
+    "chrom": 18,
+    "ref": "",
+    "alt": "GTC"
+  }
+}

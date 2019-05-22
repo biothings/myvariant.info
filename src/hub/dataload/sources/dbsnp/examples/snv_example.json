@@ -1,0 +1,152 @@
+{
+  "_id": "chrMT:m.8120C>T",
+  "dbsnp": {
+    "alt": "T",
+    "chrom": "MT",
+    "dbsnp_build": 152,
+    "gene": [
+      {
+        "geneid": 4508,
+        "is_pseudo": "False",
+        "name": "mitochondrially encoded ATP synthase 6",
+        "orientation": "plus",
+        "rnas": [
+          {
+            "codon_aligned_transcript_change": {
+              "deleted_sequence": "C",
+              "inserted_sequence": "C",
+              "position": 8119,
+              "seq_id": "NC_012920.1"
+            },
+            "id": "NC_012920.1",
+            "product_id": "YP_003024031.1"
+          }
+        ],
+        "sequence_ontology": [
+          {
+            "accession": "SO:0001636",
+            "name": "2KB_upstream_variant"
+          }
+        ],
+        "symbol": "MT-ATP6"
+      },
+      {
+        "geneid": 4509,
+        "is_pseudo": "False",
+        "name": "mitochondrially encoded ATP synthase 8",
+        "orientation": "plus",
+        "rnas": [
+          {
+            "codon_aligned_transcript_change": {
+              "deleted_sequence": "C",
+              "inserted_sequence": "C",
+              "position": 8119,
+              "seq_id": "NC_012920.1"
+            },
+            "id": "NC_012920.1",
+            "product_id": "YP_003024030.1"
+          }
+        ],
+        "sequence_ontology": [
+          {
+            "accession": "SO:0001636",
+            "name": "2KB_upstream_variant"
+          }
+        ],
+        "symbol": "MT-ATP8"
+      },
+      {
+        "geneid": 4513,
+        "is_pseudo": "False",
+        "name": "mitochondrially encoded cytochrome c oxidase II",
+        "orientation": "plus",
+        "rnas": [
+          {
+            "codon_aligned_transcript_change": {
+              "deleted_sequence": "CTA",
+              "inserted_sequence": "CTA",
+              "position": 8119,
+              "seq_id": "NC_012920.1"
+            },
+            "id": "NC_012920.1",
+            "product_id": "YP_003024029.1",
+            "protein": {
+              "variant": {
+                "spdi": {
+                  "deleted_sequence": "L",
+                  "inserted_sequence": "L",
+                  "position": 178,
+                  "seq_id": "YP_003024029.1"
+                }
+              }
+            },
+            "sequence_ontology": [
+              {
+                "accession": "SO:0001580",
+                "name": "coding_sequence_variant"
+              }
+            ]
+          }
+        ],
+        "symbol": "MT-CO2"
+      },
+      {
+        "geneid": 4514,
+        "is_pseudo": "False",
+        "name": "mitochondrially encoded cytochrome c oxidase III",
+        "orientation": "plus",
+        "rnas": [
+          {
+            "codon_aligned_transcript_change": {
+              "deleted_sequence": "C",
+              "inserted_sequence": "C",
+              "position": 8119,
+              "seq_id": "NC_012920.1"
+            },
+            "id": "NC_012920.1",
+            "product_id": "YP_003024032.1"
+          }
+        ],
+        "sequence_ontology": [
+          {
+            "accession": "SO:0001636",
+            "name": "2KB_upstream_variant"
+          }
+        ],
+        "symbol": "MT-CO3"
+      },
+      {
+        "geneid": 4537,
+        "is_pseudo": "False",
+        "name": "mitochondrially encoded NADH dehydrogenase 3",
+        "orientation": "plus",
+        "rnas": [
+          {
+            "codon_aligned_transcript_change": {
+              "deleted_sequence": "C",
+              "inserted_sequence": "C",
+              "position": 8119,
+              "seq_id": "NC_012920.1"
+            },
+            "id": "NC_012920.1",
+            "product_id": "YP_003024033.1"
+          }
+        ],
+        "sequence_ontology": [
+          {
+            "accession": "SO:0001636",
+            "name": "2KB_upstream_variant"
+          }
+        ],
+        "symbol": "MT-ND3"
+      }
+    ],
+    "hg19": {
+      "end": 8120,
+      "start": 8120
+    },
+    "ref": "C",
+    "rsid": "rs8936",
+    "vartype": "snv"
+  }
+}
