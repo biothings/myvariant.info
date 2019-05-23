@@ -17,6 +17,7 @@ class DBSNPDumper(FTPDumper):
     CWD_DIR = '/snp/latest_release/JSON'
     VERSIONS_DIR = '/snp/archive'
     FILE_RE = 'refsnp-chr*.json.bz2'
+    MAX_PARALLEL_DUMP = 10
 
     SCHEDULE = "0 9 * * *"
 

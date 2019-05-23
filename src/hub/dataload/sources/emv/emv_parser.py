@@ -54,9 +54,7 @@ def batch_query_myvariant_id_from_clingen(hgvs_ids, assembly):
 
     hgvs_dict = {}
     hgvs_ids = list(set(hgvs_ids))
-    print('total hgvs ids to process is: {}'.format(len(hgvs_ids)))
     for i in range(0, len(hgvs_ids), 1000):
-        print('currently processing {}th variant'.format(i))
         if i + 1000 <= len(hgvs_ids):
             batch = hgvs_ids[i: i + 1000]
         else:
