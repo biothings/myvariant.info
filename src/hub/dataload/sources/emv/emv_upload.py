@@ -26,32 +26,28 @@ class EMVBaseUploader(SnpeffPostUpdateUploader):
             "emv": {
                 "properties": {
                     "gene": {
-                        "type": "text",
-                        "analyzer": "string_lowercase",
-                        "copy_to" : ["all"]
+                        "normalizer": "keyword_lowercase_normalizer",
+                        "type": "keyword"
+                    },
+                    "variant_id": {
+                        "type": "integer"
+                    },
+                    "exon": {
+                        "normalizer": "keyword_lowercase_normalizer",
+                        "type": "keyword"
                     },
                     "egl_variant": {
-                        "type": "text",
-                        "analyzer": "string_lowercase",
-                        "copy_to" : ["all"]
-                    },
-                    "egl_protein": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
-                    },
-                    "egl_classification": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
+                        "normalizer": "keyword_lowercase_normalizer",
+                        "type": "keyword"
                     },
                     "hgvs": {
-                        "type": "text",
-                        "analyzer": "string_lowercase",
-                        "copy_to" : ["all"]
+                        "type": "text"
                     },
-                    "clinvar_rcv": {
-                        "type": "text",
-                        "analyzer": "string_lowercase",
-                        "copy_to" : ["all"]
+                    "egl_classification": {
+                        "type": "text"
+                    },
+                    "egl_protein": {
+                        "type": "text"
                     }
                 }
             }
