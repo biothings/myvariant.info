@@ -178,7 +178,7 @@ class MyVariantHubServer(HubServer):
 
 import hub.dataload
 # pass explicit list of datasources (no auto-discovery)
-server = MyVariantHubServer(hub.dataload.__sources_dict__,name="MyVariant.info")
+server = MyVariantHubServer(config.ACTIVE_DATASOURCES, name="MyVariant.info")
 
 
 if __name__ == "__main__":

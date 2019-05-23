@@ -1,32 +1,23 @@
 import os
 import glob
-import zipfile
 
 from .emv_parser import load_data
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 
-class EMVUploader(SnpeffPostUpdateUploader):
+SRC_META = {
+    "url" : "http://www.egl-eurofins.com/emvclass/emvclass.php",
+    "license_url" : "http://www.egl-eurofins.com/emvclass/emvclass.php",
+    "license_url_short": "http://bit.ly/2RieoY1"
+}
 
-    name = "emv"
-    __metadata__ = {"mapper" : 'observed',
-            "assembly" : "hg19",
-            "src_meta" : {
-                "url" : "http://www.egl-eurofins.com/emvclass/emvclass.php",
-                "license_url" : "http://www.egl-eurofins.com/emvclass/emvclass.php",
-                "license_url_short": "http://bit.ly/2RieoY1"
-                }
-            }
+
+class EMVBaseUploader(SnpeffPostUpdateUploader):
 
     def load_data(self,data_folder):
-        # there's one csv file there, let's get it
-        input_file = glob.glob(os.path.join(data_folder,"EmVClass*.csv"))
-        if len(input_file) != 1:
-            raise uploader.ResourceError("Expecting only one CSV file, got: %s" % input_file)
-        input_file = input_file.pop()
-        self.logger.info("Load data from file '%s'" % input_file)
-        return load_data(input_file)
+        self.logger.info("Load data from folder '%s'" % data_folder)
+        return load_data(data_folder,self.__class__.__metadata__["assembly"])
 
 
     @classmethod
@@ -66,3 +57,23 @@ class EMVUploader(SnpeffPostUpdateUploader):
             }
         }
         return mapping
+
+
+class EMVHg19Uploader(EMVBaseUploader):
+
+    name = "emv_hg19"
+    main_source = "emv"
+    __metadata__ = {"mapper" : 'observed',
+            "assembly" : "hg19",
+            "src_meta" : SRC_META,
+            }
+
+
+class EMVHg38Uploader(EMVBaseUploader):
+
+    name = "emv_hg38"
+    main_source = "emv"
+    __metadata__ = {"mapper" : 'observed',
+            "assembly" : "hg38",
+            "src_meta" : SRC_META,
+            }
