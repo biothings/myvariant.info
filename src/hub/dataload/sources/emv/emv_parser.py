@@ -1,65 +1,120 @@
 import os
-import re
-import csv
-from itertools import groupby
+import requests
+from collections import defaultdict
 
-from biothings.utils.dataload import dict_sweep, value_convert_to_number, unlist, merge_duplicate_rows
-from utils.hgvs import trim_delseq_from_hgvs
-
-#  merge EMV file with genomic ID file
-# def file_merge(emv_file, id_file):
-#    os.system("cut -f3 genomic_id.txt > genomic_id3.txt")
-#    os.system("paste -d"," genomic_id3.txt EmVClass.2014-3.csv > emv.csv")
-
-VALID_COLUMN_NO = 11
+from biothings.utils.dataload import dict_sweep, value_convert_to_number, unlist, open_anyfile
 
 
-# convert one snp to json
-def _map_line_to_json(fields):
-    vid = fields[0].split(":")
-    chrom = re.search(r'[1-9]+', vid[0]).group()
-    if chrom == '23':
-        chrom = chrom.replace('23', 'X')
-    HGVS = "chr%s:%s" % (chrom, trim_delseq_from_hgvs(vid[1]))
-    # load as json data
-    if HGVS is None:
-        return
+class DictQuery(dict):
+    """Parse nested dictionary
+    """
+    def get(self, path, default=None):
+        """Extract value from dictionary based on path
+        """
+        keys = path.split("/")
+        val = None
 
-    one_snp_json = {
-        "_id": HGVS,
-        "emv": {
-            "gene": fields[2],
-            "variant_id": fields[3],
-            "exon": fields[4],
-            "egl_variant": fields[5],
-            "egl_protein": fields[6],
-            "egl_classification": fields[7],
-            "egl_classification_date": fields[8],
-            "hgvs": fields[9].split(" | "),
-            "clinvar_rcv": fields[10],
+        for key in keys:
+            if val:
+                if isinstance(val, list):
+                    val = [v.get(key, default) if v else None for v in val]
+                else:
+                    val = val.get(key, default)
+            else:
+                val = dict.get(self, key, default)
+
+            if not val:
+                break
+        return val
+
+
+def batch_query_myvariant_id_from_clingen(hgvs_ids, assembly):
+    """Query ClinGen to get myvariant IDs for all input non genomic hgvs IDs
+
+    Keyword arguments:
+    hgvs_ids -- list of non genomic hgvs IDs
+    assembly -- genomic assembly, either hg19 or hg38
+    """
+    def parse_myvariant_ids(doc, assembly):
+        """Parse the results from clingen to retrieve myvariant id
+
+        Keyword arguments:
+        doc -- doc retrieved from clingen
+        """
+        ASSEMBLY_MAPPING = {
+            "hg19": "MyVariantInfo_hg19",
+            "hg38": "MyVariantInfo_hg38"
         }
+        extract_path = 'externalRecords/' + ASSEMBLY_MAPPING[assembly]
+        res = DictQuery(doc).get(extract_path)
+        if res:
+            return [_doc['id'] for _doc in res if _doc]
+        else:
+            return []
+
+    hgvs_dict = {}
+    hgvs_ids = list(set(hgvs_ids))
+    print('total hgvs ids to process is: {}'.format(len(hgvs_ids)))
+    for i in range(0, len(hgvs_ids), 1000):
+        print('currently processing {}th variant'.format(i))
+        if i + 1000 <= len(hgvs_ids):
+            batch = hgvs_ids[i: i + 1000]
+        else:
+            batch = hgvs_ids[i:]
+        data = '\n'.join(batch)
+        res = requests.post('http://reg.genome.network/alleles?file=hgvs',
+                            data=data,
+                            headers={'content-type': "text/plain"}).json()
+        # loop through clingen results and input hgvs id in parallel
+        # construct a mapping dictionary with key as input hgvs id
+        # and value as myvariant hgvs id
+        for _doc, _id in zip(res, batch):
+            hgvs_dict[_id] = parse_myvariant_ids(_doc, assembly)
+    return hgvs_dict
+
+
+def _map_line_to_json(fields):
+    """Mapping each lines in csv file into JSON doc
+    """
+    one_snp_json = {
+        "gene": fields[1],
+        "variant_id": fields[2],
+        "exon": fields[3],
+        "egl_variant": fields[4],
+        "egl_protein": fields[5],
+        "egl_classification": fields[6],
+        "egl_classification_date": fields[7],
+        "hgvs": fields[8].split(" | ")
     }
 
     return unlist(dict_sweep(value_convert_to_number(one_snp_json), vals=[""]))
 
 
-# open file, parse, pass to json mapper
-def data_generator(input_file):
-    # sort by the first column (hgvs id returned from Mutalyzer)
-    # TODO: use some python there...
-    os.system("sort -k1 -n %s > %s.sorted" % (input_file, input_file))
-    open_file = open("%s.sorted" % (input_file))
-    emv = csv.reader(open_file, delimiter=",")
-    # Skip header
-    next(emv)
-    emv = filter(lambda x: x[0], emv)
-    json_rows = map(_map_line_to_json, emv)
-    row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
-    return (merge_duplicate_rows(rg, "emv") for rg in row_groups)
-
-
-# load path and find files, pass to data_generator
-def load_data(path):
-    print(path)
-    for one_snp_json in data_generator(path):
-        yield one_snp_json
+def load_data(data_folder, assembly="hg19"):
+    """Load data from EMV csv file into list of JSON docs
+    """
+    input_file = os.path.join(data_folder, "EmVClass.2018-Q2.csv")
+    assert os.path.exists(input_file), "Can't find input file '%s'" % input_file
+    with open_anyfile(input_file) as in_f:
+        lines = set(list(in_f))
+        lines = [_doc.strip().split(',') for _doc in lines]
+        results = defaultdict(list)
+        # mapping non genomic hgvs ids to genomic hgvs ids used in MyVariant
+        hgvs_ids = [_item[4] for _item in lines]
+        hgvs_mapping_dict = batch_query_myvariant_id_from_clingen(hgvs_ids, assembly)
+        # loop through csv doc to convert into json docs
+        for row in lines:
+            # structure the content of emv docs
+            variant = _map_line_to_json(row)
+            # fetch corresponding genomic hgvs ids
+            mapped_ids = hgvs_mapping_dict[row[4]]
+            # could be one non-genomic hgvs id mapping to mulitple genomic ones
+            if mapped_ids:
+                for _id in mapped_ids:
+                    results[_id].append(variant)
+        for k, v in results.items():
+            if len(v) == 1:
+                doc = {'_id': k, 'emv': v[0]}
+            else:
+                doc = {'_id': k, 'emv': [_doc for _doc in v]}
+            yield doc
