@@ -5,9 +5,14 @@ from utils.hgvs import get_hgvs_from_vcf
 
 CHROM_VALID_VALUES = [str(_chr) for _chr in list(range(1, 23)) + ['X', 'Y', 'MT']]
 
+
 def _map_line_to_json(item, keys):
     key_start = ["AC", "AF", "AN", "Hom", "GC", "Hemi"]
     chrom = str(item.CHROM)
+    # the value of CHROM in hg38 GNOMAD source file startswith 'chr'
+    # need to remove it first
+    if chrom.startswith('chr'):
+        chrom = chrom[3:]
     if chrom not in CHROM_VALID_VALUES:
         return
     chromStart = item.POS
@@ -82,18 +87,18 @@ def _map_line_to_json(item, keys):
 
 
 def load_data(input_file):
-    vcf_reader = vcf.Reader(filename=input_file,compressed=True)
+    vcf_reader = vcf.Reader(filename=input_file, compressed=True)
     keys = vcf_reader.infos.keys()
     keys = [_key for _key in keys if _key.startswith(("AC", "AF", "AN", "Hom", "GC", "Hemi"))]
     for record in vcf_reader:
         for record_mapped in _map_line_to_json(record, keys):
             yield record_mapped
 
+
 def test(input_file):
-    vcf_reader = vcf.Reader(filename=input_file,compressed=True)
+    vcf_reader = vcf.Reader(filename=input_file, compressed=True)
     chrom_li = [str(i) for i in range(1, 23)]
     chrom_li += ['X', 'Y']
     for chrom in chrom_li:
         data = next(vcf_reader.fetch(chrom))
         print(list(_map_line_to_json(data)))
-
