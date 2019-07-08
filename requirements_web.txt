@@ -1,7 +1,3 @@
-# Required python modules for running a web node of MyVariant.info
-# To install all requirement, run
-#    pip install -r requirements_web.txt
-
 # biothings
 git+https://github.com/biothings/biothings.api.git@475c41cfc7f0650eb315cefe853e7a0331098517#egg=biothings
 

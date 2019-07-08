@@ -11,13 +11,13 @@ from biothings.tests import BiothingsTestCase
 
 class MyVariantRemoteTest(BiothingsTestCase):
     '''
-        Test against server specified in environment variable MV_HOST
-        or MyVariant.info production server if MV_HOST is not specified
-        MV_HOST must start with its protocol like http://myvariant.info
+        Test against server specified in environment variable BT_HOST
+        or MyVariant.info production server if BT_HOST is not specified
+        BT_HOST must start with its protocol like http://myvariant.info
     '''
     __test__ = True
 
-    host = os.getenv("MV_HOST", "http://myvariant.info")
+    host = os.getenv("BT_HOST", "http://myvariant.info")
     host = host.rstrip('/')
     api = '/v1'
 

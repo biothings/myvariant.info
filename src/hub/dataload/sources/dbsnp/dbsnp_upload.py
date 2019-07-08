@@ -35,71 +35,214 @@ class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
         mapping = {
             "dbsnp": {
                 "properties": {
-                    "allele_origin": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
-                    },
-                    "alt": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
-                    },
-                    "chrom": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
-                    },
-                    "class": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
-                    },
-                    "flags": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
-                    },
-                    "gmaf": {
-                        "type": "float"
-                    },
-                    klass.__metadata__["assembly"]: {
+                    "alleles": {
                         "properties": {
-                            "end": {
-                                "type": "integer"
+                            "freq": {
+                                "properties": {
+                                    "1000g": {
+                                        "type": "float"
+                                    },
+                                    "alspac": {
+                                        "type": "float"
+                                    },
+                                    "estonian": {
+                                        "type": "float"
+                                    },
+                                    "exac": {
+                                        "type": "float"
+                                    },
+                                    "gnomad": {
+                                        "type": "float"
+                                    },
+                                    "gnomad_exomes": {
+                                        "type": "float"
+                                    },
+                                    "goesp": {
+                                        "type": "float"
+                                    },
+                                    "topmed": {
+                                        "type": "float"
+                                    },
+                                    "twinsuk": {
+                                        "type": "float"
+                                    }
+                                }
                             },
-                            "start": {
-                                "type": "integer"
+                            "allele": {
+                                "normalizer": "keyword_lowercase_normalizer",
+                                "type": "keyword"
                             }
                         }
-                    },
-                    "ref": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
-                    },
-                    "rsid": {
-                        "type": "text",
-                        "copy_to" : ["all"],
-                        "analyzer": "string_lowercase"
-                    },
-                    "var_subtype": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
-                    },
-                    "vartype": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "validated": {
-                        "type": "boolean"
                     },
                     "gene": {
                         "properties": {
-                            "symbol": {
-                                "type": "text",
-                                "analyzer": "string_lowercase",
-                                "copy_to" : ["all"]
+                            "is_pseudo": {
+                                "type": "boolean"
+                            },
+                            "rnas": {
+                                "properties": {
+                                    "refseq": {
+                                        "normalizer": "keyword_lowercase_normalizer",
+                                        "type": "keyword"
+                                    },
+                                    "so": {
+                                        "properties": {
+                                            "name": {
+                                                "normalizer": "keyword_lowercase_normalizer",
+                                                "type": "keyword"
+                                            },
+                                            "accession": {
+                                                "normalizer": "keyword_lowercase_normalizer",
+                                                "type": "keyword"
+                                            }
+                                        }
+                                    },
+                                    "protein_product": {
+                                        "properties": {
+                                            "refseq": {
+                                                "normalizer": "keyword_lowercase_normalizer",
+                                                "type": "keyword"
+                                            }
+                                        }
+                                    },
+                                    "codon_aligned_transcript_change": {
+                                        "properties": {
+                                            "seq_id": {
+                                                "normalizer": "keyword_lowercase_normalizer",
+                                                "type": "keyword"
+                                            },
+                                            "position": {
+                                                "type": "integer"
+                                            },
+                                            "deleted_sequence": {
+                                                "normalizer": "keyword_lowercase_normalizer",
+                                                "type": "keyword"
+                                            },
+                                            "inserted_sequence": {
+                                                "normalizer": "keyword_lowercase_normalizer",
+                                                "type": "keyword"
+                                            }
+                                        }
+                                    },
+                                    "protein": {
+                                        "properties": {
+                                            "variant": {
+                                                "properties": {
+                                                    "spdi": {
+                                                        "properties": {
+                                                            "seq_id": {
+                                                                "normalizer": "keyword_lowercase_normalizer",
+                                                                "type": "keyword"
+                                                            },
+                                                            "position": {
+                                                                "type": "integer"
+                                                            },
+                                                            "deleted_sequence": {
+                                                                "normalizer": "keyword_lowercase_normalizer",
+                                                                "type": "keyword"
+                                                            },
+                                                            "inserted_sequence": {
+                                                                "normalizer": "keyword_lowercase_normalizer",
+                                                                "type": "keyword"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "sequence_ontology": {
+                                                "properties": {
+                                                    "name": {
+                                                        "normalizer": "keyword_lowercase_normalizer",
+                                                        "type": "keyword"
+                                                    },
+                                                    "accession": {
+                                                        "normalizer": "keyword_lowercase_normalizer",
+                                                        "type": "keyword"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "strand": {
+                                "normalizer": "keyword_lowercase_normalizer",
+                                "type": "keyword"
                             },
                             "geneid": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "integer"
+                            },
+                            "symbol": {
+                                "normalizer": "keyword_lowercase_normalizer",
+                                "type": "keyword"
+                            },
+                            "so": {
+                                "properties": {
+                                    "name": {
+                                        "normalizer": "keyword_lowercase_normalizer",
+                                        "type": "keyword"
+                                    },
+                                    "accession": {
+                                        "normalizer": "keyword_lowercase_normalizer",
+                                        "type": "keyword"
+                                    }
+                                }
+                            },
+                            "name": {
+                                "type": "text"
                             }
                         }
+                    },
+                    "hg19": {
+                        "properties": {
+                            "start": {
+                                "type": "integer"
+                            },
+                            "end": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "vartype": {
+                        "normalizer": "keyword_lowercase_normalizer",
+                        "type": "keyword"
+                    },
+                    "rsid": {
+                        "normalizer": "keyword_lowercase_normalizer",
+                        "type": "keyword"
+                    },
+                    "dbsnp_build": {
+                        "type": "integer"
+                    },
+                    "dbsnp_merges": {
+                        "properties": {
+                            "rsid": {
+                                "normalizer": "keyword_lowercase_normalizer",
+                                "type": "keyword"
+                            },
+                            "date": {
+                                "normalizer": "keyword_lowercase_normalizer",
+                                "type": "keyword"
+                            },
+                            "rv": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "citations": {
+                        "type": "integer"
+                    },
+                    "chrom": {
+                        "normalizer": "keyword_lowercase_normalizer",
+                        "type": "keyword"
+                    },
+                    "ref": {
+                        "normalizer": "keyword_lowercase_normalizer",
+                        "type": "keyword"
+                    },
+                    "alt": {
+                        "normalizer": "keyword_lowercase_normalizer",
+                        "type": "keyword"
                     }
                 }
             }
