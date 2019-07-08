@@ -14,6 +14,7 @@ class CivicDumper(HTTPDumper):
     SCHEDULE = "0 22 1 * *"
     IGNORE_HTTP_CODE = [404] # some variants are 
     MAX_PARALLEL_DUMP = 1
+    SLEEP_BETWEEN_DOWNLOAD = 1.0
 
     def set_release(self):
         self.release = datetime.date.today().strftime("%Y-%m-%d")
