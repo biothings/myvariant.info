@@ -11,6 +11,8 @@ import config
 
 class MyVariantDataBuilder(builder.DataBuilder):
 
+    MAX_CHROM_EX = 100000 # if chrom discrepancies found, max # of examples we keep
+
     def merge(self, sources=None, target_name=None, batch_size=50000, job_manager=None, **kwargs):
         # just override default batch_size or it consumes too much mem
         return super(MyVariantDataBuilder,self).merge(
@@ -41,7 +43,16 @@ class MyVariantDataBuilder(builder.DataBuilder):
         btotal = math.ceil(total/batch_size) 
         bnum = 1
         cnt = 0
-        results = {"missing" : [], "disagreed" : []}
+        results = {
+            "missing" : {
+                "count": 0,
+                "examples": []
+            },
+            "disagreed" : {
+                "count": 0,
+                "examples": []
+            }
+        }
         root_keys = {}
         # grab ids only, so we can get more and fill queue for each step
         # each round, fill the queue to make sure every cpu slots are always working
@@ -62,8 +73,11 @@ class MyVariantDataBuilder(builder.DataBuilder):
                 def processed(f,results, batch_num):
                     try:
                         fres = f.result()
-                        results["missing"].extend(fres["missing"])
-                        results["disagreed"].extend(fres["disagreed"])
+                        for errtype in ("missing","disagreed"):
+                            if fres[errtype]:
+                                results[errtype]["count"] += len(fres[errtype])
+                                if len(results[errtype]["examples"]) < self.__class__.MAX_CHROM_EX:
+                                    results[errtype]["examples"].extend(fres[errtype])
                         # merge root key counts
                         rk = fres["root_keys"]
                         for k in rk:
@@ -81,8 +95,8 @@ class MyVariantDataBuilder(builder.DataBuilder):
         self.logger.info("%d jobs created for merging step" % len(jobs))
         if jobs:
             yield from asyncio.gather(*jobs)
-            self.logger.info("Found %d missing 'chrom' and %d where resources disagreed" % (len(results["missing"]), len(results["disagreed"])))
-            if results["missing"] or results["disagreed"]:
+            self.logger.info("Found %d missing 'chrom' and %d where resources disagreed" % (results["missing"]["count"], results["disagreed"]["count"]))
+            if results["missing"]["count"] or results["disagreed"]["count"]:
                 fn = "chrom_%s_%s.pickle" % (self.target_backend.target_name,datetime.datetime.now().strftime("%Y%m%d_%H%M%S"))
                 self.logger.info("Pickling 'chrom' discrepancies into %s" % fn)
                 pickle.dump(results,open(fn,"wb"))
@@ -122,7 +136,12 @@ def get_chrom(doc):
         this_chrom["agreed"] = True
     elif doc['_id'].startswith('chr'):
         this_chrom["chrom"] = doc['_id'].split(':')[0][3:]
-        this_chrom["agreed"] = False
+        if chrom_keys:
+            this_chrom["agreed"] = False
+        else:
+            # neither a disagrement or agreement, info is just not there
+            # (ie. chrom value could only be determined from _id)
+            this_chrom["agreed"] = None
     return this_chrom
 
 
@@ -139,7 +158,7 @@ def chrom_worker(col_name, ids):
         dchrom = get_chrom(doc)
         if dchrom["chrom"] is None:
             missing.append(doc["_id"])
-        elif dchrom["agreed"] == False:
+        elif dchrom["agreed"] is False:
             disagreed.append(doc["_id"])
         chrom = dchrom["chrom"]
         if chrom:
