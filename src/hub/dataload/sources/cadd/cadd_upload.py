@@ -536,8 +536,8 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                     "polyphen": {
                         "properties": {
                             "cat": {
-                                "type": "text",
-                                "analyzer": "string_lowercase"
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
                             },
                             "val": {
                                 "type": "float"
