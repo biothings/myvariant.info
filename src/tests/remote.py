@@ -132,7 +132,7 @@ class MyVariantRemoteTest(BiothingsTestCase):
         eq_(set(res), set(['_id', '_version', 'dbsnp']))
         res = self.request(
             'variant/chr1:g.31349647C>T?fields=dbnsfp.clinvar,dbsnp.gmaf,clinvar.hgvs').json()
-        eq_(set(res), set(['_id', '_version', 'dbsnp', 'clinvar', 'dbnsfp']))
+        eq_(set(res), set(['_id', '_version', 'clinvar', 'dbnsfp']))
 
         self.request('variant', expect_status=404)
         self.request('variant/', expect_status=404)
@@ -223,15 +223,15 @@ class MyVariantRemoteTest(BiothingsTestCase):
 
     def test_msgpack(self):
         res = self.request('variant/chr11:g.66397320A>G').json()
-        res2 = self.msgpack_ok(self.request("variant/chr11:g.66397320A>G?msgpack=true").content)
+        res2 = self.msgpack_ok(self.request("variant/chr11:g.66397320A>G?format=msgpack").content)
         ok_(res, res2)
 
         res = self.request('query?q=rs2500').json()
-        res2 = self.msgpack_ok(self.request("query?q=rs2500&msgpack=true").content)
+        res2 = self.msgpack_ok(self.request("query?q=rs2500&format=msgpack").content)
         ok_(res, res2)
 
         res = self.request('metadata').json()
-        res2 = self.msgpack_ok(self.request("metadata?msgpack=true").content)
+        res2 = self.msgpack_ok(self.request("metadata?format=msgpack").content)
         ok_(res, res2)
 
     # Too slow
