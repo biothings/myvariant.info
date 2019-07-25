@@ -174,7 +174,8 @@ class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                             },
                             "symbol": {
                                 "normalizer": "keyword_lowercase_normalizer",
-                                "type": "keyword"
+                                "type": "keyword",
+                                "copy_to": ["all"]
                             },
                             "so": {
                                 "properties": {
@@ -209,7 +210,8 @@ class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                     },
                     "rsid": {
                         "normalizer": "keyword_lowercase_normalizer",
-                        "type": "keyword"
+                        "type": "keyword",
+                        "copy_to": ["all"]
                     },
                     "dbsnp_build": {
                         "type": "integer"
@@ -218,7 +220,8 @@ class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
                         "properties": {
                             "rsid": {
                                 "normalizer": "keyword_lowercase_normalizer",
-                                "type": "keyword"
+                                "type": "keyword",
+                                "copy_to": ["all"]
                             },
                             "date": {
                                 "normalizer": "keyword_lowercase_normalizer",
