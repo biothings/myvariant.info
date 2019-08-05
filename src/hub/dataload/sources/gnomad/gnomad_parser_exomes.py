@@ -8,6 +8,7 @@ CHROM_VALID_VALUES = [str(_chr) for _chr in list(range(1, 23)) + ['X', 'Y', 'MT'
 
 def _map_line_to_json(item, keys):
     key_start = ["AC", "AF", "AN", "Hom", "GC", "Hemi"]
+    key_start_new = ["AC", "AF", "AN", "nhomalt", "GC", "Hemi"]
     chrom = str(item.CHROM)
     # the value of CHROM in hg38 GNOMAD source file startswith 'chr'
     # need to remove it first
@@ -76,12 +77,15 @@ def _map_line_to_json(item, keys):
         for _key in keys:
             if _key in info:
                 # loop through each prefix
-                for _start in key_start:
+                for _start in key_start_new:
                     # "ac", "af" value is related to multi-allelic, need to deal with separately
-                    if _key.startswith(_start) and _start in ['AC', 'AF', 'Hom', 'Hemi']:
-                        one_snp_json['gnomad_exome'][_start.lower()][_key.lower()] = info[_key][i]
-                    elif _key.startswith(_start) and _start not in ['AC', 'AF', 'Hom', 'Hemi']:
-                        one_snp_json['gnomad_exome'][_start.lower()][_key.lower()] = info[_key]
+                    if _key.startswith(_start):
+                        if _start == 'nhomalt':
+                            one_snp_json['gnomad_exome']['hom'][_key.replace('nhomalt', 'hom')] = info[_key][i]
+                        elif _start in ['AC', 'AF', 'Hemi']:
+                            one_snp_json['gnomad_exome'][_start.lower()][_key.lower()] = info[_key][i]
+                        else:
+                            one_snp_json['gnomad_exome'][_start.lower()][_key.lower()] = info[_key]
         obj = (dict_sweep(unlist(value_convert_to_number(one_snp_json, skipped_keys=['chrom'])), [None]))
         yield obj
 
@@ -89,7 +93,7 @@ def _map_line_to_json(item, keys):
 def load_data(input_file):
     vcf_reader = vcf.Reader(filename=input_file, compressed=True)
     keys = vcf_reader.infos.keys()
-    keys = [_key for _key in keys if _key.startswith(("AC", "AF", "AN", "Hom", "GC", "Hemi"))]
+    keys = [_key for _key in keys if _key.startswith(("AC", "AF", "AN", "nhomalt", "GC", "Hemi"))]
     for record in vcf_reader:
         for record_mapped in _map_line_to_json(record, keys):
             yield record_mapped
