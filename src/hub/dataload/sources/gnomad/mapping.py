@@ -417,6 +417,124 @@ exomes_mapping = {
                     }
                 }
             },
+            "hom": {
+                "properties": {
+                    "hom": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_seu": {
+                        "type": "integer"
+                    },
+                    "hom_raw": {
+                        "type": "integer"
+                    },
+                    "hom_fin_female": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_bgr": {
+                        "type": "integer"
+                    },
+                    "hom_sas_male": {
+                        "type": "integer"
+                    },
+                    "hom_afr_male": {
+                        "type": "integer"
+                    },
+                    "hom_afr": {
+                        "type": "integer"
+                    },
+                    "hom_eas_female": {
+                        "type": "integer"
+                    },
+                    "hom_afr_female": {
+                        "type": "integer"
+                    },
+                    "hom_sas": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_onf": {
+                        "type": "integer"
+                    },
+                    "hom_fin_male": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_female": {
+                        "type": "integer"
+                    },
+                    "hom_amr": {
+                        "type": "integer"
+                    },
+                    "hom_eas": {
+                        "type": "integer"
+                    },
+                    "hom_asj_male": {
+                        "type": "integer"
+                    },
+                    "hom_oth_female": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_swe": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_nwe": {
+                        "type": "integer"
+                    },
+                    "hom_eas_jpn": {
+                        "type": "integer"
+                    },
+                    "hom_female": {
+                        "type": "integer"
+                    },
+                    "hom_eas_kor": {
+                        "type": "integer"
+                    },
+                    "hom_eas_oea": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_est": {
+                        "type": "integer"
+                    },
+                    "hom_eas_male": {
+                        "type": "integer"
+                    },
+                    "hom_nfe": {
+                        "type": "integer"
+                    },
+                    "hom_fin": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_male": {
+                        "type": "integer"
+                    },
+                    "hom_sas_female": {
+                        "type": "integer"
+                    },
+                    "hom_asj_female": {
+                        "type": "integer"
+                    },
+                    "hom_asj": {
+                        "type": "integer"
+                    },
+                    "hom_oth": {
+                        "type": "integer"
+                    },
+                    "hom_male": {
+                        "type": "integer"
+                    },
+                    "hom_amr_male": {
+                        "type": "integer"
+                    },
+                    "hom_amr_female": {
+                        "type": "integer"
+                    },
+                    "hom_oth_male": {
+                        "type": "integer"
+                    },
+                    "hom_popmax": {
+                        "type": "integer"
+                    }
+                }
+            },
             "filter": {
                 "normalizer": "keyword_lowercase_normalizer",
                 "type": "keyword"
@@ -764,6 +882,124 @@ genomes_mapping = {
                         "type": "integer"
                     },
                     "an_popmax": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "hom": {
+                "properties": {
+                    "hom": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_seu": {
+                        "type": "integer"
+                    },
+                    "hom_raw": {
+                        "type": "integer"
+                    },
+                    "hom_fin_female": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_bgr": {
+                        "type": "integer"
+                    },
+                    "hom_sas_male": {
+                        "type": "integer"
+                    },
+                    "hom_afr_male": {
+                        "type": "integer"
+                    },
+                    "hom_afr": {
+                        "type": "integer"
+                    },
+                    "hom_eas_female": {
+                        "type": "integer"
+                    },
+                    "hom_afr_female": {
+                        "type": "integer"
+                    },
+                    "hom_sas": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_onf": {
+                        "type": "integer"
+                    },
+                    "hom_fin_male": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_female": {
+                        "type": "integer"
+                    },
+                    "hom_amr": {
+                        "type": "integer"
+                    },
+                    "hom_eas": {
+                        "type": "integer"
+                    },
+                    "hom_asj_male": {
+                        "type": "integer"
+                    },
+                    "hom_oth_female": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_swe": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_nwe": {
+                        "type": "integer"
+                    },
+                    "hom_eas_jpn": {
+                        "type": "integer"
+                    },
+                    "hom_female": {
+                        "type": "integer"
+                    },
+                    "hom_eas_kor": {
+                        "type": "integer"
+                    },
+                    "hom_eas_oea": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_est": {
+                        "type": "integer"
+                    },
+                    "hom_eas_male": {
+                        "type": "integer"
+                    },
+                    "hom_nfe": {
+                        "type": "integer"
+                    },
+                    "hom_fin": {
+                        "type": "integer"
+                    },
+                    "hom_nfe_male": {
+                        "type": "integer"
+                    },
+                    "hom_sas_female": {
+                        "type": "integer"
+                    },
+                    "hom_asj_female": {
+                        "type": "integer"
+                    },
+                    "hom_asj": {
+                        "type": "integer"
+                    },
+                    "hom_oth": {
+                        "type": "integer"
+                    },
+                    "hom_male": {
+                        "type": "integer"
+                    },
+                    "hom_amr_male": {
+                        "type": "integer"
+                    },
+                    "hom_amr_female": {
+                        "type": "integer"
+                    },
+                    "hom_oth_male": {
+                        "type": "integer"
+                    },
+                    "hom_popmax": {
                         "type": "integer"
                     }
                 }
