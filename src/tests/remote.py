@@ -41,10 +41,10 @@ class MyVariantRemoteTest(BiothingsTestCase):
         self.has_hits('rs58991260')
         self.has_hits('rcv000149017')
         self.has_hits('RCV000149017')
-        self.has_hits('BTK', morethan=7000)
+        self.has_hits('BTK', morethan=6000)
 
         self.has_hits('chr1:69000-70000', morethan=2000)
-        self.has_hits('dbsnp.vartype:snp')
+        self.has_hits('dbsnp.vartype:snv')
         # Too slow
         # self.has_hits('_exists_:dbnsfp')
         self.has_hits('dbnsfp.genename:BTK', morethan=5000)
