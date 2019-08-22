@@ -38,6 +38,8 @@ class MyVariantRemoteTest(BiothingsTestCase):
 
     def test_query(self):
         # public query self.api at /query via get
+        # check if gnomad_exome.hom field exists
+        self.has_hits('_exists_:gnomad_exome.hom&fields=gnomad_exome.hom')
         self.has_hits('rs58991260')
         self.has_hits('rcv000149017')
         self.has_hits('RCV000149017')
