@@ -3,7 +3,7 @@ import glob
 from biothings.utils.dataload import list_split, dict_sweep, unlist, value_convert_to_number
 from biothings.utils.common import anyfile
 
-VALID_COLUMN_NO = 367
+VALID_COLUMN_NO = 376
 
 '''this parser is for dbNSFP v3.5a beta2 downloaded from
 https://sites.google.com/site/jpopgen/dbNSFP'''
@@ -26,7 +26,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
     else:
         chromStart = int(df["hg19_pos(1-based)"])
         chromEnd = chromStart
-    chromStart_38 = int(df["pos(1-coor)"])
+    chromStart_38 = int(df["pos(1-based)"])
     ref = df["ref"].upper()
     alt = df["alt"].upper()
     HGVS_19 = "chr%s:g.%d%s>%s" % (chrom, chromStart, ref, alt)
@@ -35,7 +35,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
         HGVS = HGVS_19
     elif version == 'hg38':
         HGVS = HGVS_38
-    siphy_29way_pi = df["29way_pi"]
+    siphy_29way_pi = df["SiPhy_29way_pi"]
     if siphy_29way_pi == ".":
         siphy = "."
     else:
@@ -280,8 +280,8 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "end": hg18_end
             },
             "hg38": {
-                "start": df["pos(1-coor)"],
-                "end": df["pos(1-coor)"]
+                "start": df["pos(1-based)"],
+                "end": df["pos(1-based)"]
             },
             "ref": ref,
             "alt": alt,
@@ -505,8 +505,8 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
             },
             "siphy_29way": {
                 "pi": siphy,
-                "logodds": df["29way_logOdds"],
-                "logodds_rankscore": df["29way_logOdds_rankscore"]
+                "logodds": df["SiPhy_29way_logOdds"],
+                "logodds_rankscore": df["SiPhy_29way_logOdds_rankscore"]
             },
             "1000gp3": {
                 "ac": df["1000Gp3_AC"],
@@ -595,13 +595,26 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "sas_af": df["ExAC_nonpsych_SAS_AF"]
             },
             "clinvar": {
-                "rs": df["clinvar_rs"],
+                "clinvar_id": df["clinvar_id"],
                 "clinsig": [i for i in df["clinvar_clnsig"].split("/") if i != "."],
                 "trait": [i for i in df["clinvar_trait"].split("|") if i != "."],
                 "review": [i for i in df["clinvar_review"].split(",") if i != "."],
                 "hgvs": df["clinvar_hgvs"],
+                "omim": df["clinvar_OMIM_id"],
+                "medgen": df["clinvar_MedGen_id"].split('|'),
+                "orphanet": df["clinvar_Orphanet_id"],
                 "var_source": [i for i in df["clinvar_var_source"].split("|") if i != "."]
 
+            },
+            "hgvsc": {
+                "annovar": df["HGVSc_ANNOVAR"].split(';'),
+                "snpeff": df["HGVSc_snpEff"].split(';'),
+                "vep": df["HGVSc_VEP"].split(';')
+            },
+            "hgvsp": {
+                "annovar": df["HGVSp_ANNOVAR"].split(';'),
+                "snpeff": df["HGVSp_snpEff"].split(';'),
+                "vep": df["HGVSp_VEP"].split(';')
             },
             "gtex": list(gtex),
             "geuvadis_eqtl_target_gene": df["Geuvadis_eQTL_target_gene"]
