@@ -238,8 +238,8 @@ def encode_long_hgvs_id(doc,maxlen=512):
         prefix = trim_delseq_from_hgvs(doc["_id"],remove_ins=True)
         seq = doc["_id"].replace(prefix,"")
         seqshashed = blake2b(seq.encode(), digest_size=16).hexdigest()
-        new_id = prefix + "_SEQHASHED_" + seqshashed
+        new_id = prefix + "_seqhashed_" + seqshashed
         doc["_id"] = new_id
-        doc["_SEQHASHED"] = {seqshashed : seq}
+        doc["_seqhashed"] = {seqshashed : seq}
     return doc
 

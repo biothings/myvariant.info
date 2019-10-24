@@ -3,6 +3,7 @@ import itertools, glob, os
 from .dbsnp_json_parser import load_data_file
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
+from hub.dataload.storage import MyVariantIgnoreDuplicatedStorage
 
 
 SRC_META = {
@@ -12,9 +13,10 @@ SRC_META = {
         }
 
 
-class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
-                    uploader.ParallelizedSourceUploader,
+class DBSNPBaseUploader(uploader.ParallelizedSourceUploader,
                     SnpeffPostUpdateUploader):
+
+    storage_class = MyVariantIgnoreDuplicatedStorage
 
     def jobs(self):
         files = glob.glob(os.path.join(self.data_folder,"refsnp-chr*.json.bz2"))
@@ -258,7 +260,7 @@ class DBSNPHg19Uploader(DBSNPBaseUploader):
     main_source = "dbsnp"
     name = "dbsnp_hg19"
     __metadata__ = {
-            "mapper" : 'observed_skipidtoolong',
+            "mapper" : 'observed',
             "assembly" : "hg19",
             "src_meta" : SRC_META
             }
@@ -269,7 +271,7 @@ class DBSNPHg38Uploader(DBSNPBaseUploader):
     main_source = "dbsnp"
     name = "dbsnp_hg38"
     __metadata__ = {
-            "mapper" : 'observed_skipidtoolong',
+            "mapper" : 'observed',
             "assembly" : "hg38",
             "src_meta" : SRC_META
             }

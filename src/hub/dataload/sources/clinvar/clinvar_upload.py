@@ -224,7 +224,7 @@ class ClinvarHG19Uploader(ClinvarBaseUploader):
     name = "clinvar_hg19"
     main_source = "clinvar"
     __metadata__ = {
-            "mapper" : 'observed_skipidtoolong',
+            "mapper" : 'observed',
             "assembly" : "hg19",
             "src_meta" : SRC_META,
             }
@@ -244,7 +244,7 @@ class ClinvarHG38Uploader(ClinvarBaseUploader):
     name = "clinvar_hg38"
     main_source = "clinvar"
     __metadata__ = {
-            "mapper" : 'observed_skipidtoolong',
+            "mapper" : 'observed',
             "assembly" : "hg38",
             "src_meta" : SRC_META,
             }

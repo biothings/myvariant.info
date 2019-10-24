@@ -18,6 +18,9 @@ class BaseVariantIndexer(indexer.Indexer):
             'type': 'text'}
         final_mapping["properties"]["observed"] = {
             "type": "boolean"}
+        final_mapping["properties"]["_seqhashed"] = {
+            "type": "boolean"}
+
         return final_mapping
 
     def get_index_creation_settings(self):
