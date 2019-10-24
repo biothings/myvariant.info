@@ -75,6 +75,7 @@ class MyVariantRemoteTest(BiothingsTestCase):
 
         res = self.request("query", method='POST', data={'q': 'rs58991260,rs2500',
                                                               'scopes': 'dbsnp.rsid'}).json()
+        print(res)
         eq_(len(res), 2)
         eq_(res[0]['_id'], 'chr1:g.218631822G>A')
         eq_(res[1]['_id'], 'chr11:g.66397320A>G')

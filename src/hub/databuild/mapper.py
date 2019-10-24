@@ -1,5 +1,6 @@
-from biothings.utils.common import loadobj
 import biothings.hub.databuild.mapper as mapper
+from biothings import config as btconfig
+logging = btconfig.logger
 
 class TagObserved(mapper.BaseMapper):
 
@@ -11,3 +12,21 @@ class TagObserved(mapper.BaseMapper):
             doc.update({'observed':True})
             yield doc
 
+class SkipLongId(mapper.BaseMapper):
+
+    def load(self, *args, **kwargs):
+        pass
+
+    def process(self,docs):
+        for doc in docs:
+            if len(doc["_id"]) > btconfig.MAX_ID_LENGTH:
+                logging.debug("Skip doc, _id too long: %s" % doc["_id"])
+                continue
+            yield doc
+    
+class TagObservedAndSkipLongId(TagObserved,SkipLongId):
+    
+    def process(self,docs):
+        okdocs = SkipLongId.process(self,docs)
+        obsdocs = TagObserved.process(self,okdocs)
+        return obsdocs

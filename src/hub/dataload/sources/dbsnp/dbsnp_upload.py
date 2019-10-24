@@ -258,7 +258,7 @@ class DBSNPHg19Uploader(DBSNPBaseUploader):
     main_source = "dbsnp"
     name = "dbsnp_hg19"
     __metadata__ = {
-            "mapper" : 'observed',
+            "mapper" : 'observed_skipidtoolong',
             "assembly" : "hg19",
             "src_meta" : SRC_META
             }
@@ -269,7 +269,7 @@ class DBSNPHg38Uploader(DBSNPBaseUploader):
     main_source = "dbsnp"
     name = "dbsnp_hg38"
     __metadata__ = {
-            "mapper" : 'observed',
+            "mapper" : 'observed_skipidtoolong',
             "assembly" : "hg38",
             "src_meta" : SRC_META
             }

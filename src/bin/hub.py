@@ -23,7 +23,7 @@ import biothings.hub.databuild.syncer as syncer
 from hub.databuild.builder import MyVariantDataBuilder
 from hub.dataindex.indexer import MyVariantIndexerManager
 from hub.databuild.differ import MyVariantDifferManager
-from hub.databuild.mapper import TagObserved
+from hub.databuild.mapper import TagObserved, TagObservedAndSkipLongId
 from hub.databuild.syncer import MyVariantThrottledESColdHotJsonDiffSelfContainedSyncer, MyVariantThrottledESJsonDiffSelfContainedSyncer, \
                                  MyVariantESColdHotJsonDiffSelfContainedSyncer, MyVariantESJsonDiffSelfContainedSyncer
 
@@ -105,8 +105,9 @@ class MyVariantHubServer(HubServer):
 
     def configure_build_manager(self):
         observed = TagObserved(name="observed")
+        observed_skipidtoolong = TagObservedAndSkipLongId(name="observed_skipidtoolong")
         build_manager = builder.BuilderManager(
-                builder_class=partial(MyVariantDataBuilder,mappers=[observed]),
+                builder_class=partial(MyVariantDataBuilder,mappers=[observed,observed_skipidtoolong]),
                 job_manager=self.managers["job_manager"])
         build_manager.configure()
         self.managers["build_manager"] = build_manager
