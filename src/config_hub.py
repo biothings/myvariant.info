@@ -37,6 +37,9 @@ MAX_RANDOMLY_PICKED = 10
 # size in bytes for a diff file (used in diff/reduce step)
 MAX_DIFF_SIZE = 10 * 1024**2
 
+# max length for _id field
+MAX_ID_LENGTH = 512
+
 # ES s3 repository to use snapshot/restore (must be pre-configured in ES)
 SNAPSHOT_REPOSITORY = "variant_repository"
 # ES snapshot name accessible (usually using a URL)
