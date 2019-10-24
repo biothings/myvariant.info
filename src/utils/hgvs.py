@@ -1,6 +1,7 @@
 import re
 import copy
 import requests
+from hashlib import blake2b
 
 
 def is_snp(hgvs_id):
@@ -230,3 +231,15 @@ def trim_delseq_from_hgvs(hgvs, remove_ins=False):
         hgvs = "".join(re_dup.match(hgvs).groups())
     
     return hgvs
+
+def encode_long_hgvs_id(doc,maxlen=512):
+    assert "_id" in doc
+    if len(doc["_id"]) > maxlen:
+        prefix = trim_delseq_from_hgvs(doc["_id"],remove_ins=True)
+        seq = doc["_id"].replace(prefix,"")
+        seqshashed = blake2b(seq.encode(), digest_size=16).hexdigest()
+        new_id = prefix + "_SEQHASHED_" + seqshashed
+        doc["_id"] = new_id
+        doc["_SEQHASHED"] = {seqshashed : seq}
+    return doc
+
