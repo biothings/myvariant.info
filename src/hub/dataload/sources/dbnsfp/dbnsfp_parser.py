@@ -606,16 +606,8 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "var_source": [i for i in df["clinvar_var_source"].split("|") if i != "."]
 
             },
-            "hgvsc": {
-                "annovar": df["HGVSc_ANNOVAR"].split(';'),
-                "snpeff": df["HGVSc_snpEff"].split(';'),
-                "vep": df["HGVSc_VEP"].split(';')
-            },
-            "hgvsp": {
-                "annovar": df["HGVSp_ANNOVAR"].split(';'),
-                "snpeff": df["HGVSp_snpEff"].split(';'),
-                "vep": df["HGVSp_VEP"].split(';')
-            },
+            "hgvsc": list(set(df["HGVSc_ANNOVAR"].split(';') + df["HGVSc_snpEff"].split(';') + df["HGVSc_VEP"].split(';'))),
+            "hgvsp": list(set(df["HGVSp_ANNOVAR"].split(';') + df["HGVSp_snpEff"].split(';') + df["HGVSp_VEP"].split(';'))),
             "gtex": list(gtex),
             "geuvadis_eqtl_target_gene": df["Geuvadis_eQTL_target_gene"]
         }
