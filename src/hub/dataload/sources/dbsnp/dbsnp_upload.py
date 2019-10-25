@@ -3,6 +3,7 @@ import itertools, glob, os
 from .dbsnp_json_parser import load_data_file
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
+from hub.dataload.storage import MyVariantIgnoreDuplicatedStorage
 
 
 SRC_META = {
@@ -12,9 +13,10 @@ SRC_META = {
         }
 
 
-class DBSNPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
-                    uploader.ParallelizedSourceUploader,
+class DBSNPBaseUploader(uploader.ParallelizedSourceUploader,
                     SnpeffPostUpdateUploader):
+
+    storage_class = MyVariantIgnoreDuplicatedStorage
 
     def jobs(self):
         files = glob.glob(os.path.join(self.data_folder,"refsnp-chr*.json.bz2"))

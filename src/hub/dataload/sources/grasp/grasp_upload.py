@@ -4,14 +4,14 @@ import zipfile
 
 from .grasp_parser import load_data
 import biothings.hub.dataload.uploader as uploader
-import biothings.hub.dataload.storage as storage
 from hub.dataload.uploader import SnpeffPostUpdateUploader
+from hub.dataload.storage import MyVariantIgnoreDuplicatedStorage
 
-class GraspUploader(uploader.IgnoreDuplicatedSourceUploader,
-                    SnpeffPostUpdateUploader):
+
+class GraspUploader(SnpeffPostUpdateUploader):
 
     name = "grasp"
-    strorage_class = storage.IgnoreDuplicatedStorage
+    storage_class = MyVariantIgnoreDuplicatedStorage
     __metadata__ = {"mapper" : 'observed',
             "assembly" : "hg19",
             "src_meta" : {

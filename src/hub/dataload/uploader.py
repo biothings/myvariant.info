@@ -10,13 +10,15 @@ from biothings.utils.dataload import dict_attrmerge
 
 import hub.dataload.sources.snpeff.snpeff_upload as snpeff_upload
 import hub.dataload.sources.snpeff.snpeff_parser as snpeff_parser
+from hub.dataload.storage import MyVariantBasicStorage
 from utils.hgvs import get_pos_start_end
 from config import MAX_REF_ALT_LEN
+
 
 class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
 
     keep_archive = 1
-
+    storage_class = MyVariantBasicStorage
     SNPEFF_BATCH_SIZE = 1000000
 
     def get_pinfo(self):
@@ -49,7 +51,7 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
         cnt = 0
         to_process = []
 
-        def process(ids):
+        def process(ids, bnum):
             self.logger.info("%d documents to annotate" % len(ids))
             hgvs_vcfs = vcf_builder.build_vcfs(ids)
             # merge "vcf" and snpeff annotations keys when possible
@@ -66,7 +68,18 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
                 hgvs_vcfs[_id] = vcf
 
             data = annotate_start_end(hgvs_vcfs,version)
-            howmany = storage.process(data, batch_size)
+            try:
+                howmany = storage.process(data, batch_size)
+            except Exception as e:
+                # batch failed, rebuild it (it was a generator, we don't know where it is now)
+                # and retry one by one
+                data = annotate_start_end(hgvs_vcfs,version)
+                howmany = 0
+                for doc in data:
+                    try:
+                        howmany += storage.process([doc],batch_size=1)
+                    except Exception as e:
+                        self.logger.exception("Couldn't annotate document _id '%s', skip it: %s" % (doc["_id"],e))
             if howmany:
                 # we need to update some metadata info about snpeff b/c data has changed
                 # so cache could be invalid
@@ -90,13 +103,14 @@ class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
                     if not (len(to_process) >= batch_size):
                         # can fill more...
                         continue
-                    process(to_process)
+                    process(to_process,cnt)
                     to_process = []
             else:
                 to_process = ids
         # for potential remainings
         if to_process:
-            process(to_process)
+            cnt += 1 # last batch
+            process(to_process,cnt)
 
     def post_update_data(self, steps, force, batch_size, job_manager, **kwargs):
         # this one will run in current thread, snpeff java prg will
