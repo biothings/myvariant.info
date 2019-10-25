@@ -326,6 +326,12 @@ class MyVariantRemoteTest(BiothingsTestCase):
         # (testing failing status would require actually loading tornado app from there
         #  and deal with config params...)
 
+    def test_seqhashed_long_hgvs_id(self):
+        res = self.request("query?q=_exists_:_seqhashed&fields=_seqhashed").json()
+        assert "_seqhashed_" in res["hits"][0]["_id"]
+        h = res["hits"][0]["_id"].split("_seqhashed_")[-1]
+        assert h in res["hits"][0]["_seqhashed"]
+
 
 if __name__ == '__main__':
     print()
