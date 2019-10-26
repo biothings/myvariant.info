@@ -10,13 +10,15 @@ from biothings.utils.dataload import dict_attrmerge
 
 import hub.dataload.sources.snpeff.snpeff_upload as snpeff_upload
 import hub.dataload.sources.snpeff.snpeff_parser as snpeff_parser
+from hub.dataload.storage import MyVariantBasicStorage
 from utils.hgvs import get_pos_start_end
 from config import MAX_REF_ALT_LEN
+
 
 class SnpeffPostUpdateUploader(uploader.BaseSourceUploader):
 
     keep_archive = 1
-
+    storage_class = MyVariantBasicStorage
     SNPEFF_BATCH_SIZE = 1000000
 
     def get_pinfo(self):

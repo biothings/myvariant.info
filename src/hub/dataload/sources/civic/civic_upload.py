@@ -2,12 +2,14 @@ import glob, os
 
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
+from hub.dataload.storage import MyVariantIgnoreDuplicatedStorage
 
 from .civic_parser import load_data
 
-class CivicUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUploader):
+class CivicUploader(SnpeffPostUpdateUploader):
 
     name = "civic"
+    storage_class = MyVariantIgnoreDuplicatedStorage
     __metadata__ = {
         "mapper" : 'observed',
         "assembly" : "hg19",

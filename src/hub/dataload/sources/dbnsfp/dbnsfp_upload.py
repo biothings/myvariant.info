@@ -8,6 +8,7 @@ from .dbnsfp_parser import load_data_file as load_common
 import biothings.hub.dataload.uploader as uploader
 from biothings.hub.dataload.storage import IgnoreDuplicatedStorage
 from hub.dataload.uploader import SnpeffPostUpdateUploader
+from hub.dataload.storage import MyVariantIgnoreDuplicatedStorage
 
 
 SRC_META = {
@@ -17,10 +18,10 @@ SRC_META = {
 }
 
 
-class DBNSFPBaseUploader(uploader.IgnoreDuplicatedSourceUploader,
-                         uploader.ParallelizedSourceUploader,
+class DBNSFPBaseUploader(uploader.ParallelizedSourceUploader,
                          SnpeffPostUpdateUploader):
 
+    storage_class = MyVariantIgnoreDuplicatedStorage
     GLOB_PATTERN = "dbNSFP*_variant.chr*"
 
     @classmethod

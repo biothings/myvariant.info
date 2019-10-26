@@ -14,10 +14,19 @@ class BaseVariantIndexer(indexer.Indexer):
     def enrich_final_mapping(self,final_mapping):
         # enrich with myvariant specific stuff
         final_mapping["properties"]["chrom"] = {
-            'analyzer': 'string_lowercase',
-            'type': 'text'}
+                'analyzer': 'string_lowercase',
+                'type': 'text'}
         final_mapping["properties"]["observed"] = {
-            "type": "boolean"}
+                "type": "boolean"}
+        final_mapping["properties"]["_seqhashed"] = {
+                "type" : "object",
+                "properties" : {
+                    "_flag": {
+                        "type" : "boolean"
+                        }
+                    }
+                }
+
         return final_mapping
 
     def get_index_creation_settings(self):

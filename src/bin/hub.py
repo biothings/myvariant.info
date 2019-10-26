@@ -8,6 +8,8 @@ logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 logging.getLogger("urllib3").setLevel(logging.ERROR)
 logging.getLogger("requests").setLevel(logging.ERROR)
 logging.getLogger("boto").setLevel(logging.ERROR)
+logging.getLogger("parso.cache").setLevel(logging.ERROR)
+
 
 import config, biothings
 from biothings.utils.version import set_versions
@@ -161,7 +163,7 @@ class MyVariantHubServer(HubServer):
         # snapshot, diff & publish
         self.commands["snapshot_demo"] = partial(self.managers["index_manager"].snapshot,repository=config.SNAPSHOT_REPOSITORY + "-demo")
         # override with diff type
-        self.commands["diff"] = partial(self.managers["diff_manager"].diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
+        self.commands["diff_prod"] = partial(self.managers["diff_manager"].diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
         self.commands["diff_demo"] = partial(self.managers["diff_manager"].diff,differ.SelfContainedJsonDiffer.diff_type)
         self.commands["publish_diff_hg19"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-hg19")
         self.commands["publish_diff_hg38"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-hg38")

@@ -41,6 +41,15 @@ class MyVariantRemoteTest(BiothingsTestCase):
         # check if gnomad_exome.hom field exists
         self.has_hits('_exists_:gnomad_exome.hom&fields=gnomad_exome.hom')
         self.has_hits('_exists_:gnomad_genome.hom&fields=gnomad_genome.hom')
+        self.has_hits('_exists_:dbnsfp.hgvsc.annovar&fields=dbnsfp.hgvsc.annovar')
+        self.has_hits('_exists_:dbnsfp.hgvsc.snpeff&fields=dbnsfp.hgvsc.snpeff')
+        self.has_hits('_exists_:dbnsfp.hgvsc.vep&fields=dbnsfp.hgvsc.vep')
+        self.has_hits('_exists_:dbnsfp.hgvsp.annovar&fields=dbnsfp.hgvsp.annovar')
+        self.has_hits('_exists_:dbnsfp.hgvsp.snpeff&fields=dbnsfp.hgvsp.snpeff')
+        self.has_hits('_exists_:dbnsfp.hgvsp.vep&fields=dbnsfp.hgvsp.vep')
+        self.has_hits('_exists_:dbnsfp.clinvar.clinvar_id&fields=dbnsfp.clinvar')
+        self.has_hits('_exists_:dbnsfp.clinvar.omim&fields=dbnsfp.clinvar')
+        self.has_hits('_exists_:dbnsfp.clinvar.medgen&fields=dbnsfp.clinvar')
         self.has_hits('rs58991260')
         self.has_hits('rcv000149017')
         self.has_hits('RCV000149017')
@@ -73,12 +82,12 @@ class MyVariantRemoteTest(BiothingsTestCase):
         eq_(len(res), 1)
         eq_(res[0]['_id'], 'chr1:g.218631822G>A')
 
-        res = self.request("query", method='POST', data={'q': 'rs58991260,rs2500',
+        res = self.request("query", method='POST', data={'q': 'rs58991260,rs268',
                                                               'scopes': 'dbsnp.rsid'}).json()
         print(res)
         eq_(len(res), 2)
         eq_(res[0]['_id'], 'chr1:g.218631822G>A')
-        eq_(res[1]['_id'], 'chr11:g.66397320A>G')
+        eq_(res[1]['_id'], 'chr8:g.19813529A>G')
 
         res = self.request("query", method='POST',
                            data={'q': 'rs58991260', 'scopes': 'dbsnp.rsid',
@@ -92,7 +101,7 @@ class MyVariantRemoteTest(BiothingsTestCase):
         #                                       'scopes': 'dbsnp.rsid'}).json()
         #eq_(len(res), 2)
         #eq_(res[0]['_id'], 'chr1:g.218631822G>A')
-        #eq_(res[1]['_id'], 'chr11:g.66397320A>G')
+        #eq_(res[1]['_id'], 'chr8:g.19813529A>G')
 
     def test_query_interval(self):
         self.has_hits('chr1:10000-100000', morethan=30000)
@@ -147,21 +156,21 @@ class MyVariantRemoteTest(BiothingsTestCase):
         eq_(res[0]['_id'], "chr16:g.28883241A>G")
 
         res = self.request("variant", method='POST', data={
-                           'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G'}).json()
+                           'ids': 'chr16:g.28883241A>G, chr8:g.19813529A>G'}).json()
         eq_(len(res), 2)
         eq_(res[0]['_id'], 'chr16:g.28883241A>G')
-        eq_(res[1]['_id'], 'chr11:g.66397320A>G')
+        eq_(res[1]['_id'], 'chr8:g.19813529A>G')
 
         res = self.request(
             "variant", method='POST',
-            data={'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'fields': 'dbsnp'}).json()
+            data={'ids': 'chr16:g.28883241A>G, chr8:g.19813529A>G', 'fields': 'dbsnp'}).json()
         eq_(len(res), 2)
         for _g in res:
             eq_(set(_g), set(['_id', 'query', 'dbsnp']))
 
         # TODO redo this test, doesn't test much really....
         res = self.request("variant", method='POST',
-                           data={'ids': 'chr16:g.28883241A>G,chr11:g.66397320A>G',
+                           data={'ids': 'chr16:g.28883241A>G,chr8:g.19813529A>G',
                                  'filter': 'dbsnp.chrom'}).json()
         eq_(len(res), 2)
         for _g in res:
@@ -226,8 +235,8 @@ class MyVariantRemoteTest(BiothingsTestCase):
         ok_(len(res2['hits']) == 1000)
 
     def test_msgpack(self):
-        res = self.request('variant/chr11:g.66397320A>G').json()
-        res2 = self.msgpack_ok(self.request("variant/chr11:g.66397320A>G?format=msgpack").content)
+        res = self.request('variant/chr8:g.19813529A>G').json()
+        res2 = self.msgpack_ok(self.request("variant/chr8:g.19813529A>G?format=msgpack").content)
         ok_(res, res2)
 
         res = self.request('query?q=rs2500').json()
@@ -256,7 +265,7 @@ class MyVariantRemoteTest(BiothingsTestCase):
             assert res['snpeff']['_license']
 
     def test_jsonld(self):
-        res = self.request('variant/chr11:g.66397320A>G?jsonld=true').json()
+        res = self.request('variant/chr8:g.19813529A>G?jsonld=true').json()
         assert '@context' in res
         assert '@id' in res
 
@@ -268,7 +277,7 @@ class MyVariantRemoteTest(BiothingsTestCase):
         # Check a post with jsonld
         res = self.request(
             "variant", method='POST',
-            data={'ids': 'chr16:g.28883241A>G, chr11:g.66397320A>G', 'jsonld': 'true'}).json()
+            data={'ids': 'chr16:g.28883241A>G, chr8:g.19813529A>G', 'jsonld': 'true'}).json()
         for r in res:
             assert '@context' in r
             assert '@id' in r
@@ -285,7 +294,7 @@ class MyVariantRemoteTest(BiothingsTestCase):
         #assert 'gene' in res['hits'][0]['clinvar'] and '@context' in res['hits'][0]['clinvar']['gene']
 
         # Check query post with jsonld
-        res = self.request("query", method='POST', data={'q': 'rs58991260,rs2500',
+        res = self.request("query", method='POST', data={'q': 'rs58991260,rs268',
                                                               'scopes': 'dbsnp.rsid',
                                                               'jsonld': 'true'}).json()
 
@@ -301,20 +310,27 @@ class MyVariantRemoteTest(BiothingsTestCase):
         eq_(res["hits"][0]["_id"], "chr11:g.56319006C>A")
 
     def test_HGVS_redirect(self):
-        res = self.request('variant/chr11:66397320A>G').json()
-        res2 = self.request('variant/chr11:g66397320A>G').json()
-        res3 = self.request('variant/chr11:.66397320A>G').json()
-        res4 = self.request('variant/chr11:g.66397320A>G').json()
+        
+        res = self.request('variant/chr8:19813529A>G').json()
+        res2 = self.request('variant/chr8:g19813529A>G').json()
+        res3 = self.request('variant/chr8:.19813529A>G').json()
+        res4 = self.request('variant/chr8:g.19813529A>G').json()
 
         eq_(res, res2)
         eq_(res2, res3)
         eq_(res3, res4)
-        eq_(res["_id"], 'chr11:g.66397320A>G')
+        eq_(res["_id"], 'chr8:g.19813529A>G')
 
     def test_status_endpoint(self):
         self.request(self.host + '/status')
         # (testing failing status would require actually loading tornado app from there
         #  and deal with config params...)
+
+    def test_seqhashed_long_hgvs_id(self):
+        res = self.request("query?q=_exists_:_seqhashed&fields=_seqhashed").json()
+        assert "_seqhashed_" in res["hits"][0]["_id"]
+        h = res["hits"][0]["_id"].split("_seqhashed_")[-1]
+        assert h in res["hits"][0]["_seqhashed"]
 
 
 if __name__ == '__main__':

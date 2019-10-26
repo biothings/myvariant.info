@@ -3,12 +3,12 @@ import glob
 import zipfile
 
 import biothings.hub.dataload.uploader as uploader
-import biothings.hub.dataload.storage as storage
 
 from .gnomad_parser_genomes import load_data as load_data_genomes
 from .gnomad_parser_exomes import load_data as load_data_exomes
 from .mapping import exomes_mapping, genomes_mapping
 from hub.dataload.uploader import SnpeffPostUpdateUploader
+from hub.dataload.storage import MyVariantIgnoreDuplicatedStorage
 
 SRC_META = {
     "url" : "http://gnomad.broadinstitute.org",
@@ -17,8 +17,9 @@ SRC_META = {
     "license" : "ODbL"
 }
 
-class GnomadBaseUploader(uploader.IgnoreDuplicatedSourceUploader,SnpeffPostUpdateUploader):
-    pass
+class GnomadBaseUploader(SnpeffPostUpdateUploader):
+
+    storage_class = MyVariantIgnoreDuplicatedStorage
 
 
 class GnomadBaseHg19Uploader(GnomadBaseUploader):
