@@ -63,8 +63,10 @@ def parse_measure(Measure, hg19=True):
                 chrom = SequenceLocation.Chr
                 chromStart_19 = SequenceLocation.start
                 chromEnd_19 = SequenceLocation.stop
-                ref = SequenceLocation.referenceAllele
-                alt = SequenceLocation.alternateAllele
+                if not ref:
+                    ref = SequenceLocation.referenceAllele
+                if not alt:
+                    alt = SequenceLocation.alternateAllele
             if 'GRCh38' in SequenceLocation.Assembly:
                 chromStart_38 = SequenceLocation.start
                 chromEnd_38 = SequenceLocation.stop
@@ -145,7 +147,8 @@ def parse_measure(Measure, hg19=True):
                     hgvs_genome = AttributeSet.Attribute.get_valueOf_()
                     break
         if chrom and chromStart and chromEnd:
-            if variation_type == 'single nucleotide variant':
+            # if its SNP, make sure chrom, chromStart, chromEnd, ref, alt are all provided
+            if variation_type == 'single nucleotide variant' and ref and alt:
                 hgvs_id = "chr%s:g.%s%s>%s" % (chrom, chromStart, ref, alt)
             # items whose type belong to 'Indel, Insertion, \
             # Duplication' might not hava explicit alt information, \
