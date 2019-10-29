@@ -29,7 +29,7 @@ class DBNSFPDumper(GoogleDriveDumper):
     # also, sometimes there's a "v", sometimes not...
     RELEASE_PAT = "dbNSFPv?(\d+\..*\d+a)\.zip"
 
-    #SCHEDULE = "0 9 * * *" # disabled until we have a new parser for rel. 4.0
+    SCHEDULE = "0 9 * * *" # disabled until we have a new parser for rel. 4.0
 
     def get_newest_info(self):
         ftp = FTP('dbnsfp.softgenetics.com')
@@ -42,9 +42,22 @@ class DBNSFPDumper(GoogleDriveDumper):
         [drels.setdefault(rel,f) for (f,rel) in releases]
         # sort items based on date
         releases = sorted(drels.keys())
+        # check if there's a non-beta version. Tricky there, usually versions are like that:
+        # 4.0a, 4.0ab1, 4.0ab2
+        # if sorted, 4.0ab2 will be the "newest", but it's a beta (b2) and 4.0a is
+        # actually the newest there
+        newest = releases[-1]
+        nonbetapat = re.compile("(\d+\.\d+)\w\d(\w)")
+        m = nonbetapat.match(newest)
+        if m:
+            nonbeta = "".join(m.groups())
+            if nonbeta in releases:
+                self.logger.info("Found non-beta version '%s'" % nonbeta)
+                newest = nonbeta
+
         # get the last item in the list, which is the latest version
-        self.newest_file = drels[releases[-1]]
-        self.release = releases[-1]
+        self.newest_file = drels[newest]
+        self.release = newest
 
     def new_release_available(self):
         current_release = self.src_doc.get("download",{}).get("release")
