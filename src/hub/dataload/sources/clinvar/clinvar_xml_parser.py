@@ -65,15 +65,23 @@ def parse_measure(Measure, hg19=True):
                 chromEnd_19 = SequenceLocation.stop
                 if not ref:
                     ref = SequenceLocation.referenceAllele
+                if not ref:
+                    ref = SequenceLocation.referenceAlleleVCF
                 if not alt:
                     alt = SequenceLocation.alternateAllele
+                if not alt:
+                    alt = SequenceLocation.alternateAlleleVCF
             if 'GRCh38' in SequenceLocation.Assembly:
                 chromStart_38 = SequenceLocation.start
                 chromEnd_38 = SequenceLocation.stop
                 if not ref:
                     ref = SequenceLocation.referenceAllele
+                if not ref:
+                    ref = SequenceLocation.referenceAlleleVCF
                 if not alt:
                     alt = SequenceLocation.alternateAllele
+                if not alt:
+                    alt = SequenceLocation.alternateAlleleVCF
     if Measure.MeasureRelationship:
         try:
             symbol = Measure.MeasureRelationship[0].\
@@ -148,8 +156,11 @@ def parse_measure(Measure, hg19=True):
                     break
         if chrom and chromStart and chromEnd:
             # if its SNP, make sure chrom, chromStart, chromEnd, ref, alt are all provided
-            if variation_type == 'single nucleotide variant' and ref and alt:
-                hgvs_id = "chr%s:g.%s%s>%s" % (chrom, chromStart, ref, alt)
+            if variation_type == 'single nucleotide variant':
+                if ref and alt:
+                    hgvs_id = "chr%s:g.%s%s>%s" % (chrom, chromStart, ref, alt)
+                else:
+                    print('hgvs not found chr {}, chromStart {}, chromEnd {}, ref {}, alt {}, allele id {}'.format(chrom, chromStart, chromEnd, ref, alt, allele_id))
             # items whose type belong to 'Indel, Insertion, \
             # Duplication' might not hava explicit alt information, \
             # so we will parse from hgvs_genome
