@@ -45,9 +45,9 @@ class MyVariantRemoteTest(BiothingsTestCase):
         # we will add these tests back when the mapping file is ready.
         # self.has_hits('_exists_:dbnsfp.hgvsp&fields=dbnsfp.hgvsp')
         # self.has_hits('_exists_:dbnsfp.hgvsc&fields=dbnsfp.hgvsc')
-        self.has_hits('_exists_:dbnsfp.clinvar.clinvar_id&fields=dbnsfp.clinvar')
-        self.has_hits('_exists_:dbnsfp.clinvar.omim&fields=dbnsfp.clinvar')
-        self.has_hits('_exists_:dbnsfp.clinvar.medgen&fields=dbnsfp.clinvar')
+        # self.has_hits('_exists_:dbnsfp.clinvar.clinvar_id&fields=dbnsfp.clinvar')
+        # self.has_hits('_exists_:dbnsfp.clinvar.omim&fields=dbnsfp.clinvar')
+        # self.has_hits('_exists_:dbnsfp.clinvar.medgen&fields=dbnsfp.clinvar')
         self.has_hits('rs58991260')
         self.has_hits('rcv000149017')
         self.has_hits('RCV000149017')
