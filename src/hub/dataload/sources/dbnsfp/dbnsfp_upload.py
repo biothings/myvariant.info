@@ -725,8 +725,7 @@ class DBNSFPBaseUploader(uploader.ParallelizedSourceUploader,
                     "clinvar": {
                         "properties": {
                             "clinvar_id": {
-                                "type": "integer",
-                                "copy_to": ["all"]
+                                "type": "integer"
                             },
                             "clinsig": {
                                 "type": "keyword",
