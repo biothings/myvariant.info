@@ -724,9 +724,8 @@ class DBNSFPBaseUploader(uploader.ParallelizedSourceUploader,
                     },
                     "clinvar": {
                         "properties": {
-                            "rs": {
-                                "type": "integer",
-                                "copy_to": ["all"]
+                            "clinvar_id": {
+                                "type": "integer"
                             },
                             "clinsig": {
                                 "type": "keyword",
@@ -741,6 +740,17 @@ class DBNSFPBaseUploader(uploader.ParallelizedSourceUploader,
                                 "normalizer": "keyword_lowercase_normalizer"
                             },
                             "hgvs": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "omim": {
+                                "type": "integer"
+                            },
+                            "medgen": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "orphanet": {
                                 "type": "keyword",
                                 "normalizer": "keyword_lowercase_normalizer"
                             },
@@ -1005,7 +1015,15 @@ class DBNSFPBaseUploader(uploader.ParallelizedSourceUploader,
                     "geuvadis_eqtl_target_gene": {
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    },
+                    "hgvsc": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "hgvsp": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    } 
                 }
             }
         }
