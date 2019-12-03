@@ -7,11 +7,20 @@ from biothings.utils.common import iter_n, open_compressed_file
 from biothings.utils.mongo import id_feeder
 import biothings.utils.mongo as mongo
 import biothings.hub.databuild.builder as builder
+from biothings.hub.databuild.backend import ShardedTargetDocMongoBackend
 import config
 
 class MyVariantDataBuilder(builder.DataBuilder):
 
     MAX_CHROM_EX = 100000 # if chrom discrepancies found, max # of examples we keep
+
+    def __init__(self, build_name, source_backend, target_backend, *args, **kwargs):
+        shared_tgt_backend = partial(ShardedTargetDocMongoBackend,
+                                     target_db=partial(mongo.get_target_db))
+        super().__init__(build_name=build_name,
+                         source_backend=source_backend,
+                         target_backend=shared_tgt_backend,
+                         *args,**kwargs)
 
     def merge(self, sources=None, target_name=None, batch_size=50000, job_manager=None, **kwargs):
         # just override default batch_size or it consumes too much mem
