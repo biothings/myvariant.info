@@ -599,10 +599,10 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "clinsig": [i for i in df["clinvar_clnsig"].split("/") if i != "."],
                 "trait": [i for i in df["clinvar_trait"].split("|") if i != "."],
                 "review": [i for i in df["clinvar_review"].split(",") if i != "."],
-                "hgvs": df["clinvar_hgvs"],
-                "omim": df["clinvar_OMIM_id"],
-                "medgen": df["clinvar_MedGen_id"].split('|'),
-                "orphanet": df["clinvar_Orphanet_id"],
+                "hgvs": [i for i in df["clinvar_hgvs"].split("|") if i != "."],
+                "omim": [i for i in df["clinvar_OMIM_id"].split("|") if i != "."],
+                "medgen": [i for i in df["clinvar_MedGen_id"].split("|") if i != "."],
+                "orphanet": [i for i in df["clinvar_Orphanet_id"].split("|") if i != "."],
                 "var_source": [i for i in df["clinvar_var_source"].split("|") if i != "."]
 
             },
