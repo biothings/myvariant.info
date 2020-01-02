@@ -10,7 +10,7 @@ class CivicDumper(HTTPDumper):
 
     SRC_NAME = "civic"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
-    API_PAGE = 'https://civic.genome.wustl.edu/api/variants/'
+    API_PAGE = 'https://civicdb.org/api/variants/'
     SCHEDULE = "0 22 1 * *"
     IGNORE_HTTP_CODE = [404] # some variants are 
     MAX_PARALLEL_DUMP = 1
