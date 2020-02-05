@@ -22,7 +22,7 @@ import biothings.hub.databuild.builder as builder
 import biothings.hub.databuild.differ as differ
 import biothings.hub.databuild.syncer as syncer
 
-from hub.databuild.builder import MyVariantDataBuilder
+from hub.databuild.builder import MyVariantDataBuilder, MyVariantShardedDataBuilder
 from hub.dataindex.indexer import MyVariantIndexerManager
 from hub.databuild.differ import MyVariantDifferManager
 from hub.databuild.mapper import TagObserved, TagObservedAndSkipLongId
@@ -108,8 +108,10 @@ class MyVariantHubServer(HubServer):
     def configure_build_manager(self):
         observed = TagObserved(name="observed")
         observed_skipidtoolong = TagObservedAndSkipLongId(name="observed_skipidtoolong")
+        mvbuilder = partial(MyVariantDataBuilder,mappers=[observed,observed_skipidtoolong])
+        sharded_mvbuilder = partial(MyVariantShardedDataBuilder,mappers=[observed,observed_skipidtoolong])
         build_manager = builder.BuilderManager(
-                builder_class=partial(MyVariantDataBuilder,mappers=[observed,observed_skipidtoolong]),
+                builder_class=[mvbuilder,sharded_mvbuilder],
                 job_manager=self.managers["job_manager"])
         build_manager.configure()
         self.managers["build_manager"] = build_manager
@@ -145,38 +147,38 @@ class MyVariantHubServer(HubServer):
         self.commands["premerge"] = partial(self.managers["build_manager"].merge,steps=["merge","metadata"])
         # sync
         self.commands["es_sync_hg19_test"] = partial(self.managers["sync_manager_test"].sync,"es",
-                                                target_backend=(config.ES_CONFIG["env"]["test"]["host"],
-                                                                config.ES_CONFIG["env"]["test"]["index"]["hg19"][0]["index"],
-                                                                config.ES_CONFIG["env"]["test"]["index"]["hg19"][0]["doc_type"]))
+                                                target_backend=(config.INDEX_CONFIG["env"]["test"]["host"],
+                                                                config.INDEX_CONFIG["env"]["test"]["index"]["hg19"][0]["index"],
+                                                                config.INDEX_CONFIG["env"]["test"]["index"]["hg19"][0]["doc_type"]))
         self.commands["es_sync_hg38_test"] = partial(self.managers["sync_manager_test"].sync,"es",
-                                                target_backend=(config.ES_CONFIG["env"]["test"]["host"],
-                                                                config.ES_CONFIG["env"]["test"]["index"]["hg38"][0]["index"],
-                                                                config.ES_CONFIG["env"]["test"]["index"]["hg38"][0]["doc_type"]))
+                                                target_backend=(config.INDEX_CONFIG["env"]["test"]["host"],
+                                                                config.INDEX_CONFIG["env"]["test"]["index"]["hg38"][0]["index"],
+                                                                config.INDEX_CONFIG["env"]["test"]["index"]["hg38"][0]["doc_type"]))
         self.commands["es_sync_hg19_prod"] = partial(self.managers["sync_manager"].sync,"es",
-                                                target_backend=(config.ES_CONFIG["env"]["prod"]["host"],
-                                                                config.ES_CONFIG["env"]["prod"]["index"]["hg19"][0]["index"],
-                                                                config.ES_CONFIG["env"]["prod"]["index"]["hg19"][0]["doc_type"]))
+                                                target_backend=(config.INDEX_CONFIG["env"]["prod"]["host"],
+                                                                config.INDEX_CONFIG["env"]["prod"]["index"]["hg19"][0]["index"],
+                                                                config.INDEX_CONFIG["env"]["prod"]["index"]["hg19"][0]["doc_type"]))
         self.commands["es_sync_hg38_prod"] = partial(self.managers["sync_manager"].sync,"es",
-                                                target_backend=(config.ES_CONFIG["env"]["prod"]["host"],
-                                                                config.ES_CONFIG["env"]["prod"]["index"]["hg38"][0]["index"],
-                                                                config.ES_CONFIG["env"]["prod"]["index"]["hg38"][0]["doc_type"]))
-        # snapshot, diff & publish
-        self.commands["snapshot_demo"] = partial(self.managers["index_manager"].snapshot,repository=config.SNAPSHOT_REPOSITORY + "-demo")
-        # override with diff type
-        self.commands["diff_prod"] = partial(self.managers["diff_manager"].diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
-        self.commands["diff_demo"] = partial(self.managers["diff_manager"].diff,differ.SelfContainedJsonDiffer.diff_type)
-        self.commands["publish_diff_hg19"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-hg19")
-        self.commands["publish_diff_hg38"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-hg38")
-        self.commands["publish_snapshot_hg19"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-hg19")
-        self.commands["publish_snapshot_hg38"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-hg38")
-        self.commands["publish_diff_demo_hg19"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-demo_hg19",
-                                                s3_bucket=config.S3_DIFF_BUCKET + "-demo")
-        self.commands["publish_diff_demo_hg38"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-demo_hg38",
-                                                s3_bucket=config.S3_DIFF_BUCKET + "-demo")
-        self.commands["publish_snapshot_demo_hg19"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-demo_hg19",
-                                                                                        repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
-        self.commands["publish_snapshot_demo_hg38"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-demo_hg38",
-                                                                                repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
+                                                target_backend=(config.INDEX_CONFIG["env"]["prod"]["host"],
+                                                                config.INDEX_CONFIG["env"]["prod"]["index"]["hg38"][0]["index"],
+                                                                config.INDEX_CONFIG["env"]["prod"]["index"]["hg38"][0]["doc_type"]))
+        ## snapshot, diff & publish
+        #self.commands["snapshot_demo"] = partial(self.managers["index_manager"].snapshot,repository=config.SNAPSHOT_REPOSITORY + "-demo")
+        ## override with diff type
+        #self.commands["diff_prod"] = partial(self.managers["diff_manager"].diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
+        #self.commands["diff_demo"] = partial(self.managers["diff_manager"].diff,differ.SelfContainedJsonDiffer.diff_type)
+        #self.commands["publish_diff_hg19"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-hg19")
+        #self.commands["publish_diff_hg38"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-hg38")
+        #self.commands["publish_snapshot_hg19"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-hg19")
+        #self.commands["publish_snapshot_hg38"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-hg38")
+        #self.commands["publish_diff_demo_hg19"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-demo_hg19",
+        #                                        s3_bucket=config.S3_DIFF_BUCKET + "-demo")
+        #self.commands["publish_diff_demo_hg38"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-demo_hg38",
+        #                                        s3_bucket=config.S3_DIFF_BUCKET + "-demo")
+        #self.commands["publish_snapshot_demo_hg19"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-demo_hg19",
+        #                                                                                repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
+        #self.commands["publish_snapshot_demo_hg38"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-demo_hg38",
+        #                                                                        repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
 
 
 import hub.dataload
