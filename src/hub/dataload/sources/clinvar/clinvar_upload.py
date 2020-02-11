@@ -1,5 +1,4 @@
 from .clinvar_xml_parser import load_data as load_common
-import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
 
 
