@@ -743,9 +743,6 @@ class DBNSFPBaseUploader(uploader.ParallelizedSourceUploader,
                                 "type": "keyword",
                                 "normalizer": "keyword_lowercase_normalizer"
                             },
-                            "omim": {
-                                "type": "integer"
-                            },
                             "medgen": {
                                 "type": "keyword",
                                 "normalizer": "keyword_lowercase_normalizer"

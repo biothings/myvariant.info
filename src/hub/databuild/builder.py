@@ -14,14 +14,6 @@ class MyVariantDataBuilder(builder.DataBuilder):
 
     MAX_CHROM_EX = 100000 # if chrom discrepancies found, max # of examples we keep
 
-    def __init__(self, build_name, source_backend, target_backend, *args, **kwargs):
-        shared_tgt_backend = partial(ShardedTargetDocMongoBackend,
-                                     target_db=partial(mongo.get_target_db))
-        super().__init__(build_name=build_name,
-                         source_backend=source_backend,
-                         target_backend=shared_tgt_backend,
-                         *args,**kwargs)
-
     def merge(self, sources=None, target_name=None, batch_size=50000, job_manager=None, **kwargs):
         # just override default batch_size or it consumes too much mem
         return super(MyVariantDataBuilder,self).merge(
@@ -130,6 +122,16 @@ class MyVariantDataBuilder(builder.DataBuilder):
         # we overide that one just to make sure existing metadata won't be
         # overwritten by the ones coming from the base class (see root_keys in set_chrom())
         return {}
+
+class MyVariantShardedDataBuilder(MyVariantDataBuilder):
+
+    def __init__(self, build_name, source_backend, target_backend, *args, **kwargs):
+        shared_tgt_backend = partial(ShardedTargetDocMongoBackend,
+                                     target_db=partial(mongo.get_target_db))
+        super().__init__(build_name=build_name,
+                         source_backend=source_backend,
+                         target_backend=shared_tgt_backend,
+                         *args,**kwargs)
 
 
 def get_chrom(doc):

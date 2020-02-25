@@ -44,7 +44,7 @@ class BaseVariantIndexer(indexer.Indexer):
         return update_stats(idxer,assembly)
 
 
-class MyVariantIndexerManager(indexer.IndexerManager):
+class MyVariantIndexerManager(indexer.IndexManager):
 
     def post_publish(self, snapshot, index, *args, **kwargs):
         # assuming build name == index name, and assuming demo index has
