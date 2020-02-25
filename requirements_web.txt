@@ -1,8 +1,6 @@
 # biothings
-git+https://github.com/biothings/biothings.api.git@475c41cfc7f0650eb315cefe853e7a0331098517#egg=biothings
-
-# optional
-msgpack-python==0.4.6
+biothings[web_extra]==0.5.0
+gitdb2==2.0.4
 
 # for nosetests
 nose>=1.3.7
