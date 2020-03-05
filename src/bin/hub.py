@@ -146,23 +146,34 @@ class MyVariantHubServer(HubServer):
         # merge
         self.commands["premerge"] = partial(self.managers["build_manager"].merge,steps=["merge","metadata"])
         # sync
+
+        def select_index(env, asm):
+            return [idx for idx in config.INDEX_CONFIG["env"][env]["index"] if asm in idx][0]
+
+        # first test index from config
+        test_index_hg19 = select_index("test","hg19")
+        test_index_hg38 = select_index("test","hg38")
         self.commands["es_sync_hg19_test"] = partial(self.managers["sync_manager_test"].sync,"es",
                                                 target_backend=(config.INDEX_CONFIG["env"]["test"]["host"],
-                                                                config.INDEX_CONFIG["env"]["test"]["index"]["hg19"][0]["index"],
-                                                                config.INDEX_CONFIG["env"]["test"]["index"]["hg19"][0]["doc_type"]))
+                                                                test_index_hg19["index"],
+                                                                test_index_hg19["doc_type"]))
         self.commands["es_sync_hg38_test"] = partial(self.managers["sync_manager_test"].sync,"es",
                                                 target_backend=(config.INDEX_CONFIG["env"]["test"]["host"],
-                                                                config.INDEX_CONFIG["env"]["test"]["index"]["hg38"][0]["index"],
-                                                                config.INDEX_CONFIG["env"]["test"]["index"]["hg38"][0]["doc_type"]))
+                                                                test_index_hg38["index"],
+                                                                test_index_hg38["doc_type"]))
+
+        # first prod index from config
+        prod_index_hg19 = select_index("prod","hg19")
+        prod_index_hg38 = select_index("prod","hg38")
         self.commands["es_sync_hg19_prod"] = partial(self.managers["sync_manager"].sync,"es",
                                                 target_backend=(config.INDEX_CONFIG["env"]["prod"]["host"],
-                                                                config.INDEX_CONFIG["env"]["prod"]["index"]["hg19"][0]["index"],
-                                                                config.INDEX_CONFIG["env"]["prod"]["index"]["hg19"][0]["doc_type"]))
+                                                                prod_index_hg19["index"],
+                                                                prod_index_hg19["doc_type"]))
         self.commands["es_sync_hg38_prod"] = partial(self.managers["sync_manager"].sync,"es",
                                                 target_backend=(config.INDEX_CONFIG["env"]["prod"]["host"],
-                                                                config.INDEX_CONFIG["env"]["prod"]["index"]["hg38"][0]["index"],
-                                                                config.INDEX_CONFIG["env"]["prod"]["index"]["hg38"][0]["doc_type"]))
-        ## snapshot, diff & publish
+                                                                prod_index_hg38["index"],
+                                                                prod_index_hg38["doc_type"]))
+        # snapshot, diff & publish
         #self.commands["snapshot_demo"] = partial(self.managers["index_manager"].snapshot,repository=config.SNAPSHOT_REPOSITORY + "-demo")
         ## override with diff type
         #self.commands["diff_prod"] = partial(self.managers["diff_manager"].diff,differ.ColdHotSelfContainedJsonDiffer.diff_type)
