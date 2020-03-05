@@ -85,11 +85,11 @@ INDEX_CONFIG = {
                         "max_retries" : 10,
                         },
                     },
-                "index" : {
+                "index" : [
                     # keys match build_config_key value
-                    "hg19" : [{"index": "myvariant_current_hg19", "doc_type": "variant"}],
-                    "hg38" : [{"index": "myvariant_current_hg38", "doc_type": "variant"}],
-                    },
+                    {"index": "myvariant_current_hg19", "doc_type": "variant", "hg19": True},
+                    {"index": "myvariant_current_hg38", "doc_type": "variant", "hg38": True},
+                    ],
                 },
             "test" : {
                 "host" : "localhost:9200",
@@ -100,10 +100,11 @@ INDEX_CONFIG = {
                         "max_retries" : 10,
                         },
                     },
-                "index" : {
-                    "hg19" : [{"index": "myvariant_current_hg19", "doc_type": "variant"}],
-                    "hg38" : [{"index": "myvariant_current_hg38", "doc_type": "variant"}],
-                    },
+                "index" : [
+                    # "hg19/hg38" are flags used to filter compatible index from the UI
+                    {"index": "myvariant_current_hg19", "doc_type": "variant", "hg19": True},
+                    {"index": "myvariant_current_hg38", "doc_type": "variant", "hg38": True},
+                    ],
                 },
             },
         }
