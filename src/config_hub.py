@@ -2,6 +2,7 @@
 # HUB VARS  #
 # ######### #
 import os
+import copy
 
 DATA_HUB_DB_DATABASE = "variant_hubdb"     # db containing the following (internal use)
 DATA_SRC_MASTER_COLLECTION = 'src_master'  # for metadata of each src collections
@@ -119,7 +120,7 @@ SNAPSHOT_CONFIG = {
                     "secret_key" : None,
                     },
                 "repository" : {
-                    "name" : "variant_repository",
+                    "name" : "variant_repository-$(Y)",
                     "type" : "s3",
                     "settings" : {
                         "bucket" : "<SNAPSHOT_BUCKET_NAME>",
@@ -143,7 +144,7 @@ SNAPSHOT_CONFIG = {
                     "secret_key" : None,
                     },
                 "repository" : {
-                    "name" : "variant_repository-demo",
+                    "name" : "variant_repository-demo-$(Y)",
                     "type" : "s3",
                     "settings" : {
                         "bucket" : "<SNAPSHOT_DEMO_BUCKET_NAME>",
@@ -167,7 +168,7 @@ SNAPSHOT_CONFIG = {
 # Each root keys define a release environment (test, prod, ...)
 RELEASE_CONFIG = {
         "env" : {
-            "prod" : {
+            "prod-hg19" : {
                 "cloud" : {
                     "type" : "aws", # default, only one supported by now
                     "access_key" : None,
@@ -176,17 +177,17 @@ RELEASE_CONFIG = {
                 "release" : {
                     "bucket" : "<RELEASES_BUCKET_NAME>",
                     "region" : "us-west-2",
-                    "folder" : "myvariant.info",
+                    "folder" : "myvariant.info-hg19",
                     "auto" : True, # automatically generate release-note ?
                     },
                 "diff" : {
                     "bucket" : "<DIFFS_BUCKET_NAME>",
-                    "folder" : "myvariant.info",
+                    "folder" : "myvariant.info-hg19",
                     "region" : "us-west-2",
                     "auto" : True, # automatically generate diff ? Careful if lots of changes
                     },
                 },
-            "demo": {
+            "demo-hg19": {
                 "cloud" : {
                     "type" : "aws", # default, only one supported by now
                     "access_key" : None,
@@ -195,18 +196,30 @@ RELEASE_CONFIG = {
                 "release" : {
                     "bucket" : "<RELEASES_BUCKET_NAME>",
                     "region" : "us-west-2",
-                    "folder" : "myvariant.info-demo",
+                    "folder" : "myvariant.info-demo_hg19",
                     "auto" : True, # automatically generate release-note ?
                     },
                 "diff" : {
                     "bucket" : "<DIFFS_BUCKET_NAME>",
-                    "folder" : "myvariant.info",
+                    "folder" : "myvariant.info-demo_hg19",
                     "region" : "us-west-2",
                     "auto" : True, # automatically generate diff ? Careful if lots of changes
                     },
                 }
             }
         }
+
+
+# fir hg38 it's almost the same
+# prod
+RELEASE_CONFIG["env"]["prod-hg38"] = copy.deepcopy(RELEASE_CONFIG["env"]["prod-hg19"])
+RELEASE_CONFIG["env"]["prod-hg38"]["release"]["folder"] = "myvariant.info-hg38"
+RELEASE_CONFIG["env"]["prod-hg38"]["diff"]["folder"] = "myvariant.info-hg38"
+# demo
+RELEASE_CONFIG["env"]["demo-hg38"] = copy.deepcopy(RELEASE_CONFIG["env"]["demo-hg19"])
+RELEASE_CONFIG["env"]["demo-hg38"]["release"]["folder"] = "myvariant.info-demo_hg38"
+RELEASE_CONFIG["env"]["demo-hg38"]["diff"]["folder"] = "myvariant.info-demo_hg38"
+
 
 SLACK_WEBHOOK = None
 
