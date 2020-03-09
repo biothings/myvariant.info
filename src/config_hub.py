@@ -92,7 +92,7 @@ INDEX_CONFIG = {
                     {"index": "myvariant_current_hg38", "doc_type": "variant", "hg38": True},
                     ],
                 },
-            "test" : {
+            "local" : {
                 "host" : "localhost:9200",
                 "indexer" : {
                     "args" : {
@@ -131,7 +131,7 @@ SNAPSHOT_CONFIG = {
                     },
                 "indexer" : {
                     # reference to INDEX_CONFIG
-                    "env" : "prod",
+                    "env" : "local",
                     },
                 # when creating a snapshot, how long should we wait before querying ES
                 # to check snapshot status/completion ? (in seconds)
@@ -155,7 +155,7 @@ SNAPSHOT_CONFIG = {
                     },
                 "indexer" : {
                     # reference to INDEX_CONFIG
-                    "env" : "test",
+                    "env" : "local",
                     },
                 # when creating a snapshot, how long should we wait before querying ES
                 # to check snapshot status/completion ? (in seconds)
