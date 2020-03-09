@@ -151,14 +151,14 @@ class MyVariantHubServer(HubServer):
             return [idx for idx in config.INDEX_CONFIG["env"][env]["index"] if asm in idx][0]
 
         # first test index from config
-        test_index_hg19 = select_index("test","hg19")
-        test_index_hg38 = select_index("test","hg38")
+        test_index_hg19 = select_index("local","hg19")
+        test_index_hg38 = select_index("local","hg38")
         self.commands["es_sync_hg19_test"] = partial(self.managers["sync_manager_test"].sync,"es",
-                                                target_backend=(config.INDEX_CONFIG["env"]["test"]["host"],
+                                                target_backend=(config.INDEX_CONFIG["env"]["local"]["host"],
                                                                 test_index_hg19["index"],
                                                                 test_index_hg19["doc_type"]))
         self.commands["es_sync_hg38_test"] = partial(self.managers["sync_manager_test"].sync,"es",
-                                                target_backend=(config.INDEX_CONFIG["env"]["test"]["host"],
+                                                target_backend=(config.INDEX_CONFIG["env"]["local"]["host"],
                                                                 test_index_hg38["index"],
                                                                 test_index_hg38["doc_type"]))
 
