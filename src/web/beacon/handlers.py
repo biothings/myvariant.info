@@ -1,5 +1,5 @@
 import sys
-from biothings.web.api.helper import BaseHandler
+from biothings.web.handlers import BaseHandler
 from biothings.utils.common import dotdict
 from web.api.transform import ESResultTransformer
 #import logging
