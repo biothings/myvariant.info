@@ -35,11 +35,10 @@ class MVQueryBuilder(ESQueryBuilder):
             search = AsyncSearch()
             if match['query']:
                 search = search.query("query_string", query=match['query'])
-            else:
-                search = search.query('match', chrom=match['chr'])
-                assembly = 'hg38' if options.biothing_type == 'hg38' else 'hg19'
-                search = search.query('range', **{assembly + ".start": {"lte": match['gend']}})
-                search = search.query('range', **{assembly + ".end": {"gte": match['gstart']}})
+            search = search.filter('match', chrom=match['chr'])
+            assembly = 'hg38' if options.assembly == 'hg38' else 'hg19'
+            search = search.filter('range', **{assembly + ".start": {"lte": match['gend']}})
+            search = search.filter('range', **{assembly + ".end": {"gte": match['gstart']}})
 
         else:  # default query
             search = AsyncSearch().query("query_string", query=q)
