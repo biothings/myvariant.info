@@ -10,7 +10,7 @@ from biothings.tests.web import BiothingsTestCase
 class TestMyvariant(BiothingsTestCase):
 
     def check_index_count(self, assembly):
-        meta = self.request("metadata?assembly=%s" % assembly).json()
+        meta = self.request(f"{assembly}/metadata").json()
         results = {}
         for src_name in meta["src"]:
             if src_name == "snpeff":

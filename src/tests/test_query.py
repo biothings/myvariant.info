@@ -20,10 +20,10 @@ class TestMyvariant(BiothingsTestCase):
 
     def test_101_query_exists_(self):
         # check if gnomad_exome.hom field exists
-        self.query(q='_exists_:gnomad_exome.hom&fields=gnomad_exome.hom')
+        self.query(q='_exists_:gnomad_exome.hom', fields='gnomad_exome.hom')
 
     def test_102_query_exists_(self):
-        self.query(q='_exists_:gnomad_genome.hom&fields=gnomad_genome.hom')
+        self.query(q='_exists_:gnomad_genome.hom', fields='gnomad_genome.hom')
 
     def test_110_query_exists_(self):
         # TODO: The following tests are commented out because dbnsfp mapping file is not updated
@@ -66,8 +66,7 @@ class TestMyvariant(BiothingsTestCase):
         self.query(q='snpeff.ann.genename:BTK', morethan=8000)
 
     def test_130_query(self):
-        self.query(q=
-            '_exists_:wellderly%20AND%20cadd.polyphen.cat:possibly_damaging&fields=wellderly,cadd.polyphen')
+        self.query(q='_exists_:wellderly AND cadd.polyphen.cat:possibly_damaging', fields='wellderly,cadd.polyphen')
 
     def test_131_query_jsonld(self):
         con = self.request("query?q=rs58991260&callback=mycallback").content
@@ -123,10 +122,10 @@ class TestMyvariant(BiothingsTestCase):
         self.query(q='chr11:45891937')
 
     def test_162_query_interval(self):
-        self.query(q='chr11:45891937&assembly=hg19')
+        self.query(q='chr11:45891937', assembly='hg19')
 
     def test_163_query_interval(self):
-        self.query(q='chr6:128883143&assembly=hg38')
+        self.query(q='chr6:128883143', assembly='hg38')
 
     def test_170_query_size(self):
         res = self.request('query?q=t*').json()
@@ -261,8 +260,7 @@ class TestMyvariant(BiothingsTestCase):
         #assert 'ann' in res[1]['snpeff'] and '@context' in res[1]['snpeff']['ann'][0]
 
     def test_230_assembly(self):
-        res = self.request(
-            'query?q=clinvar.ref:C%20AND%20chr11:56319006%20AND%20clinvar.alt:A&assembly=hg38').json()
+        res = self.query(q='clinvar.ref:C AND chr11:56319006 AND clinvar.alt:A', assembly='hg38')
         assert res["hits"][0]["_id"] == "chr11:g.56319006C>A"
 
     def test_240_HGVS_redirect(self):
