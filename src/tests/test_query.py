@@ -69,8 +69,9 @@ class TestMyvariant(BiothingsTestCase):
         self.query(q='_exists_:wellderly AND cadd.polyphen.cat:possibly_damaging', fields='wellderly,cadd.polyphen')
 
     def test_131_query_jsonld(self):
-        con = self.request("query?q=rs58991260&callback=mycallback").content
-        assert con.startswith('mycallback('.encode('utf-8'))
+        pass # feature removed in biothings 0.7.0
+        # con = self.request("query?q=rs58991260&callback=mycallback").content
+        # assert con.startswith('mycallback('.encode('utf-8'))
 
     def test_141_query_invalid(self):
         # testing non-ascii character
@@ -198,10 +199,6 @@ class TestMyvariant(BiothingsTestCase):
         res2 = self.msgpack_ok(self.request("query?q=rs2500&format=msgpack").content)
         assert res, res2
 
-        res = self.request('metadata').json()
-        res2 = self.msgpack_ok(self.request("metadata?format=msgpack").content)
-        assert res, res2
-
     # Too slow
     def test_210_licenses(self):
         # cadd license
@@ -220,44 +217,45 @@ class TestMyvariant(BiothingsTestCase):
             assert res['snpeff']['_license']
 
     def test_220_jsonld(self):
-        res = self.request('variant/chr8:g.19813529A>G?jsonld=true').json()
-        assert '@context' in res
-        assert '@id' in res
+        pass # feature removed in biothings 0.7.0
+        # res = self.request('variant/chr8:g.19813529A>G?jsonld=true').json()
+        # assert '@context' in res
+        # assert '@id' in res
 
-        # Check some subfields - INVALIDATED BY NEW JSON-LD STRUCTURE
-        #assert 'snpeff' in res and '@context' in res['snpeff']
+        # # Check some subfields - INVALIDATED BY NEW JSON-LD STRUCTURE
+        # #assert 'snpeff' in res and '@context' in res['snpeff']
 
-        #assert 'ann' in res['snpeff'] and '@context' in res['snpeff']['ann'][0]
+        # #assert 'ann' in res['snpeff'] and '@context' in res['snpeff']['ann'][0]
 
-        # Check a post with jsonld
-        res = self.request(
-            "variant", method='POST',
-            data={'ids': 'chr16:g.28883241A>G, chr8:g.19813529A>G', 'jsonld': 'true'}).json()
-        for r in res:
-            assert '@context' in r
-            assert '@id' in r
+        # # Check a post with jsonld
+        # res = self.request(
+        #     "variant", method='POST',
+        #     data={'ids': 'chr16:g.28883241A>G, chr8:g.19813529A>G', 'jsonld': 'true'}).json()
+        # for r in res:
+        #     assert '@context' in r
+        #     assert '@id' in r
 
-        # Check a query get with jsonld
-        res = self.request('query?q=_exists_:clinvar&fields=clinvar&size=1&jsonld=true').json()
+        # # Check a query get with jsonld
+        # res = self.request('query?q=_exists_:clinvar&fields=clinvar&size=1&jsonld=true').json()
 
-        assert '@context' in res['hits'][0]
-        assert '@id' in res['hits'][0]
+        # assert '@context' in res['hits'][0]
+        # assert '@id' in res['hits'][0]
 
-        # subfields
-        #assert 'clinvar' in res['hits'][0] and '@context' in res['hits'][0]['clinvar']
-        # TODO: fix test
-        #assert 'gene' in res['hits'][0]['clinvar'] and '@context' in res['hits'][0]['clinvar']['gene']
+        # # subfields
+        # #assert 'clinvar' in res['hits'][0] and '@context' in res['hits'][0]['clinvar']
+        # # TODO: fix test
+        # #assert 'gene' in res['hits'][0]['clinvar'] and '@context' in res['hits'][0]['clinvar']['gene']
 
-        # Check query post with jsonld
-        res = self.request("query", method='POST', data={'q': 'rs58991260,rs268',
-                                                              'scopes': 'dbsnp.rsid',
-                                                              'jsonld': 'true'}).json()
+        # # Check query post with jsonld
+        # res = self.request("query", method='POST', data={'q': 'rs58991260,rs268',
+        #                                                       'scopes': 'dbsnp.rsid',
+        #                                                       'jsonld': 'true'}).json()
 
-        assert len(res) == 2
-        assert '@context' in res[0] and '@context' in res[1]
-        assert '@id' in res[0] and '@id' in res[1]
-        #assert 'snpeff' in res[1] and '@context' in res[1]['snpeff']
-        #assert 'ann' in res[1]['snpeff'] and '@context' in res[1]['snpeff']['ann'][0]
+        # assert len(res) == 2
+        # assert '@context' in res[0] and '@context' in res[1]
+        # assert '@id' in res[0] and '@id' in res[1]
+        # #assert 'snpeff' in res[1] and '@context' in res[1]['snpeff']
+        # #assert 'ann' in res[1]['snpeff'] and '@context' in res[1]['snpeff']['ann'][0]
 
     def test_230_assembly(self):
         res = self.query(q='clinvar.ref:C AND chr11:56319006 AND clinvar.alt:A', assembly='hg38')
