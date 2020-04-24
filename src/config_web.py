@@ -54,10 +54,13 @@ STATUS_CHECK = {
     'doc_type': 'variant'
 }
 
-# Allow searching by other ids with annotation endpoint
+# *****************************************************************************
+# User Input Control
+# *****************************************************************************
 ANNOTATION_ID_REGEX_LIST = [(re.compile(r'rs[0-9]+', re.I), 'dbsnp.rsid'),
                             (re.compile(r'rcv[0-9\.]+', re.I), 'clinvar.rcv.accession'),
                             (re.compile(r'var_[0-9]+', re.I), 'uniprot.humsavar.ftid')]
+ANNOTATION_DEFAULT_SCOPES = ['_id', 'clingen.caid']
 
 # typedef for assembly parameter
 ASSEMBLY_TYPEDEF = {'assembly': {'type': str, 'default': 'hg19', 'enum': ('hg19', 'hg38')}}
