@@ -81,6 +81,12 @@ class TestMyvariant(BiothingsTestCase):
     def test_142_query_invalid(self):
         self.request("query", expect=400)
 
+    def test_143_clingen(self):
+        self.request("variant/CA9996207?assembly=hg38")
+        
+    def test_144_clingen(self):
+        self.request("hg38/CA9996207")
+
     def test_150_query_post(self):
         # /query via post
         self.request("query", method='POST', data={'q': 'rs58991260'}).json()
