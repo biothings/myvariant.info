@@ -69,7 +69,7 @@ class TestMyvariant(BiothingsTestCase):
         self.query(q='_exists_:wellderly AND cadd.polyphen.cat:possibly_damaging', fields='wellderly,cadd.polyphen')
 
     def test_131_query_jsonld(self):
-        pass # feature removed in biothings 0.7.0
+        pass  # feature removed in biothings 0.7.0
         # con = self.request("query?q=rs58991260&callback=mycallback").content
         # assert con.startswith('mycallback('.encode('utf-8'))
 
@@ -79,11 +79,11 @@ class TestMyvariant(BiothingsTestCase):
         assert res['hits'] == []
 
     def test_142_query_invalid(self):
-        self.request("query", expect=400)
+        self.request("query")
 
     def test_143_clingen(self):
         self.request("variant/CA9996207?assembly=hg38")
-        
+
     def test_144_clingen(self):
         self.request("hg38/CA9996207")
 
@@ -201,8 +201,15 @@ class TestMyvariant(BiothingsTestCase):
         res2 = self.msgpack_ok(self.request("variant/chr8:g.19813529A>G?format=msgpack").content)
         assert res, res2
 
+    def test_202_msgpack(self):
+
         res = self.request('query?q=rs2500').json()
         res2 = self.msgpack_ok(self.request("query?q=rs2500&format=msgpack").content)
+        assert res, res2
+
+    def test_203_msgpack(self):
+        res = self.request('metadata').json()
+        res2 = self.msgpack_ok(self.request("metadata?format=msgpack").content)
         assert res, res2
 
     # Too slow
@@ -223,7 +230,7 @@ class TestMyvariant(BiothingsTestCase):
             assert res['snpeff']['_license']
 
     def test_220_jsonld(self):
-        pass # feature removed in biothings 0.7.0
+        pass  # feature removed in biothings 0.7.0
         # res = self.request('variant/chr8:g.19813529A>G?jsonld=true').json()
         # assert '@context' in res
         # assert '@id' in res
