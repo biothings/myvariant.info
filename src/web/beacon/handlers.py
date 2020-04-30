@@ -1,7 +1,7 @@
 import sys
 
-from biothings.web.api.handler import BaseAPIHandler
-from biothings.web.api.es.handlers import BaseESRequestHandler
+from biothings.web.handlers import BaseAPIHandler
+from biothings.web.handlers import BaseESRequestHandler
 from biothings.utils.common import dotdict
 
 

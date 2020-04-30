@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-from biothings.web.settings.default import *
+import copy
+import re
 
+from biothings.web.settings.default import (ANNOTATION_KWARGS, APP_LIST,
+                                            QUERY_KWARGS)
 
 # *****************************************************************************
 # Elasticsearch variables
@@ -23,8 +26,8 @@ APP_LIST = [
 # *****************************************************************************
 # ES Query Pipeline
 # *****************************************************************************
-ES_QUERY_BUILDER = 'web.pipelines.MVQueryBuilder'
-ES_QUERY_BACKEND = 'web.pipelines.MVQueryBackend'
+ES_QUERY_BUILDER = 'web.pipeline.MVQueryBuilder'
+ES_QUERY_BACKEND = 'web.pipeline.MVQueryBackend'
 
 # *****************************************************************************
 # Analytics & Tracking
@@ -63,24 +66,16 @@ ANNOTATION_ID_REGEX_LIST = [(re.compile(r'rs[0-9]+', re.I), 'dbsnp.rsid'),
 ANNOTATION_DEFAULT_SCOPES = ['_id', 'clingen.caid']
 
 # typedef for assembly parameter
-ASSEMBLY_TYPEDEF = {'assembly': {'type': str, 'default': 'hg19', 'enum': ('hg19', 'hg38')}}
+ASSEMBLY_TYPEDEF = {'assembly': {'type': str, 'default': 'hg19', 'enum': ('hg19', 'hg38'), 'group':('esqb', 'es')}}
 
+ANNOTATION_KWARGS = copy.deepcopy(ANNOTATION_KWARGS)
+ANNOTATION_KWARGS['*'].update(ASSEMBLY_TYPEDEF)
 
-ANNOTATION_GET_ES_KWARGS = dict(ASSEMBLY_TYPEDEF)
-ANNOTATION_POST_ES_KWARGS = dict(ASSEMBLY_TYPEDEF)
-QUERY_GET_ES_KWARGS.update(ASSEMBLY_TYPEDEF)
-QUERY_POST_ES_KWARGS = dict(ASSEMBLY_TYPEDEF)
-
-ANNOTATION_GET_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
-ANNOTATION_POST_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
-QUERY_GET_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
-QUERY_POST_ESQB_KWARGS.update(ASSEMBLY_TYPEDEF)
+QUERY_KWARGS = copy.deepcopy(QUERY_KWARGS)
+QUERY_KWARGS['*'].update(ASSEMBLY_TYPEDEF)
 
 LICENSE_TRANSFORM = {
     "exac_nontcga": "exac",
     "gnomad_exome": "gnomad",
     "gnomad_genome": "gnomad"
 }
-
-JSONLD_CONTEXT_PATH = 'web/context/context.json'
-AVAILABLE_FIELDS_NOTES_PATH = 'web/context/myvariant_field_table_notes.json'

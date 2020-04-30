@@ -1,7 +1,7 @@
 import re
 
 from biothings.utils.web.es_dsl import AsyncSearch
-from biothings.web.api.es.pipelines import ESQueryBuilder, ESQueryBackend
+from biothings.web.pipeline import ESQueryBuilder, ESQueryBackend
 
 
 INTERVAL_PATTERN = re.compile(r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>[1-9xXyYmM][0-9tT]?):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*')
