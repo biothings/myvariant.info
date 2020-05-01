@@ -2,6 +2,7 @@
     MyVariant Data-Aware Tests
 '''
 import os
+import time
 from pprint import pformat
 
 from biothings.tests.web import BiothingsTestCase
@@ -10,6 +11,10 @@ from biothings.tests.web import BiothingsTestCase
 class TestMyvariant(BiothingsTestCase):
 
     def check_index_count(self, assembly):
+        # when run individually
+        # it's possible there's not enough time to populate the metadata
+        # before it is accessed
+        # need a workaround #TODO
         meta = self.request(f"{assembly}/metadata").json()
         results = {}
         for src_name in meta["src"]:
