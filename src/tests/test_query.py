@@ -292,3 +292,24 @@ class TestMyvariant(BiothingsTestCase):
         assert "_seqhashed_" in res["hits"][0]["_id"]
         h = res["hits"][0]["_id"].split("_seqhashed_")[-1]
         assert h in res["hits"][0]["_seqhashed"]
+
+    def test_250_nested_match(self):
+        payload = {
+            "q": [["CDK2", "c.314A>T"]],
+            "scopes": [["dbsnp.gene.symbol", "snpeff.ann.genename"], "snpeff.ann.hgvs_c"]
+        }
+        ans = self.query(method='POST', json=payload)
+        assert ans[0]["_id"] == "chr12:g.56361952A>T"
+        assert ans[1]["_id"] == "chr12:g.56362638A>T"
+
+    def test_251_nested_match(self):
+        payload = {
+            "q": [["CDK2", "c.314A>T"], ["CXCR4", "c.535G>C"]],
+            "scopes": [["dbsnp.gene.symbol", "snpeff.ann.genename"], "snpeff.ann.hgvs_c"],
+            "fields": ["dbsnp.gene.symbol", "snpeff.ann.genename", "snpeff.ann.hgvs_c"]
+        }
+        ans = self.query(method='POST', json=payload)
+        assert ans[0]["_id"] == "chr12:g.56361952A>T"
+        assert ans[1]["_id"] == "chr12:g.56362638A>T"
+        assert ans[2]["_id"] == "chr2:g.136872975C>G"
+        assert ans[3]["_id"] == "chr2:g.136872963C>G"
