@@ -226,6 +226,7 @@ SLACK_WEBHOOK = None
 # SSH port for hub console
 HUB_SSH_PORT = 7022
 HUB_API_PORT = 7080
+READONLY_HUB_API_PORT = 7081
 
 ################################################################################
 # HUB_PASSWD
@@ -237,8 +238,37 @@ HUB_PASSWD = {"guest":"9RKfd8gDuNf0Q"}
 # cached data (it None, caches won't be used at all)
 CACHE_FOLDER = None
 
+# Autohub configuration
+STANDALONE_AWS_CREDENTIALS = {
+    "AWS_ACCESS_KEY_ID": "",
+    "AWS_SECRET_ACCESS_KEY": ""
+}
+
 # when publishing releases, specify the targetted (ie. required) standalone version
-STANDALONE_VERSION = "standalone_v3"
+STANDALONE_VERSION = {"branch": "standalone_v3"}                                                                                                                                                                                                                                
+
+# Autohub configuration, either from a static definition...
+STANDALONE_CONFIG = { 
+    "_default": {
+        "es_host": "localhost:9200",
+        "index": "myvariant_test",
+        "doc_type": "variant"
+    },  
+    "myvariant.info-hg19": {
+        "es_host": "prodserver:9200",
+        "index": "myvariant_prod_hg19",
+        "doc_type": "variant"
+    },  
+    "myvariant.info-hg38": {
+        "es_host": "prodserver:9200",
+        "index": "myvariant_prod_hg38",
+        "doc_type": "variant"
+    },  
+}
+# ... or using a dynamic indexer factory and ES host (index names are then
+# taken from VERSION_URLS and all are managed on one given ES host)
+#AUTOHUB_INDEXER_FACTORY = "biothings.hub.dataindex.indexer.DynamicIndexerFactory"
+#AUTOHUB_ES_HOST = "localhost:9200"
 
 import logging
 from biothings.utils.loggers import setup_default_log
