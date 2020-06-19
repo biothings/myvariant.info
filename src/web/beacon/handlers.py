@@ -86,7 +86,7 @@ class BeaconHandler(BaseESRequestHandler):
                     body={"query": {"query_string": {"query": q}}},
                     _source=[dataset]
                 )
-                res = self.query_transform.transform(res, dotdict(dotfield=True))
+                res = self.result_transform.transform(res, dotdict(dotfield=True))
                 if res and res.get('total') > 0:
                     out = self.format_output(res, out, q_type)
 
@@ -149,11 +149,11 @@ class BeaconInfoHandler(BaseAPIHandler):
 
     def get(self):
         self.get_beacon_info()
-        self.ga_event_object_ret['action'] = 'beacon_info_post'
+        self.event['action'] = 'beacon_info_post'
 
     def post(self):
         self.get_beacon_info()
-        self.ga_event_object_ret['action'] = 'beacon_info_post'
+        self.event['action'] = 'beacon_info_post'
 
     def get_beacon_info(self):
         # Boilerplate Beacon Info
