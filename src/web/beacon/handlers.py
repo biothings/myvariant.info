@@ -86,7 +86,7 @@ class BeaconHandler(BaseESRequestHandler):
                     body={"query": {"query_string": {"query": q}}},
                     _source=[dataset]
                 )
-                res = self.query_transform.transform(res, dotdict(dotfield=True))
+                res = self.result_transform.transform(res, dotdict(dotfield=True))
                 if res and res.get('total') > 0:
                     out = self.format_output(res, out, q_type)
 
