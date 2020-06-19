@@ -6,6 +6,7 @@ from biothings.utils.common import dotdict
 
 
 class BeaconHandler(BaseESRequestHandler):
+    name = 'beacon'
     # Initialize Assembly and Datasets
     assembly_keys = {'NCBI36': 'hg18', 'GRCh37': 'hg19', 'GRCh38': 'hg38'}
     pos_dbs = ['exac', 'cadd']  # These are hg19 ONLY
@@ -13,11 +14,11 @@ class BeaconHandler(BaseESRequestHandler):
 
     def post(self, src=None):
         self.receive_data()
-        self.ga_event_object_ret['action'] = 'beacon_post'
+        self.event['action'] = 'beacon_post'
 
     def get(self, src=None):
         self.receive_data()
-        self.ga_event_object_ret['action'] = 'beacon_get'
+        self.event['action'] = 'beacon_get'
 
     def receive_data(self):
         chrom = self.get_argument('referenceName', None)
