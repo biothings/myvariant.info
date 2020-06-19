@@ -149,11 +149,11 @@ class BeaconInfoHandler(BaseAPIHandler):
 
     def get(self):
         self.get_beacon_info()
-        self.ga_event_object_ret['action'] = 'beacon_info_post'
+        self.event['action'] = 'beacon_info_post'
 
     def post(self):
         self.get_beacon_info()
-        self.ga_event_object_ret['action'] = 'beacon_info_post'
+        self.event['action'] = 'beacon_info_post'
 
     def get_beacon_info(self):
         # Boilerplate Beacon Info
