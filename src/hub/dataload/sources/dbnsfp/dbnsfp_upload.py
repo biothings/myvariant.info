@@ -681,6 +681,34 @@ class DBNSFPBaseUploader(uploader.ParallelizedSourceUploader,
                             }
                         }
                     },
+                    "clinpred": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "list-s2s": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
                     "metalr": {
                         "properties": {
                             "score": {
