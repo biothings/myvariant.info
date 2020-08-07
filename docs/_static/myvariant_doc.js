@@ -87,8 +87,7 @@ jQuery(document).ready(function () {
                         });
                         jQuery.ajax({
                             url: "//myvariant.info/v1/metadata/fields",
-                            dataType: "JSONP",
-                            jsonpCallback: "callback",
+                            dataType: "json",
                             type: "GET",
                             success: function (hg19_data) {
                                 var allFields = {}
@@ -98,8 +97,7 @@ jQuery(document).ready(function () {
                                 });
                                 jQuery.ajax({
                                     url: "//myvariant.info/v1/metadata/fields?assembly=hg38",
-                                    dataType: "JSONP",
-                                    jsonpCallback: "callback",
+                                    dataType: "json",
                                     type: "GET",
                                     success: function (hg38_data) {
                                         jQuery.each(hg38_data, function (field, d) {
