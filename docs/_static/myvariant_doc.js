@@ -10,8 +10,7 @@ jQuery(document).ready(function () {
         // get the hg19 metadata information
         jQuery.ajax({
             url: "//myvariant.info/v1/metadata",
-            dataType: "JSONP",
-            jsonpCallback: "callback",
+            dataType: "json",
             type: "GET",
             success: function (data) {
                 // Set the total number of variants
