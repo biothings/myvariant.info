@@ -8,7 +8,7 @@ from biothings.web.settings.default import (ANNOTATION_KWARGS, APP_LIST,
 # *****************************************************************************
 # Elasticsearch variables
 # *****************************************************************************
-ES_HOST = 'localhost:9200'
+ES_HOST = 'es6.biothings.io:9200'
 ES_INDEX = 'myvariant_current_hg19'
 ES_DOC_TYPE = 'variant'
 ES_INDICES = {
