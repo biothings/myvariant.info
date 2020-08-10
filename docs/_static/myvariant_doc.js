@@ -10,8 +10,7 @@ jQuery(document).ready(function () {
         // get the hg19 metadata information
         jQuery.ajax({
             url: "//myvariant.info/v1/metadata",
-            dataType: "JSONP",
-            jsonpCallback: "callback",
+            dataType: "json",
             type: "GET",
             success: function (data) {
                 // Set the total number of variants
@@ -50,8 +49,7 @@ jQuery(document).ready(function () {
                 // get the hg38 metadata information
                 jQuery.ajax({
                     url: "//myvariant.info/v1/metadata?assembly=hg38",
-                    dataType: "JSONP",
-                    jsonpCallback: "callback",
+                    dataType: "json",
                     type: "GET",
                     success: function (data) {
                         // Set the total number of variants
@@ -89,8 +87,7 @@ jQuery(document).ready(function () {
                         });
                         jQuery.ajax({
                             url: "//myvariant.info/v1/metadata/fields",
-                            dataType: "JSONP",
-                            jsonpCallback: "callback",
+                            dataType: "json",
                             type: "GET",
                             success: function (hg19_data) {
                                 var allFields = {}
@@ -100,8 +97,7 @@ jQuery(document).ready(function () {
                                 });
                                 jQuery.ajax({
                                     url: "//myvariant.info/v1/metadata/fields?assembly=hg38",
-                                    dataType: "JSONP",
-                                    jsonpCallback: "callback",
+                                    dataType: "json",
                                     type: "GET",
                                     success: function (hg38_data) {
                                         jQuery.each(hg38_data, function (field, d) {

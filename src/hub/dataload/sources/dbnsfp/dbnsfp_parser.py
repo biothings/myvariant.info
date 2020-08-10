@@ -3,9 +3,9 @@ import glob
 from biothings.utils.dataload import list_split, dict_sweep, unlist, value_convert_to_number
 from biothings.utils.common import anyfile
 
-VALID_COLUMN_NO = 376
+VALID_COLUMN_NO = 367
 
-'''this parser is for dbNSFP v3.5a beta2 downloaded from
+'''this parser is for dbNSFP v4.1a downloaded from
 https://sites.google.com/site/jpopgen/dbNSFP'''
 
 # convert one snp to json
@@ -41,8 +41,8 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
     else:
         freq = siphy_29way_pi.split(":")
         siphy = {'a': freq[0], 'c': freq[1], 'g': freq[2], 't': freq[3]}
-    gtex_gene = df["GTEx_V7_gene"].split('|')
-    gtex_tissue = df["GTEx_V7_tissue"].split('|')
+    gtex_gene = df["GTEx_V8_gene"].split('|')
+    gtex_tissue = df["GTEx_V8_tissue"].split('|')
     gtex = map(dict, map(lambda t: zip(('gene', 'tissue'), t), zip(gtex_gene, gtex_tissue)))
     acc = df["Uniprot_acc"].rstrip().rstrip(';').split(";")
     entry = df["Uniprot_entry"].rstrip().rstrip(';').split(";")
@@ -202,6 +202,10 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "afr_af": df["gnomAD_genomes_AFR_AF"],
                 "afr_an": df["gnomAD_genomes_AFR_AN"],
                 "afr_nhomalt": df["gnomAD_genomes_AFR_nhomalt"],
+                "ami_ac": df["gnomAD_genomes_AMI_AC"],
+                "ami_an": df["gnomAD_genomes_AMI_AN"],
+                "ami_af": df["gnomAD_genomes_AMI_AF"],
+                "ami_nhomalt": df["gnomAD_genomes_AMI_nhomalt"],
                 "amr_ac": df["gnomAD_genomes_AMR_AC"],
                 "amr_an": df["gnomAD_genomes_AMR_AN"],
                 "amr_af": df["gnomAD_genomes_AMR_AF"],
@@ -226,41 +230,6 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "popmax_af": df["gnomAD_genomes_POPMAX_AF"],
                 "popmax_an": df["gnomAD_genomes_POPMAX_AN"],
                 "popmax_nhomalt": df["gnomAD_genomes_POPMAX_nhomalt"]
-            },
-            "gnomad_genomes_controls": {
-                "nhomalt": df["gnomAD_genomes_controls_nhomalt"],
-                "ac": df["gnomAD_genomes_controls_AC"],
-                "an": df["gnomAD_genomes_controls_AN"],
-                "af": df["gnomAD_genomes_controls_AF"],
-                "nhomalt": df["gnomAD_genomes_controls_nhomalt"],
-                "afr_ac": df["gnomAD_genomes_controls_AFR_AC"],
-                "afr_af": df["gnomAD_genomes_controls_AFR_AF"],
-                "afr_an": df["gnomAD_genomes_controls_AFR_AN"],
-                "afr_nhomalt": df["gnomAD_genomes_controls_AFR_nhomalt"],
-                "amr_ac": df["gnomAD_genomes_controls_AMR_AC"],
-                "amr_an": df["gnomAD_genomes_controls_AMR_AN"],
-                "amr_af": df["gnomAD_genomes_controls_AMR_AF"],
-                "amr_nhomalt": df["gnomAD_genomes_controls_AMR_nhomalt"],
-                "asj_ac": df["gnomAD_genomes_controls_ASJ_AC"],
-                "asj_an": df["gnomAD_genomes_controls_ASJ_AN"],
-                "asj_af": df["gnomAD_genomes_controls_ASJ_AF"],
-                "asj_nhomalt": df["gnomAD_genomes_controls_ASJ_nhomalt"],
-                "eas_ac": df["gnomAD_genomes_controls_EAS_AC"],
-                "eas_af": df["gnomAD_genomes_controls_EAS_AF"],
-                "eas_an": df["gnomAD_genomes_controls_EAS_AN"],
-                "eas_nhomalt": df["gnomAD_genomes_controls_EAS_nhomalt"],
-                "fin_ac": df["gnomAD_genomes_controls_FIN_AC"],
-                "fin_af": df["gnomAD_genomes_controls_FIN_AF"],
-                "fin_an": df["gnomAD_genomes_controls_FIN_AN"],
-                "fin_nhomalt": df["gnomAD_genomes_controls_FIN_nhomalt"],
-                "nfe_ac": df["gnomAD_genomes_controls_NFE_AC"],
-                "nfe_af": df["gnomAD_genomes_controls_NFE_AF"],
-                "nfe_an": df["gnomAD_genomes_controls_NFE_AN"],
-                "nfe_nhomalt": df["gnomAD_genomes_controls_NFE_nhomalt"],
-                "popmax_ac": df["gnomAD_genomes_controls_POPMAX_AC"],
-                "popmax_af": df["gnomAD_genomes_controls_POPMAX_AF"],
-                "popmax_an": df["gnomAD_genomes_controls_POPMAX_AN"],
-                "popmax_nhomalt": df["gnomAD_genomes_controls_POPMAX_nhomalt"]
             }
         }
 
@@ -507,6 +476,28 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "pi": siphy,
                 "logodds": df["SiPhy_29way_logOdds"],
                 "logodds_rankscore": df["SiPhy_29way_logOdds_rankscore"]
+            },
+            "bayesdel": {
+                "add_af": {
+                    "score": df["BayesDel_addAF_score"],
+                    "rankscore": df["BayesDel_addAF_rankscore"],
+                    "pred": df["BayesDel_addAF_pred"]
+                },
+                "no_af": {
+                    "score": df["BayesDel_noAF_score"],
+                    "rankscore": df["BayesDel_noAF_rankscore"],
+                    "pred": df["BayesDel_noAF_pred"]
+                }
+            },
+            "clinpred": {
+                "score": df["ClinPred_score"],
+                "rankscore": df["ClinPred_rankscore"],
+                "pred": df["ClinPred_pred"]
+            },
+            "list-s2": {
+                "score": df["LIST-S2_score"],
+                "rankscore": df["LIST-S2_rankscore"],
+                "pred": df["LIST-S2_pred"]
             },
             "1000gp3": {
                 "ac": df["1000Gp3_AC"],
