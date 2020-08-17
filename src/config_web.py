@@ -22,7 +22,12 @@ ES_INDICES = {
 API_VERSION = 'v1'
 APP_LIST = [
     (r'/v1/variant/(chr.{1,2}):(?!g\.)[g\.]{0,2}(\d+.*)', 'tornado.web.RedirectHandler', {'url': '/v1/variant/{0}:g.{1}'}),
-] + APP_LIST
+] + APP_LIST + [
+    (r"/{pre}/metadata/fields/?", 'web.handlers.MVMetadataFieldHandler'),
+    (r"/{pre}/metadata/?", 'web.handlers.MVMetadataSourceHandler'),
+    (r"/{pre}/{ver}/metadata/fields/?", 'web.handlers.MVMetadataFieldHandler'),
+    (r"/{pre}/{ver}/metadata/?", 'web.handlers.MVMetadataSourceHandler'),
+]
 # *****************************************************************************
 # ES Query Pipeline
 # *****************************************************************************
@@ -66,13 +71,15 @@ ANNOTATION_ID_REGEX_LIST = [(re.compile(r'rs[0-9]+', re.I), 'dbsnp.rsid'),
 ANNOTATION_DEFAULT_SCOPES = ['_id', 'clingen.caid']
 
 # typedef for assembly parameter
-ASSEMBLY_TYPEDEF = {'assembly': {'type': str, 'default': 'hg19', 'enum': ('hg19', 'hg38'), 'group':('esqb', 'es')}}
+ASSEMBLY_TYPEDEF = {'assembly': {'type': str, 'default': 'hg19', 'enum': ('hg19', 'hg38'), 'group': ('esqb', 'es')}}
 
 ANNOTATION_KWARGS = copy.deepcopy(ANNOTATION_KWARGS)
 ANNOTATION_KWARGS['*'].update(ASSEMBLY_TYPEDEF)
 
 QUERY_KWARGS = copy.deepcopy(QUERY_KWARGS)
 QUERY_KWARGS['*'].update(ASSEMBLY_TYPEDEF)
+
+METADATA_KWARGS = {'*': ASSEMBLY_TYPEDEF}
 
 LICENSE_TRANSFORM = {
     "exac_nontcga": "exac",
