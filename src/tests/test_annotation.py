@@ -100,3 +100,8 @@ class TestMyvariant(BiothingsTestCase):
         # res = self.request("variant", method='POST', data={'ids': VARIANT_POST_LIST}).json()
         # assert len(res) == 999
         pass  # TODO
+
+    def test_050_annotation_multihit(self):
+        res = self.request("variant/rs2267").json()
+        assert isinstance(res, list)
+        assert len(res) == 2
