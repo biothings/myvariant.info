@@ -1,7 +1,9 @@
 import os
 import os.path
 import sys
+import shutil
 import time
+import subprocess
 
 import biothings, config
 biothings.config_for_app(config)
@@ -64,7 +66,14 @@ def generate_clinvar_lib(data_folder):
     try:
         os.chdir(data_folder)
         logging.info("Generate XM parser")
-        ret = os.system('''generateDS.py -f -o "clinvar_tmp.py" -s "clinvarsubs.py" clinvar_public.xsd''')
+        # ret = os.system('''generateDS.py -f -o "clinvar_tmp.py" -s "clinvarsubs.py" clinvar_public.xsd''')
+        cmd = shutil.which('generateDS.py')
+        if not cmd:
+            raise OSError('"generateDS.py" is not found in the PATH!')
+        # logging.info("CMD: %s; PATH: %s", cmd, os.environ.get("PATH"))
+        cmd += " -f -o clinvar_tmp.py -s clinvarsubs.py clinvar_public.xsd"
+        # logging.info("CMD: %s", cmd)
+        ret = subprocess.call(cmd, shell=True)
         if ret != 0:
             raise Exception("Unable to generate parser, return code: %s" % ret)
         try:
