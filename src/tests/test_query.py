@@ -82,10 +82,12 @@ class TestMyvariant(BiothingsTestCase):
         self.request("query")
 
     def test_143_clingen(self):
-        self.request("variant/CA9996207?assembly=hg38")
+        # self.request("variant/CA9996207?assembly=hg38")
+        self.request("variant/CA321211?assembly=hg38")
 
     def test_144_clingen(self):
-        self.request("hg38/CA9996207")
+        # self.request("hg38/CA9996207")
+        self.request("hg38/CA321211")
 
     def test_150_query_post(self):
         # /query via post

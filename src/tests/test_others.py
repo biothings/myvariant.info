@@ -18,6 +18,8 @@ class TestMyvariant(BiothingsTestCase):
         meta = self.request(f"{assembly}/metadata").json()
         results = {}
         for src_name in meta["src"]:
+            #if src_name == "cadd":
+            #    continue
             if src_name == "snpeff":
                 continue  # not a root src, counts always different
                 # TODO: that said, count in meta could be correct...
@@ -27,7 +29,11 @@ class TestMyvariant(BiothingsTestCase):
                 if subsrc in ("gnomad_genomes", "gnomad_exomes"):
                     subsrc = subsrc.rstrip("s")  # plural in meta, singular in docs
                 meta_cnt = meta["src"][src_name]["stats"][stat]
-                res = self.request("query?q=_exists_:%s&size=0&assembly=%s" % (subsrc, assembly)).json()
+                try:
+                    res = self.request("query?q=_exists_:%s&size=0&assembly=%s" % (subsrc, assembly)).json()
+                except:
+                    print(f'Query error for ("{subsrc}", "{assembly}")')
+                    raise
                 results[subsrc] = {"meta": meta_cnt, "index": res["total"]}
             #assert res["total"] == meta_cnt, "Count in metadata (%s) doesn't match count from query (%s) for datasource '%s'" % (meta_cnt,res["total"],subsrc)
         errs = {}
