@@ -2,10 +2,10 @@ import os
 import os.path
 import sys
 import shutil
-import time
 import subprocess
 
-import biothings, config
+import biothings
+import config
 biothings.config_for_app(config)
 
 from config import DATA_ARCHIVE_ROOT, logger as logging
@@ -32,7 +32,7 @@ class ClinvarDumper(FTPDumper):
         self.release = releases[-1].split('.')[0].split('_')[1]
 
     def new_release_available(self):
-        current_release = self.src_doc.get("download",{}).get("release")
+        current_release = self.src_doc.get("download", {}).get("release")
         if not current_release or self.release > current_release:
             self.logger.info("New release '%s' found" % self.release)
             return True
@@ -42,26 +42,26 @@ class ClinvarDumper(FTPDumper):
 
     def create_todump_list(self, force=False):
         self.get_newest_info()
-        new_localfile = os.path.join(self.new_data_folder,os.path.basename(self.newest_file))
+        new_localfile = os.path.join(self.new_data_folder, os.path.basename(self.newest_file))
         try:
-            current_localfile = os.path.join(self.current_data_folder,os.path.basename(self.newest_file))
+            current_localfile = os.path.join(self.current_data_folder, os.path.basename(self.newest_file))
         except TypeError:
             # current data folder doesn't even exist
             current_localfile = new_localfile
-        if force or not os.path.exists(current_localfile) or self.remote_is_better(self.newest_file,current_localfile) or self.new_release_available():
+        if force or not os.path.exists(current_localfile) or self.remote_is_better(self.newest_file, current_localfile) or self.new_release_available():
             # register new release (will be stored in backend)
-            self.to_dump.append({"remote": self.newest_file,"local":new_localfile})
+            self.to_dump.append({"remote": self.newest_file, "local": new_localfile})
             # schema
             xsd = "clinvar_public.xsd"
-            localxsdfile = os.path.join(self.new_data_folder,xsd)
-            self.to_dump.append({"remote": "../%s" % xsd, "local":localxsdfile})
+            localxsdfile = os.path.join(self.new_data_folder, xsd)
+            self.to_dump.append({"remote": "../%s" % xsd, "local": localxsdfile})
 
     def post_dump(self, *args, **kwargs):
         generate_clinvar_lib(self.new_data_folder)
 
 
 def generate_clinvar_lib(data_folder):
-    sys.path.insert(0,data_folder)
+    sys.path.insert(0, data_folder)
     orig_path = os.getcwd()
     try:
         os.chdir(data_folder)
@@ -79,8 +79,8 @@ def generate_clinvar_lib(data_folder):
         try:
             py = open("clinvar_tmp.py").read()
             # convert py2 to py3 (though they claim it support both versions)
-            py = py.replace("from StringIO import StringIO","from io import StringIO")
-            fout = open("genclinvar.py","w")
+            py = py.replace("from StringIO import StringIO", "from io import StringIO")
+            fout = open("genclinvar.py", "w")
             fout.write(py)
             fout.close()
             os.unlink("clinvar_tmp.py")
@@ -97,6 +97,7 @@ def generate_clinvar_lib(data_folder):
 def main():
     dumper = ClinvarDumper()
     dumper.dump()
+
 
 if __name__ == "__main__":
     main()
