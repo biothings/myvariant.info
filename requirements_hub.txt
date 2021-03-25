@@ -15,5 +15,9 @@
 #       require their own modules to run. Check their
 #       __METADATA__ setting for required modules.
 
+-e git+https://github.com/biothings/biothings.api.git#egg=biothings[hub]
 
-bitarray==0.8.1    # used in utils.validate module
+bitarray==0.8.1     # used in utils.validate module
+generateDS>=2.29.24 # used in hub.dataload.sources.clinvar.clinvar_dump
+PyVCF>=0.6.7        # used in various VCF parsers
+pysam>=0.8.1        # used in hub.dataload.sources.cadd.cadd_parser
