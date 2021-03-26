@@ -4,7 +4,8 @@ from biothings.utils.web.es_dsl import AsyncSearch
 from biothings.web.pipeline import ESQueryBuilder, ESQueryBackend
 
 
-INTERVAL_PATTERN = re.compile(r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>[1-9xXyYmM][0-9tT]?):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*')
+INTERVAL_PATTERN = re.compile(
+    r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>[1-9xXyYmM][0-9tT]?):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*')
 SNP_PATTERN = re.compile(r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>[1-9xXyYmM][0-9tT]?):(?P<gend>(?P<gstart>[0-9,]+))\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*')
 PATTERNS = [INTERVAL_PATTERN, SNP_PATTERN]
 
@@ -41,7 +42,7 @@ class MVQueryBuilder(ESQueryBuilder):
             search = search.filter('range', **{assembly + ".end": {"gte": match['gstart']}})
 
         else:  # default query
-            search = AsyncSearch().query("query_string", query=q)
+            search = super().default_string_query(q, options)
 
         return search
 
@@ -55,4 +56,3 @@ class MVQueryBackend(ESQueryBackend):
             options.biothing_type = 'hg38'
 
         return super().execute(query, options)
-
