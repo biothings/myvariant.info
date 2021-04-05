@@ -1,10 +1,15 @@
-import biothings.hub.dataload.uploader as uploader
+import os
+import glob
+from biothings.hub.dataload.uploader import ParallelizedSourceUploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
+from .wellderly_parser import WellderlyTsvReader
 
-class WellderlyFactoryUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
+
+class WellderlyUploader(ParallelizedSourceUploader, SnpeffPostUpdateUploader):
     """Data originally coming from: http://www.stsiweb.org/wellderly"""
 
     name = "wellderly"
+
     __metadata__ = {
         "mapper" : 'observed',
         "assembly" : "hg19",
@@ -15,19 +20,23 @@ class WellderlyFactoryUploader(uploader.DummySourceUploader,SnpeffPostUpdateUplo
         }
     }
 
-    #split_collections = ["wellderly_cg1","wellderly_cg10","wellderly_cg11",
-    #                     "wellderly_cg12","wellderly_cg13","wellderly_cg14",
-    #                     "wellderly_cg15","wellderly_cg16","wellderly_cg17",
-    #                     "wellderly_cg18","wellderly_cg19","wellderly_cg2",
-    #                     "wellderly_cg20","wellderly_cg21","wellderly_cg22",
-    #                     "wellderly_cg3","wellderly_cg4","wellderly_cg5",
-    #                     "wellderly_cg6","wellderly_cg7","wellderly_cg8",
-    #                     "wellderly_cg9","wellderly_cgX","wellderly_cgY",
-    #                     "wellderly_cgY1"]
+    def jobs(self):
+        """
+        this method will be called by self.update_data() and then generate arguments for self.load.data() method,
+        allowing parallelization
+        """
+        tsv_filename_pattern = "Wellderly.chr22.g.vcf.gz.tsv"
+        tsv_file_collection = glob.glob(os.path.join(self.data_folder, tsv_filename_pattern))
 
-    #@classmethod
-    #def create(klass, db_conn_info, data_root, *args, **kwargs):
-    #    return [klass(db_conn_info, data_root, collection_name=c,*args,*kwargs) for c in klass.split_collections]
+        assembly = self.__metadata__["assembly"]
+
+        return [(tsv_file, assembly) for tsv_file in tsv_file_collection]
+
+    def load_data(self, file, assembly):
+        """load data from an input file"""
+        self.logger.info("Load data from file {} (assembly: {})".format(file, assembly))
+
+        return WellderlyTsvReader.load_data(file, assembly)
 
     @classmethod
     def get_mapping(klass):
@@ -63,36 +72,18 @@ class WellderlyFactoryUploader(uploader.DummySourceUploader,SnpeffPostUpdateUplo
                         "type": "text",
                         "analyzer": "string_lowercase"
                     },
-                    # "alleles": {
-                    #     "properties": {
-                    #         "allele": {
-                    #             "type": "text",
-                    #             "analyzer": "string_lowercase"
-                    #         },
-                    #         "allele": {
-                    #             "type": "float"
-                    #         }
-                    #     }
-                    # },
-                    "gene": {
-                        "type": "text",
-                        "analyzer": "string_lowercase",
-                        "copy_to" : ["all"]
-                    },
-                    "coding_impact": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
-                    },
-                    "polyphen": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
-                    },
-                    "sift": {
-                        "type": "text",
-                        "analyzer": "string_lowercase"
+                    "alleles": {
+                        "properties": {
+                            "allele": {
+                                "type": "text",
+                                "analyzer": "string_lowercase"
+                            },
+                            "freq": {
+                                "type": "float"
+                            }
+                        }
                     }
                 }
             }
         }
         return mapping
-
