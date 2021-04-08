@@ -5,6 +5,7 @@ biothings.config_for_app(config)
 from config import DATA_ARCHIVE_ROOT
 from biothings.hub.dataload.dumper import ManualDumper
 
+
 class WellderlyDumper(ManualDumper):
 
     SRC_NAME = "wellderly"

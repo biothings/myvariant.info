@@ -25,7 +25,7 @@ class WellderlyUploader(ParallelizedSourceUploader, SnpeffPostUpdateUploader):
         this method will be called by self.update_data() and then generate arguments for self.load.data() method,
         allowing parallelization
         """
-        tsv_filename_pattern = "Wellderly.chr22.g.vcf.gz.tsv"
+        tsv_filename_pattern = "Wellderly.chr*.g.vcf.gz.tsv"
         tsv_file_collection = glob.glob(os.path.join(self.data_folder, tsv_filename_pattern))
 
         assembly = self.__metadata__["assembly"]
