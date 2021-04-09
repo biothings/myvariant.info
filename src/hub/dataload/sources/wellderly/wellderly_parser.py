@@ -1,5 +1,5 @@
 import pandas as pd
-from collections import namedtuple, Counter
+from collections import namedtuple
 from itertools import combinations_with_replacement as cwr
 from utils.hgvs import _normalized_vcf
 
