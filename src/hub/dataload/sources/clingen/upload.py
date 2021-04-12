@@ -1,5 +1,6 @@
 import os, glob
 
+from hub.dataload.storage import MyVariantBasicStorage
 import biothings.hub.dataload.uploader as uploader
 from .parser import load_data
 
@@ -17,6 +18,8 @@ class ClingenUploader(uploader.ParallelizedSourceUploader):
             }
 
     GLOB_PATTERN = "mvi_ca.split.*"
+
+    storage_class = MyVariantBasicStorage
 
     def jobs(self):
         # tuple(input_file,) (only one arg, but still need a tuple
