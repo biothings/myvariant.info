@@ -11,12 +11,12 @@ class WellderlyUploader(ParallelizedSourceUploader, SnpeffPostUpdateUploader):
     name = "wellderly"
 
     __metadata__ = {
-        "mapper" : 'observed',
-        "assembly" : "hg19",
-        "src_meta" : {
-            "url" : "https://genomics.scripps.edu/browser/",
-            "license_url" : "https://genomics.scripps.edu/browser/page-help.html",
-            "license_url_short": "http://bit.ly/2VE6gj7"
+        "mapper": 'observed',
+        "assembly": "hg19",
+        "src_meta": {
+            "url": "https://www.scripps.edu/science-and-medicine/translational-institute/translational-research/genomic-medicine/wellderly/?tab-1-text-content=1",
+            "license_url": "https://redcapstsi.scripps.edu/redcap/surveys/?s=NT4N7A3KJD",
+            "license_url_short": "https://bit.ly/32bNrIu"
         }
     }
 
