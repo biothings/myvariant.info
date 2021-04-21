@@ -22,7 +22,7 @@ ES_INDICES = {
 API_VERSION = 'v1'
 APP_LIST = [
     (r'/v1/variant/(chr.{1,2}):(?!g\.)[g\.]{0,2}(\d+.*)', 'tornado.web.RedirectHandler', {'url': '/v1/variant/{0}:g.{1}'}),
-] + APP_LIST + [
+    *APP_LIST,
     (r"/{pre}/metadata/fields/?", 'web.handlers.MVMetadataFieldHandler'),
     (r"/{pre}/metadata/?", 'web.handlers.MVMetadataSourceHandler'),
     (r"/{pre}/{ver}/metadata/fields/?", 'web.handlers.MVMetadataFieldHandler'),
