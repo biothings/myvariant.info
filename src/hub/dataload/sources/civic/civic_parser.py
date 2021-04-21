@@ -50,7 +50,7 @@ def load_data(data_folder):
                 no_case4 += 1
                 new_doc['_id'] = 'CIVIC_VARIANT:' + str(variant_id)
             for _evidence in doc['evidence_items']:
-                if 'disease' in _evidence and 'doid' in _evidence['disease'] and _evidence['disease']['doid']:
+                if 'disease' in _evidence and 'doid' in (_evidence['disease'] or {}) and _evidence['disease']['doid']:
                     _evidence['disease']['doid'] = 'DOID:' + _evidence['disease']['doid']
                 if 'source' in _evidence and 'citation_id' in _evidence['source']:
                     if _evidence['source']['source_type'] == "PubMed":
