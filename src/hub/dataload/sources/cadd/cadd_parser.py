@@ -210,5 +210,5 @@ def fetch_generator(tabix, contig):
 
 def load_data(data_folder):
     for contig in [i for i in range(1,24)] + ["X","Y"]:
-        load_contig(config)
+        load_contig(contig)
 

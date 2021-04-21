@@ -1,11 +1,10 @@
 import re
 import copy
-import requests
 from hashlib import blake2b
 
 
 def is_snp(hgvs_id):
-    '''return True/False if a hgvs id a SNP or not.'''
+    """return True/False if a hgvs id a SNP or not."""
     pat = 'chr(\w+):g\.(\d+)(\w)\>(\w)'
     mat = re.match(pat, hgvs_id)
     return mat is not None
@@ -24,8 +23,8 @@ def reverse_complement_seq(seq):
 
 
 def reverse_complement_hgvs(hgvs_id):
-    '''return a complementary version of hgvs_id.
-    works only for SNP, ins, delins variant for now.'''
+    """return a complementary version of hgvs_id.
+    works only for SNP, ins, delins variant for now."""
     pat_snp = '(chr\w+:g\.\d+)(\w)\>(\w)'
     pat_ins = '(chr\w+:g\.\d+_\d+)ins(\w+)'
     pat_del_ins = '(chr\w+:g\.\d+_\d+)delins(\w+)'
@@ -83,11 +82,11 @@ def _normalized_vcf(chr, pos, ref, alt):
         _ref = ref[i:]
         _alt = alt[i:]
 
-    return (chr, _pos, _ref, _alt)
+    return chr, _pos, _ref, _alt
 
 
 def get_hgvs_from_vcf(chr, pos, ref, alt, mutant_type=None):
-    '''get a valid hgvs name from VCF-style "chr, pos, ref, alt" data.'''
+    """get a valid hgvs name from VCF-style "chr, pos, ref, alt" data."""
     if not (re.match('^[ACGTN]+$', ref) and re.match('^[ACGTN*]+$', alt)):
         raise ValueError("Cannot convert {} into HGVS id.".format((chr, pos, ref, alt)))
     if len(ref) == len(alt) == 1:
@@ -136,7 +135,7 @@ def get_hgvs_from_vcf(chr, pos, ref, alt, mutant_type=None):
 
 
 def get_pos_start_end(chr, pos, ref, alt):
-    '''get start,end tuple from VCF-style "chr, pos, ref, alt" data.'''
+    """get start,end tuple from VCF-style "chr, pos, ref, alt" data."""
     try:
         pos = int(pos)
     except ValueError:
@@ -202,7 +201,7 @@ def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col, skip_unmatched=False):
         rsid = rsid_fn(doc)
         if rsid is None:
             yield doc
-        hits = [d for d in dbsnp_col.find({"dbsnp.rsid":rsid})]
+        hits = [d for d in dbsnp_col.find({"dbsnp.rsid": rsid})]
         if hits:
             for hit in hits:
                 hgvs_id = hit['_id']
@@ -211,6 +210,7 @@ def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col, skip_unmatched=False):
                 yield _doc
         elif skip_unmatched:
             yield doc
+
 
 def trim_delseq_from_hgvs(hgvs, remove_ins=False):
     """Remove the deleted nucleotides from hgvs ID
@@ -229,17 +229,101 @@ def trim_delseq_from_hgvs(hgvs, remove_ins=False):
         hgvs = "".join(re_del.match(hgvs).groups())
     elif re_dup.match(hgvs):
         hgvs = "".join(re_dup.match(hgvs).groups())
-    
+
     return hgvs
 
-def encode_long_hgvs_id(doc,maxlen=512):
-    assert "_id" in doc
-    if len(doc["_id"]) > maxlen:
-        prefix = trim_delseq_from_hgvs(doc["_id"],remove_ins=True)
-        seq = doc["_id"].replace(prefix,"")
-        seqshashed = blake2b(seq.encode(), digest_size=16).hexdigest()
-        new_id = prefix + "_seqhashed_" + seqshashed
-        doc["_id"] = new_id
-        doc["_seqhashed"] = {seqshashed : seq}
-    return doc
+
+class DocEncoder:
+    key_to_id = "_id"
+    key_to_seq_map = "_seqhashed"  # doc["_seqhashed"] saves all <seq_hashed : seq> mapping
+    key_to_ref_seq = "ref"
+    key_to_alt_seq = "alt"
+
+    @classmethod
+    def __save_seq_map(cls, doc, seq_hashed, seq):
+        """
+        `seq_hashed` is the the blake2b-encoded `seq`
+        A dictionary or entry of <seq_hashed, seq> will be inserted into `doc["_seqhashed"]`
+        """
+        if cls.key_to_seq_map in doc:
+            doc[cls.key_to_seq_map][seq_hashed] = seq
+        else:
+            doc[cls.key_to_seq_map] = {seq_hashed: seq}
+
+        return doc
+
+    @classmethod
+    def __new_id(cls, prefix, seq_hashed):
+        # the encoded id will have a pattern of `<prefix>_<infix>_<seq_hashed>`
+        infix = "seqhashed"
+        new_id = "{prefix}_{infix}_{seq_hashed}".format(prefix=prefix, infix=infix, seq_hashed=seq_hashed)
+        return new_id
+
+    @classmethod
+    def __new_seq(cls, seq_hashed, seq, max_len):
+        # the encoded seq will have a pattern of `<prefix>_<infix>_<seq_hashed>`
+        infix = "fullseqhashed"
+
+        # make sure the length of the `<prefix>_<infix>_<seq_hashed>` string is max_len
+        prefix_length = max_len - len(seq_hashed) - len(infix) - 2
+        prefix = seq[0: prefix_length]
+
+        new_seq = "{prefix}_{infix}_{seq_hashed}".format(prefix=prefix, infix=infix, seq_hashed=seq_hashed)
+        return new_seq
+
+    @classmethod
+    def encode_long_hgvs_id(cls, doc, max_len=512):
+        """
+        Encode long `doc["_id"]` whose length exceed `max_len`.
+        """
+        assert cls.key_to_id in doc
+
+        encoded = False
+        if len(doc[cls.key_to_id]) > max_len:
+            prefix = trim_delseq_from_hgvs(doc[cls.key_to_id], remove_ins=True)
+            seq = doc[cls.key_to_id].replace(prefix, "")
+            seq_hashed = blake2b(seq.encode(), digest_size=16).hexdigest()
+
+            doc[cls.key_to_id] = cls.__new_id(prefix, seq_hashed)
+            doc = cls.__save_seq_map(doc, seq_hashed, seq)
+
+            encoded = True
+
+        return encoded, doc
+
+    @classmethod
+    def encode_long_ref_alt_seq(cls, doc, key, max_len=1000):
+        """
+        Encode "ref" and "alt" sequences whose length exceed `max_len` inside `doc[key]` field.
+        This method assumes that `doc[key]` is a dict.
+
+        Suppose we have the following structure for `doc`:
+
+            {
+                "_id": xxx,
+                "_seqhashed": {...},
+
+                "<source-name>": {
+                    "alt": xxx
+                    "ref": xxx
+                    ...
+                },
+            }
+
+        Then the `key` of interest is the `<source-name>`.
+        """
+        assert key in doc
+
+        encoded = False
+        for seq_key in [cls.key_to_ref_seq, cls.key_to_alt_seq]:
+            seq = doc[key].get(seq_key, None)
+            if seq and len(seq) > max_len:
+                seq_hashed = blake2b(seq.encode(), digest_size=16).hexdigest()
+
+                doc[key][seq_key] = cls.__new_seq(seq_hashed, seq, max_len)
+                doc = cls.__save_seq_map(doc, seq_hashed, seq)
+
+                encoded = True
+
+        return encoded, doc
 

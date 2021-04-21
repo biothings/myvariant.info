@@ -14,4 +14,5 @@ src/www/static/docs
 src/config_prod.py
 src/run/*.pickle
 src/run/done/*.pickle
+src/.idea/
 .vscode
