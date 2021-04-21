@@ -1,19 +1,22 @@
 from .clinvar_xml_parser import load_data as load_common
 from hub.dataload.uploader import SnpeffPostUpdateUploader
+from hub.dataload.storage import MyVariantTrimmingStorage
 
 
 SRC_META = {
-        "url" : "https://www.ncbi.nlm.nih.gov/clinvar/",
-        "license_url" : "https://www.ncbi.nlm.nih.gov/clinvar/intro/",
-        "license_url_short": "http://bit.ly/2SQdcI0"
-        }
+    "url": "https://www.ncbi.nlm.nih.gov/clinvar/",
+    "license_url": "https://www.ncbi.nlm.nih.gov/clinvar/intro/",
+    "license_url_short": "http://bit.ly/2SQdcI0"
+}
+
 
 class ClinvarBaseUploader(SnpeffPostUpdateUploader):
+    storage_class = MyVariantTrimmingStorage
 
     def get_pinfo(self):
         pinfo = super(ClinvarBaseUploader,self).get_pinfo()
         # clinvar parser has some memory requirements, ~1.5G
-        pinfo.setdefault("__reqs__",{})["mem"] = 1.5 * (1024**3)
+        pinfo.setdefault("__reqs__", {})["mem"] = 1.5 * (1024**3)
         return pinfo
 
     @classmethod
@@ -223,18 +226,18 @@ class ClinvarHG19Uploader(ClinvarBaseUploader):
     name = "clinvar_hg19"
     main_source = "clinvar"
     __metadata__ = {
-            "mapper" : 'observed_skipidtoolong',
-            "assembly" : "hg19",
-            "src_meta" : SRC_META,
-            }
+        "mapper": 'observed_skipidtoolong',
+        "assembly": "hg19",
+        "src_meta": SRC_META,
+    }
 
-    def load_data(self,data_folder):
+    def load_data(self, data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)
         try:
-            return load_common(data_folder,"hg19")
+            return load_common(data_folder, "hg19")
         except Exception as e:
             import traceback
-            self.logger.error("Error while uploading, %s:\n%s" % (e,traceback.format_exc()))
+            self.logger.error("Error while uploading, %s:\n%s" % (e, traceback.format_exc()))
             raise
 
 
@@ -243,17 +246,16 @@ class ClinvarHG38Uploader(ClinvarBaseUploader):
     name = "clinvar_hg38"
     main_source = "clinvar"
     __metadata__ = {
-            "mapper" : 'observed_skipidtoolong',
-            "assembly" : "hg38",
-            "src_meta" : SRC_META,
-            }
+        "mapper": 'observed_skipidtoolong',
+        "assembly": "hg38",
+        "src_meta": SRC_META,
+    }
 
-    def load_data(self,data_folder):
+    def load_data(self, data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)
         try:
-            return load_common(data_folder,"hg38")
+            return load_common(data_folder, "hg38")
         except Exception as e:
             import traceback
             self.logger.error("Error while uploading, %s:\n%s" % (e,traceback.format_exc()))
             raise
-
