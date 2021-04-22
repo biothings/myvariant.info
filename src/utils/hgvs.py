@@ -68,7 +68,11 @@ def _normalized_vcf(chr, pos, ref, alt):
     # _ref/_alt cannot be both None, if so,
     # ref and alt are exactly the same,
     # something is wrong with this VCF record
-    assert not (_ref is None and _alt is None)
+    # assert not (_ref is None and _alt is None)
+    if (_ref is None and _alt is None):
+        raise ValueError('"ref" and "alt" cannot be the same: {}'.format(
+            (chr, pos, ref, alt)
+        ))
 
     _pos = int(pos)
     if _ref is None or _alt is None:
@@ -151,7 +155,7 @@ def get_pos_start_end(chr, pos, ref, alt):
         start = pos + 1
         end = pos + len(ref) - 1
         if start == end:
-            end += 1    # end is start+1 for single nt deletion     
+            end += 1    # end is start+1 for single nt deletion
                         # TODO: double-check this is the right convention
     elif len(ref) == 1 and len(alt) > 1:
         # this is a insertion
