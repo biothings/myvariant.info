@@ -20,8 +20,11 @@ CHROM_FIELDS = {'cadd':'chrom', 'clinvar':'chrom', 'cosmic':'chrom', 'dbnsfp':'c
 HG38_FIELDS = ['clinvar.hg38', 'dbnsfp.hg38', 'evs.hg38']
 HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19', 'dbsnp.hg19', 'docm.hg19', 'evs.hg19', 'grasp.hg19']
 
-# Max length for vcf.alt and vcf.ref fields (must be less than 32k, ElasticSearch limit)
-MAX_REF_ALT_LEN = 1000
+# Max length for vcf.alt and vcf.ref fields (must be less than 32k as a keyword field in ElasticSearch)
+# otherwise, Elasticsearch will raise an error like this:
+#   "type": "max_bytes_length_exceeded_exception",
+#   "reason": "bytes can be at most 32766 in length; got 32770"
+MAX_REF_ALT_LEN = 10000
 
 # reporting diff results, number of IDs to consider (to avoid too much mem usage)
 MAX_REPORTED_IDS = 1000
@@ -56,7 +59,7 @@ MAX_QUEUED_JOBS = os.cpu_count() * 4
 
 # Hub environment (like, prod, dev, ...)
 # Used to generate remote metadata file, like "latest.json", "versions.json"
-# If non-empty, this constant will be used to generate those url, as a prefix 
+# If non-empty, this constant will be used to generate those url, as a prefix
 # with "-" between. So, if "dev", we'll have "dev-latest.json", etc...
 # "" means production
 HUB_ENV = ""
@@ -245,25 +248,25 @@ STANDALONE_AWS_CREDENTIALS = {
 }
 
 # when publishing releases, specify the targetted (ie. required) standalone version
-STANDALONE_VERSION = {"branch": "standalone_v3"}                                                                                                                                                                                                                                
+STANDALONE_VERSION = {"branch": "standalone_v3"}
 
 # Autohub configuration, either from a static definition...
-STANDALONE_CONFIG = { 
+STANDALONE_CONFIG = {
     "_default": {
         "es_host": "localhost:9200",
         "index": "myvariant_test",
         "doc_type": "variant"
-    },  
+    },
     "myvariant.info-hg19": {
         "es_host": "prodserver:9200",
         "index": "myvariant_prod_hg19",
         "doc_type": "variant"
-    },  
+    },
     "myvariant.info-hg38": {
         "es_host": "prodserver:9200",
         "index": "myvariant_prod_hg38",
         "doc_type": "variant"
-    },  
+    },
 }
 # ... or using a dynamic indexer factory and ES host (index names are then
 # taken from VERSION_URLS and all are managed on one given ES host)
