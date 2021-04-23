@@ -41,7 +41,7 @@ class MyVariantDataBuilder(builder.DataBuilder):
         # divide & conquer... build batches
         jobs = []
         total = self.target_backend.count()
-        btotal = math.ceil(total/batch_size) 
+        btotal = math.ceil(total/batch_size)
         bnum = 1
         cnt = 0
         results = {
@@ -62,7 +62,7 @@ class MyVariantDataBuilder(builder.DataBuilder):
                 (self.target_backend.target_collection.name, id_batch_size, batch_size))
         for big_doc_ids in id_feeder(self.target_backend.target_collection, batch_size=id_batch_size, logger=self.logger):
             for doc_ids in iter_n(big_doc_ids,batch_size):
-                yield from asyncio.sleep(0.1)
+                # yield from asyncio.sleep(0.1)   # comment this out, this raised an error in py3.8
                 cnt += len(doc_ids)
                 pinfo = self.get_pinfo()
                 pinfo["step"] = "post-merge (chrom)"
