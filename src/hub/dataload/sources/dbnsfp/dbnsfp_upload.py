@@ -155,7 +155,7 @@ class DBNSFPBaseUploader(uploader.ParallelizedSourceUploader,
                             "score": {
                                 "type": "integer"
                             },
-                            "rankscore": {
+                            "converted_rankscore": {
                                 "type": "float"
                             }
                         }
