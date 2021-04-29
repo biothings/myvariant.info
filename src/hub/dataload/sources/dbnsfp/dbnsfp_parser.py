@@ -3,10 +3,15 @@ import glob
 from biothings.utils.dataload import list_split, dict_sweep, unlist, value_convert_to_number
 from biothings.utils.common import anyfile
 
-VALID_COLUMN_NO = 367
+# VALID_COLUMN_NO = 367  # for 4.1a
+VALID_COLUMN_NO = 642  # for 4.2a
 
-'''this parser is for dbNSFP v4.1a downloaded from
-https://sites.google.com/site/jpopgen/dbNSFP'''
+
+"""
+this parser is for dbNSFP v4.2a downloaded from
+https://sites.google.com/site/jpopgen/dbNSFP
+"""
+
 
 # convert one snp to json
 def _map_line_to_json(df, version, include_gnomad, index=0):
@@ -114,7 +119,6 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
 
     gnomad = {"gnomad_exomes": {
                 "flag": df["gnomAD_exomes_flag"],
-                "nhomalt": df["gnomAD_exomes_nhomalt"],
                 "ac": df["gnomAD_exomes_AC"],
                 "an": df["gnomAD_exomes_AN"],
                 "af": df["gnomAD_exomes_AF"],
@@ -153,7 +157,6 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "popmax_nhomalt": df["gnomAD_exomes_POPMAX_nhomalt"]
             },
             "gnomad_exomes_controls": {
-                "nhomalt": df["gnomAD_exomes_controls_nhomalt"],
                 "ac": df["gnomAD_exomes_controls_AC"],
                 "an": df["gnomAD_exomes_controls_AN"],
                 "af": df["gnomAD_exomes_controls_AF"],
@@ -193,7 +196,6 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
             },
             "gnomad_genomes": {
                 "flag": df["gnomAD_genomes_flag"],
-                "nhomalt": df["gnomAD_genomes_nhomalt"],
                 "ac": df["gnomAD_genomes_AC"],
                 "an": df["gnomAD_genomes_AN"],
                 "af": df["gnomAD_genomes_AF"],
@@ -229,16 +231,20 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "popmax_ac": df["gnomAD_genomes_POPMAX_AC"],
                 "popmax_af": df["gnomAD_genomes_POPMAX_AF"],
                 "popmax_an": df["gnomAD_genomes_POPMAX_AN"],
-                "popmax_nhomalt": df["gnomAD_genomes_POPMAX_nhomalt"]
+                "popmax_nhomalt": df["gnomAD_genomes_POPMAX_nhomalt"],
+                "sas_ac": df["gnomAD_genomes_SAS_AC"],
+                "sas_af": df["gnomAD_genomes_SAS_AF"],
+                "sas_an": df["gnomAD_genomes_SAS_AN"],
+                "sas_nhomalt": df["gnomAD_genomes_SAS_nhomalt"]
             }
         }
 
-# load as json data
+    # load as json data
     one_snp_json = {
         "_id": HGVS,
         "dbnsfp": {
-            "rsid": df["rs_dbSNP151"],
-            #"rsid_dbSNP144": fields[6],
+            "rsid": df["rs_dbSNP"],  # for 4.2a
+            # "rsid": df["rs_dbSNP151"],  # for 4.1a
             "chrom": chrom,
             "hg19": {
                 "start": chromStart,
@@ -272,8 +278,8 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
             "genecode_basic": df["GENCODE_basic"],
             "tsl": tsl,
             "vep_canonical": vep_canonical,
-            #"altaineandertal": fields[17],
-            #"denisova": fields[18]
+            # "altaineandertal": fields[17],
+            # "denisova": fields[18]
             "ensembl": {
                 "geneid": df["Ensembl_geneid"],
                 "transcriptid": df["Ensembl_transcriptid"],
@@ -317,7 +323,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
             },
             "bstatistic": {
                 "score": df['bStatistic'],
-                "rankscore": df["bStatistic_rankscore"]
+                "converted_rankscore": df["bStatistic_converted_rankscore"]
             },
             "aloft": {
                 "fraction_transcripts_affected": df["Aloft_Fraction_transcripts_affected"].split(';'),
@@ -377,7 +383,7 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
             "eigen": {
                 "raw_coding": df["Eigen-raw_coding"],
                 "raw_coding_rankscore": df["Eigen-raw_coding_rankscore"],
-                "phred_coding": df["Eigen-pred_coding"]
+                "phred_coding": df["Eigen-phred_coding"]
             },
             "eigen-pc": {
                 "raw_coding": df["Eigen-PC-raw_coding"],
@@ -595,7 +601,6 @@ def _map_line_to_json(df, version, include_gnomad, index=0):
                 "medgen": [i for i in df["clinvar_MedGen_id"].split("|") if i != "."],
                 "orphanet": [i for i in df["clinvar_Orphanet_id"].split("|") if i != "."],
                 "var_source": [i for i in df["clinvar_var_source"].split("|") if i != "."]
-
             },
             "hgvsc": list(set(df["HGVSc_ANNOVAR"].split(';') + df["HGVSc_snpEff"].split(';') + df["HGVSc_VEP"].split(';'))),
             "hgvsp": list(set(df["HGVSp_ANNOVAR"].split(';') + df["HGVSp_snpEff"].split(';') + df["HGVSp_VEP"].split(';'))),
@@ -646,5 +651,5 @@ def load_data_file(input_file, version, include_gnomad=False):
 # load path and find files, pass to data_generator
 def load_data(path_glob, version='hg19', include_gnomad=False):
     for input_file in sorted(glob.glob(path_glob)):
-         for d in load_data_file(input_file, version, include_gnomad):
-             yield d
+        for d in load_data_file(input_file, version, include_gnomad):
+            yield d
