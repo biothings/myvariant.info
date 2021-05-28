@@ -1,6 +1,9 @@
 import csv
 import glob
-from biothings.utils.dataload import list_split, dict_sweep, unlist, value_convert_to_number
+import itertools
+import re
+
+from biothings.utils.dataload import dict_sweep  # list_split, unlist, value_convert_to_number
 from biothings.utils.common import anyfile
 
 # VALID_COLUMN_NO = 367  # for 4.1a
@@ -13,614 +16,638 @@ https://sites.google.com/site/jpopgen/dbNSFP
 """
 
 
-# convert one snp to json
-def _map_row_to_json(row, version, include_gnomad):
-    """
-    `row` is a pandas Series-like object or a simple `dict` representing the content of one row in a dbNSFP tsv files
-    """
+class DbnsfpReader:
+    # dbNSFP_variant use "." for missing values;
+    # other none values are borrowed from the `biothings.utils.dataload.dict_sweep` function and
+    #   from the default `na_values` argument of pandas.read_csv().
+    # see https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html
+    none_values = {r'.', r'', r" ", r"-", r'#N/A', r'#N/A N/A', r'#NA', r'-1.#IND', r'-1.#QNAN', r'-NaN', r'-nan',
+                   r'1.#IND', r'1.#QNAN', r'<NA>', r'N/A', r'NA', r'NULL', r'NaN', r'n/a', r'nan', r'null', r'none',
+                   r"Not Available", r"unknown"}
 
-    # specific variable treatment
-    chrom = row["#chr"]
-    if chrom == 'M':
-        chrom = 'MT'
-    # fields[7] in version 2, represent hg18_pos
-    hg18_end = row["hg18_pos(1-based)"]
-    if hg18_end == ".":
-        hg18_end = "."
-    else:
-        hg18_end = int(hg18_end)
-    # in case of no hg19 position provided, remove the item
-    if row["hg19_pos(1-based)"] == '.':
-        return None
-    else:
-        chromStart = int(row["hg19_pos(1-based)"])
-        chromEnd = chromStart
-    chromStart_38 = int(row["pos(1-based)"])
-    ref = row["ref"].upper()
-    alt = row["alt"].upper()
-    HGVS_19 = "chr%s:g.%d%s>%s" % (chrom, chromStart, ref, alt)
-    HGVS_38 = "chr%s:g.%d%s>%s" % (chrom, chromStart_38, ref, alt)
-    if version == 'hg19':
-        HGVS = HGVS_19
-    elif version == 'hg38':
-        HGVS = HGVS_38
-    siphy_29way_pi = row["SiPhy_29way_pi"]
-    if siphy_29way_pi == ".":
-        siphy = "."
-    else:
-        freq = siphy_29way_pi.split(":")
-        siphy = {'a': freq[0], 'c': freq[1], 'g': freq[2], 't': freq[3]}
-    gtex_gene = row["GTEx_V8_gene"].split('|')
-    gtex_tissue = row["GTEx_V8_tissue"].split('|')
-    gtex = map(dict, map(lambda t: zip(('gene', 'tissue'), t), zip(gtex_gene, gtex_tissue)))
-    acc = row["Uniprot_acc"].rstrip().rstrip(';').split(";")
-    entry = row["Uniprot_entry"].rstrip().rstrip(';').split(";")
-    uniprot = map(dict, map(lambda t: zip(('acc', 'entry'), t), zip(acc, entry)))
-    provean_score = row["PROVEAN_score"].split(';')
-    sift_score = row["SIFT_score"].split(';')
-    sift4g_score = row["SIFT4G_score"].split(';')
-    hdiv_score = row["Polyphen2_HDIV_score"].split(';')
-    hvar_score = row["Polyphen2_HVAR_score"].split(';')
-    lrt_score = row["LRT_score"].split(';')
-    m_cap_score = row["M-CAP_score"].split(';')
-    mutationtaster_score = row["MutationTaster_score"].split(';')
-    mutationassessor_score = row["MutationAssessor_score"].split(';')
-    vest3_score = row["VEST4_score"].split(';')
-    metasvm_score = row["MetaSVM_score"].split(';')
-    fathmm_score = row["FATHMM_score"].split(';')
-    metalr_score = row["MetaLR_score"].split(';')
-    revel_score = row["REVEL_score"].split(';')
-    appris = row["APPRIS"].split(";")
-    mpc_score = row["MPC_score"].split(';')
-    mvp_score = row["MVP_score"].split(';')
-    tsl = row["TSL"].split(';')
-    vep_canonical = row["VEP_canonical"].split(';')
-    deogen2_score = row["DEOGEN2_score"].split(';')
-    '''
-    parse mutpred top 5 features
-    '''
-    def modify_pvalue(pvalue):
-        return float(pvalue.strip('P = '))
-    mutpred_mechanisms = row["MutPred_Top5features"]
-    if mutpred_mechanisms not in ['.', ',', '-']:
-        mutpred_mechanisms = mutpred_mechanisms.split(" (") and mutpred_mechanisms.split(";")
-        mutpred_mechanisms = [m.rstrip(")") for m in mutpred_mechanisms]
-        mutpred_mechanisms = [i.split(" (") for i in mutpred_mechanisms]
-        mutpred_mechanisms = sum(mutpred_mechanisms, [])
-        mechanisms = [
-            {"mechanism": mutpred_mechanisms[0],
-             "p_val": modify_pvalue(mutpred_mechanisms[1])},
-            {"mechanism": mutpred_mechanisms[2],
-             "p_val": modify_pvalue(mutpred_mechanisms[3])},
-            {"mechanism": mutpred_mechanisms[4],
-             "p_val": modify_pvalue(mutpred_mechanisms[5])},
-            {"mechanism": mutpred_mechanisms[6],
-             "p_val": modify_pvalue(mutpred_mechanisms[7])},
-            {"mechanism": mutpred_mechanisms[8],
-             "p_val": modify_pvalue(mutpred_mechanisms[9])}
-        ]
-    else:
-        mechanisms = '.'
+    mutpred_top5features_pattern = re.compile(r" \(P = (\d*\.?\d+)\)$")
 
-    # normalize scores
+    # A general rule from observation: for some of the columns, data type can be inferred from the suffix of their
+    # column names. E.g. "xxx_score" is usually float.
+    # This rule is usually true especially when dealing with grouped columns (like "DANN_score" and "DANN_rankscore").
+    # Grouped columns are represented by their common col_prefix (like "DANN").
+    # Column names in one group can be restored by concatenating their common col_prefix and individual suffixes.
+    col_suffix_to_type = {
+        "score": float,
+        "rankscore": float,
+        "converted_rankscore": float,
+        "fitCons_score": float,
+        "fitCons_rankscore": float,
+        "confidence_value": int,
+        "AC": int,
+        "AF": float
+    }
 
-    def norm(arr):
-        return [None if item == '.' else item for item in arr]
+    @classmethod
+    def read_string(cls, row, col, sep=None, transform=None):
+        """
+        Read `row[col]` as a string. If `sep` is None, return the single string (with transformation).
+        If `sep` is not None, separate the string into a list of substrings, transform each substring, and then return
+        the list.
+        """
+        def apply_transformation(_string, _transform):
+            """
+            If the transformation is to convert the string into an integer or float, wrap it in try-catch;
+            otherwise simply apply the transformation as a function to the string.
+            """
+            if _transform is int or _transform is float:
+                try:
+                    return _transform(_string)
+                except ValueError:
+                    raise ValueError("Cannot convert {col} value {string} to {type}".format(col=col, string=_string,
+                                                                                            type=_transform))
+            return _transform(_string)
 
-    provean_score = norm(provean_score)
-    sift_score = norm(sift_score)
-    hdiv_score = norm(hdiv_score)
-    hvar_score = norm(hvar_score)
-    lrt_score = norm(lrt_score)
-    m_cap_score = norm(m_cap_score)
-    mutationtaster_score = norm(mutationtaster_score)
-    mutationassessor_score = norm(mutationassessor_score)
-    vest3_score = norm(vest3_score)
-    metasvm_score = norm(metasvm_score)
-    fathmm_score = norm(fathmm_score)
-    metalr_score = norm(metalr_score)
-    revel_score = norm(revel_score)
+        string = row[col]
+        if string in cls.none_values:
+            return None
 
-    gnomad = {"gnomad_exomes": {
-                "flag": row["gnomAD_exomes_flag"],
-                "ac": row["gnomAD_exomes_AC"],
-                "an": row["gnomAD_exomes_AN"],
-                "af": row["gnomAD_exomes_AF"],
-                "nhomalt": row["gnomAD_exomes_nhomalt"],
-                "afr_ac": row["gnomAD_exomes_AFR_AC"],
-                "afr_af": row["gnomAD_exomes_AFR_AF"],
-                "afr_an": row["gnomAD_exomes_AFR_AN"],
-                "afr_nhomalt": row["gnomAD_exomes_AFR_nhomalt"],
-                "amr_ac": row["gnomAD_exomes_AMR_AC"],
-                "amr_an": row["gnomAD_exomes_AMR_AN"],
-                "amr_af": row["gnomAD_exomes_AMR_AF"],
-                "amr_nhomalt": row["gnomAD_exomes_AMR_nhomalt"],
-                "asj_ac": row["gnomAD_exomes_ASJ_AC"],
-                "asj_an": row["gnomAD_exomes_ASJ_AN"],
-                "asj_af": row["gnomAD_exomes_ASJ_AF"],
-                "asj_nhomalt": row["gnomAD_exomes_ASJ_nhomalt"],
-                "eas_ac": row["gnomAD_exomes_EAS_AC"],
-                "eas_af": row["gnomAD_exomes_EAS_AF"],
-                "eas_an": row["gnomAD_exomes_EAS_AN"],
-                "eas_nhomalt": row["gnomAD_exomes_EAS_nhomalt"],
-                "fin_ac": row["gnomAD_exomes_FIN_AC"],
-                "fin_af": row["gnomAD_exomes_FIN_AF"],
-                "fin_an": row["gnomAD_exomes_FIN_AN"],
-                "fin_nhomalt": row["gnomAD_exomes_FIN_nhomalt"],
-                "nfe_ac": row["gnomAD_exomes_NFE_AC"],
-                "nfe_af": row["gnomAD_exomes_NFE_AF"],
-                "nfe_an": row["gnomAD_exomes_NFE_AN"],
-                "nfe_nhomalt": row["gnomAD_exomes_NFE_nhomalt"],
-                "sas_ac": row["gnomAD_exomes_SAS_AC"],
-                "sas_af": row["gnomAD_exomes_SAS_AF"],
-                "sas_an": row["gnomAD_exomes_SAS_AN"],
-                "sas_nhomalt": row["gnomAD_exomes_SAS_nhomalt"],
-                "popmax_ac": row["gnomAD_exomes_POPMAX_AC"],
-                "popmax_af": row["gnomAD_exomes_POPMAX_AF"],
-                "popmax_an": row["gnomAD_exomes_POPMAX_AN"],
-                "popmax_nhomalt": row["gnomAD_exomes_POPMAX_nhomalt"]
-            },
-            "gnomad_exomes_controls": {
-                "ac": row["gnomAD_exomes_controls_AC"],
-                "an": row["gnomAD_exomes_controls_AN"],
-                "af": row["gnomAD_exomes_controls_AF"],
-                "nhomalt": row["gnomAD_exomes_controls_nhomalt"],
-                "afr_ac": row["gnomAD_exomes_controls_AFR_AC"],
-                "afr_af": row["gnomAD_exomes_controls_AFR_AF"],
-                "afr_an": row["gnomAD_exomes_controls_AFR_AN"],
-                "afr_nhomalt": row["gnomAD_exomes_controls_AFR_nhomalt"],
-                "amr_ac": row["gnomAD_exomes_controls_AMR_AC"],
-                "amr_an": row["gnomAD_exomes_controls_AMR_AN"],
-                "amr_af": row["gnomAD_exomes_controls_AMR_AF"],
-                "amr_nhomalt": row["gnomAD_exomes_controls_AMR_nhomalt"],
-                "asj_ac": row["gnomAD_exomes_controls_ASJ_AC"],
-                "asj_an": row["gnomAD_exomes_controls_ASJ_AN"],
-                "asj_af": row["gnomAD_exomes_controls_ASJ_AF"],
-                "asj_nhomalt": row["gnomAD_exomes_controls_ASJ_nhomalt"],
-                "eas_ac": row["gnomAD_exomes_controls_EAS_AC"],
-                "eas_af": row["gnomAD_exomes_controls_EAS_AF"],
-                "eas_an": row["gnomAD_exomes_controls_EAS_AN"],
-                "eas_nhomalt": row["gnomAD_exomes_controls_EAS_nhomalt"],
-                "fin_ac": row["gnomAD_exomes_controls_FIN_AC"],
-                "fin_af": row["gnomAD_exomes_controls_FIN_AF"],
-                "fin_an": row["gnomAD_exomes_controls_FIN_AN"],
-                "fin_nhomalt": row["gnomAD_exomes_controls_FIN_nhomalt"],
-                "nfe_ac": row["gnomAD_exomes_controls_NFE_AC"],
-                "nfe_af": row["gnomAD_exomes_controls_NFE_AF"],
-                "nfe_an": row["gnomAD_exomes_controls_NFE_AN"],
-                "nfe_nhomalt": row["gnomAD_exomes_controls_NFE_nhomalt"],
-                "sas_ac": row["gnomAD_exomes_controls_SAS_AC"],
-                "sas_af": row["gnomAD_exomes_controls_SAS_AF"],
-                "sas_an": row["gnomAD_exomes_controls_SAS_AN"],
-                "sas_nhomalt": row["gnomAD_exomes_controls_SAS_nhomalt"],
-                "popmax_ac": row["gnomAD_exomes_controls_POPMAX_AC"],
-                "popmax_af": row["gnomAD_exomes_controls_POPMAX_AF"],
-                "popmax_an": row["gnomAD_exomes_controls_POPMAX_AN"],
-                "popmax_nhomalt": row["gnomAD_exomes_controls_POPMAX_nhomalt"]
-            },
-            "gnomad_genomes": {
-                "flag": row["gnomAD_genomes_flag"],
-                "ac": row["gnomAD_genomes_AC"],
-                "an": row["gnomAD_genomes_AN"],
-                "af": row["gnomAD_genomes_AF"],
-                "nhomalt": row["gnomAD_genomes_nhomalt"],
-                "afr_ac": row["gnomAD_genomes_AFR_AC"],
-                "afr_af": row["gnomAD_genomes_AFR_AF"],
-                "afr_an": row["gnomAD_genomes_AFR_AN"],
-                "afr_nhomalt": row["gnomAD_genomes_AFR_nhomalt"],
-                "ami_ac": row["gnomAD_genomes_AMI_AC"],
-                "ami_an": row["gnomAD_genomes_AMI_AN"],
-                "ami_af": row["gnomAD_genomes_AMI_AF"],
-                "ami_nhomalt": row["gnomAD_genomes_AMI_nhomalt"],
-                "amr_ac": row["gnomAD_genomes_AMR_AC"],
-                "amr_an": row["gnomAD_genomes_AMR_AN"],
-                "amr_af": row["gnomAD_genomes_AMR_AF"],
-                "amr_nhomalt": row["gnomAD_genomes_AMR_nhomalt"],
-                "asj_ac": row["gnomAD_genomes_ASJ_AC"],
-                "asj_an": row["gnomAD_genomes_ASJ_AN"],
-                "asj_af": row["gnomAD_genomes_ASJ_AF"],
-                "asj_nhomalt": row["gnomAD_genomes_ASJ_nhomalt"],
-                "eas_ac": row["gnomAD_genomes_EAS_AC"],
-                "eas_af": row["gnomAD_genomes_EAS_AF"],
-                "eas_an": row["gnomAD_genomes_EAS_AN"],
-                "eas_nhomalt": row["gnomAD_genomes_EAS_nhomalt"],
-                "fin_ac": row["gnomAD_genomes_FIN_AC"],
-                "fin_af": row["gnomAD_genomes_FIN_AF"],
-                "fin_an": row["gnomAD_genomes_FIN_AN"],
-                "fin_nhomalt": row["gnomAD_genomes_FIN_nhomalt"],
-                "nfe_ac": row["gnomAD_genomes_NFE_AC"],
-                "nfe_af": row["gnomAD_genomes_NFE_AF"],
-                "nfe_an": row["gnomAD_genomes_NFE_AN"],
-                "nfe_nhomalt": row["gnomAD_genomes_NFE_nhomalt"],
-                "popmax_ac": row["gnomAD_genomes_POPMAX_AC"],
-                "popmax_af": row["gnomAD_genomes_POPMAX_AF"],
-                "popmax_an": row["gnomAD_genomes_POPMAX_AN"],
-                "popmax_nhomalt": row["gnomAD_genomes_POPMAX_nhomalt"],
-                "sas_ac": row["gnomAD_genomes_SAS_AC"],
-                "sas_af": row["gnomAD_genomes_SAS_AF"],
-                "sas_an": row["gnomAD_genomes_SAS_AN"],
-                "sas_nhomalt": row["gnomAD_genomes_SAS_nhomalt"]
+        if sep is None:
+            if transform is not None:
+                string = apply_transformation(string, transform)
+
+            return string
+        else:
+            string_list = [s for s in string.split(sep=sep) if s not in cls.none_values]
+            if not string_list:  # `string_list` is empty after none-values are removed
+                return None
+
+            if transform is not None:
+                string_list = [apply_transformation(string, transform) for string in string_list]
+
+            return string_list if len(string_list) > 1 else string_list[0]
+
+    @classmethod
+    def read_unique_strings(cls, row, cols, sep=None):
+        """
+        Return the unique strings from the readout union of multiple columns.
+        No transformation is applied.
+        """
+        string_list = [row[key].split(sep=sep) for key in cols]
+        string_list = list(set(string for string in itertools.chain.from_iterable(string_list)
+                               if string not in cls.none_values))
+
+        if not string_list:  # `string_list` is empty after none-values are removed
+            return None
+
+        return string_list if len(string_list) > 1 else string_list[0]
+
+    @classmethod
+    def _iter_read_group(cls, row, col_prefix, col_suffixes, sep=";"):
+        """
+        Some columns other than `*_AC` and `*_AF` are grouped by their prefixes, e.g. "ClinPred_pred",
+        "ClinPred_rankscore", and "ClinPred_score". Such groups of columns usually contains scores of some metrics.
+
+        To play safe, I assume each column in such a group is a separable string (although it may not contain any
+        separator at all); and I assume all columns in a group should use the same separator, semicolon by default.
+
+        `col_prefix` and `col_suffixes`, when joined with "_", form the column names in the `row` to be read.
+        Each column will be read and yielded as in an iterator.
+
+        Args:
+            row (dict-like): the data to read in
+            col_prefix (string): col_prefix of the keys of interest in `row`, e.g "ClinPred"
+            col_suffixes (collection of strings): suffixes of the columns interest in `row`,
+                                                  e.g. ("pred", "rankscore", "score")
+            sep (string): a single string of the separator
+        """
+        for col_suffix in col_suffixes:
+            # filter(function, iterable):
+            #   If function is None, the identity function is assumed, that is,
+            #   all elements of iterable that are false are removed.
+            col = "_".join(filter(None, (col_prefix, col_suffix)))
+            transform = cls.col_suffix_to_type.get(col_suffix)
+            yield cls.read_string(row, col, sep=sep, transform=transform)
+
+    @classmethod
+    def map_score_rankscore_to_json(cls, row, col_prefix):
+        """
+        A common case of calling `_iter_read_group`.
+
+        Dozens of columns are grouped into tuple, like "<col_prefix>_score" and "<col_prefix>_rankscore".
+        Their data types are usually float.
+        """
+        col_suffixes = ("score", "rankscore")  # col_suffixes are also the json keys
+        return dict(zip(col_suffixes, cls._iter_read_group(row, col_prefix, col_suffixes)))
+
+    @classmethod
+    def map_score_rankscore_pred_to_json(cls, row, col_prefix):
+        """
+        A common case of calling `_iter_read_group`.
+
+        Dozens of columns are grouped into triples, like "<col_prefix>_score", "<col_prefix>_rankscore", and
+        "<col_prefix>_pred". Their data types are usually float, float and string.
+        """
+        col_suffixes = ("score", "rankscore", "pred")  # col_suffixes are also the json keys
+        return dict(zip(col_suffixes, cls._iter_read_group(row, col_prefix, col_suffixes)))
+
+    @classmethod
+    def map_score_converted_rankscore_pred_to_json(cls, row, col_prefix):
+        """
+        A common case of calling `_iter_read_group`.
+
+        Dozens of columns are grouped into triples, like "<col_prefix>_score", "<col_prefix>_converted_rankscore", and
+        "<col_prefix>_pred". Their data types are usually float, float and string.
+        """
+        col_suffixes = ("score", "converted_rankscore", "pred")  # col_suffixes are also the json keys
+        return dict(zip(col_suffixes, cls._iter_read_group(row, col_prefix, col_suffixes)))
+
+    @classmethod
+    def map_fitcons_score_rankscore_confidence_value_to_json(cls, row, col_prefix):
+        """
+        A common case of calling `_iter_read_group`.
+
+        Dozens of columns are grouped into triples, like "<col_prefix>_fitCons_score", "<col_prefix>_fitCons_rankscore",
+        and "<col_prefix>_confidence_value". Their data types are usually float, float and int.
+        """
+        col_suffixes = ("fitCons_score", "fitCons_rankscore", "confidence_value")
+        json_keys = ("fitcons_score", "fitcons_rankscore", "confidence_value")
+        return dict(zip(json_keys, cls._iter_read_group(row, col_prefix, col_suffixes)))
+
+    @classmethod
+    def map_AC_AF_to_json(cls, row, col_prefix, col_infixes, whole_group=False):
+        """
+        Read `<col_prefix>_<col_infix>_AC` and `<col_prefix>_<col_infix>_AF` columns for each `col_infix` in
+        `col_infixes`.
+        When `whole_group` is True, read two extra columns, `<col_prefix>_AC` and `<col_prefix>_AF`.
+
+        AC (allele counts) will be parsed into integers; AF (allele freqs) will be parsed into floats.
+        No separator is assumed to exist in such AC/AF columns.
+
+        The readout will be returned as a dict like:
+
+            {
+                <col_infix.lower()>_ac : int(<col_prefix>_<col_infix>_AC)
+                <col_infix.lower()>_af : float(<col_prefix>_<col_infix>_AF)
+            }
+
+        E.g. to read `ESP6500_AA_AC`, `ESP6500_AA_AF`, `ESP6500_EA_AC` and `ESP6500_EA_AF` columns, we can simply call
+        map_AC_AF_to_json(col_prefix="ESP6500", col_infixes=["AA", "EA"], whole_group=False)
+        """
+        if col_infixes is None:
+            col_infixes = []
+
+        if whole_group:
+            col_infixes = [""] + col_infixes
+
+        col_suffixes = ("AC", "AF")
+
+        def _generate_json_fields():
+            for col_infix in col_infixes:
+                for col_suffix in col_suffixes:
+                    # filter(function, iterable):
+                    #   If function is None, the identity function is assumed, that is,
+                    #   all elements of iterable that are false are removed.
+                    col = "_".join(filter(None, (col_prefix, col_infix, col_suffix)))
+                    transform = cls.col_suffix_to_type.get(col_suffix)
+
+                    json_key = "_".join(filter(None, (col_infix, col_suffix))).lower()
+                    yield json_key, cls.read_string(row, col, sep=None, transform=transform)
+
+        return dict(_generate_json_fields())
+
+    @classmethod
+    def parse_mutpred_top5features(cls, row, col):
+        """
+        `mutpred_mechanisms` is a string combined from 5 clauses, separated by semicolons (with whitespaces).
+        Each clause has the same pattern of "<mechanism> (P = <p_val>)".
+
+        E.g. "Loss of helix (P = 0.0444); Gain of loop (P = 0.0502); Gain of catalytic residue at A444 (P = 0.1876); \
+        Gain of solvent accessibility (P = 0.2291); Loss of disorder (P = 0.9475)"
+
+        Here we apply regex to parse this string
+
+            regex = re.compile(r" \(P = (\d*\.?\d+)\)$")
+            [(e for e in regex.split(s) if e.strip()) for s in string.split("; ")]
+
+        and get a list of 5 tuples like
+
+            [('Loss of helix', '0.0444'), ('Gain of loop', '0.0502'), ('Gain of catalytic residue at A444', '0.1876'),
+            ('Gain of solvent accessibility', '0.2291'), ('Loss of disorder', '0.9475')]
+
+        Then construct a list of 5 dictionaries of <"mechanism": xxx, "p_val": xxx> and return
+        """
+        string = cls.read_string(row, col)
+        if string is None:
+            return None
+
+        mp_list = [(e for e in cls.mutpred_top5features_pattern.split(s) if e.strip()) for s in string.split("; ")]
+        return [{"mechanism": mp[0], "p_val": float(mp[1])} for mp in mp_list]
+
+    @classmethod
+    def parse_uniprot(cls, row, acc_col, entry_col):
+        """
+        Read uniprot accession numbers and entry names as two strings from `row`. Map each accession number and entry
+        name into a dictionary, and return a list of such dictionaries.
+
+        E.g. suppose we have the following readouts
+
+            row[acc_col] = "P54578-2;P54578-3;A6NJA2;P54578"
+            row[entry_col] = UBP14_HUMAN;UBP14_HUMAN;A6NJA2_HUMAN;UBP14_HUMAN
+
+        Then we will return a list of dictionaries like:
+
+            [{'acc': 'P54578-2', 'entry': 'UBP14_HUMAN'},
+             {'acc': 'P54578-3', 'entry': 'UBP14_HUMAN'},
+             {'acc': 'A6NJA2', 'entry': 'A6NJA2_HUMAN'},
+             {'acc': 'P54578', 'entry': 'UBP14_HUMAN'}]
+        """
+        # cls.read_string() is not used here because it will remove the NA substrings from the split string
+        acc_list = [s if s not in cls.none_values else None for s in row[acc_col].split(";")]
+        entry_list = [s if s not in cls.none_values else None for s in row[entry_col].split(";")]
+
+        return [{"acc": acc, "entry": entry} for (acc, entry) in zip(acc_list, entry_list)
+                if (acc, entry) != (None, None)]
+
+    @classmethod
+    def parse_gtex(cls, row, gene_col, tissue_col):
+        """
+        Read GTEx genes and tissues as two strings from `row`. Map each gene and tissue into a dictionary, and return
+        a list of such dictionaries.
+
+        E.g. suppose we have the following readouts
+
+            row[gene_col] = "ENOSF1|ENOSF1"
+            row[tissue_col] = Adipose_Subcutaneous|Muscle_Skeletal
+
+        Then we will return a list of dictionaries like:
+
+            [{'gene': 'ENOSF1', 'tissue': 'Adipose_Subcutaneous'},
+             {'gene': 'ENOSF1', 'tissue': 'Muscle_Skeletal'}]
+        """
+        # cls.read_string() is not used here because it will remove the NA substrings from the split string
+        gene_list = [s if s not in cls.none_values else None for s in row[gene_col].split(r"|")]
+        tissue_list = [s if s not in cls.none_values else None for s in row[tissue_col].split(r"|")]
+
+        return [{"gene": gene, "tissue": tissue} for (gene, tissue) in zip(gene_list, tissue_list)
+                if (gene, tissue) != (None, None)]
+
+    @classmethod
+    def parse_siphy_29way_pi(cls, row, col):
+        """
+        A "SiPhy_29way_pi" value, if not None, is a string separated by ":", representing an estimated stationary
+        distribution of A, C, G and T at a variant site. E.g. "0.0:0.5259:0.0:0.4741".
+
+        Here we split the string and convert it to a dict of {<nt>: <freq>}.
+        """
+        string = cls.read_string(row, col)
+        if string is None:
+            return None
+
+        freq = [float(s) for s in string.split(":")]
+        pi_dict = {'a': freq[0], 'c': freq[1], 'g': freq[2], 't': freq[3]}
+        return pi_dict
+
+    @classmethod
+    def map_CADD_to_json(cls, row, version):
+        """
+        Myvariant.info already has a datasource of CADD, but it's hg19 only.
+        When version == "hg19", we will discard all CADD fields in dbNSFP.
+        When version == "hg38", we will only include the hg38 CADD fields in dbNSFP.
+        """
+        if version == "hg38":
+            cadd_dict = {
+                "raw_score": cls.read_string(row, "CADD_raw", sep=";", tranform=float),
+                "raw_rankscore": cls.read_string(row, "CADD_raw_rankscore", sep=";", tranform=float),
+                "phred": cls.read_string(row, "CADD_phred", sep=";", tranform=float),
+                # "raw_score_hg19": cls.read_string(row, "CADD_raw_hg19", sep=";", tranform=float),
+                # "raw_rankscore_hg19": cls.read_string(row, "CADD_raw_rankscore_hg19", sep=";", tranform=float),
+                # "phred_hg19": cls.read_string(row, "CADD_phred_hg19", sep=";", tranform=float)
+            }
+            return cadd_dict
+        elif version == "hg19":
+            return None
+        else:
+            raise ValueError("Cannot recognize version. Should be either hg19 or hg38. Got version={}".format(version))
+
+    @classmethod
+    def map_row_to_json(cls, row, version):
+        """
+        Parse each row into a json object
+        """
+
+        """
+        Step 1: Read basic variant information
+        """
+        # in case of no hg19 position provided, remove the item
+        pos_hg19 = cls.read_string(row, "hg19_pos(1-based)", transform=int)  # Column 9
+        if pos_hg19 is None:
+            return None
+
+        pos_hg18 = cls.read_string(row, "hg18_pos(1-based)", transform=int)  # Column 11
+        pos_hg38 = cls.read_string(row, "pos(1-based)", transform=int)  # Column 2
+
+        # ref and alt cannot be None else hgvs_id is invalid
+        ref = cls.read_string(row, "ref", transform=lambda s: s.upper())  # Column 3
+        alt = cls.read_string(row, "alt", transform=lambda s: s.upper())  # Column 4
+
+        if version == 'hg19':
+            chrom = cls.read_string(row, "hg19_chr", ransform=lambda s: "MT" if s == "M" else s)  # Column 1
+            hgvs_id = "chr%s:g.%d%s>%s" % (chrom, pos_hg19, ref, alt)
+        elif version == 'hg38':
+            chrom = cls.read_string(row, "#chr", ransform=lambda s: "MT" if s == "M" else s)  # Column 8
+            hgvs_id = "chr%s:g.%d%s>%s" % (chrom, pos_hg38, ref, alt)
+        else:
+            raise ValueError("Cannot recognize version. Should be either hg19 or hg38. Got version={}".format(version))
+
+        rsid = cls.read_string(row, "rs_dbSNP")  # Column 7
+
+        # Column 10 "hg18_chr" is skipped
+
+        """
+        Step 2: Construct the JSON object
+        """
+        one_snp_json = {
+            "_id": hgvs_id,
+            "dbnsfp": {
+                "rsid": rsid,  # Column 7
+                "chrom": chrom,  # Column 1 or 8
+                "hg19": {  # Column 9
+                    "start": pos_hg19,
+                    "end": pos_hg19
+                },
+                "hg18": {  # Column 11
+                    "start": pos_hg18,
+                    "end": pos_hg18
+                },
+                "hg38": {  # Column 2
+                    "start": pos_hg38,
+                    "end": pos_hg38
+                },
+                "ref": ref,  # Column 3
+                "alt": alt,  # Column 4
+                "aa": {  # Column 5-6, 12, 30-32
+                    "ref": cls.read_string(row, "aaref"),
+                    "alt": cls.read_string(row, "aaalt"),
+                    "pos": cls.read_string(row, "aapos", sep=";", transform=int),
+                    "refcodon": cls.read_string(row, "refcodon", sep=";"),
+                    "codonpos": cls.read_string(row, "codonpos", sep=";", transform=int),
+                    "codon_degeneracy": cls.read_string(row, "codon_degeneracy", sep=";", transform=int),
+                },
+                # Column 13
+                "genename": cls.read_string(row, "genename", sep=";"),
+                # Column 14-16
+                "ensembl": {
+                    "geneid": cls.read_string(row, "Ensembl_geneid", sep=";"),
+                    "transcriptid": cls.read_string(row, "Ensembl_transcriptid", sep=";"),
+                    "proteinid": cls.read_string(row, "Ensembl_proteinid", sep=";")
+                },
+                # Column 17-18
+                "uniprot": cls.parse_uniprot(row, "Uniprot_acc", "Uniprot_entry"),
+                # Column 19-24
+                "hgvsc": cls.read_unique_strings(row, cols=["HGVSc_ANNOVAR", "HGVSc_snpEff", "HGVSc_VEP"], sep=";"),
+                "hgvsp": cls.read_unique_strings(row, cols=["HGVSp_ANNOVAR", "HGVSp_snpEff", "HGVSp_VEP"], sep=";"),
+                # Column 25-29
+                "appris": cls.read_string(row, "APPRIS", sep=";"),
+                "genecode_basic": cls.read_string(row, "GENCODE_basic", sep=";"),
+                "tsl": cls.read_string(row, "TSL", sep=";", transform=int),
+                "vep_canonical": cls.read_string(row, "VEP_canonical", sep=";"),
+                "cds_strand": cls.read_string(row, "cds_strand", sep=";"),
+                # Column 33-36
+                "ancestral_allele": cls.read_string(row, "Ancestral_allele", sep=";"),
+                "altai_neandertal": cls.read_string(row, "AltaiNeandertal", sep=r"/"),
+                "denisova": cls.read_string(row, "Denisova", sep=r"/"),
+                "vindijia_neandertal": cls.read_string(row, "VindijiaNeandertal", sep=r"/"),
+                # Column 37-42
+                "sift": cls.map_score_converted_rankscore_pred_to_json(row, col_prefix="SIFT"),
+                "sift4g": cls.map_score_converted_rankscore_pred_to_json(row, col_prefix="SIFT4G"),
+                # Column 43-48
+                "polyphen2": {
+                    "hdiv": cls.map_score_rankscore_pred_to_json(row, col_prefix="Polyphen2_HDIV"),
+                    "hvar": cls.map_score_rankscore_pred_to_json(row, col_prefix="Polyphen2_HVAR"),
+                },
+                # Column 49-52
+                "lrt": {
+                    "score": cls.read_string(row, "LRT_score", sep=";", transform=float),
+                    "converted_rankscore": cls.read_string(row, "LRT_converted_rankscore", sep=";", transform=float),
+                    "pred": cls.read_string(row, "LRT_pred", sep=";"),
+                    "omega": cls.read_string(row, "LRT_Omega", sep=";", transform=float)
+                },
+                # Column 53-60
+                "mutationtaster": {
+                    "score": cls.read_string(row, "MutationTaster_score", sep=";", transform=float),
+                    "converted_rankscore": cls.read_string(row, "MutationTaster_converted_rankscore", sep=";", transform=float),
+                    "pred": cls.read_string(row, "MutationTaster_pred", sep=";"),
+                    "model": cls.read_string(row, "MutationTaster_model", sep=";"),
+                    "AAE": cls.read_string(row, "MutationTaster_AAE", sep=";")
+                },
+                "mutationassessor": cls.map_score_rankscore_pred_to_json(row, col_prefix="MutationAssessor"),
+                # Column 61-63
+                "fathmm": cls.map_score_converted_rankscore_pred_to_json(row, col_prefix="FATHMM"),
+                # Column 64-66
+                "provean": cls.map_score_converted_rankscore_pred_to_json(row, col_prefix="PROVEAN"),
+                # Column 67-68
+                "vest4": cls.map_score_rankscore_to_json(row, col_prefix="VEST4"),
+                # Column 69-78
+                "metasvm": cls.map_score_rankscore_pred_to_json(row, col_prefix="MetaSVM"),
+                "metalr": cls.map_score_rankscore_pred_to_json(row, col_prefix="MetaLR"),
+                "reliability_index": cls.read_string(row, "Reliability_index", transform=int),
+                "metarnn": cls.map_score_rankscore_pred_to_json(row, col_prefix="MetaRNN"),
+                # Column 79-81
+                "m-cap": cls.map_score_rankscore_pred_to_json(row, col_prefix="M-CAP"),
+                # Column 82-83
+                "revel": cls.map_score_rankscore_to_json(row, col_prefix="REVEL"),
+                # Column 84-88
+                "mutpred": {
+                    "score": cls.read_string(row, "MutPred_score", sep=";", transform=float),
+                    "rankscore": cls.read_string(row, "MutPred_rankscore", sep=";", transform=float),
+                    "accession": cls.read_string(row, "MutPred_protID", sep=";"),
+                    "aa_change": cls.read_string(row, "MutPred_AAchange", sep=";"),
+                    "pred": cls.parse_mutpred_top5features(row, "MutPred_Top5features"),
+                },
+                # Column 89-92
+                "mvp": cls.map_score_rankscore_to_json(row, col_prefix="MVP"),
+                "mpc": cls.map_score_rankscore_to_json(row, col_prefix="MPC"),
+                # Column 93-95
+                "primateai": cls.map_score_rankscore_pred_to_json(row, col_prefix="PrimateAI"),
+                # Column 96-98
+                "deogen2": cls.map_score_rankscore_pred_to_json(row, col_prefix="DEOGEN2"),
+                # Column 99-104
+                "bayesdel": {
+                    "add_af": cls.map_score_rankscore_pred_to_json(row, col_prefix="BayesDel_addAF"),
+                    "no_af": cls.map_score_rankscore_pred_to_json(row, col_prefix="BayesDel_noAF")
+                },
+                # Column 105-107
+                "clinpred": cls.map_score_rankscore_pred_to_json(row, col_prefix="ClinPred"),
+                # Column 108-110
+                "list-s2": cls.map_score_rankscore_pred_to_json(row, col_prefix="LIST-S2"),
+                # Column 111-116
+                "aloft": {
+                    "fraction_transcripts_affected": cls.read_string(row, "Aloft_Fraction_transcripts_affected", sep=";"),
+                    "prob_tolerant": cls.read_string(row, "Aloft_prob_Tolerant", sep=";"),
+                    "prob_recessive": cls.read_string(row, "Aloft_prob_Recessive", sep=";"),
+                    "prob_dominant": cls.read_string(row, "Aloft_prob_Dominant", sep=";"),
+                    "pred": cls.read_string(row, "Aloft_pred", sep=";"),
+                    "confidence": cls.read_string(row, "Aloft_Confidence", sep=";")
+                },
+                # Column 117-122
+                #   Column 117-119 are hg38
+                #   Column 120-122 are hg19
+                # Only column 117-119 will be included in the document when verison == "hg38"
+                # No CADD fields will be included verison == "hg19"
+                "cadd": cls.map_CADD_to_json(row, version),
+                # Column 123-124
+                "dann": cls.map_score_rankscore_to_json(row, col_prefix="DANN"),
+                # Column 125-131
+                "fathmm-mkl": {
+                    "coding_score": cls.read_string(row, "fathmm-MKL_coding_score", sep=";", tranform=float),
+                    "coding_rankscore": cls.read_string(row, "fathmm-MKL_coding_rankscore", sep=";", tranform=float),
+                    "coding_pred": cls.read_string(row, "fathmm-MKL_coding_pred", sep=";"),
+                    "coding_group": cls.read_string(row, "fathmm-MKL_coding_group", sep=";")
+                },
+                "fathmm-xf": {
+                    "coding_score": cls.read_string(row, "fathmm-XF_coding_score", sep=";", tranform=float),
+                    "coding_rankscore": cls.read_string(row, "fathmm-XF_coding_rankscore", sep=";", tranform=float),
+                    "coding_pred": cls.read_string(row, "fathmm-XF_coding_pred", sep=";")
+                },
+                # Column 132-137
+                # Please note that Eigen uses "-", NOT "_", to connect column name prefix and suffixes
+                # Cannot use cls._iter_read_group here
+                "eigen":  {
+                    "raw_coding": cls.read_string(row, "Eigen-raw_coding", sep=";", transform=float),
+                    "raw_coding_rankscore": cls.read_string(row, "Eigen-raw_coding_rankscore", sep=";", transform=float),
+                    "phred_coding": cls.read_string(row, "Eigen-phred_coding", sep=";", transform=float)
+                },
+                "eigen-pc": {
+                    "raw_coding": cls.read_string(row, "Eigen-PC-raw_coding", sep=";", transform=float),
+                    "raw_coding_rankscore": cls.read_string(row, "Eigen-PC-raw_coding_rankscore", sep=";", transform=float),
+                    "phred_coding": cls.read_string(row, "Eigen-PC-phred_coding", sep=";", transform=float),
+                },
+                # Column 138-139
+                # Please note that column 139 in dbNSFP4.2a.readme.txt is "GenoCanyon_score_rankscore" and it's a typo
+                "genocanyon": cls.map_score_rankscore_to_json(row, col_prefix="GenoCanyon"),
+                # Column 140-142
+                "integrated": cls.map_fitcons_score_rankscore_confidence_value_to_json(row, col_prefix="integrated"),
+                # Column 143-145
+                "gm12878": cls.map_fitcons_score_rankscore_confidence_value_to_json(row, col_prefix="GM12878"),
+                # Column 146-148
+                "h1-hesc": cls.map_fitcons_score_rankscore_confidence_value_to_json(row, col_prefix="H1-hESC"),
+                # Column 149-151
+                "huvec": cls.map_fitcons_score_rankscore_confidence_value_to_json(row, col_prefix="HUVEC"),
+                # Column 152-153
+                # Note that column 152 is "LINSIGHT", not "LINSIGHT_score" (possibly a typo in the source data file)
+                "linsight": {
+                    "score": cls.read_string(row, 'LINSIGHT', sep=";", transform=float),
+                    "rankscore": cls.read_string(row, "LINSIGHT_rankscore", sep=";", transform=float)
+                },
+                # Column 154-156
+                "gerp++": {
+                    "nr": cls.read_string(row, "GERP++_NR", sep=";", transform=float),
+                    "rs": cls.read_string(row, "GERP++_RS", sep=";", transform=float),
+                    "rs_rankscore": cls.read_string(row, "GERP++_RS_rankscore", sep=";", transform=float)
+                },
+                # Column 157-162
+                "phylop": {
+                    "vertebrate": {
+                        "track": "100way",
+                        "score": cls.read_string(row, "phyloP100way_vertebrate", sep=";", transform=float),
+                        "rankscore": cls.read_string(row, "phyloP100way_vertebrate_rankscore", sep=";", transform=float)
+                    },
+                    "mammal": {
+                        "track": "30way",
+                        "score": cls.read_string(row, "phyloP30way_mammalian", sep=";", transform=float),
+                        "rankscore": cls.read_string(row, "phyloP30way_mammalian_rankscore", sep=";", transform=float)
+                    },
+                    "primate": {
+                        "track": "17way",
+                        "score": cls.read_string(row, "phyloP17way_primate", sep=";", transform=float),
+                        "rankscore": cls.read_string(row, "phyloP17way_primate_rankscore", sep=";", transform=float)
+                    }
+                },
+                # Column 163-168
+                "phastcons": {
+                    "vertebrate": {
+                        "track": "100way",
+                        "score": cls.read_string(row, "phastCons100way_vertebrate", sep=";", transform=float),
+                        "rankscore": cls.read_string(row, "phastCons100way_vertebrate_rankscore", sep=";", transform=float)
+                    },
+                    "mammal": {
+                        "track": "30way",
+                        "score": cls.read_string(row, "phastCons30way_mammalian", sep=";", transform=float),
+                        "rankscore": cls.read_string(row, "phastCons30way_mammalian_rankscore", sep=";", transform=float)
+                    },
+                    "primate": {
+                        "track": "17way",
+                        "score": cls.read_string(row, "phastCons17way_primate", sep=";", transform=float),
+                        "rankscore": cls.read_string(row, "phastCons17way_primate_rankscore", sep=";", transform=float)
+                    }
+                },
+                # Column 169-171
+                "siphy": {
+                    "mammal": {
+                        "track": "29way",
+                        "pi": cls.parse_siphy_29way_pi(row, "SiPhy_29way_pi"),
+                        # Note that the column name is "SiPhy_29way_logOdds", not "SiPhy_29way_logOdds_score"
+                        "logodds_score": cls.read_string(row, "SiPhy_29way_logOdds", sep=";", transform=float),
+                        "logodds_rankscore": cls.read_string(row, "SiPhy_29way_logOdds_rankscore", sep=";", transform=float)
+                    }
+                },
+                # Column 172-173
+                "bstatistic": {
+                    # Note that the column name is "bStatistic", not "bStatistic_score"
+                    "score": cls.read_string(row, 'bStatistic', sep=";", transform=float),
+                    "converted_rankscore": cls.read_string(row, "bStatistic_converted_rankscore", sep=";", transform=float)
+                },
+                # map_AC_AF_to_json(cls, row, col_prefix, col_infixes)
+                # Column 174-185
+                "1000gp3": cls.map_AC_AF_to_json(row, col_prefix="1000Gp3", col_infixes=["AFR", "EUR", "AMR", "EAS", "SAS"], whole_group=True),
+                # Column 186-187
+                "twinsuk": cls.map_AC_AF_to_json(row, col_prefix="TWINSUK", col_infixes=None, whole_group=True),
+                # Column 188-189
+                "alspac": cls.map_AC_AF_to_json(row, col_prefix="ALSPAC", col_infixes=None, whole_group=True),
+                # Column 190-191
+                "uk10k": cls.map_AC_AF_to_json(row, col_prefix="UK10K", col_infixes=None, whole_group=True),
+                # Column 192-195
+                "esp6500": cls.map_AC_AF_to_json(row, col_prefix="ESP6500", col_infixes=["AA", "EA"], whole_group=False),
+                # Column 196-211
+                "exac": cls.map_AC_AF_to_json(row, col_prefix="ExAC", col_infixes=["Adj", "AFR", "AMR", "EAS", "FIN", "NFE", "SAS"], whole_group=True),
+                # Column 212-227
+                "exac_nontcga": cls.map_AC_AF_to_json(row, col_prefix="ExAC_nonTCGA", col_infixes=["Adj", "AFR", "AMR", "EAS", "FIN", "NFE", "SAS"], whole_group=True),
+                # Column 228-243
+                "exac_nonpsych": cls.map_AC_AF_to_json(row, col_prefix="ExAC_nonpsych", col_infixes=["Adj", "AFR", "AMR", "EAS", "FIN", "NFE", "SAS"], whole_group=True),
+
+                # Column 245-629 are gnomAD_* columns. Skipped.
+
+                # Column 630-638
+                "clinvar": {
+                    "clinvar_id": cls.read_string(row, "clinvar_id"),
+                    "clinsig": cls.read_string(row, "clinvar_clnsig", sep=r"|"),
+                    "trait": cls.read_string(row, "clinvar_trait", sep=r"|"),
+                    "review": cls.read_string(row, "clinvar_review", sep=r"|"),
+                    "hgvs": cls.read_string(row, "clinvar_hgvs", sep=r"|"),
+                    "omim": cls.read_string(row, "clinvar_OMIM_id", sep=r"|"),
+                    "medgen": cls.read_string(row, "clinvar_MedGen_id", sep=r"|"),
+                    "orphanet": cls.read_string(row, "clinvar_Orphanet_id", sep=r"|"),
+                    "var_source": cls.read_string(row, "clinvar_var_source", sep=r"|")
+                },
+                # Column 639-642
+                "interpro_domain": cls.read_string(row, "Interpro_domain", sep=";"),
+                # "gtex": list(gtex),
+                "gtex": cls.parse_gtex(row, "GTEx_V8_gene", "GTEx_V8_tissue"),
+                "geuvadis_eqtl_target_gene": cls.read_string(row, "Geuvadis_eQTL_target_gene", sep=";")
+
+                # End of row
             }
         }
 
-    # load as json data
-    one_snp_json = {
-        "_id": HGVS,
-        "dbnsfp": {
-            "rsid": row["rs_dbSNP"],  # for 4.2a
-            # "rsid": row["rs_dbSNP151"],  # for 4.1a
-            "chrom": chrom,
-            "hg19": {
-                "start": chromStart,
-                "end": chromEnd
-            },
-            "hg18": {
-                "start": row["hg18_pos(1-based)"],
-                "end": hg18_end
-            },
-            "hg38": {
-                "start": row["pos(1-based)"],
-                "end": row["pos(1-based)"]
-            },
-            "ref": ref,
-            "alt": alt,
-            "aa": {
-                "ref": row["aaref"],
-                "alt": row["aaalt"],
-                "pos": row["aapos"],
-                "refcodon": row["refcodon"],
-                "codonpos": row["codonpos"],
-                "codon_degeneracy": row["codon_degeneracy"],
-            },
-            "genename": row["genename"],
-            "uniprot": list(uniprot),
-            "vindijia_neandertal": [i for i in row["VindijiaNeandertal"].split("/") if i != "."],
-            "interpro_domain": row["Interpro_domain"],
-            "cds_strand": row["cds_strand"],
-            "ancestral_allele": row["Ancestral_allele"],
-            "appris": appris,
-            "genecode_basic": row["GENCODE_basic"],
-            "tsl": tsl,
-            "vep_canonical": vep_canonical,
-            # "altaineandertal": fields[17],
-            # "denisova": fields[18]
-            "ensembl": {
-                "geneid": row["Ensembl_geneid"],
-                "transcriptid": row["Ensembl_transcriptid"],
-                "proteinid": row["Ensembl_proteinid"]
-            },
-            "sift": {
-                "score": sift_score,
-                "converted_rankscore": row["SIFT_converted_rankscore"],
-                "pred": row["SIFT_pred"]
-            },
-            "sift4g": {
-                "score": sift4g_score,
-                "pred": row["SIFT4G_score"],
-                "converted_rankscore": row["SIFT4G_converted_rankscore"]
-            },
-            "polyphen2": {
-                "hdiv": {
-                    "score": hdiv_score,
-                    "rankscore": row["Polyphen2_HDIV_rankscore"],
-                    "pred": row["Polyphen2_HDIV_pred"]
-                },
-                "hvar": {
-                    "score": hvar_score,
-                    "rankscore": row["Polyphen2_HVAR_rankscore"],
-                    "pred": row["Polyphen2_HVAR_pred"]
-                }
-            },
-            "lrt": {
-                "score": lrt_score,
-                "converted_rankscore": row["LRT_converted_rankscore"],
-                "pred": row["LRT_pred"],
-                "omega": row["LRT_Omega"]
-            },
-            "mvp": {
-                "score": mvp_score,
-                "rankscore": row["MVP_rankscore"]
-            },
-            "mpc": {
-                "score": mpc_score,
-                "rankscore": row["MPC_rankscore"]
-            },
-            "bstatistic": {
-                "score": row['bStatistic'],
-                "converted_rankscore": row["bStatistic_converted_rankscore"]
-            },
-            "aloft": {
-                "fraction_transcripts_affected": row["Aloft_Fraction_transcripts_affected"].split(';'),
-                "prob_tolerant": row["Aloft_prob_Tolerant"],
-                "prob_recessive": row["Aloft_prob_Recessive"],
-                "prob_dominant": row["Aloft_prob_Dominant"],
-                "pred": row["Aloft_pred"],
-                "confidence": row["Aloft_Confidence"],
-            },
-            "primateai": {
-                "score": row["PrimateAI_score"],
-                "rankscore": row["PrimateAI_rankscore"],
-                "pred": row["PrimateAI_pred"]
-            },
-            "mutationtaster": {
-                "score": mutationtaster_score,
-                "converted_rankscore": row["MutationTaster_converted_rankscore"],
-                "pred": row["MutationTaster_pred"],
-                "model": row["MutationTaster_model"],
-                "AAE": row["MutationTaster_AAE"]
-            },
-            "mutationassessor": {
-                "score": mutationassessor_score,
-                "rankscore": row["MutationAssessor_rankscore"],
-                "pred": row["MutationAssessor_pred"]
-            },
-            "fathmm": {
-                "score": fathmm_score,
-                "rankscore": row["FATHMM_converted_rankscore"],
-                "pred": row["FATHMM_pred"]
-            },
-            "provean": {
-                "score": provean_score,
-                "rankscore": row["PROVEAN_converted_rankscore"],
-                "pred": row["PROVEAN_pred"]
-            },
-            "vest4": {
-                "score": vest3_score,
-                "rankscore": row["VEST4_rankscore"]
-            },
-            "deogen2": {
-                "score": deogen2_score,
-                "rankscore": row["DEOGEN2_rankscore"],
-                "pred": row["DEOGEN2_pred"]
-            },
-            "fathmm-mkl": {
-                "coding_score": row["fathmm-MKL_coding_score"],
-                "coding_rankscore": row["fathmm-MKL_coding_rankscore"],
-                "coding_pred": row["fathmm-MKL_coding_pred"],
-                "coding_group": row["fathmm-MKL_coding_group"]
-            },
-            "fathmm-xf": {
-                "coding_score": row["fathmm-XF_coding_score"],
-                "coding_rankscore": row["fathmm-XF_coding_rankscore"],
-                "coding_pred": row["fathmm-XF_coding_pred"]
-            },
-            "eigen": {
-                "raw_coding": row["Eigen-raw_coding"],
-                "raw_coding_rankscore": row["Eigen-raw_coding_rankscore"],
-                "phred_coding": row["Eigen-phred_coding"]
-            },
-            "eigen-pc": {
-                "raw_coding": row["Eigen-PC-raw_coding"],
-                "phred_coding": row["Eigen-PC-phred_coding"],
-                "raw_rankscore": row["Eigen-PC-raw_coding_rankscore"]
-            },
-            "genocanyon": {
-                "score": row["GenoCanyon_score"],
-                "rankscore": row["GenoCanyon_rankscore"]
-            },
-            "metasvm": {
-                "score": metasvm_score,
-                "rankscore": row["MetaSVM_rankscore"],
-                "pred": row["MetaSVM_pred"]
-            },
-            "metalr": {
-                "score": metalr_score,
-                "rankscore": row["MetaLR_rankscore"],
-                "pred": row["MetaLR_pred"]
-            },
-            "reliability_index": row["Reliability_index"],
-            "m_cap_score": {
-                "score": m_cap_score,
-                "rankscore": row["M-CAP_rankscore"],
-                "pred": row["M-CAP_pred"]
-            },
-            "revel": {
-                "score": revel_score,
-                "rankscore": row["REVEL_rankscore"]
-            },
-            "mutpred": {
-                "score": row["MutPred_score"],
-                "rankscore": row["MutPred_rankscore"],
-                "accession": row["MutPred_protID"],
-                "aa_change": row["MutPred_AAchange"],
-                "pred": mechanisms
-            },
-            "dann": {
-                "score": row["DANN_score"],
-                "rankscore": row["DANN_rankscore"]
-            },
-            "gerp++": {
-                "nr": row["GERP++_NR"],
-                "rs": row["GERP++_RS"],
-                "rs_rankscore": row["GERP++_RS_rankscore"]
-            },
-            "integrated": {
-                "fitcons_score": row["integrated_fitCons_score"],
-                "fitcons_rankscore": row["integrated_fitCons_rankscore"],
-                "confidence_value": row["integrated_confidence_value"]
-            },
-            "gm12878": {
-                "fitcons_score": row["GM12878_fitCons_score"],
-                "fitcons_rankscore": row["GM12878_fitCons_rankscore"],
-                "confidence_value": row["GM12878_confidence_value"]
-            },
-            "h1-hesc": {
-                "fitcons_score": row["H1-hESC_fitCons_score"],
-                "fitcons_rankscore": row["H1-hESC_fitCons_rankscore"],
-                "confidence_value": row["H1-hESC_confidence_value"]
-            },
-            "huvec": {
-                "fitcons_score": row["HUVEC_fitCons_score"],
-                "fitcons_rankscore": row["HUVEC_fitCons_rankscore"],
-                "confidence_value": row["HUVEC_confidence_value"]
-            },
-            "phylo": {
-                "p100way": {
-                    "vertebrate": row["phyloP100way_vertebrate"],
-                    "vertebrate_rankscore": row["phyloP100way_vertebrate_rankscore"]
-                },
-                "p30way": {
-                    "mammalian": row["phyloP30way_mammalian"],
-                    "mammalian_rankscore": row["phyloP30way_mammalian_rankscore"]
-                },
-                "p17way": {
-                    "primate": row["phyloP17way_primate"],
-                    "primate_rankscore": row["phyloP17way_primate_rankscore"]
-                }
-            },
-            "phastcons": {
-                "100way": {
-                    "vertebrate": row["phastCons100way_vertebrate"],
-                    "vertebrate_rankscore": row["phastCons100way_vertebrate_rankscore"]
-                },
-                "30way": {
-                    "mammalian": row["phastCons30way_mammalian"],
-                    "mammalian_rankscore": row["phastCons30way_mammalian_rankscore"]
-                },
-                "p17way": {
-                    "primate": row["phastCons17way_primate"],
-                    "primate_rankscore": row["phastCons17way_primate_rankscore"]
-                }
-            },
-            "siphy_29way": {
-                "pi": siphy,
-                "logodds": row["SiPhy_29way_logOdds"],
-                "logodds_rankscore": row["SiPhy_29way_logOdds_rankscore"]
-            },
-            "bayesdel": {
-                "add_af": {
-                    "score": row["BayesDel_addAF_score"],
-                    "rankscore": row["BayesDel_addAF_rankscore"],
-                    "pred": row["BayesDel_addAF_pred"]
-                },
-                "no_af": {
-                    "score": row["BayesDel_noAF_score"],
-                    "rankscore": row["BayesDel_noAF_rankscore"],
-                    "pred": row["BayesDel_noAF_pred"]
-                }
-            },
-            "clinpred": {
-                "score": row["ClinPred_score"],
-                "rankscore": row["ClinPred_rankscore"],
-                "pred": row["ClinPred_pred"]
-            },
-            "list-s2": {
-                "score": row["LIST-S2_score"],
-                "rankscore": row["LIST-S2_rankscore"],
-                "pred": row["LIST-S2_pred"]
-            },
-            "1000gp3": {
-                "ac": row["1000Gp3_AC"],
-                "af": row["1000Gp3_AF"],
-                "afr_ac": row["1000Gp3_AFR_AC"],
-                "afr_af": row["1000Gp3_AFR_AF"],
-                "eur_ac": row["1000Gp3_EUR_AC"],
-                "eur_af": row["1000Gp3_EUR_AF"],
-                "amr_ac": row["1000Gp3_AMR_AC"],
-                "amr_af": row["1000Gp3_AMR_AF"],
-                "eas_ac": row["1000Gp3_EAS_AC"],
-                "eas_af": row["1000Gp3_EAS_AF"],
-                "sas_ac": row["1000Gp3_SAS_AC"],
-                "sas_af": row["1000Gp3_SAS_AF"]
-            },
-            "twinsuk": {
-                "ac": row["TWINSUK_AC"],
-                "af": row["TWINSUK_AF"]
-            },
-            "alspac": {
-                "ac": row["ALSPAC_AC"],
-                "af": row["ALSPAC_AF"]
-            },
-            "esp6500": {
-                "aa_ac": row["ESP6500_AA_AC"],
-                "aa_af": row["ESP6500_AA_AF"],
-                "ea_ac": row["ESP6500_EA_AC"],
-                "ea_af": row["ESP6500_EA_AF"]
-            },
-            "uk10k": {
-                "ac": row["UK10K_AC"],
-                "af": row["UK10K_AF"]
-            },
-            "exac": {
-                "ac": row["ExAC_AC"],
-                "af": row["ExAC_AF"],
-                "adj_ac": row["ExAC_Adj_AC"],
-                "adj_af": row["ExAC_Adj_AF"],
-                "afr_ac": row["ExAC_AFR_AC"],
-                "afr_af": row["ExAC_AFR_AF"],
-                "amr_ac": row["ExAC_AMR_AC"],
-                "amr_af": row["ExAC_AMR_AF"],
-                "eas_ac": row["ExAC_EAS_AC"],
-                "eas_af": row["ExAC_EAS_AF"],
-                "fin_ac": row["ExAC_FIN_AC"],
-                "fin_af": row["ExAC_FIN_AF"],
-                "nfe_ac": row["ExAC_NFE_AC"],
-                "nfe_af": row["ExAC_NFE_AF"],
-                "sas_ac": row["ExAC_SAS_AC"],
-                "sas_af": row["ExAC_SAS_AF"]
-            },
-            "exac_nontcga": {
-                "ac": row["ExAC_nonTCGA_AC"],
-                "af": row["ExAC_nonTCGA_AF"],
-                "adj_ac": row["ExAC_nonTCGA_Adj_AC"],
-                "adj_af": row["ExAC_nonTCGA_Adj_AF"],
-                "afr_ac": row["ExAC_nonTCGA_AFR_AC"],
-                "afr_af": row["ExAC_nonTCGA_AFR_AF"],
-                "amr_ac": row["ExAC_nonTCGA_AMR_AC"],
-                "amr_af": row["ExAC_nonTCGA_AMR_AF"],
-                "eas_ac": row["ExAC_nonTCGA_EAS_AC"],
-                "eas_af": row["ExAC_nonTCGA_EAS_AF"],
-                "fin_ac": row["ExAC_nonTCGA_FIN_AC"],
-                "fin_af": row["ExAC_nonTCGA_FIN_AF"],
-                "nfe_ac": row["ExAC_nonTCGA_NFE_AC"],
-                "nfe_af": row["ExAC_nonTCGA_NFE_AF"],
-                "sas_ac": row["ExAC_nonTCGA_SAS_AC"],
-                "sas_af": row["ExAC_nonTCGA_SAS_AF"]
-            },
-            "exac_nonpsych": {
-                "ac": row["ExAC_nonpsych_AC"],
-                "af": row["ExAC_nonpsych_AF"],
-                "adj_ac": row["ExAC_nonpsych_Adj_AC"],
-                "adj_af": row["ExAC_nonpsych_Adj_AF"],
-                "afr_ac": row["ExAC_nonpsych_AFR_AC"],
-                "afr_af": row["ExAC_nonpsych_AFR_AF"],
-                "amr_ac": row["ExAC_nonpsych_AMR_AC"],
-                "amr_af": row["ExAC_nonpsych_AMR_AF"],
-                "eas_ac": row["ExAC_nonpsych_EAS_AC"],
-                "eas_af": row["ExAC_nonpsych_EAS_AF"],
-                "fin_ac": row["ExAC_nonpsych_FIN_AC"],
-                "fin_af": row["ExAC_nonpsych_FIN_AF"],
-                "nfe_ac": row["ExAC_nonpsych_NFE_AC"],
-                "nfe_af": row["ExAC_nonpsych_NFE_AF"],
-                "sas_ac": row["ExAC_nonpsych_SAS_AC"],
-                "sas_af": row["ExAC_nonpsych_SAS_AF"]
-            },
-            "clinvar": {
-                "clinvar_id": row["clinvar_id"],
-                "clinsig": [i for i in row["clinvar_clnsig"].split("/") if i != "."],
-                "trait": [i for i in row["clinvar_trait"].split("|") if i != "."],
-                "review": [i for i in row["clinvar_review"].split(",") if i != "."],
-                "hgvs": [i for i in row["clinvar_hgvs"].split("|") if i != "."],
-                "omim": [i for i in row["clinvar_OMIM_id"].split("|") if i != "."],
-                "medgen": [i for i in row["clinvar_MedGen_id"].split("|") if i != "."],
-                "orphanet": [i for i in row["clinvar_Orphanet_id"].split("|") if i != "."],
-                "var_source": [i for i in row["clinvar_var_source"].split("|") if i != "."]
-            },
-            "hgvsc": list(set(row["HGVSc_ANNOVAR"].split(';') + row["HGVSc_snpEff"].split(';') + row["HGVSc_VEP"].split(';'))),
-            "hgvsp": list(set(row["HGVSp_ANNOVAR"].split(';') + row["HGVSp_snpEff"].split(';') + row["HGVSp_VEP"].split(';'))),
-            "gtex": list(gtex),
-            "geuvadis_eqtl_target_gene": row["Geuvadis_eQTL_target_gene"]
-        }
-    }
-    if include_gnomad:
-        one_snp_json['dbnsfp'].update(gnomad)
-    one_snp_json = list_split(dict_sweep(unlist(value_convert_to_number(one_snp_json)), vals=[".", '-', "NA", None], remove_invalid_list=True), ";")
-    one_snp_json["dbnsfp"]["chrom"] = str(one_snp_json["dbnsfp"]["chrom"])
-    return one_snp_json
+        """
+        Step 3: Prune the JSON object and return
+        """
+        # `value_convert_to_number` converts strings to numeric values inside the dictionary
+        # `unlist` regresses lists of length 1 to single values inside the dictionary
+        # `dict_sweep` remove NA values indicated by `vals` inside the dictionary
+        # `list_split` separate fields by `sep` into lists
+        one_snp_json = dict_sweep(one_snp_json, vals=[None], remove_invalid_list=True)
+        return one_snp_json
 
 
 # open file, parse, pass to json mapper
-def data_generator(input_file, version, include_gnomad):
+def data_generator(input_file, version):
     with anyfile(input_file) as file:
         file_reader = csv.reader(file, delimiter="\t")
 
@@ -631,8 +658,8 @@ def data_generator(input_file, version, include_gnomad):
         for row in file_reader:
             row = dict(zip(header, row))
 
-            # use transpose matrix to have 1 line with N 187 columns
-            current_row = _map_row_to_json(row, version=version, include_gnomad=include_gnomad)
+            # use transposed matrix to have 1 line with N 187 columns
+            current_row = DbnsfpReader.map_row_to_json(row, version=version)
             if previous_row and current_row:
                 if current_row["_id"] == previous_row["_id"]:
                     aa = previous_row["dbnsfp"]["aa"]
@@ -651,14 +678,14 @@ def data_generator(input_file, version, include_gnomad):
             yield previous_row
 
 
-def load_data_file(input_file, version, include_gnomad=False):
-    data = data_generator(input_file, version=version, include_gnomad=include_gnomad)
+def load_data_file(input_file, version):
+    data = data_generator(input_file, version=version)
     for one_snp_json in data:
         yield one_snp_json
 
 
 # load path and find files, pass to data_generator
-def load_data(path_glob, version='hg19', include_gnomad=False):
+def load_data(path_glob, version='hg19'):
     for input_file in sorted(glob.glob(path_glob)):
-        for d in load_data_file(input_file, version, include_gnomad):
+        for d in load_data_file(input_file, version):
             yield d
