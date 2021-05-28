@@ -1,6 +1,10 @@
 mapping = {
     "dbnsfp": {
         "properties": {
+            "rsid": {
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
             "chrom": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
@@ -71,42 +75,11 @@ mapping = {
                     }
                 }
             },
-            "genename": {
+            "genename": {  # Column 13
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "uniprot": {
-                "properties": {
-                    "acc": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "entry": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "ancestral_allele": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "appris": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "genecode_basic": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "tsl": {
-                "type": "integer"
-            },
-            "vep_canonical": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "ensembl": {
+            "ensembl": {  # Column 14-16
                 "properties": {
                     "geneid": {
                         "type": "keyword",
@@ -122,17 +95,139 @@ mapping = {
                     }
                 }
             },
-            "bstatistic": {
+            "uniprot": {  # Column 17-18
+                "properties": {
+                    "acc": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "entry": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "hgvsc": {  # Column 19-21
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "hgvsp": {  # Column 22-24
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "appris": {  # Column 25
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "genecode_basic": {  # Column 26
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "tsl": {  # Column 27
+                "type": "integer"
+            },
+            "vep_canonical": {  # Column 28
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "cds_strand": {  # Column 29
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "ancestral_allele": {  # Column 33
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "altai_neandertal": {  # Column 34
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "denisova": {  # Column 35
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "vindijia_neandertal": {  # Column 36
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "sift": {  # Column 37-39
                 "properties": {
                     "score": {
-                        "type": "integer"
+                        "type": "float"
+                    },
+                    "converted_rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "sift4g": {  # Column 40-42
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
                     },
                     "converted_rankscore": {
                         "type": "float"
                     }
                 }
             },
-            "mutationtaster": {
+            "polyphen2": {  # Column 43-48
+                "properties": {
+                    "hdiv": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "hvar": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    }
+                }
+            },
+            "lrt": {  # Column 49-52
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "converted_rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "omega": {
+                        "type": "float"
+                    }
+                }
+            },
+            "mutationtaster": {  # Column 53-57
                 "properties": {
                     "score": {
                         "type": "float"
@@ -153,7 +248,49 @@ mapping = {
                     }
                 }
             },
-            "vest4": {
+            "mutationassessor": {  # Column 58-60
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "fathmm": {  # Column 61-63
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "provean": {  # Column 64-66
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "vest4": {  # Column 67-68
                 "properties": {
                     "score": {
                         "type": "float"
@@ -163,7 +300,263 @@ mapping = {
                     }
                 }
             },
-            "fathmm-mkl": {
+            "metasvm": {  # Column 69-71
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "metalr": {  # Column 72-74
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "reliability_index": {  # Column 75
+                "type": "integer"
+            },
+            "metarnn": {  # Column 76-78
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "m-cap": {  # Column 79-81
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "revel": {  # Column 82-83
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    }
+                }
+            },
+            "mutpred": {  # Column 84-88
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "accession": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "aa_change": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "pred": {
+                        "properties": {
+                            "p_val": {
+                                "type": "float"
+                            },
+                            "mechanism": {
+                                "type": "text"
+                            }
+                        }
+                    }
+                }
+            },
+            "mvp": {  # Column 89-90
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    }
+                }
+            },
+            "mpc": {  # Column 91-92
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    }
+                }
+            },
+            "primateai": {  # Column 93-95
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "deogen2": {  # Column 96-98
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "bayesdel": {  # Column 43-48
+                "properties": {
+                    "add_af": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    },
+                    "no_af": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "pred": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            }
+                        }
+                    }
+                }
+            },
+            "clinpred": {  # Column 105-107
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "list-s2": {  # Column 108-110
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "aloft": {  # Column 111-116
+                "properties": {
+                    "prob_tolerant": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "prob_recessive": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "prob_dominant": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "fraction_transcripts_affected": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "confidence": {
+                        "type": "text"
+                    }
+                }
+            },
+            "cadd": {  # Column 117-119
+                "properties": {
+                    "raw_score": {
+                        "type": "float"
+                    },
+                    "raw_rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "dann": {  # Column 123-124
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    }
+                }
+            },
+            "fathmm-mkl": {  # Column 125-128
                 "properties": {
                     "coding_score": {
                         "type": "float"
@@ -181,7 +574,21 @@ mapping = {
                     }
                 }
             },
-            "eigen": {
+            "fathmm-xf": {  # Column 129-131
+                "properties": {
+                    "coding_score": {
+                        "type": "float"
+                    },
+                    "coding_rankscore": {
+                        "type": "float"
+                    },
+                    "coding_pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "eigen": {  # Column 132-134
                 "properties": {
                     "raw_coding": {
                         "type": "float"
@@ -194,20 +601,20 @@ mapping = {
                     }
                 }
             },
-            "eigen-pc": {
+            "eigen-pc": {  # Column 135-137
                 "properties": {
                     "raw_coding": {
+                        "type": "float"
+                    },
+                    "raw_coding_rankscore": {
                         "type": "float"
                     },
                     "phred_coding": {
                         "type": "float"
                     },
-                    "raw_rankscore": {
-                        "type": "float"
-                    }
                 }
             },
-            "genocanyon": {
+            "genocanyon": {  # Column 138-139
                 "properties": {
                     "score": {
                         "type": "float"
@@ -217,7 +624,59 @@ mapping = {
                     }
                 }
             },
-            "dann": {
+            "integrated": {  # Column 140-142
+                "properties": {
+                    "fitcons_score": {
+                        "type": "float"
+                    },
+                    "fitcons_rankscore": {
+                        "type": "float"
+                    },
+                    "confidence_value": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "gm12878": {  # Column 143-145
+                "properties": {
+                    "fitcons_score": {
+                        "type": "float"
+                    },
+                    "fitcons_rankscore": {
+                        "type": "float"
+                    },
+                    "confidence_value": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "h1-hesc": {  # Column 146-148
+                "properties": {
+                    "fitcons_score": {
+                        "type": "float"
+                    },
+                    "fitcons_rankscore": {
+                        "type": "float"
+                    },
+                    "confidence_value": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "huvec": {  # Column 149-151
+                "properties": {
+                    "fitcons_score": {
+                        "type": "float"
+                    },
+                    "fitcons_rankscore": {
+                        "type": "float"
+                    },
+                    "confidence_value": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "linsight": {  # Column 152-153
                 "properties": {
                     "score": {
                         "type": "float"
@@ -227,157 +686,149 @@ mapping = {
                     }
                 }
             },
-            "integrated": {
+            "gerp++": {  # Column 154-156
                 "properties": {
-                    "fitcons_score": {
+                    "nr": {
                         "type": "float"
                     },
-                    "fitcons_rankscore": {
+                    "rs": {
                         "type": "float"
                     },
-                    "confidence_value": {
+                    "rs_rankscore": {
+                        "type": "float"
+                    }
+                }
+            },
+            "phylop": {  # Column 157-162
+                "properties": {
+                    "vertebrate": {
+                        "properties": {
+                            "track": {
+                                "type": "text"
+                            },
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "mammal": {
+                        "properties": {
+                            "track": {
+                                "type": "text"
+                            },
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "primate": {
+                        "properties": {
+                            "track": {
+                                "type": "text"
+                            },
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            }
+                        }
+                    }
+                }
+            },
+            "phastcons": {  # Column 163-168
+                "properties": {
+                    "vertebrate": {
+                        "properties": {
+                            "track": {
+                                "type": "text"
+                            },
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "mammal": {
+                        "properties": {
+                            "track": {
+                                "type": "text"
+                            },
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "primate": {
+                        "properties": {
+                            "track": {
+                                "type": "text"
+                            },
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            }
+                        }
+                    }
+                }
+            },
+            "siphy": {  # Column 169-171
+                "properties": {
+                    "mammal": {
+                        "properties": {
+                            "track": {
+                                "type": "text"
+                            },
+                            "pi": {
+                                "properties": {
+                                    "a": {
+                                        "type": "float"
+                                    },
+                                    "c": {
+                                        "type": "float"
+                                    },
+                                    "g": {
+                                        "type": "float"
+                                    },
+                                    "t": {
+                                        "type": "float"
+                                    }
+                                }
+                            },
+                            "logodds_score": {
+                                "type": "float"
+                            },
+                            "logodds_rankscore": {
+                                "type": "float"
+                            }
+                        }
+                    }
+                }
+            },
+            "bstatistic": {  # Column 172-173
+                "properties": {
+                    "score": {
                         "type": "integer"
-                    }
-                }
-            },
-            "gm12878": {
-                "properties": {
-                    "fitcons_score": {
-                        "type": "float"
                     },
-                    "fitcons_rankscore": {
-                        "type": "float"
-                    },
-                    "confidence_value": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "h1-hesc": {
-                "properties": {
-                    "fitcons_score": {
-                        "type": "float"
-                    },
-                    "fitcons_rankscore": {
-                        "type": "float"
-                    },
-                    "confidence_value": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "huvec": {
-                "properties": {
-                    "fitcons_score": {
-                        "type": "float"
-                    },
-                    "fitcons_rankscore": {
-                        "type": "float"
-                    },
-                    "confidence_value": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "phylo": {
-                "properties": {
-                    "p100way": {
-                        "properties": {
-                            "vertebrate": {
-                                "type": "float"
-                            },
-                            "vertebrate_rankscore": {
-                                "type": "float"
-                            }
-                        }
-                    },
-                    "p30way": {
-                        "properties": {
-                            "mammalian": {
-                                "type": "float"
-                            },
-                            "mammalian_rankscore": {
-                                "type": "float"
-                            }
-                        }
-                    },
-                    "p17way": {
-                        "properties": {
-                            "primate": {
-                                "type": "float"
-                            },
-                            "primate_rankscore": {
-                                "type": "float"
-                            }
-                        }
-                    }
-                }
-            },
-            "phastcons": {
-                "properties": {
-                    "100way": {
-                        "properties": {
-                            "vertebrate": {
-                                "type": "float"
-                            },
-                            "vertebrate_rankscore": {
-                                "type": "float"
-                            }
-                        }
-                    },
-                    "30way": {
-                        "properties": {
-                            "mammalian": {
-                                "type": "float"
-                            },
-                            "mammalian_rankscore": {
-                                "type": "float"
-                            }
-                        }
-                    },
-                    "p17way": {
-                        "properties": {
-                            "primate": {
-                                "type": "float"
-                            },
-                            "primate_rankscore": {
-                                "type": "float"
-                            }
-                        }
-                    }
-                }
-            },
-            "siphy_29way": {
-                "properties": {
-                    "pi": {
-                        "properties": {
-                            "a": {
-                                "type": "float"
-                            },
-                            "c": {
-                                "type": "float"
-                            },
-                            "g": {
-                                "type": "float"
-                            },
-                            "t": {
-                                "type": "float"
-                            }
-                        }
-                    },
-                    "logodds": {
-                        "type": "float"
-                    },
-                    "logodds_rankscore": {
+                    "converted_rankscore": {
                         "type": "float"
                     }
                 }
             },
-            "rsid": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "1000gp3": {
+            "1000gp3": {  # Column 174-185
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -417,7 +868,53 @@ mapping = {
                     }
                 }
             },
-            "exac": {
+            "twinsuk": {  # Column 186-187
+                "properties": {
+                    "ac": {
+                        "type": "integer"
+                    },
+                    "af": {
+                        "type": "float"
+                    }
+                }
+            },
+            "alspac": {  # Column 188-189
+                "properties": {
+                    "ac": {
+                        "type": "integer"
+                    },
+                    "af": {
+                        "type": "float"
+                    }
+                }
+            },
+            "uk10k": {  # Column 190-191
+                "properties": {
+                    "ac": {
+                        "type": "integer"
+                    },
+                    "af": {
+                        "type": "float"
+                    }
+                }
+            },
+            "esp6500": {  # Column 192-195
+                "properties": {
+                    "aa_ac": {
+                        "type": "integer"
+                    },
+                    "aa_af": {
+                        "type": "float"
+                    },
+                    "ea_ac": {
+                        "type": "integer"
+                    },
+                    "ea_af": {
+                        "type": "float"
+                    }
+                }
+            },
+            "exac": {  # Column 196-211
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -469,7 +966,7 @@ mapping = {
                     }
                 }
             },
-            "exac_nontcga": {
+            "exac_nontcga": {  # Column 212-227
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -521,7 +1018,7 @@ mapping = {
                     }
                 }
             },
-            "exac_nonpsych": {
+            "exac_nonpsych": {  # Column 228-243
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -573,156 +1070,8 @@ mapping = {
                     }
                 }
             },
-            "sift4g": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "converted_rankscore": {
-                        "type": "float"
-                    }
-                }
-            },
-            "mvp": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
-                }
-            },
-            "primateai": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "deogen2": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "fathmm-xf": {
-                "properties": {
-                    "coding_score": {
-                        "type": "float"
-                    },
-                    "coding_rankscore": {
-                        "type": "float"
-                    },
-                    "coding_pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "metasvm": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "clinpred": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "list-s2s": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "metalr": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "reliability_index": {
-                "type": "integer"
-            },
-            "m_cap_score": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "revel": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
-                }
-            },
-            "clinvar": {
+            # Column 245-629 are gnomAD_* columns. Skipped.
+            "clinvar": {  # Column 630-638
                 "properties": {
                     "clinvar_id": {
                         "type": "integer"
@@ -757,7 +1106,10 @@ mapping = {
                     }
                 }
             },
-            "gtex": {
+            "interpro_domain": {  # Column 639
+                "type": "text"
+            },
+            "gtex": {  # Column 640-641
                 "properties": {
                     "gene": {
                         "type": "keyword",
@@ -769,255 +1121,7 @@ mapping = {
                     }
                 }
             },
-            "esp6500": {
-                "properties": {
-                    "aa_ac": {
-                        "type": "integer"
-                    },
-                    "aa_af": {
-                        "type": "float"
-                    },
-                    "ea_ac": {
-                        "type": "integer"
-                    },
-                    "ea_af": {
-                        "type": "float"
-                    }
-                }
-            },
-            "gerp++": {
-                "properties": {
-                    "nr": {
-                        "type": "float"
-                    },
-                    "rs": {
-                        "type": "float"
-                    },
-                    "rs_rankscore": {
-                        "type": "float"
-                    }
-                }
-            },
-            "mutationassessor": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "mutpred": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "accession": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "aa_change": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "pred": {
-                        "properties": {
-                            "p_val": {
-                                "type": "float"
-                            },
-                            "mechanism": {
-                                "type": "text"
-                            }
-                        }
-                    }
-                }
-            },
-            "polyphen2": {
-                "properties": {
-                    "hdiv": {
-                        "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "pred": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            }
-                        }
-                    },
-                    "hvar": {
-                        "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "pred": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            }
-                        }
-                    }
-                }
-            },
-            "sift": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "converted_rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "mpc": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
-                }
-            },
-            "fathmm": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "provean": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "interpro_domain": {
-                "type": "text"
-            },
-            "cds_strand": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "lrt": {
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "converted_rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "omega": {
-                        "type": "float"
-                    }
-                }
-            },
-            "aloft": {
-                "properties": {
-                    "prob_tolerant": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "prob_recessive": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "prob_dominant": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "fraction_transcripts_affected": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "confidence": {
-                        "type": "text"
-                    }
-                }
-            },
-            "vindijia_neandertal": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "twinsuk": {
-                "properties": {
-                    "ac": {
-                        "type": "integer"
-                    },
-                    "af": {
-                        "type": "float"
-                    }
-                }
-            },
-            "alspac": {
-                "properties": {
-                    "ac": {
-                        "type": "integer"
-                    },
-                    "af": {
-                        "type": "float"
-                    }
-                }
-            },
-            "uk10k": {
-                "properties": {
-                    "ac": {
-                        "type": "integer"
-                    },
-                    "af": {
-                        "type": "float"
-                    }
-                }
-            },
-            "geuvadis_eqtl_target_gene": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "hgvsc": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "hgvsp": {
+            "geuvadis_eqtl_target_gene": {  # Column 642
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             }
