@@ -25,7 +25,7 @@ class DbnsfpReader:
                    r'1.#IND', r'1.#QNAN', r'<NA>', r'N/A', r'NA', r'NULL', r'NaN', r'n/a', r'nan', r'null', r'none',
                    r"Not Available", r"unknown"}
 
-    mutpred_top5features_pattern = re.compile(r" \(P = (\d*\.?\d+)\)$")
+    mutpred_top5features_pattern = re.compile(r" \(P = ([eE0-9.-]*)\)$")
 
     # A general rule from observation: for some of the columns, data type can be inferred from the suffix of their
     # column names. E.g. "xxx_score" is usually float.
@@ -222,7 +222,7 @@ class DbnsfpReader:
 
         Here we apply regex to parse this string
 
-            regex = re.compile(r" \(P = (\d*\.?\d+)\)$")
+            regex = re.compile(r" \(P = ([eE0-9.-]*)\)$")
             [(e for e in regex.split(s) if e.strip()) for s in string.split("; ")]
 
         and get a list of 5 tuples like
@@ -236,8 +236,8 @@ class DbnsfpReader:
         if string is None:
             return None
 
-        mp_list = [(e for e in cls.mutpred_top5features_pattern.split(s) if e.strip()) for s in string.split("; ")]
-        return [{"mechanism": mp[0], "p_val": float(mp[1])} for mp in mp_list]
+        mp_list = [tuple(e for e in cls.mutpred_top5features_pattern.split(s) if e.strip()) for s in string.split("; ")]
+        return [{"mechanism": mp[0], "p_val": float(mp[1])} for mp in mp_list if mp and len(mp) == 2]
 
     @classmethod
     def parse_uniprot(cls, row, acc_col, entry_col):
@@ -312,12 +312,12 @@ class DbnsfpReader:
         """
         if version == "hg38":
             cadd_dict = {
-                "raw_score": cls.read_string(row, "CADD_raw", sep=";", tranform=float),
-                "raw_rankscore": cls.read_string(row, "CADD_raw_rankscore", sep=";", tranform=float),
-                "phred": cls.read_string(row, "CADD_phred", sep=";", tranform=float),
-                # "raw_score_hg19": cls.read_string(row, "CADD_raw_hg19", sep=";", tranform=float),
-                # "raw_rankscore_hg19": cls.read_string(row, "CADD_raw_rankscore_hg19", sep=";", tranform=float),
-                # "phred_hg19": cls.read_string(row, "CADD_phred_hg19", sep=";", tranform=float)
+                "raw_score": cls.read_string(row, "CADD_raw", sep=";", transform=float),
+                "raw_rankscore": cls.read_string(row, "CADD_raw_rankscore", sep=";", transform=float),
+                "phred": cls.read_string(row, "CADD_phred", sep=";", transform=float),
+                # "raw_score_hg19": cls.read_string(row, "CADD_raw_hg19", sep=";", transform=float),
+                # "raw_rankscore_hg19": cls.read_string(row, "CADD_raw_rankscore_hg19", sep=";", transform=float),
+                # "phred_hg19": cls.read_string(row, "CADD_phred_hg19", sep=";", transform=float)
             }
             return cadd_dict
         elif version == "hg19":
@@ -347,10 +347,10 @@ class DbnsfpReader:
         alt = cls.read_string(row, "alt", transform=lambda s: s.upper())  # Column 4
 
         if version == 'hg19':
-            chrom = cls.read_string(row, "hg19_chr", ransform=lambda s: "MT" if s == "M" else s)  # Column 1
+            chrom = cls.read_string(row, "hg19_chr", transform=lambda s: "MT" if s == "M" else s)  # Column 1
             hgvs_id = "chr%s:g.%d%s>%s" % (chrom, pos_hg19, ref, alt)
         elif version == 'hg38':
-            chrom = cls.read_string(row, "#chr", ransform=lambda s: "MT" if s == "M" else s)  # Column 8
+            chrom = cls.read_string(row, "#chr", transform=lambda s: "MT" if s == "M" else s)  # Column 8
             hgvs_id = "chr%s:g.%d%s>%s" % (chrom, pos_hg38, ref, alt)
         else:
             raise ValueError("Cannot recognize version. Should be either hg19 or hg38. Got version={}".format(version))
@@ -495,14 +495,14 @@ class DbnsfpReader:
                 "dann": cls.map_score_rankscore_to_json(row, col_prefix="DANN"),
                 # Column 125-131
                 "fathmm-mkl": {
-                    "coding_score": cls.read_string(row, "fathmm-MKL_coding_score", sep=";", tranform=float),
-                    "coding_rankscore": cls.read_string(row, "fathmm-MKL_coding_rankscore", sep=";", tranform=float),
+                    "coding_score": cls.read_string(row, "fathmm-MKL_coding_score", sep=";", transform=float),
+                    "coding_rankscore": cls.read_string(row, "fathmm-MKL_coding_rankscore", sep=";", transform=float),
                     "coding_pred": cls.read_string(row, "fathmm-MKL_coding_pred", sep=";"),
                     "coding_group": cls.read_string(row, "fathmm-MKL_coding_group", sep=";")
                 },
                 "fathmm-xf": {
-                    "coding_score": cls.read_string(row, "fathmm-XF_coding_score", sep=";", tranform=float),
-                    "coding_rankscore": cls.read_string(row, "fathmm-XF_coding_rankscore", sep=";", tranform=float),
+                    "coding_score": cls.read_string(row, "fathmm-XF_coding_score", sep=";", transform=float),
+                    "coding_rankscore": cls.read_string(row, "fathmm-XF_coding_rankscore", sep=";", transform=float),
                     "coding_pred": cls.read_string(row, "fathmm-XF_coding_pred", sep=";")
                 },
                 # Column 132-137
