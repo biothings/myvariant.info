@@ -31,24 +31,23 @@ class DBNSFPBaseUploader(uploader.ParallelizedSourceUploader,
                    glob.glob(os.path.join(self.data_folder, self.__class__.GLOB_PATTERN)))
 
     def load_data(self, input_file, hg):
+        self.logger.debug("loading file " + input_file)
         return load_common(input_file, version=hg)
 
 
 class DBNSFPHG38Uploader(DBNSFPBaseUploader):
-
     name = "dbnsfp_hg38"
     main_source = "dbnsfp"
     __metadata__ = {
-            "assembly": "hg38",
-            "src_meta" : SRC_META
-            }
+        "assembly": "hg38",
+        "src_meta": SRC_META
+    }
 
 
 class DBNSFPHG19Uploader(DBNSFPBaseUploader):
-
     name = "dbnsfp_hg19"
     main_source = "dbnsfp"
     __metadata__ = {
-            "assembly": "hg19",
-            "src_meta" : SRC_META
-            }
+        "assembly": "hg19",
+        "src_meta": SRC_META
+    }
