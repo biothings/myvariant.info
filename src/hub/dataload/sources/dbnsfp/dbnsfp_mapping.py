@@ -701,11 +701,8 @@ mapping = {
             },
             "phylop": {  # Column 157-162
                 "properties": {
-                    "vertebrate": {
+                    "100way_vertebrate": {
                         "properties": {
-                            "track": {
-                                "type": "text"
-                            },
                             "score": {
                                 "type": "float"
                             },
@@ -714,11 +711,8 @@ mapping = {
                             }
                         }
                     },
-                    "mammal": {
+                    "30way_mammalian": {
                         "properties": {
-                            "track": {
-                                "type": "text"
-                            },
                             "score": {
                                 "type": "float"
                             },
@@ -727,11 +721,8 @@ mapping = {
                             }
                         }
                     },
-                    "primate": {
+                    "17way_primate": {
                         "properties": {
-                            "track": {
-                                "type": "text"
-                            },
                             "score": {
                                 "type": "float"
                             },
@@ -744,11 +735,8 @@ mapping = {
             },
             "phastcons": {  # Column 163-168
                 "properties": {
-                    "vertebrate": {
+                    "100way_vertebrate": {
                         "properties": {
-                            "track": {
-                                "type": "text"
-                            },
                             "score": {
                                 "type": "float"
                             },
@@ -757,11 +745,8 @@ mapping = {
                             }
                         }
                     },
-                    "mammal": {
+                    "30way_mammalian": {
                         "properties": {
-                            "track": {
-                                "type": "text"
-                            },
                             "score": {
                                 "type": "float"
                             },
@@ -770,11 +755,8 @@ mapping = {
                             }
                         }
                     },
-                    "primate": {
+                    "17way_primate": {
                         "properties": {
-                            "track": {
-                                "type": "text"
-                            },
                             "score": {
                                 "type": "float"
                             },
@@ -785,36 +767,29 @@ mapping = {
                     }
                 }
             },
-            "siphy": {  # Column 169-171
+            "siphy_29way": {  # Column 169-171
                 "properties": {
-                    "mammal": {
+                    "pi": {
                         "properties": {
-                            "track": {
-                                "type": "text"
-                            },
-                            "pi": {
-                                "properties": {
-                                    "a": {
-                                        "type": "float"
-                                    },
-                                    "c": {
-                                        "type": "float"
-                                    },
-                                    "g": {
-                                        "type": "float"
-                                    },
-                                    "t": {
-                                        "type": "float"
-                                    }
-                                }
-                            },
-                            "logodds_score": {
+                            "a": {
                                 "type": "float"
                             },
-                            "logodds_rankscore": {
+                            "c": {
+                                "type": "float"
+                            },
+                            "g": {
+                                "type": "float"
+                            },
+                            "t": {
                                 "type": "float"
                             }
                         }
+                    },
+                    "logodds_score": {
+                        "type": "float"
+                    },
+                    "logodds_rankscore": {
+                        "type": "float"
                     }
                 }
             },

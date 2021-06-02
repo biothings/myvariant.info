@@ -543,49 +543,40 @@ class DbnsfpReader:
                 },
                 # Column 157-162
                 "phylop": {
-                    "vertebrate": {
-                        "track": "100way",
+                    "100way_vertebrate": {
                         "score": cls.read_string(row, "phyloP100way_vertebrate", sep=";", transform=float),
                         "rankscore": cls.read_string(row, "phyloP100way_vertebrate_rankscore", sep=";", transform=float)
                     },
-                    "mammal": {
-                        "track": "30way",
+                    "30way_mammalian": {
                         "score": cls.read_string(row, "phyloP30way_mammalian", sep=";", transform=float),
                         "rankscore": cls.read_string(row, "phyloP30way_mammalian_rankscore", sep=";", transform=float)
                     },
-                    "primate": {
-                        "track": "17way",
+                    "17way_primate": {
                         "score": cls.read_string(row, "phyloP17way_primate", sep=";", transform=float),
                         "rankscore": cls.read_string(row, "phyloP17way_primate_rankscore", sep=";", transform=float)
                     }
                 },
                 # Column 163-168
                 "phastcons": {
-                    "vertebrate": {
-                        "track": "100way",
+                    "100way_vertebrate": {
                         "score": cls.read_string(row, "phastCons100way_vertebrate", sep=";", transform=float),
                         "rankscore": cls.read_string(row, "phastCons100way_vertebrate_rankscore", sep=";", transform=float)
                     },
-                    "mammal": {
-                        "track": "30way",
+                    "30way_mammalian": {
                         "score": cls.read_string(row, "phastCons30way_mammalian", sep=";", transform=float),
                         "rankscore": cls.read_string(row, "phastCons30way_mammalian_rankscore", sep=";", transform=float)
                     },
-                    "primate": {
-                        "track": "17way",
+                    "17way_primate": {
                         "score": cls.read_string(row, "phastCons17way_primate", sep=";", transform=float),
                         "rankscore": cls.read_string(row, "phastCons17way_primate_rankscore", sep=";", transform=float)
                     }
                 },
                 # Column 169-171
-                "siphy": {
-                    "mammal": {
-                        "track": "29way",
-                        "pi": cls.parse_siphy_29way_pi(row, "SiPhy_29way_pi"),
-                        # Note that the column name is "SiPhy_29way_logOdds", not "SiPhy_29way_logOdds_score"
-                        "logodds_score": cls.read_string(row, "SiPhy_29way_logOdds", sep=";", transform=float),
-                        "logodds_rankscore": cls.read_string(row, "SiPhy_29way_logOdds_rankscore", sep=";", transform=float)
-                    }
+                "siphy_29way": {
+                    "pi": cls.parse_siphy_29way_pi(row, "SiPhy_29way_pi"),
+                    # Note that the column name is "SiPhy_29way_logOdds", not "SiPhy_29way_logOdds_score"
+                    "logodds_score": cls.read_string(row, "SiPhy_29way_logOdds", sep=";", transform=float),
+                    "logodds_rankscore": cls.read_string(row, "SiPhy_29way_logOdds_rankscore", sep=";", transform=float)
                 },
                 # Column 172-173
                 "bstatistic": {
