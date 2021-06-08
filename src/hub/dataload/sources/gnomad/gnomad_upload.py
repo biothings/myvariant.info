@@ -3,7 +3,7 @@ import glob
 
 from biothings.hub.dataload.uploader import ResourceError, ParallelizedSourceUploader
 
-from .gnomad_parser_genomes import load_genome_data, load_exome_data
+from .gnomad_v2_parser import load_genome_data, load_exome_data
 from .mapping import exomes_mapping, genomes_mapping
 from hub.dataload.uploader import SnpeffPostUpdateUploader
 from hub.dataload.storage import MyVariantIgnoreDuplicatedStorage
