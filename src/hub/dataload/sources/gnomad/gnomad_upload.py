@@ -3,8 +3,7 @@ import glob
 
 from biothings.hub.dataload.uploader import ResourceError, ParallelizedSourceUploader
 
-from .gnomad_parser_genomes import load_data as load_data_genomes
-from .gnomad_parser_exomes import load_data as load_data_exomes
+from .gnomad_parser_genomes import load_genome_data, load_exome_data
 from .mapping import exomes_mapping, genomes_mapping
 from hub.dataload.uploader import SnpeffPostUpdateUploader
 from hub.dataload.storage import MyVariantIgnoreDuplicatedStorage
@@ -47,7 +46,7 @@ class GnomadExomesBaseUploader(GnomadBaseUploader):
         input_file = files.pop()
         assert os.path.exists("%s%s" % (input_file, self.__class__.tbi_suffix)), "%s%s" % (input_file, self.__class__.tbi_suffix)
         self.logger.info("Load data from file '%s'" % input_file)
-        res = load_data_exomes(input_file)
+        res = load_exome_data(input_file)
         return res
 
     @classmethod
@@ -79,7 +78,7 @@ class GnomadGenomesBaseUploader(GnomadBaseUploader, ParallelizedSourceUploader):
 
     def load_data(self, input_file):
         self.logger.info("Load data from file '%s'" % input_file)
-        res = load_data_genomes(input_file)
+        res = load_genome_data(input_file)
         return res
 
     @classmethod
