@@ -8,7 +8,7 @@ CHROM_VALID_VALUES = {str(_chr) for _chr in list(range(1, 23)) + ['X', 'Y', 'MT'
 
 
 class PopulationFrequencyParser:
-    def __init__(self, info_keys):
+    def __init__(self, info_keys, excluded_prefixes):
         """
         Iterate all keys in the "INFO" field (which is a dict essentially) of a gnomAD VCF record, and pick the keys to
         population frequency data (as shown in the gnomAD browser).
@@ -16,33 +16,45 @@ class PopulationFrequencyParser:
         The keys of interest will be packed into a dict of the following structure:
 
             prefix_to_keys = {
-                "AC": [<Allele_Count> keys],
-                "AN": [<Allele_Number> keys],
+                "ac": [<Allele_Count> keys],
+                "an": [<Allele_Number> keys],
                 "nhomalt": [<Number_of_Homozygotes> keys],
-                "AF": [<Allele_Frequency> keys]
+                "af": [<Allele_Frequency> keys]
             }
 
         N.B. Previous prefixes of interest include "GC" and "Hemi", however they are not present in v2.1.1 or v3.1.1
+
+        Some keys starting with "AC", "AN", "nhomalt" or "AF" are not needed. They are excluded by checking against the
+        `excluded_prefixes`. E.g. if the following argument is used,
+
+            excluded_prefixes = ["AC_controls_and_biobanks", "AC_non_cancer", "AC_non_neuro",
+                                 "AC_non_topmed", "AC_non_v2"]
+
+        Then all keys starts with these prefixes are excluded (and thus are not categorized into key "ac" in
+        `self.prefix_to_info_keys`)
         """
+        if excluded_prefixes:
+            info_keys = [key for key in info_keys if not any(key.startswith(prefix) for prefix in excluded_prefixes)]
+
         self.prefix_to_info_keys = {
             "ac": [key for key in info_keys if key.startswith("AC")],
             "an": [key for key in info_keys if key.startswith("AN")],
             "nhomalt": [key for key in info_keys if key.startswith("nhomalt")],
-            "af": [key for key in info_keys if key.startswith("AF")],
+            "af": [key for key in info_keys if key.startswith("AF")]
         }
 
     @classmethod
-    def rename_nhomalt(cls, nhomalt_key):
+    def rename_nhomalt(cls, nhomalt_str):
         """
-        Replace the prefix of a "nhomalt_*" key to "hom". E.g. "nhomalt_fin_female" will changed to "hom_fin_female".
+        Replace the prefix of a "nhomalt_*" string to "hom". E.g. "nhomalt_fin_female" will changed to "hom_fin_female".
         """
-        return "hom" + nhomalt_key[7:]
+        return "hom" + nhomalt_str[7:]
 
     def parse(self, info, index):
         """
-        For each `key` in the values of `prefix_to_keys`, read the value of `info[key]`. If `info[key]` should be treated
-        as a list, read the value of `info[key][index]`. The readout values are packed into a nested dict of the following
-        structure, with the prefixes being the top level keys:
+        For each `key` in the values of `prefix_to_keys`, read the value of `info[key]`. If `info[key]` should be
+        treated as a list, read the value of `info[key][index]`. The readout values are packed into a nested dict of
+        the following structure, with the prefixes being the top level keys:
 
             pf_dict = {
                 "ac": {
@@ -95,7 +107,7 @@ def parse_site_quality_metrics(info):
     N.B. there is a "SiteQuality" metric shown in the gnomAD browser; however it's not included in the "INFO" field.
     Probably it's calculated from other metrics.
 
-    N.B. "VQSR_culprit" is not a metric but is related to "VQSLOD". Legacy code included it, so I keep it here.
+    N.B. "VQSR_culprit" is not a metric but is related to "VQSLOD". Legacy code has it, so I keep it here.
     """
     # the keys of site quality metrics could be missing in the `info` dict
     # so use dict.get() method for default None values
@@ -127,6 +139,46 @@ def parse_site_quality_metrics(info):
     return sqm_dict
 
 
+def parse_profiles(record):
+    """
+    Read the profile data from a VCF record. Note that there is no such "profile" section shown in the gnomAD browser.
+    These fields, i.e. "chrom", "pos", "filter", "multi-allelic", "ref", "alt", "alleles", "type", and "rsid", are
+    named as profile fields simply for the convenience of implementation.
+
+    Each ALT has its own profile (which will be wrapped into a dict) and this function will return a list of tuples
+    (<hgvs_id>, <profile_dict>).
+
+    It's feasible to return a dict of {<hgvs_id>: <profile_dict>} instead of a list of tuples, but the order of
+    <hgvs_id> should be preserved (to the order of ALTs). It's easier to just use an index to iterate over the list of
+    tuples, considering the implementation of `PopulationFrequencyParser.parse()` method.
+    """
+    # although each ALT looks exactly like a string, it is a special type
+    alt_list = [str(alt) for alt in record.ALT]
+    # for each ALT, get its (hgvs_id, var_type) tuple
+    # Here I assume that the "chr" prefix of `record.CHROM`, if any, has already been removed
+    hgvs_list = [get_hgvs_from_vcf(record.CHROM, record.POS, record.REF, alt, mutant_type=True) for alt in alt_list]
+
+    # if multi-allelic, put all variants' HGVS ids as a list in multi-allelic field
+    multi_allelic = [t[0] for t in hgvs_list] if len(hgvs_list) > 1 else None
+
+    def generate_profiles():
+        for alt, (hgvs_id, var_type) in zip(alt_list, hgvs_list):
+            profile_dict = {
+                "chrom": record.CHROM,
+                "pos": record.POS,
+                "filter": record.FILTER,
+                "multi-allelic": multi_allelic,
+                "ref": record.REF,
+                "alt": alt,
+                "alleles": alt_list,
+                "type": var_type,
+                "rsid": record.ID
+            }
+            yield hgvs_id, profile_dict
+
+    return list(generate_profiles())
+
+
 def _map_record_to_json(record, population_freq_parser, doc_key):
     """
     When parsing gnomad.genomes.*.vcf.bgz files, `doc_key` should be "gnomad_genome";
@@ -143,30 +195,25 @@ def _map_record_to_json(record, population_freq_parser, doc_key):
         }
     """
     # the value of CHROM in hg38 GNOMAD source file startswith 'chr'; need to remove it first
-    chrom = str(record.CHROM)
-    if chrom.startswith('chr'):
-        chrom = chrom[3:]
-    if chrom not in CHROM_VALID_VALUES:
+    if record.CHROM.startswith('chr'):
+        record.CHROM = record.CHROM[3:]  # This step is necessary to `parse_profiles` function
+    if record.CHROM not in CHROM_VALID_VALUES:
         return
 
     info = record.INFO
 
     assert len(record.ALT) == len(info['AC']), \
-        "Expecting length of record.ALT= length of info.AC, but not for %s" % record.ID
+        "length of record.ALT != length of info.AC, at CHROM=%s, POS=%s" % (record.CHROM, record.POS)
     assert len(record.ALT) == len(info['AF']), \
-        "Expecting length of record.ALT= length of info.AF, but not for %s" % record.ID
+        "length of record.ALT != length of info.AF, at CHROM=%s, POS=%s" % (record.CHROM, record.POS)
+    assert len(record.ALT) == len(info['nhomalt']), \
+        "length of record.ALT != length of info.nhomalt, at CHROM=%s, POS=%s" % (record.CHROM, record.POS)
 
-    # although each ALT looks exactly like a string, it is a special type
-    record.ALT = [str(alt) for alt in record.ALT]
-    # map each ALT to its (hgvs_id, var_type) tuple
-    alt_to_hgvs = {alt: get_hgvs_from_vcf(chrom, record.POS, record.REF, alt, mutant_type=True) for alt in record.ALT}
-    # if multi-allelic, put all variants as a list in multi-allelic field
-    hgvs_list = [t[0] for t in alt_to_hgvs.values()] if len(record.ALT) > 1 else None
-
+    profile_list = parse_profiles(record)
     sqm_dict = parse_site_quality_metrics(info)
 
-    for i, alt in enumerate(record.ALT):
-        hgvs_id, var_type = alt_to_hgvs[alt]
+    for i in range(len(record.ALT)):
+        hgvs_id, profile_dict = profile_list[i]
         if hgvs_id is None:
             return  # TODO use `continue` instead?
 
@@ -175,15 +222,7 @@ def _map_record_to_json(record, population_freq_parser, doc_key):
         one_snp_json = {
             "_id": hgvs_id,
             doc_key: {
-                "chrom": chrom,
-                "pos": record.POS,
-                "filter": record.FILTER,
-                "multi-allelic": hgvs_list,
-                "ref": record.REF,
-                "alt": alt,
-                "alleles": record.ALT,
-                "type": var_type,
-                "rsid": record.ID,
+                **profile_dict,
                 **sqm_dict,
                 **pf_dict
             }
@@ -195,7 +234,7 @@ def _map_record_to_json(record, population_freq_parser, doc_key):
 
 def load_genome_data(input_file):
     vcf_reader = vcf.Reader(filename=input_file, compressed=True)
-    pf_parser = PopulationFrequencyParser(vcf_reader.infos.keys())
+    pf_parser = PopulationFrequencyParser(vcf_reader.infos.keys(), excluded_prefixes=None)
     for record in vcf_reader:
         for doc in _map_record_to_json(record, pf_parser, doc_key="gnomad_genome"):
             yield doc
@@ -203,7 +242,7 @@ def load_genome_data(input_file):
 
 def load_exome_data(input_file):
     vcf_reader = vcf.Reader(filename=input_file, compressed=True)
-    pf_parser = PopulationFrequencyParser(vcf_reader.infos.keys())
+    pf_parser = PopulationFrequencyParser(vcf_reader.infos.keys(), excluded_prefixes=None)
     for record in vcf_reader:
         for doc in _map_record_to_json(record, pf_parser, doc_key="gnomad_exome"):
             yield doc
