@@ -127,7 +127,21 @@ def parse_site_quality_metrics(info):
     return sqm_dict
 
 
-def _map_record_to_json(record, population_freq_parser):
+def _map_record_to_json(record, population_freq_parser, doc_key):
+    """
+    When parsing gnomad.genomes.*.vcf.bgz files, `doc_key` should be "gnomad_genome";
+    when parsing gnomad.exomes.*.vcf.bgz files, `doc_key` should be "gnomad_exome".
+
+    The returned document has the following structure:
+
+        one_snp_json = {
+            "_id": hgvs_id,
+            doc_key: {
+                "chrom": chrom,
+                ...
+            }
+        }
+    """
     # the value of CHROM in hg38 GNOMAD source file startswith 'chr'; need to remove it first
     chrom = str(record.CHROM)
     if chrom.startswith('chr'):
@@ -160,7 +174,7 @@ def _map_record_to_json(record, population_freq_parser):
 
         one_snp_json = {
             "_id": hgvs_id,
-            "gnomad_genome": {
+            doc_key: {
                 "chrom": chrom,
                 "pos": record.POS,
                 "filter": record.FILTER,
@@ -179,9 +193,17 @@ def _map_record_to_json(record, population_freq_parser):
         yield obj
 
 
-def load_data(input_file):
+def load_genome_data(input_file):
     vcf_reader = vcf.Reader(filename=input_file, compressed=True)
     pf_parser = PopulationFrequencyParser(vcf_reader.infos.keys())
     for record in vcf_reader:
-        for doc in _map_record_to_json(record, pf_parser):
+        for doc in _map_record_to_json(record, pf_parser, doc_key="gnomad_genome"):
+            yield doc
+
+
+def load_exome_data(input_file):
+    vcf_reader = vcf.Reader(filename=input_file, compressed=True)
+    pf_parser = PopulationFrequencyParser(vcf_reader.infos.keys())
+    for record in vcf_reader:
+        for doc in _map_record_to_json(record, pf_parser, doc_key="gnomad_exome"):
             yield doc
