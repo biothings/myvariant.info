@@ -1,68 +1,97 @@
+profile_sub_mapping = {
+    "chrom": {
+        "normalizer": "keyword_lowercase_normalizer",
+        "type": "keyword"
+    },
+    "pos": {
+        "type": "integer"
+    },
+    "filter": {
+        "normalizer": "keyword_lowercase_normalizer",
+        "type": "keyword"
+    },
+    "multi-allelic": {
+        "normalizer": "keyword_lowercase_normalizer",
+        "type": "keyword"
+    },
+    "ref": {
+        "normalizer": "keyword_lowercase_normalizer",
+        "type": "keyword"
+    },
+    "alt": {
+        "normalizer": "keyword_lowercase_normalizer",
+        "type": "keyword"
+    },
+    "alleles": {
+        "normalizer": "keyword_lowercase_normalizer",
+        "type": "keyword"
+    },
+    "type": {
+        "normalizer": "keyword_lowercase_normalizer",
+        "type": "keyword"
+    },
+    "rsid": {
+        "normalizer": "keyword_lowercase_normalizer",
+        "type": "keyword"
+    }
+}
+
+site_quality_metrics_sub_mapping = {
+    "baseqranksum": {
+        "type": "float"
+    },
+    "clippingranksum": {
+        "type": "float"
+    },
+    "dp": {
+        "type": "float"
+    },
+    "fs": {
+        "type": "float"
+    },
+    "inbreedingcoeff": {
+        "type": "float"
+    },
+    "mq": {
+        "properties": {
+            "mq": {
+                "type": "float"
+            },
+            "mqranksum": {
+                "type": "float"
+            }
+        }
+    },
+    "pab_max": {
+        "type": "float"
+    },
+    "qd": {
+        "type": "float"
+    },
+    "readposranksum": {
+        "type": "float"
+    },
+    "rf": {
+        "type": "float"
+    },
+    "sor": {
+        "type": "float"
+    },
+    "vqslod": {
+        "type": "float"
+    },
+    "vqsr_culprit": {
+        "normalizer": "keyword_lowercase_normalizer",
+        "type": "keyword"
+    }
+}
+
+
 exomes_mapping = {
     "gnomad_exome": {
         "properties": {
-            "chrom": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
-            "pos": {
-                "type": "integer"
-            },
-            "ref": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
-            "alt": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
-            "alleles": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
-            "type": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
-            "rsid": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
-            "baseqranksum": {
-                "type": "float"
-            },
-            "clippingranksum": {
-                "type": "float"
-            },
-            "fs": {
-                "type": "float"
-            },
-            "inbreedingcoeff": {
-                "type": "float"
-            },
-            "mq": {
-                "properties": {
-                    "mq": {
-                        "type": "float"
-                    },
-                    "mqranksum": {
-                        "type": "float"
-                    }
-                }
-            },
-            "qd": {
-                "type": "float"
-            },
-            "readposranksum": {
-                "type": "float"
-            },
-            "vqslod": {
-                "type": "float"
-            },
-            "vqsr_culprit": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
+            **profile_sub_mapping,
+            **site_quality_metrics_sub_mapping,
             "ac": {
                 "properties": {
                     "ac": {
@@ -535,10 +564,6 @@ exomes_mapping = {
                     }
                 }
             },
-            "filter": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            }
         }
     }
 }
@@ -547,63 +572,8 @@ exomes_mapping = {
 genomes_mapping = {
     "gnomad_genome": {
         "properties": {
-            "chrom": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
-            "pos": {
-                "type": "integer"
-            },
-            "filter": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
-            "ref": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
-            "alt": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
-            "alleles": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
-            "type": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
-            "rsid": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
-            "fs": {
-                "type": "float"
-            },
-            "inbreedingcoeff": {
-                "type": "float"
-            },
-            "mq": {
-                "properties": {
-                    "mq": {
-                        "type": "float"
-                    },
-                    "mqranksum": {
-                        "type": "float"
-                    }
-                }
-            },
-            "qd": {
-                "type": "float"
-            },
-            "vqslod": {
-                "type": "float"
-            },
-            "vqsr_culprit": {
-                "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
-            },
+            **profile_sub_mapping,
+            **site_quality_metrics_sub_mapping,
             "ac": {
                 "properties": {
                     "ac": {
@@ -1004,15 +974,6 @@ genomes_mapping = {
                     }
                 }
             },
-            "baseqranksum": {
-                "type": "float"
-            },
-            "clippingranksum": {
-                "type": "float"
-            },
-            "readposranksum": {
-                "type": "float"
-            }
         }
     }
 }
