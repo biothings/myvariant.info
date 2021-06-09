@@ -37,7 +37,6 @@ class SiteQualityMetricsParser(AbstractSiteQualityMetricsParser):
             },
             "as_pab_max": info.get("AS_pab_max"),
             "as_qd": info.get("AS_QD"),
-            "as_qd": info.get("AS_QD"),
             "as_readposranksum": info.get('AS_ReadPosRankSum'),
             "as_sor": info.get("AS_SOR"),
             "as_vqslod": as_vqslod,
