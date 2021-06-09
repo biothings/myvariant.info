@@ -1,7 +1,48 @@
 import vcf
 import math
 from itertools import chain
-from .gnomad_common_parser import PopulationFrequencyParser, ProfileParser, AbstractSiteQualityMetricsParser, GnomadVcfRecordParser
+from .gnomad_common_parser import PopulationName, PopulationFrequencyParser, generate_population_frequency_keys, \
+    ProfileParser, AbstractSiteQualityMetricsParser, GnomadVcfRecordParser
+
+# Globals of population names
+_FEMALE, _MALE = "XX", "XY"
+_POPULATION_NAME_OBJ_LIST = [
+    PopulationName("afr", [_FEMALE, _MALE]),
+    PopulationName("ami", [_FEMALE, _MALE]),
+    PopulationName("amr", [_FEMALE, _MALE]),
+    PopulationName("asj", [_FEMALE, _MALE]),
+    PopulationName("eas", [_FEMALE, _MALE, "jpn", "kor", "oea"]),
+    PopulationName("fin", [_FEMALE, _MALE]),
+    PopulationName("mid", [_FEMALE, _MALE]),
+    PopulationName("nfe", [_FEMALE, _MALE, "bgr", "est", "nwe", "onf", "seu", "swe"]),
+    PopulationName("oth", [_FEMALE, _MALE]),
+    PopulationName("sas", [_FEMALE, _MALE])
+]
+_POPULATION_NAME_STR_LIST = list(chain.from_iterable(pop_name.to_list() for pop_name in _POPULATION_NAME_OBJ_LIST))
+
+"""
+Globals of keys to population frequency data in gnomAD VCF `_RECORD.INFO` objects
+
+Keys starts with the following prefixes are not parsed as population frequencies:
+
+    excluded_prefixes = ["AC_controls_and_biobanks", "AC_non_cancer", "AC_non_neuro", "AC_non_topmed", "AC_non_v2",
+                         "AF_controls_and_biobanks", "AF_non_cancer", "AF_non_neuro", "AF_non_topmed", "AF_non_v2",
+                         "nhomalt_controls_and_biobanks", "nhomalt_non_cancer", "nhomalt_non_neuro", 
+                         "nhomalt_non_topmed", "nhomalt_non_v2",
+                         "AN_controls_and_biobanks", "AN_non_cancer", "AN_non_neuro", "AN_non_topmed", "AN_non_v2"]
+"""
+AC_KEYS = generate_population_frequency_keys("AC", population_suffixes=_POPULATION_NAME_STR_LIST,
+                                             extra_suffixes=(_FEMALE, _MALE))
+AN_KEYS = generate_population_frequency_keys("AN", population_suffixes=_POPULATION_NAME_STR_LIST,
+                                             extra_suffixes=(_FEMALE, _MALE))
+NHOMALT_KEYS = generate_population_frequency_keys("nhomalt", population_suffixes=_POPULATION_NAME_STR_LIST,
+                                                  extra_suffixes=(_FEMALE, _MALE))
+AF_KEYS = generate_population_frequency_keys("AF", population_suffixes=_POPULATION_NAME_STR_LIST,
+                                             extra_suffixes=(_FEMALE, _MALE))
+
+# Global PopulationFrequencyParser object
+population_frequency_parser = PopulationFrequencyParser(ac_keys=AC_KEYS, an_keys=AN_KEYS, nhomalt_keys=NHOMALT_KEYS,
+                                                        af_keys=AF_KEYS)
 
 
 class SiteQualityMetricsParser(AbstractSiteQualityMetricsParser):
@@ -48,23 +89,8 @@ class SiteQualityMetricsParser(AbstractSiteQualityMetricsParser):
 def load_genome_data(input_file):
     vcf_reader = vcf.Reader(filename=input_file, compressed=True)
 
-    """
-    Exclude the following prefixes when parsing population frequencies:
-    
-        excluded_prefixes = ["AC_controls_and_biobanks", "AC_non_cancer", "AC_non_neuro", "AC_non_topmed", "AC_non_v2",
-                             "AF_controls_and_biobanks", "AF_non_cancer", "AF_non_neuro", "AF_non_topmed", "AF_non_v2",
-                             "nhomalt_controls_and_biobanks", "nhomalt_non_cancer", "nhomalt_non_neuro", 
-                             "nhomalt_non_topmed", "nhomalt_non_v2",
-                             "AN_controls_and_biobanks", "AN_non_cancer", "AN_non_neuro", "AN_non_topmed", "AN_non_v2"]
-    """
-    pop_freq_prefixes = ["AC", "AF", "nhomalt", "AN"]
-    excluded_infixes = ["controls_and_biobanks", "non_cancer", "non_neuro", "non_topmed", "non_v2"]
-    excluded_prefixes = list(chain.from_iterable((prefix + "_" + infix for infix in excluded_infixes)
-                                                 for prefix in pop_freq_prefixes))
+    record_parser = GnomadVcfRecordParser(ProfileParser, SiteQualityMetricsParser, population_frequency_parser)
 
-    pop_freq_parser = PopulationFrequencyParser(vcf_reader.infos.keys(), excluded_prefixes=excluded_prefixes)
-
-    record_parser = GnomadVcfRecordParser(ProfileParser, SiteQualityMetricsParser, pop_freq_parser)
     for record in vcf_reader:
         for doc in record_parser.parse(record, doc_key="gnomad_genome"):
             yield doc
