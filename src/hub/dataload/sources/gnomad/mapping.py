@@ -36,7 +36,7 @@ profile_sub_mapping = {
     }
 }
 
-site_quality_metrics_sub_mapping = {
+site_quality_metrics_sub_mapping_v2 = {
     "baseqranksum": {
         "type": "float"
     },
@@ -86,12 +86,46 @@ site_quality_metrics_sub_mapping = {
     }
 }
 
+site_quality_metrics_sub_mapping_v3 = {
+    "inbreedingcoeff": {
+        "type": "float"
+    },
+    "as_fs": {
+        "type": "float"
+    },
+    "as_mq": {
+        "properties": {
+            "as_mq": {
+                "type": "float"
+            },
+            "as_mqranksum": {
+                "type": "float"
+            }
+        }
+    },
+    "as_pab_max": {
+        "type": "float"
+    },
+    "as_qd": {
+        "type": "float"
+    },
+    "as_readposranksum": {
+        "type": "float"
+    },
+    "as_sor": {
+        "type": "float"
+    },
+    "as_vqslod": {
+        "type": "float"
+    }
+}
+
 
 exomes_mapping = {
     "gnomad_exome": {
         "properties": {
             **profile_sub_mapping,
-            **site_quality_metrics_sub_mapping,
+            **site_quality_metrics_sub_mapping_v2,
             "ac": {
                 "properties": {
                     "ac": {
@@ -573,7 +607,8 @@ genomes_mapping = {
     "gnomad_genome": {
         "properties": {
             **profile_sub_mapping,
-            **site_quality_metrics_sub_mapping,
+            **site_quality_metrics_sub_mapping_v2,
+            **site_quality_metrics_sub_mapping_v3,
             "ac": {
                 "properties": {
                     "ac": {
