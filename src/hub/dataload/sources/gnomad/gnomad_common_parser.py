@@ -56,19 +56,6 @@ class PopulationName:
         return self.name_list
 
 
-def generate_population_frequency_keys(prefix, population_suffixes, extra_suffixes=None, separator="_"):
-    """
-    Generates the keys to access a gnomAD VCF `_RECORD.INFO` object for population frequency data.
-
-    E.g. generate_population_frequency_keys("AC", ["afr", "ami"], ["XX", "XY"], "_") will return a list of keys
-    `["AC", "AC_afr", "AC_ami", "AC_XX", "AC_XY"]`
-    """
-    pop_freq_keys = [prefix] + [separator.join(prefix, suffix) for suffix in population_suffixes]
-    if extra_suffixes:
-        pop_freq_keys.extend(separator.join(prefix, suffix) for suffix in extra_suffixes)
-    return pop_freq_keys
-
-
 class PopulationFrequencyParser:
     def __init__(self, ac_keys: list, an_keys: list, nhomalt_keys: list, af_keys: list):
         """
@@ -88,6 +75,30 @@ class PopulationFrequencyParser:
         self.an_keys = an_keys
         self.nhomalt_keys = nhomalt_keys
         self.af_keys = af_keys
+
+    @classmethod
+    def from_suffixes(cls, population_suffixes, extra_suffixes=None, separator="_"):
+        parser = PopulationFrequencyParser(None, None, None, None)
+
+        parser.ac_keys = cls.create_info_keys("AC", population_suffixes, extra_suffixes, separator)
+        parser.an_keys = cls.create_info_keys("AN", population_suffixes, extra_suffixes, separator)
+        parser.nhomalt_keys = cls.create_info_keys("nhomalt", population_suffixes, extra_suffixes, separator)
+        parser.af_keys = cls.create_info_keys("AF", population_suffixes, extra_suffixes, separator)
+
+        return parser
+
+    @classmethod
+    def create_info_keys(cls, prefix, population_suffixes, extra_suffixes=None, separator="_"):
+        """
+        Generates the keys to access a gnomAD VCF `_RECORD.INFO` object for population frequency data.
+
+        E.g. generate_population_frequency_keys("AC", ["afr", "ami"], ["XX", "XY"], "_") will return a list of keys
+        `["AC", "AC_afr", "AC_ami", "AC_XX", "AC_XY"]`
+        """
+        pop_freq_keys = [prefix] + [separator.join(prefix, suffix) for suffix in population_suffixes]
+        if extra_suffixes:
+            pop_freq_keys.extend(separator.join(prefix, suffix) for suffix in extra_suffixes)
+        return pop_freq_keys
 
     @classmethod
     def rename_nhomalt(cls, nhomalt_str: str) -> str:
