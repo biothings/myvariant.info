@@ -20,19 +20,9 @@ _POPULATION_NAME_OBJ_LIST = [
 ]
 _POPULATION_NAME_STR_LIST = list(chain.from_iterable(pop_name.to_list() for pop_name in _POPULATION_NAME_OBJ_LIST))
 
-# Globals of keys to population frequency data in gnomAD VCF `_RECORD.INFO` objects
-AC_KEYS = generate_population_frequency_keys("AC", population_suffixes=_POPULATION_NAME_STR_LIST,
-                                             extra_suffixes=(_FEMALE, _MALE))
-AN_KEYS = generate_population_frequency_keys("AN", population_suffixes=_POPULATION_NAME_STR_LIST,
-                                             extra_suffixes=(_FEMALE, _MALE))
-NHOMALT_KEYS = generate_population_frequency_keys("nhomalt", population_suffixes=_POPULATION_NAME_STR_LIST,
-                                                  extra_suffixes=(_FEMALE, _MALE))
-AF_KEYS = generate_population_frequency_keys("AF", population_suffixes=_POPULATION_NAME_STR_LIST,
-                                             extra_suffixes=(_FEMALE, _MALE))
-
 # Global PopulationFrequencyParser object
-population_frequency_parser = PopulationFrequencyParser(ac_keys=AC_KEYS, an_keys=AN_KEYS, nhomalt_keys=NHOMALT_KEYS,
-                                                        af_keys=AF_KEYS)
+population_frequency_parser = PopulationFrequencyParser.from_suffixes(population_suffixes=_POPULATION_NAME_STR_LIST,
+                                                                      extra_suffixes=[_FEMALE, _MALE])
 
 
 class SiteQualityMetricsParser(AbstractSiteQualityMetricsParser):
