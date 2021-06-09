@@ -1,6 +1,38 @@
 import vcf
 import math
-from .gnomad_common_parser import PopulationFrequencyParser, ProfileParser, AbstractSiteQualityMetricsParser, GnomadVcfRecordParser
+from itertools import chain
+from .gnomad_common_parser import PopulationName, PopulationFrequencyParser, generate_population_frequency_keys, \
+    ProfileParser, AbstractSiteQualityMetricsParser, GnomadVcfRecordParser
+
+# Globals of population names
+_FEMALE, _MALE = "female", "male"
+_POPULATION_NAME_OBJ_LIST = [
+    PopulationName("afr", [_FEMALE, _MALE]),
+    PopulationName("ami", [_FEMALE, _MALE]),
+    PopulationName("amr", [_FEMALE, _MALE]),
+    PopulationName("asj", [_FEMALE, _MALE]),
+    PopulationName("eas", [_FEMALE, _MALE, "jpn", "kor", "oea"]),
+    PopulationName("fin", [_FEMALE, _MALE]),
+    PopulationName("mid", [_FEMALE, _MALE]),
+    PopulationName("nfe", [_FEMALE, _MALE, "bgr", "est", "nwe", "onf", "seu", "swe"]),
+    PopulationName("oth", [_FEMALE, _MALE]),
+    PopulationName("sas", [_FEMALE, _MALE])
+]
+_POPULATION_NAME_STR_LIST = list(chain.from_iterable(pop_name.to_list() for pop_name in _POPULATION_NAME_OBJ_LIST))
+
+# Globals of keys to population frequency data in gnomAD VCF `_RECORD.INFO` objects
+AC_KEYS = generate_population_frequency_keys("AC", population_suffixes=_POPULATION_NAME_STR_LIST,
+                                             extra_suffixes=(_FEMALE, _MALE))
+AN_KEYS = generate_population_frequency_keys("AN", population_suffixes=_POPULATION_NAME_STR_LIST,
+                                             extra_suffixes=(_FEMALE, _MALE))
+NHOMALT_KEYS = generate_population_frequency_keys("nhomalt", population_suffixes=_POPULATION_NAME_STR_LIST,
+                                                  extra_suffixes=(_FEMALE, _MALE))
+AF_KEYS = generate_population_frequency_keys("AF", population_suffixes=_POPULATION_NAME_STR_LIST,
+                                             extra_suffixes=(_FEMALE, _MALE))
+
+# Global PopulationFrequencyParser object
+population_frequency_parser = PopulationFrequencyParser(ac_keys=AC_KEYS, an_keys=AN_KEYS, nhomalt_keys=NHOMALT_KEYS,
+                                                        af_keys=AF_KEYS)
 
 
 class SiteQualityMetricsParser(AbstractSiteQualityMetricsParser):
@@ -48,8 +80,7 @@ class SiteQualityMetricsParser(AbstractSiteQualityMetricsParser):
 def load_genome_data(input_file):
     vcf_reader = vcf.Reader(filename=input_file, compressed=True)
 
-    pf_parser = PopulationFrequencyParser(vcf_reader.infos.keys(), excluded_prefixes=None)
-    record_parser = GnomadVcfRecordParser(ProfileParser, SiteQualityMetricsParser, pf_parser)
+    record_parser = GnomadVcfRecordParser(ProfileParser, SiteQualityMetricsParser, population_frequency_parser)
 
     for record in vcf_reader:
         for doc in record_parser.parse(record, doc_key="gnomad_genome"):
@@ -59,8 +90,7 @@ def load_genome_data(input_file):
 def load_exome_data(input_file):
     vcf_reader = vcf.Reader(filename=input_file, compressed=True)
 
-    pf_parser = PopulationFrequencyParser(vcf_reader.infos.keys(), excluded_prefixes=None)
-    record_parser = GnomadVcfRecordParser(ProfileParser, SiteQualityMetricsParser, pf_parser)
+    record_parser = GnomadVcfRecordParser(ProfileParser, SiteQualityMetricsParser, population_frequency_parser)
 
     for record in vcf_reader:
         for doc in record_parser.parse(record, doc_key="gnomad_exome"):

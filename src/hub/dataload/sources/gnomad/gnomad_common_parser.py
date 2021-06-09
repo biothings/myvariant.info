@@ -7,54 +7,102 @@ from utils.hgvs import get_hgvs_from_vcf
 CHROM_VALID_VALUES = {str(_chr) for _chr in list(range(1, 23)) + ['X', 'Y', 'MT']}
 
 
+class PopulationName:
+    """
+    Helps to generate population names to access `_RECORD.INFO`.
+
+    According to https://gnomad.broadinstitute.org/help/how-are-population-names-abbreviated, population names in gnomAD
+    VCF and Hail Table are abbreviated to 3 letter IDs:
+
+    - afr: African/African-American
+    - ami: Amish
+    - amr: Latino/Admixed American
+    - asj: Ashkenazi Jewish
+    - eas: East Asian
+        - jpn: Japanese
+        - kor: Korean
+        - oea: Other East Asian
+    - fin: European (Finnish)
+    - mid: Middle Eastern
+    - nfe: European (non-Finnish)
+        - bgr: Bulgarian
+        - est: Estonian
+        - nwe: North-western European
+        - onf: Other non-Finnish European
+        - seu: Southern European
+        - swe: Swedish
+    - oth: Other
+    - sas: South Asian
+
+    Take "East Asian" as an example. It actually spawns 6 populations in gnomAD, i.e. `eas`, `eas_jpn`, `eas_kor`,
+    `eas_oea`, `eas_XX` (or `eas_female` in v2), and `eas_XY` (or `eas_male` in v2). We can use the following code to
+    generate the 6 population names at once:
+
+        eas = PopulationName("eas", ["jpn", "kor", "oea", "XX", "XY"], separator="_")
+        eas.to_list()  # returns [`eas`, `eas_jpn`, `eas_kor`, `eas_oea`, `eas_XX`, `eas_XY`]
+    """
+    def __init__(self, primary_name, secondary_names, separator="_"):
+        self.primary_name = primary_name
+        self.secondary_names = secondary_names
+        self.separator = separator
+
+        self.name_list = None
+
+    def to_list(self):
+        if self.name_list is None:
+            self.name_list = [self.primary_name] + [self.separator.join((self.primary_name, secondary_name)) for
+                                                    secondary_name in self.secondary_names]
+
+        return self.name_list
+
+
+def generate_population_frequency_keys(prefix, population_suffixes, extra_suffixes=None, separator="_"):
+    """
+    Generates the keys to access a gnomAD VCF `_RECORD.INFO` object for population frequency data.
+
+    E.g. generate_population_frequency_keys("AC", ["afr", "ami"], ["XX", "XY"], "_") will return a list of keys
+    `["AC", "AC_afr", "AC_ami", "AC_XX", "AC_XY"]`
+    """
+    pop_freq_keys = [prefix] + [separator.join(prefix, suffix) for suffix in population_suffixes]
+    if extra_suffixes:
+        pop_freq_keys.extend(separator.join(prefix, suffix) for suffix in extra_suffixes)
+    return pop_freq_keys
+
+
 class PopulationFrequencyParser:
-    def __init__(self, info_keys: list, excluded_prefixes: list):
+    def __init__(self, ac_keys: list, an_keys: list, nhomalt_keys: list, af_keys: list):
         """
-        Iterate all keys in the "INFO" field (which is a dict essentially) of a gnomAD VCF record, and pick the keys to
-        population frequency data (as shown in the gnomAD browser).
+        Save the keys to allele count (AC), allele number (AN), allele frequency (AF), and number of homozygotes
+        (nhomalt) data in a gnomAD VCF `_RECORD.INFO` object.
 
-        The keys of interest will be packed into a dict of the following structure:
+        In theory, these four lists represent the whole set of keys of interest to parse population frequency data, but
+        they are NOT guaranteed to appear in every `record.INFO` object.
 
-            prefix_to_keys = {
-                "ac": [<Allele_Count> keys],
-                "an": [<Allele_Number> keys],
-                "nhomalt": [<Number_of_Homozygotes> keys],
-                "af": [<Allele_Frequency> keys]
-            }
-
-        N.B. Previous prefixes of interest include "GC" and "Hemi", however they are not present in v2.1.1 or v3.1.1
-
-        Some keys starting with "AC", "AN", "nhomalt" or "AF" are not needed. They are excluded by checking against the
-        `excluded_prefixes`. E.g. if the following argument is used,
-
-            excluded_prefixes = ["AC_controls_and_biobanks", "AC_non_cancer", "AC_non_neuro",
-                                 "AC_non_topmed", "AC_non_v2"]
-
-        Then all keys starts with these prefixes are excluded (and thus are not categorized into key "ac" in
-        `self.prefix_to_info_keys`)
+        Args:
+            ac_keys (list): a list of "AC*" keys, e.g. ["AC", "AC_XX", "AC_XY", "AC_afr", "AC_afr_XX", "AC_afr_XY"]
+            an_keys (list): a list of "AN*" keys, e.g. ["AN", "AN_XX", "AN_XY", "AN_ami", "AN_ami_XX", "AN_ami_XY"]
+            af_keys (list): a list of "AF*" keys, e.g. ["AN", "AF_XX", "AF_XY", "AF_asj", "AF_asj_XX", "AF_asj_XY"]
+            nhomalt_keys (list): a list of "nhomalt*" keys, e.g. ["nhomalt_fin", "nhomalt_fin_XX", "nhomalt_fin_XY"]
         """
-        if excluded_prefixes:
-            info_keys = [key for key in info_keys if not any(key.startswith(prefix) for prefix in excluded_prefixes)]
-
-        self.prefix_to_info_keys = {
-            "ac": [key for key in info_keys if key.startswith("AC")],
-            "an": [key for key in info_keys if key.startswith("AN")],
-            "nhomalt": [key for key in info_keys if key.startswith("nhomalt")],
-            "af": [key for key in info_keys if key.startswith("AF")]
-        }
+        self.ac_keys = ac_keys
+        self.an_keys = an_keys
+        self.nhomalt_keys = nhomalt_keys
+        self.af_keys = af_keys
 
     @classmethod
     def rename_nhomalt(cls, nhomalt_str: str) -> str:
         """
-        Replace the prefix of a "nhomalt_*" string to "hom". E.g. "nhomalt_fin_female" will changed to "hom_fin_female".
+        Change a "nhomalt*" string to "hom*". E.g. "nhomalt_fin_female" will be changed to "hom_fin_female".
+        This is the naming convention used in myvariant.info and has nothing to do with gnomAD.
         """
         return "hom" + nhomalt_str[7:]
 
     def parse(self, info: dict, index: int) -> dict:
         """
-        For each `key` in the values of `prefix_to_keys`, read the value of `info[key]`. If `info[key]` should be
-        treated as a list, read the value of `info[key][index]`. The readout values are packed into a nested dict of
-        the following structure, with the prefixes being the top level keys:
+        For each `key` in `self.ac_keys`, `self.an_keys`, `self.nhomalt_keys`, and `self.af_keys`, read the value of
+        `info[key]`. If `info[key]` should be treated as a list, read the value of `info[key][index]`.
+        The readout values are packed into a nested dict of the following structure, with the prefixes being
+        allele count (ac), allele number (an), allele frequency (af), or number of homozygotes (hom):
 
             pf_dict = {
                 "ac": {
@@ -84,18 +132,21 @@ class PopulationFrequencyParser:
              "AN_*" (and "GC_*" in legacy code) values are scalars.
         """
         pf_dict = dict()
-        for (prefix, info_keys) in self.prefix_to_info_keys.items():
-            # This is a little bit tricky.
-            # Note that `self.prefix_to_info_keys` can be initialized using the global `vcf_reader.infos.keys()`
-            # However part of the `vcf_reader.infos.keys()` may not reside in a specific `info` dict
-            keys = [key for key in info_keys if key in info]
 
-            if prefix == "nhomalt":
-                pf_dict[self.rename_nhomalt(prefix)] = {self.rename_nhomalt(key): info[key][index] for key in keys}
-            elif prefix == "ac" or prefix == "af":
-                pf_dict[prefix] = {key: info[key][index] for key in keys}
-            else:
-                pf_dict[prefix] = {key: info[key] for key in keys}
+        # A particular `_RECORD.INFO` object is not guaranteed to contain all keys saved in `self.ac_keys`,
+        #   `self.an_keys`, `self.nhomalt_keys`, and `self.af_keys`, so here we need to check the key existence by
+        #   using `if key in info`
+        #
+        # The dict comprehension below is a little hard to read. The first line is equivalent to:
+        #
+        #   for key in self.ac_keys:
+        #       if key in info:
+        #           pf_dict["ac"][key.lower()] = info[key][index]
+        pf_dict["ac"] = {key.lower(): info[key][index] for key in self.ac_keys if key in info}
+        pf_dict["an"] = {key.lower(): info[key][index] for key in self.an_keys if key in info}
+        pf_dict["hom"] = {self.rename_nhomalt(key).lower(): info[key][index] for key in self.nhomalt_keys if key in info}
+        pf_dict["af"] = {key.lower(): info[key] for key in self.af_keys if key in info}  # AF values are scalars
+
         return pf_dict
 
 
