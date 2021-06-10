@@ -76,28 +76,51 @@ class PopulationFrequencyParser:
         self.nhomalt_keys = nhomalt_keys
         self.af_keys = af_keys
 
+        self.keys = {
+            "AC": self.ac_keys,
+            "AN": self.an_keys,
+            "nhomalt": self.nhomalt_keys,
+            "AF": self.af_keys
+        }
+
+        # "AC_*", "nhomalt_*", and "AF_*" (and "Hemi_*" in legacy code) values are alt-specific, i.e. they are lists
+        #   with each element mapped to a alternative nucleotide in _RECORD.ALT.
+        # "AN_*" (and "GC_*" in legacy code) values are scalars.
+        self._alt_specific = {
+            "AC": True,
+            "AN": False,
+            "nhomalt": True,
+            "AF": True
+        }
+
+        # Lazy initialization in self.get_field_name()
+        self._key_to_field_name = dict()
+
     @classmethod
-    def from_suffixes(cls, population_suffixes, extra_suffixes=None, separator="_"):
+    def from_suffixes(cls, population_suffixes, extra_suffixes, separator="_"):
         parser = PopulationFrequencyParser(None, None, None, None)
 
-        parser.ac_keys = cls.create_info_keys("AC", population_suffixes, extra_suffixes, separator)
-        parser.an_keys = cls.create_info_keys("AN", population_suffixes, extra_suffixes, separator)
-        parser.nhomalt_keys = cls.create_info_keys("nhomalt", population_suffixes, extra_suffixes, separator)
-        parser.af_keys = cls.create_info_keys("AF", population_suffixes, extra_suffixes, separator)
+        for prefix in parser.keys:
+            parser.keys[prefix] = cls.create_info_keys(prefix, population_suffixes, extra_suffixes, separator)
+
+        # parser.ac_keys = cls.create_info_keys("AC", population_suffixes, extra_suffixes, separator)
+        # parser.an_keys = cls.create_info_keys("AN", population_suffixes, extra_suffixes, separator)
+        # parser.nhomalt_keys = cls.create_info_keys("nhomalt", population_suffixes, extra_suffixes, separator)
+        # parser.af_keys = cls.create_info_keys("AF", population_suffixes, extra_suffixes, separator)
 
         return parser
 
     @classmethod
-    def create_info_keys(cls, prefix, population_suffixes, extra_suffixes=None, separator="_"):
+    def create_info_keys(cls, prefix, population_suffixes, extra_suffixes, separator="_"):
         """
         Generates the keys to access a gnomAD VCF `_RECORD.INFO` object for population frequency data.
 
         E.g. generate_population_frequency_keys("AC", ["afr", "ami"], ["XX", "XY"], "_") will return a list of keys
         `["AC", "AC_afr", "AC_ami", "AC_XX", "AC_XY"]`
         """
-        pop_freq_keys = [prefix] + [separator.join(prefix, suffix) for suffix in population_suffixes]
+        pop_freq_keys = [prefix] + [separator.join([prefix, suffix]) for suffix in population_suffixes]
         if extra_suffixes:
-            pop_freq_keys.extend(separator.join(prefix, suffix) for suffix in extra_suffixes)
+            pop_freq_keys.extend(separator.join([prefix, suffix]) for suffix in extra_suffixes)
         return pop_freq_keys
 
     @classmethod
@@ -107,6 +130,27 @@ class PopulationFrequencyParser:
         This is the naming convention used in myvariant.info and has nothing to do with gnomAD.
         """
         return "hom" + nhomalt_str[7:]
+
+    def get_field_name(self, key):
+        """
+        Return the corresponding field name (that would appear in our JSON document), given a key in the INFO object.
+
+        General rules:
+
+        - Keys like "AC_*", "AN_*", or "AF_*" will be converted to lowercase as field names
+        - Keys like "nhomalt_*" will be converted to "hom_*" and then lowercase as field names
+        """
+        field_name = self._key_to_field_name.get(key)
+        if field_name is None:
+            if key.startswith("AC") or key.startswith("AN") or key.startswith("AF"):
+                field_name = key.lower()
+            elif key.startswith("nhomalt"):
+                field_name = self.rename_nhomalt(key).lower()
+            else:
+                raise ValueError("Cannot recognize key %s." % key)
+
+            self._key_to_field_name[key] = field_name
+        return field_name
 
     def parse(self, info: dict, index: int) -> dict:
         """
@@ -148,15 +192,31 @@ class PopulationFrequencyParser:
         #   `self.an_keys`, `self.nhomalt_keys`, and `self.af_keys`, so here we need to check the key existence by
         #   using `if key in info`
         #
-        # The dict comprehension below is a little hard to read. The first line is equivalent to:
+        # The dict construction below is a little hard to read. Take prefix "AC" as an example. It's equivalent to:
         #
-        #   for key in self.ac_keys:
+        #   is_alt_specific = True
+        #
+        #   primary_field_name = "ac"
+        #   pf_dict["ac"] = dict()
+        #
+        #   for key in self.keys["AC"]:
         #       if key in info:
-        #           pf_dict["ac"][key.lower()] = info[key][index]
-        pf_dict["ac"] = {key.lower(): info[key][index] for key in self.ac_keys if key in info}
-        pf_dict["an"] = {key.lower(): info[key][index] for key in self.an_keys if key in info}
-        pf_dict["hom"] = {self.rename_nhomalt(key).lower(): info[key][index] for key in self.nhomalt_keys if key in info}
-        pf_dict["af"] = {key.lower(): info[key] for key in self.af_keys if key in info}  # AF values are scalars
+        #           pf_dict["ac"][self._key_to_field_name[key]] = info[key][index]
+        for prefix in self.keys:
+            is_alt_specific = self._alt_specific[prefix]
+
+            # `prefix` is also an INFO key. we have its corresponding field name saved in `self._key_to_field_name`
+            primary_field_name = self.get_field_name(prefix)
+            pf_dict[primary_field_name] = dict()
+
+            for key in self.keys[prefix]:
+                if key in info:
+                    # alt-specific values are lists; use `index` to fetch individual values
+                    # non-alt-specific values are scalars; `index` ignored
+                    value = info[key][index] if is_alt_specific else info[key]
+
+                    secondary_field_name = self.get_field_name(key)
+                    pf_dict[primary_field_name][secondary_field_name] = value
 
         return pf_dict
 
@@ -211,12 +271,12 @@ class AbstractSiteQualityMetricsParser(ABC):
 
 
 class GnomadVcfRecordParser:
-    def __init__(self, profile_parser, site_quality_metrics_parser, population_freq_parser):
+    def __init__(self, profile_parser, site_quality_metrics_parser, population_frequency_parser):
         self.profile_parser = profile_parser
         self.site_quality_metrics_parser = site_quality_metrics_parser
-        self.population_freq_parser = population_freq_parser
+        self.population_frequency_parser = population_frequency_parser
 
-    def parse(self, record: vcf.model._Record, doc_key):
+    def parse(self, record: vcf.model._Record, doc_key: str):
         """
             When parsing gnomad.genomes.*.vcf.bgz files, `doc_key` should be "gnomad_genome";
             when parsing gnomad.exomes.*.vcf.bgz files, `doc_key` should be "gnomad_exome".
@@ -247,21 +307,21 @@ class GnomadVcfRecordParser:
             "length of record.ALT != length of info.nhomalt, at CHROM=%s, POS=%s" % (record.CHROM, record.POS)
 
         profile_list = self.profile_parser.parse(record)
-        sqm_dict = self.site_quality_metrics_parser.parse(info)
+        site_quality_metrics_dict = self.site_quality_metrics_parser.parse(info)
 
         for i in range(len(record.ALT)):
             hgvs_id, profile_dict = profile_list[i]
             if hgvs_id is None:
                 continue
 
-            pf_dict = self.population_freq_parser.parse(info, i)
+            population_frequency_dict = self.population_frequency_parser.parse(info, i)
 
             one_snp_json = {
                 "_id": hgvs_id,
                 doc_key: {
                     **profile_dict,
-                    **sqm_dict,
-                    **pf_dict
+                    **site_quality_metrics_dict,
+                    **population_frequency_dict
                 }
             }
 
