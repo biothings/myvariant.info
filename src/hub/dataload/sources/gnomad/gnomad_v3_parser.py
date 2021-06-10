@@ -1,8 +1,8 @@
 import vcf
 import math
 from itertools import chain
-from .gnomad_common_parser import PopulationName, PopulationFrequencyParser, generate_population_frequency_keys, \
-    ProfileParser, AbstractSiteQualityMetricsParser, GnomadVcfRecordParser
+from .gnomad_common_parser import PopulationName, PopulationFrequencyParser, ProfileParser, \
+    AbstractSiteQualityMetricsParser, GnomadVcfRecordParser
 
 # Globals of population names
 _FEMALE, _MALE = "XX", "XY"
