@@ -170,7 +170,7 @@ site_quality_metrics_sub_mapping_v3 = {
 }
 
 
-exomes_mapping = {
+exomes_mapping_v2 = {
     "gnomad_exome": {
         "properties": {
             **profile_sub_mapping,
@@ -182,13 +182,21 @@ exomes_mapping = {
 }
 
 
-genomes_mapping = {
+genomes_mapping_v2 = {
     "gnomad_genome": {
         "properties": {
             **profile_sub_mapping,
 
             **site_quality_metrics_sub_mapping_v2,
-            **population_frequency_sub_mapping_v2,
+            **population_frequency_sub_mapping_v2
+        }
+    }
+}
+
+genomes_mapping_v3 = {
+    "gnomad_genome": {
+        "properties": {
+            **profile_sub_mapping,
 
             **site_quality_metrics_sub_mapping_v3,
             **population_frequency_sub_mapping_v3
