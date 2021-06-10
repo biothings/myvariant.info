@@ -30,8 +30,7 @@ Keys starts with the following prefixes are not parsed as population frequencies
      "nhomalt_controls_and_biobanks", "nhomalt_non_cancer", "nhomalt_non_neuro", "nhomalt_non_topmed", "nhomalt_non_v2",
      "AN_controls_and_biobanks", "AN_non_cancer", "AN_non_neuro", "AN_non_topmed", "AN_non_v2"]
 """
-population_frequency_parser = PopulationFrequencyParser.from_suffixes(population_suffixes=_POPULATION_NAME_STR_LIST,
-                                                                      extra_suffixes=[_FEMALE, _MALE])
+population_frequency_parser = PopulationFrequencyParser.from_suffixes(suffixes=[_FEMALE, _MALE] + _POPULATION_NAME_STR_LIST)
 
 
 class SiteQualityMetricsParser(AbstractSiteQualityMetricsParser):
