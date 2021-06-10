@@ -21,8 +21,7 @@ _POPULATION_NAME_OBJ_LIST = [
 _POPULATION_NAME_STR_LIST = list(chain.from_iterable(pop_name.to_list() for pop_name in _POPULATION_NAME_OBJ_LIST))
 
 # Global PopulationFrequencyParser object
-population_frequency_parser = PopulationFrequencyParser.from_suffixes(population_suffixes=_POPULATION_NAME_STR_LIST,
-                                                                      extra_suffixes=[_FEMALE, _MALE])
+population_frequency_parser = PopulationFrequencyParser.from_suffixes(suffixes=[_FEMALE, _MALE] + _POPULATION_NAME_STR_LIST)
 
 
 class SiteQualityMetricsParser(AbstractSiteQualityMetricsParser):
