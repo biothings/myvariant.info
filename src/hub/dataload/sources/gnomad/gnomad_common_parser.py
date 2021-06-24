@@ -294,12 +294,10 @@ class GnomadVcfRecordParser:
 
         info = record.INFO
 
-        assert len(record.ALT) == len(info['AC']), \
-            "length of record.ALT != length of info.AC, at CHROM=%s, POS=%s" % (record.CHROM, record.POS)
-        assert len(record.ALT) == len(info['AF']), \
-            "length of record.ALT != length of info.AF, at CHROM=%s, POS=%s" % (record.CHROM, record.POS)
-        assert len(record.ALT) == len(info['nhomalt']), \
-            "length of record.ALT != length of info.nhomalt, at CHROM=%s, POS=%s" % (record.CHROM, record.POS)
+        for key in ["AC", "AF", "nhomalt"]:
+            if key in info:
+                assert len(record.ALT) == len(info[key]), \
+                    "length of record.ALT != length of info.%s, at CHROM=%s, POS=%s" % (key, record.CHROM, record.POS)
 
         profile_list = self.profile_parser.parse(record)
         site_quality_metrics_dict = self.site_quality_metrics_parser.parse(info)
