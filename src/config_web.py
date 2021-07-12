@@ -9,7 +9,7 @@ from biothings.web.settings.default import (
 # *****************************************************************************
 ES_HOST = 'es7.biothings.io:443'
 ES_ARGS = {
-    'timeout': 60,
+    'timeout': 120,
     'aws': True
 }
 ES_INDICES = {
@@ -42,11 +42,6 @@ ES_QUERY_BACKEND = 'web.pipeline.MVQueryBackend'
 # Analytics & Tracking
 # *****************************************************************************
 
-GA_ACTION_QUERY_GET = 'query_get'
-GA_ACTION_QUERY_POST = 'query_post'
-GA_ACTION_ANNOTATION_GET = 'variant_get'
-GA_ACTION_ANNOTATION_POST = 'variant_post'
-GA_TRACKER_URL = 'MyVariant.info'
 URL_BASE = 'http://myvariant.info'
 
 # for logo on format=html
@@ -62,8 +57,7 @@ ANNOTATION_DOCS_URL = "http://docs.myvariant.info/en/latest/doc/variant_annotati
 # kwargs for status check get
 STATUS_CHECK = {
     'id': 'chr1:g.218631822G>A',
-    'index': 'myvariant_current_hg19',
-    'doc_type': 'variant'
+    'index': 'myvariant_current_hg19'
 }
 
 # *****************************************************************************
