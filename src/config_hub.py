@@ -130,9 +130,9 @@ SNAPSHOT_CONFIG = {
                 "name": "variant_repository-$(Y)",
                 "type": "s3",
                 "settings": {
-                        "bucket": "<SNAPSHOT_BUCKET_NAME>",
-                        "base_path": "myvariant",
-                        "region": "us-west-2",
+                    "bucket": "<SNAPSHOT_BUCKET_NAME>",
+                    "base_path": "myvariant",
+                    "region": "us-west-2",
                 },
                 "acl": "private",
             },
@@ -154,9 +154,9 @@ SNAPSHOT_CONFIG = {
                 "name": "variant_repository-demo-$(Y)",
                 "type": "s3",
                 "settings": {
-                        "bucket": "<SNAPSHOT_DEMO_BUCKET_NAME>",
-                        "base_path": "myvariant.info/$(Y)",  # per year
-                        "region": "us-west-2",
+                    "bucket": "<SNAPSHOT_DEMO_BUCKET_NAME>",
+                    "base_path": "myvariant.info/$(Y)",  # per year
+                    "region": "us-west-2",
                 },
                 "acl": "public",
             },
