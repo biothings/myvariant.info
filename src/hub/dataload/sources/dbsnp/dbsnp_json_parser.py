@@ -20,6 +20,7 @@ from biothings.utils.common import open_compressed_file
 # TODO
 # Index geneid field as string
 
+
 def parse_one_rec(assembly, record):
     """Restructure JSON
     """
@@ -84,6 +85,7 @@ def restructure_allele_freq_info(allele_annotations):
             alleles_data.append(freq)
     return alleles_data
 
+
 """
 def normalize_delins_hgvs(hgvs):
     # handle delins, where no deleted nucleotides is specified
@@ -104,6 +106,7 @@ def normalize_delins_hgvs(hgvs):
         print('hgvs not delins or snv or dup', hgvs)
         return hgvs
 """
+
 
 def restructure_gene_info(allele_annotations):
     """Restructure information related to gene
@@ -150,27 +153,39 @@ def accession_2_chr(accession):
 
 
 def get_hgvs_and_vcf(assembly, placements):
-    ASSEMBLY_NAME_MAPPING = {"hg19": "GRCh37.p13",
-                             "hg38": "GRCh38.p12"}
-    hgvs = None
-    vcf = {}
+    # Note that hg38 data of dbsnp release 154 are based on "GRCh38.p12",
+    #   while release 155 based on "GRCh38.p13"
+    ASSEMBLY_NAME_MAPPING = {"hg19": "GRCh37.p13", "hg38": "GRCh38.p13"}
+
     if placements:
         for _placement in placements:
             seq = _placement.get('placement_annot').get('seq_id_traits_by_assembly')
             if seq:
-                assembly_name = seq[0].get('assembly_name')
-                if assembly_name == ASSEMBLY_NAME_MAPPING[assembly]:
+                placement_assembly_name = seq[0].get('assembly_name')
+                expected_assembly_name = ASSEMBLY_NAME_MAPPING[assembly]
+
+                if placement_assembly_name == ASSEMBLY_NAME_MAPPING[assembly]:
                     for _allele in _placement.get('alleles'):
                         if _allele.get('allele').get('spdi').get('deleted_sequence') != _allele.get('allele').get('spdi').get('inserted_sequence') and _allele.get('hgvs').startswith('NC'):
                             hgvs = 'chr' + accession_2_chr(_allele.get('hgvs')) + ":" + _allele.get('hgvs').split(':')[-1]
-                            ref = _allele.get("allele").get('spdi').get('deleted_sequence')
-                            alt = _allele.get("allele").get('spdi').get('inserted_sequence')
+                            # ref = _allele.get("allele").get('spdi').get('deleted_sequence')
+                            # alt = _allele.get("allele").get('spdi').get('inserted_sequence')
                             vcf = (accession_2_chr(_allele.get('allele').get('spdi').get('seq_id')),
                                    _allele.get("allele").get('spdi').get('position') + 1,
                                    _allele.get("allele").get('spdi').get('deleted_sequence'),
                                    _allele.get("allele").get('spdi').get('inserted_sequence'))
-                            yield (hgvs, vcf)
-    yield (None, None)
+                            yield hgvs, vcf
+                else:
+                    # Take "GRCh38.p13" as an example.
+                    #   "GRCh38" is the build number; "p13" is the release number
+                    placement_grch_build = placement_assembly_name.split(r".", 1)[0]
+                    expected_grch_build = expected_assembly_name.split(r".", 1)[0]
+
+                    if placement_grch_build == expected_grch_build:
+                        raise ValueError("GRCh release numbers do not match. Expect {}. Got {}.".format(
+                            expected_assembly_name, placement_assembly_name))
+
+    yield None, None
 
 
 def load_data_file(input_file, version):
@@ -178,7 +193,7 @@ def load_data_file(input_file, version):
     for line in f:
         record = parse_one_rec(version, json.loads(line.decode()))
         for _doc in record:
-            new_doc = {}
+            new_doc = dict()
             new_doc['_id'] = trim_delseq_from_hgvs(_doc.pop('_id'))
             new_doc['dbsnp'] = _doc
             yield new_doc
@@ -187,5 +202,5 @@ def load_data_file(input_file, version):
 # load path and find files, pass to data_generator
 def load_data(path_glob, version='hg19'):
     for input_file in sorted(glob.glob(path_glob)):
-         for d in load_data_file(input_file, version):
-             yield d
+        for d in load_data_file(input_file, version):
+            yield d
