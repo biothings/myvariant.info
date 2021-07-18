@@ -1,13 +1,9 @@
-'''
-    MyVariant Data-Aware Tests
-'''
-import os
-from pprint import pformat
 
-from biothings.tests.web import BiothingsTestCase
+from biothings.tests.web import BiothingsWebTest
 
 
-class TestMyvariant(BiothingsTestCase):
+class TestMyvariant(BiothingsWebTest):
+    host = "myvariant.info"
 
     # override
     def query(self, *args, **kwargs):
@@ -66,7 +62,8 @@ class TestMyvariant(BiothingsTestCase):
         self.query(q='snpeff.ann.genename:BTK', morethan=8000)
 
     def test_130_query(self):
-        self.query(q='_exists_:wellderly AND cadd.polyphen.cat:possibly_damaging', fields='wellderly,cadd.polyphen')
+        self.query(q='_exists_:wellderly AND cadd.polyphen.cat:possibly_damaging',
+                   fields='wellderly,cadd.polyphen')
 
     def test_131_query_jsonld(self):
         pass  # feature removed in biothings 0.7.0

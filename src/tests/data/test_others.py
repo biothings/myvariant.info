@@ -1,14 +1,11 @@
-'''
-    MyVariant Data-Aware Tests
-'''
-import os
-import time
+
 from pprint import pformat
 
-from biothings.tests.web import BiothingsTestCase
+from biothings.tests.web import BiothingsWebTest
 
 
-class TestMyvariant(BiothingsTestCase):
+class TestMyvariant(BiothingsWebTest):
+    host = "myvariant.info"
 
     def check_index_count(self, assembly):
         # when run individually
@@ -18,7 +15,7 @@ class TestMyvariant(BiothingsTestCase):
         meta = self.request(f"{assembly}/metadata").json()
         results = {}
         for src_name in meta["src"]:
-            #if src_name == "cadd":
+            # if src_name == "cadd":
             #    continue
             if src_name == "snpeff":
                 continue  # not a root src, counts always different
@@ -30,7 +27,8 @@ class TestMyvariant(BiothingsTestCase):
                     subsrc = subsrc.rstrip("s")  # plural in meta, singular in docs
                 meta_cnt = meta["src"][src_name]["stats"][stat]
                 try:
-                    res = self.request("query?q=_exists_:%s&size=0&assembly=%s" % (subsrc, assembly)).json()
+                    res = self.request("query?q=_exists_:%s&size=0&assembly=%s" %
+                                       (subsrc, assembly)).json()
                 except:
                     print(f'Query error for ("{subsrc}", "{assembly}")')
                     raise
@@ -44,7 +42,6 @@ class TestMyvariant(BiothingsTestCase):
                 errs[src] = results[src]
                 errs[src]["diff"] = mc - ic
         assert len(errs) == 0, "Some counts don't match metadata:\n%s" % pformat(errs)
-
 
     def test_300_metadata(self):
         self.request("metadata").content
