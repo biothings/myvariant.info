@@ -58,11 +58,6 @@ class TestMyvariant(BiothingsWebTest):
         assert 'wellderly' in res
         assert 'clinvar' in res
 
-    def test_310_status(self):
-        self.request(self.host + '/status')
-        # (testing failing status would require actually loading tornado app from there
-        #  and deal with config params...)
-
     def test_320_index_count_hg19(self):
         self.check_index_count("hg19")
 
