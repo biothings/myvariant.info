@@ -34,8 +34,8 @@ def merge_rcv_accession(generator):
         if len(item) > 1:
             json_item = item[0]
             for _item in item:
-                    rcv_info = _item['clinvar']['rcv']
-                    rcv_new.append(rcv_info)
+                rcv_info = _item['clinvar']['rcv']
+                rcv_new.append(rcv_info)
             json_item['clinvar']['rcv'] = rcv_new
             yield json_item
         else:
@@ -71,6 +71,7 @@ def parse_measure(Measure, hg19=True):
                     alt = SequenceLocation.alternateAllele
                 if not alt:
                     alt = SequenceLocation.alternateAlleleVCF
+
             if 'GRCh38' in SequenceLocation.Assembly:
                 chromStart_38 = SequenceLocation.start
                 chromEnd_38 = SequenceLocation.stop
@@ -82,6 +83,7 @@ def parse_measure(Measure, hg19=True):
                     alt = SequenceLocation.alternateAllele
                 if not alt:
                     alt = SequenceLocation.alternateAlleleVCF
+
     if Measure.MeasureRelationship:
         try:
             symbol = Measure.MeasureRelationship[0].\
@@ -92,14 +94,17 @@ def parse_measure(Measure, hg19=True):
     else:
         symbol = None
         gene_id = None
+
     if Measure.Name:
         name = Measure.Name[0].ElementValue.valueOf_
     else:
         name = None
+
     if len(Measure.CytogeneticLocation) == 1:
         cytogenic = Measure.CytogeneticLocation[0]
     else:
         cytogenic = Measure.CytogeneticLocation
+
     hgvs_coding = None
     hgvs_genome = None
     HGVS = {'genomic': [], 'coding': [], 'non-coding': [], 'protein': []}
@@ -111,49 +116,40 @@ def parse_measure(Measure, hg19=True):
     else:
         chromStart = chromStart_38
         chromEnd = chromEnd_38
+
     # hgvs_not_validated = None
     if Measure.AttributeSet:
         # 'copy number loss' or 'gain' have format different\
         # from other types, should be dealt with seperately
-        if (variation_type == 'copy number loss') or \
-                (variation_type == 'copy number gain'):
+        if (variation_type == 'copy number loss') or (variation_type == 'copy number gain'):
             for AttributeSet in Measure.AttributeSet:
-                if 'HGVS, genomic, top level' in AttributeSet.\
-                        Attribute.Type:
+                if 'HGVS, genomic, top level' in AttributeSet.Attribute.Type:
                     if AttributeSet.Attribute.integerValue == 37:
                         hgvs_genome = AttributeSet.Attribute.get_valueOf_()
                 if 'genomic' in AttributeSet.Attribute.Type:
-                    HGVS['genomic'].append(AttributeSet.Attribute.
-                                           get_valueOf_())
+                    HGVS['genomic'].append(AttributeSet.Attribute.get_valueOf_())
                 elif 'non-coding' in AttributeSet.Attribute.Type:
-                    HGVS['non-coding'].append(AttributeSet.Attribute.
-                                              get_valueOf_())
+                    HGVS['non-coding'].append(AttributeSet.Attribute.get_valueOf_())
                 elif 'coding' in AttributeSet.Attribute.Type:
-                    HGVS['coding'].append(AttributeSet.Attribute.
-                                          get_valueOf_())
+                    HGVS['coding'].append(AttributeSet.Attribute.get_valueOf_())
                 elif 'protein' in AttributeSet.Attribute.Type:
-                    HGVS['protein'].append(AttributeSet.
-                                           Attribute.get_valueOf_())
+                    HGVS['protein'].append(AttributeSet.Attribute.get_valueOf_())
         else:
             for AttributeSet in Measure.AttributeSet:
                 if 'genomic' in AttributeSet.Attribute.Type:
-                    HGVS['genomic'].append(AttributeSet.
-                                           Attribute.get_valueOf_())
+                    HGVS['genomic'].append(AttributeSet.Attribute.get_valueOf_())
                 elif 'non-coding' in AttributeSet.Attribute.Type:
-                    HGVS['non-coding'].append(AttributeSet.
-                                              Attribute.get_valueOf_())
+                    HGVS['non-coding'].append(AttributeSet.Attribute.get_valueOf_())
                 elif 'coding' in AttributeSet.Attribute.Type:
-                    HGVS['coding'].append(AttributeSet.Attribute.
-                                          get_valueOf_())
+                    HGVS['coding'].append(AttributeSet.Attribute.get_valueOf_())
                 elif 'protein' in AttributeSet.Attribute.Type:
-                    HGVS['protein'].append(AttributeSet.
-                                           Attribute.get_valueOf_())
+                    HGVS['protein'].append(AttributeSet.Attribute.get_valueOf_())
                 if AttributeSet.Attribute.Type == 'HGVS, coding, RefSeq':
                     hgvs_coding = AttributeSet.Attribute.get_valueOf_()
-                elif AttributeSet.Attribute.Type == \
-                        'HGVS, genomic, top level, previous':
+                elif AttributeSet.Attribute.Type == 'HGVS, genomic, top level, previous':
                     hgvs_genome = AttributeSet.Attribute.get_valueOf_()
                     break
+
         if chrom and chromStart and chromEnd:
             # if its SNP, make sure chrom, chromStart, chromEnd, ref, alt are all provided
             if variation_type == 'single nucleotide variant':
@@ -169,8 +165,7 @@ def parse_measure(Measure, hg19=True):
                 if hgvs_genome:
                     indel_position = hgvs_genome.find('del')
                     indel_alt = hgvs_genome[indel_position+3:]
-                    hgvs_id = "chr%s:g.%s_%sdel%s" % \
-                              (chrom, chromStart, chromEnd, indel_alt)
+                    hgvs_id = "chr%s:g.%s_%sdel%s" % (chrom, chromStart, chromEnd, indel_alt)
             elif variation_type == 'Deletion':
                 if chromStart == chromEnd:
                     # RCV000048406, chr17:g.41243547del
@@ -183,24 +178,19 @@ def parse_measure(Measure, hg19=True):
                     if 'ins' in hgvs_genome:
                         ins_ref = hgvs_genome[ins_position+3:]
                         if chromStart == chromEnd:
-                            hgvs_id = "chr%s:g.%sins%s" % \
-                                      (chrom, chromStart, ins_ref)
+                            hgvs_id = "chr%s:g.%sins%s" % (chrom, chromStart, ins_ref)
                         else:
-                            hgvs_id = "chr%s:g.%s_%sins%s" % \
-                                      (chrom, chromStart, chromEnd, ins_ref)
+                            hgvs_id = "chr%s:g.%s_%sins%s" % (chrom, chromStart, chromEnd, ins_ref)
             elif variation_type == 'Duplication':
                 if hgvs_genome:
                     dup_position = hgvs_genome.find('dup')
                     if 'dup' in hgvs_genome:
                         dup_ref = hgvs_genome[dup_position+3:]
                         if chromStart == chromEnd:
-                            hgvs_id = "chr%s:g.%sdup%s" % \
-                                  (chrom, chromStart, dup_ref)
+                            hgvs_id = "chr%s:g.%sdup%s" % (chrom, chromStart, dup_ref)
                         else:
-                            hgvs_id = "chr%s:g.%s_%sdup%s" % \
-                                  (chrom, chromStart, chromEnd, dup_ref)
-        elif variation_type == 'copy number loss' or\
-                variation_type == 'copy number gain':
+                            hgvs_id = "chr%s:g.%s_%sdup%s" % (chrom, chromStart, chromEnd, dup_ref)
+        elif variation_type == 'copy number loss' or variation_type == 'copy number gain':
             if hgvs_genome and chrom:
                 hgvs_id = "chr" + chrom + ":" + hgvs_genome.split('.')[2]
         elif hgvs_coding:
@@ -210,8 +200,10 @@ def parse_measure(Measure, hg19=True):
             return
     else:
         return
+
     for key in HGVS:
         HGVS[key].sort()
+
     rsid = None
     cosmic = None
     dbvar = None
@@ -234,7 +226,6 @@ def parse_measure(Measure, hg19=True):
     # make sure the hgvs_id is not none
     if hgvs_id:
         one_snp_json = {
-
             "_id": hgvs_id,
             "clinvar":
                 {
@@ -244,26 +235,22 @@ def parse_measure(Measure, hg19=True):
                     "cosmic": cosmic,
                     "uniprot": uniprot,
                     "dbvar": dbvar,
-                    "hg19":
-                        {
-                            "start": chromStart_19,
-                            "end": chromEnd_19
-                        },
-                    "hg38":
-                        {
-                            "start": chromStart_38,
-                            "end": chromEnd_38
-                        },
+                    "hg19": {
+                        "start": chromStart_19,
+                        "end": chromEnd_19
+                    },
+                    "hg38": {
+                        "start": chromStart_38,
+                        "end": chromEnd_38
+                    },
                     "type": variation_type,
-                    "gene":
-                        {
-                            "id": gene_id,
-                            "symbol": symbol
-                        },
-                    "rcv":
-                        {
-                            "preferred_name": name,
-                        },
+                    "gene": {
+                        "id": gene_id,
+                        "symbol": symbol
+                    },
+                    "rcv": {
+                        "preferred_name": name,
+                    },
                     "rsid": rsid,
                     "cytogenic": cytogenic,
                     "hgvs": HGVS,
@@ -277,19 +264,19 @@ def parse_measure(Measure, hg19=True):
 
 def _map_line_to_json(cp, hg19):
     try:
-        clinical_significance = cp.ReferenceClinVarAssertion.\
-            ClinicalSignificance.Description
+        clinical_significance = cp.ReferenceClinVarAssertion.ClinicalSignificance.Description
     except:
         clinical_significance = None
+
     rcv_accession = cp.ReferenceClinVarAssertion.ClinVarAccession.Acc
+
     try:
-        review_status = cp.ReferenceClinVarAssertion.ClinicalSignificance.\
-            ReviewStatus
+        review_status = cp.ReferenceClinVarAssertion.ClinicalSignificance.ReviewStatus
     except:
         review_status = None
+
     try:
-        last_evaluated = cp.ReferenceClinVarAssertion.ClinicalSignificance.\
-            DateLastEvaluated
+        last_evaluated = cp.ReferenceClinVarAssertion.ClinicalSignificance.DateLastEvaluated
     except:
         last_evaluated = None
     
@@ -299,6 +286,7 @@ def _map_line_to_json(cp, hg19):
         origin = cp.ReferenceClinVarAssertion.ObservedIn[0].Sample.Origin
     except:
         origin = None
+
     conditions = []
     for _trait in cp.ReferenceClinVarAssertion.TraitSet.Trait:
         synonyms = []
@@ -308,6 +296,7 @@ def _map_line_to_json(cp, hg19):
                 synonyms.append(name.ElementValue.get_valueOf_())
             if name.ElementValue.Type == 'Preferred':
                 conditions_name += name.ElementValue.get_valueOf_()
+
         identifiers = {}
         for item in _trait.XRef:
             if item.DB == 'Human Phenotype Ontology':
@@ -318,16 +307,19 @@ def _map_line_to_json(cp, hg19):
         for symbol in _trait.Symbol:
             if symbol.ElementValue.Type == 'Preferred':
                 conditions_name += ' (' + symbol.ElementValue.get_valueOf_() + ')'
+
         age_of_onset = ''
         for _set in _trait.AttributeSet:
             if _set.Attribute.Type == 'age of onset':
                 age_of_onset = _set.Attribute.get_valueOf_()
+
         conditions.append({"name": conditions_name, "synonyms": synonyms, "identifiers": identifiers, "age_of_onset": age_of_onset})
 
     try:
         genotypeset = cp.ReferenceClinVarAssertion.GenotypeSet
     except:
         genotypeset = None
+
     if genotypeset:
         obj_list = []
         id_list = []
@@ -351,9 +343,9 @@ def _map_line_to_json(cp, hg19):
                     id_list.append(json_obj['_id'])
         for _obj in obj_list:
             _obj['clinvar'].update({'genotypeset': {
-                    'type': 'CompoundHeterozygote',
-                    'genotype': id_list
-                    }})
+                'type': 'CompoundHeterozygote',
+                'genotype': id_list
+            }})
             yield _obj
     else:
         variant_id = cp.ReferenceClinVarAssertion.MeasureSet.ID
@@ -382,11 +374,13 @@ def rcv_feeder(input_file, hg19):
         # some exceptions
         if record.startswith('\n</ReleaseSet>'):
             continue
+
         try:
             record_parsed = clinvarlib.parseString(record, silence=1)
         except:
             logging.debug(record)
             raise
+
         for record_mapped in _map_line_to_json(record_parsed, hg19):
             yield record_mapped
 
@@ -402,7 +396,8 @@ def load_data(data_folder, version):
     input_file = files[0]
     data_generator = rcv_feeder(input_file, version == "hg19")
     data_list = list(data_generator)
-    # TODO: why do we sort this list ? this prevent from using yield/iterator
+    # Sort the `data_list` because `merge_rcv_accession` will call `itertools.groupby()`
+    #   which cannot group non-adjacent items with the same key into a group
     data_list_sorted = sorted(data_list, key=lambda k: k['_id'])
     data_merge_rcv = merge_rcv_accession(data_list_sorted)
     return data_merge_rcv
