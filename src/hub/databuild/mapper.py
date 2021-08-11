@@ -1,6 +1,7 @@
 import biothings.hub.databuild.mapper as mapper
 from biothings import config as btconfig
 logging = btconfig.logger
+max_id_length = btconfig.MAX_ID_LENGTH
 
 class TagObserved(mapper.BaseMapper):
 
@@ -19,7 +20,7 @@ class SkipLongId(mapper.BaseMapper):
 
     def process(self,docs):
         for doc in docs:
-            if len(doc["_id"]) > btconfig.MAX_ID_LENGTH:
+            if len(doc["_id"]) > max_id_length:
                 logging.debug("Skip doc, _id too long: %s" % doc["_id"])
                 continue
             yield doc
