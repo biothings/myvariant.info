@@ -2,11 +2,12 @@
     MyVariant Data-Aware Tests
 '''
 
-from biothings.tests.web import BiothingsWebTest
+from biothings.tests.web import BiothingsDataTest
 
 
-class TestMyvariant(BiothingsWebTest):
-    host = "myvariant.info"
+class TestMyvariant(BiothingsDataTest):
+    prefix = 'v1'
+    host = 'myvariant.info'
 
     # override
     def query(self, *args, **kwargs):
