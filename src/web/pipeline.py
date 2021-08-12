@@ -1,12 +1,13 @@
 import re
 
-from biothings.utils.web.es_dsl import AsyncSearch
-from biothings.web.pipeline import ESQueryBuilder, ESQueryBackend
+from elasticsearch_dsl import Search
+from biothings.web.query import ESQueryBuilder, AsyncESQueryBackend
 
 
 INTERVAL_PATTERN = re.compile(
     r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>[1-9xXyYmM][0-9tT]?):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*')
-SNP_PATTERN = re.compile(r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>[1-9xXyYmM][0-9tT]?):(?P<gend>(?P<gstart>[0-9,]+))\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*')
+SNP_PATTERN = re.compile(
+    r'(?P<pre_query>.+(?P<pre_and>[Aa][Nn][Dd]))*(?P<interval>\s*chr(?P<chr>[1-9xXyYmM][0-9tT]?):(?P<gend>(?P<gstart>[0-9,]+))\s*)(?P<post_query>(?P<post_and>[Aa][Nn][Dd]).+)*')
 PATTERNS = [INTERVAL_PATTERN, SNP_PATTERN]
 
 
@@ -33,7 +34,7 @@ class MVQueryBuilder(ESQueryBuilder):
 
         match = self._parse_interval_query(q)
         if match:  # interval query
-            search = AsyncSearch()
+            search = Search()
             if match['query']:
                 search = search.query("query_string", query=match['query'])
             search = search.filter('match', chrom=match['chr'])
@@ -47,12 +48,12 @@ class MVQueryBuilder(ESQueryBuilder):
         return search
 
 
-class MVQueryBackend(ESQueryBackend):
+class MVQueryBackend(AsyncESQueryBackend):
 
-    def execute(self, query, options):
+    def execute(self, query, **options):
 
         # override index to query
-        if options.assembly == 'hg38':
-            options.biothing_type = 'hg38'
+        if options.get('assembly') == 'hg38':
+            options['biothing_type'] = 'hg38'
 
-        return super().execute(query, options)
+        return super().execute(query, **options)
