@@ -1,7 +1,7 @@
 # ######### #
 # HUB VARS  #
 # ######### #
-from biothings import ConfigurationError, ConfigurationDefault, ConfigurationValue
+from biothings.utils.configuration import ConfigurationError, ConfigurationDefault, ConfigurationValue
 from biothings.utils.loggers import setup_default_log
 import logging
 import os
