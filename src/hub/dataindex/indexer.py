@@ -11,8 +11,8 @@ from utils.stats import update_stats
 
 class BaseVariantIndexer(Indexer):
 
-    def __init__(self, build_doc, indexer_env, target_name, index_name):
-        super().__init__(build_doc, indexer_env, target_name, index_name)
+    def __init__(self, build_doc, indexer_env, index_name):
+        super().__init__(build_doc, indexer_env, index_name)
 
         self.es_index_mappings["properties"]["chrom"] = {
             'analyzer': 'string_lowercase',
