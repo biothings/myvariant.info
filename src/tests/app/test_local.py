@@ -136,6 +136,47 @@ class TestBeaconEndpoints(BiothingsWebAppTest):
 class TestGenomicIntervalQuery(BiothingsWebAppTest):
     TEST_DATA_DIR_NAME = 'mv_app_test'
 
-    pass
-    # TODO: Write tests along with the correct implementation
-    #  the data is already enough to write the tests
+    def test_standalone_interval_query_pos_hg19(self):
+        self.query(data={'q': 'chr8:7194707'})
+
+    def test_standalone_interval_query_range_hg19(self):
+        self.query(data={'q': 'chr8:7194706-7194708'})
+
+    def test_standalone_interval_query_pos_hg38(self):
+        self.query(data={'q': 'chrX:30718532', 'assembly': 'hg38'})
+
+    def test_prequery(self):
+        self.query(data={'q': 'cadd.chrom:9 AND chr8:7194707'}, hits=False)
+        self.query(data={'q': 'cadd.chrom:8 AND chr8:7194707'})
+
+    def test_postquery(self):
+        self.query(data={'q': 'chr8:7194707 AND cadd.chrom:9'}, hits=False)
+        self.query(data={'q': 'chr8:7194707 cadd.chrom:9 OR cadd.chrom:8'})
+
+    def test_pre_and_post_query(self):
+        self.query(data={'q': 'dbnsfp.alt:A AND chr8:7194707 AND cadd.chrom:8'})
+        self.query(data={'q': 'NOT dbnsfp.alt:A AND chr8:7194707 AND cadd.chrom:8'},
+                   hits=False)
+        self.query(data={'q': 'dbnsfp.alt:A AND chr8:7194707 AND NOT cadd.chrom:8'},
+                   hits=False)
+
+    def test_pre_and_post_query_logic(self):
+        # we want something that messes up the old one when it
+        # does the concatenation without () and breaking the
+        # (intended) affinity
+        # ES itself is very weird anyways,
+        # see https://github.com/elastic/elasticsearch/issues/24847
+        #
+        # Explanation on the query used below
+        # if it gets evaluated to
+        #   (cadd.chrom:8 OR cadd.chrom:9) AND (cadd.chrom:8 OR cadd.chrom:9)
+        # then there should be hits, but
+        #   cadd.chrom:8 OR cadd.chrom:9 AND cadd.chrom:8 OR cadd.chrom:9
+        # does not yield results. Despite the strange query, usually it makes
+        # sense to add the parenthesis, and that's the better practices following
+        # ES documentation anyways
+        self.query(data={
+            'q': 'cadd.chrom:8 OR cadd.chrom:9'
+            'AND chr8:7194707 AND '
+            'cadd.chrom:9 OR cadd.chrom:8'
+        })
