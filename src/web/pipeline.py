@@ -5,7 +5,7 @@ from elasticsearch_dsl import Search
 from biothings.web.query import ESQueryBuilder, AsyncESQueryBackend
 
 
-INTERVAL_PATTERN_INT_ONLY = re.compile(
+INTERVAL_PATTERN = re.compile(
     r"""
     chr  # string literal chr   
         (?P<chr>[1-9]|1[0-9]|2[0-2]|X|Y|MT)  # chromasomes 1-22, X, Y, and MT
@@ -27,25 +27,51 @@ INTERVAL_PATTERN_INT_ONLY = re.compile(
 
 class MVQueryBuilder(ESQueryBuilder):
     @staticmethod
-    def _parse_interval_query(q: str):
+    def _parse_interval_query(q: str) -> Optional[Dict[str, str]]:
+        """
+        Parse query string and extract appropriate genome interval query
+
+        If the query string includes a valid genome interval/position query,
+        such information is extracted, along with other parts of the string
+        query. Using [] to denote optional parts and <> for required parts,
+        such queries looks like this:
+            [query string AND ] chr<Chromosome>:<start>-<end> [AND query string]
+            [query string AND ] chr<Chromosome>:<position> [AND query string]
+
+        If the query string is not of this format, None is returned. If a
+        valid interval query is found, a dictionary is returned with the keys
+        'chr', 'gstart', 'gend', and 'query'.
+
+        Args:
+            q: input query string
+        Returns:
+            None: if input query string is not a valid interval query
+            Dict[str, str]: with the following keys
+                'chr': Chromosome identifier: 1-22, X, Y, MT
+                'gstart': start position of gene
+                'gend': end position of gene
+                'query': other parts of the query string, concatenated with AND
+        """
         # don't even bother when we don't see chr
         # even with improved regex, this is a few times faster
-        start_pos = q.find('chr')
+        start_pos = q.find('chr')  # find first occurrence of 'chr'
+        # might not be what we're looking for, but usually discards enough
+        # so the regex engine runs less
         if start_pos < 0:
             return None
+        m = re.search(INTERVAL_PATTERN, q[start_pos:])
+        if not m:
+            return None
+        start_pos += m.start()  # add real offset
         pre_query = q[:start_pos].strip()
+        query = []
         if pre_query != '':
             # pre_query non empty and does not end in AND\s+
             if not q[start_pos - 1].isspace():
                 return None
             if pre_query[-3:].upper() != 'AND':
                 return None
-            pre_query = pre_query[:-3]  # strip the AND
-        else:
-            pre_query = None
-        m = re.match(INTERVAL_PATTERN_INT_ONLY, q[start_pos:])
-        if not m:
-            return None
+            query.append(f'({pre_query[:-3]})')  # strip the AND, add parenthesis
         md = m.groupdict()
         r = {}
         # copy chr
@@ -56,11 +82,9 @@ class MVQueryBuilder(ESQueryBuilder):
         else:
             r['gstart'] = md['gstart']
             r['gend'] = md['gend']
-        r['query'] = ' AND '.join(filter(
-                       None, (
-                           pre_query,
-                           md['post_query_string'],
-                       )))
+        if md['post_query_string']:
+            query.append(f"({md['post_query_string']})")
+        r['query'] = ' AND '.join(query)
         return r
 
     def default_string_query(self, q, options):
