@@ -114,15 +114,29 @@ class TestRedirecdt(BiothingsWebAppTest):
 class TestLicenseXfrm(BiothingsWebAppTest):
     TEST_DATA_DIR_NAME = 'mv_app_test'
 
+    def _wait(self):
+        # seems like the only way to do it
+        # although this is not its (AsyncTestCase.wait) intended use
+        # (besides actually fixing the issue so that web blocks until metadata is ready)
+        #
+        # Note: don't try to put it in a fixture, it won't work
+        try:
+            self.wait(timeout=3.0)
+        except:  # noqa
+            pass
+
     def test_exac_nontcga(self):
+        self._wait()
         res = self.request('variant', data={'id': 'chr8:g.7194707G>A'})
         assert '_license' in res.json()['exac_nontcga']
 
     def test_gnomad_exome(self):
+        self._wait()
         res = self.request('variant', data={'id': 'chr8:g.7194707G>A'})
         assert '_license' in res.json()['gnomad_exome']
 
     def test_gnomad_genome(self):
+        self._wait()
         res = self.request('variant', data={'id': 'chr8:g.7194707G>A'})
         assert '_license' in res.json()['gnomad_genome']
 
