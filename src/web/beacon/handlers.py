@@ -1,11 +1,11 @@
 import sys
 
 from biothings.web.handlers import BaseAPIHandler
-from biothings.web.handlers import BaseESRequestHandler
+from biothings.web.handlers import BaseQueryHandler
 from biothings.utils.common import dotdict
 
 
-class BeaconHandler(BaseESRequestHandler):
+class BeaconHandler(BaseQueryHandler):
     name = 'beacon'
     # Initialize Assembly and Datasets
     assembly_keys = {'NCBI36': 'hg18', 'GRCh37': 'hg19', 'GRCh38': 'hg38'}
