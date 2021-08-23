@@ -7,10 +7,9 @@ from biothings.web.settings.default import (
 # *****************************************************************************
 # Elasticsearch variables
 # *****************************************************************************
-ES_HOST = 'es7.biothings.io:443'
+ES_HOST = 'es6.biothings.io'
 ES_ARGS = {
     'timeout': 120,
-    'aws': True
 }
 ES_INDICES = {
     None: 'myvariant_current_hg19',
