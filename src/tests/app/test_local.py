@@ -197,16 +197,22 @@ class TestGenomicIntervalQuery(BiothingsWebAppTest):
 
 
 class TestIssue133(BiothingsWebAppTest):
-    TEST_DATA_DIR_NAME = 'mv_app_test'
+    TEST_DATA_DIR_NAME = 'issue_133'
 
-    def test_multiple_rsid(self):
-        variants = ['rs771931171', 'rs1555101858', 'rs10474608', 'rs1047781'
-                    'rs10479013', 'rs10479542', 'rs1048169', 'rs1048374']
+    def test_one_doc_one_rsid(self):
+        variants = ['rs771931171']
         ids = ','.join([f'"{variant}"' for variant in variants])
         res = self.request('variant', method='POST',
                            data={'ids': ids}).json()
         for variant in variants:
             # we don't really care about the results
             assert self.value_in_result(variant, res, 'query')
-        # this document is actually present, doesn't hurt to check
-        assert self.value_in_result('rs771931171', res, 'dbsnp.rsid')
+
+    def test_multiple_doc_same_rsid(self):
+        variants = ['rs1047781']
+        ids = ','.join([f'"{variant}"' for variant in variants])
+        res = self.request('variant', method='POST',
+                           data={'ids': ids}).json()
+        for variant in variants:
+            # we don't really care about the results
+            assert self.value_in_result(variant, res, 'query')
