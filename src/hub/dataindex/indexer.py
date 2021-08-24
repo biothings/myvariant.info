@@ -8,11 +8,70 @@ from biothings.utils.hub_db import get_src_build
 from biothings.utils.es import ESIndexer
 from utils.stats import update_stats
 
+from elasticsearch import JSONSerializer, SerializationError
+from elasticsearch.compat import string_types
+
+import orjson
+
+class MyVariantJSONSerializer(JSONSerializer):
+    """
+    MyVariantJSONSerializer is an extension to JSONSerializer. Its `loads` and `dumps` code structures are logically the same 
+    with JSONSerializer, except that `orjson` is used as the underlying serializer instead of `json` or `simplejson`.
+
+    `orjson` is used to encode infinity values `float("inf")` or `float("-inf")` into `None`, instead of into "Infinity" or 
+    "-Infinity" strings.
+    ElasticSearch's underlying `JsonParser` module cannot convert "Infinity" or "-Infinity" strings back into infinity values
+
+    See https://github.com/elastic/elasticsearch-py/blob/master/elasticsearch/serializer.py
+    """
+
+    def loads(self, s):
+        try:
+            # return json.loads(s)
+            return orjson.loads(s)
+        except (ValueError, TypeError) as e:
+            raise SerializationError(s, e)
+
+    def dumps(self, data):
+        # don't serialize strings
+        if isinstance(data, string_types):
+            return data
+
+        try:
+            """
+            `json.dumps()` behaviors:
+
+            ensure_ascii: If true (the default), the output is guaranteed to have all incoming non-ASCII characters escaped. 
+                          If false, these characters will be output as-is.
+            separators: an (item_separator, key_separator) tuple, specifying the separators in the output.
+            """
+            # return json.dumps(
+            #     data, default=self.default, ensure_ascii=False, separators=(",", ":")
+            # )
+            
+            """
+            `orjson.dumps()` will escape all incoming non-ASCII characters and output the encoded bytestrings.
+            We decode the output bytestrings into string, and as a result, those escaped characters are un-escaped.
+            In Python 3, the default encoding is "utf-8" (see https://docs.python.org/3/library/stdtypes.html#bytes.decode).
+
+            `orjson.dumps()` will output compact JSON representation, effectively the same behavior with json.dumps(separators=(",", ":"))
+            """
+            return orjson.dumps(
+                data, default=self.default
+            ).decode()
+        except (ValueError, TypeError) as e:
+            raise SerializationError(data, e)
+
 
 class BaseVariantIndexer(Indexer):
 
     def __init__(self, build_doc, indexer_env, index_name):
         super().__init__(build_doc, indexer_env, index_name)
+
+        # Changing the `es_client_args` object might affect top level config serialization.
+        # we have an endpoint to print the config, it might be safer to avoid changing the `es_client_args` object.
+        self.es_client_args = dict(self.es_client_args)
+        self.es_client_args["serializer"] = MyVariantJSONSerializer()
 
         self.es_index_mappings["properties"]["chrom"] = {
             'analyzer': 'string_lowercase',
@@ -37,11 +96,11 @@ class BaseVariantIndexer(Indexer):
         self.assembly = build_doc["build_config"]["assembly"]
 
     @asyncio.coroutine
-    def post_index(self):
+    def post_index(self, *args, **kwargs):
         # Migrated from Sebastian's commit 1a7b7a
         # It was orginally marked "Not Tested Yet".
         self.logger.info("Sleeping for a bit while index is being fully updated...")
-        yield from time.sleep(3*60)
+        yield from asyncio.sleep(3*60)
         idxer = ESIndexer(
             index=self.es_index_name,
             doc_type=self.doc_type,
