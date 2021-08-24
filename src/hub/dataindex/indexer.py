@@ -37,11 +37,11 @@ class BaseVariantIndexer(Indexer):
         self.assembly = build_doc["build_config"]["assembly"]
 
     @asyncio.coroutine
-    def post_index(self):
+    def post_index(self, *args, **kwargs):
         # Migrated from Sebastian's commit 1a7b7a
         # It was orginally marked "Not Tested Yet".
         self.logger.info("Sleeping for a bit while index is being fully updated...")
-        yield from time.sleep(3*60)
+        yield from asyncio.sleep(3*60)
         idxer = ESIndexer(
             index=self.es_index_name,
             doc_type=self.doc_type,
