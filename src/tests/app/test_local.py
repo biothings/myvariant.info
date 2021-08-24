@@ -194,3 +194,19 @@ class TestGenomicIntervalQuery(BiothingsWebAppTest):
             'AND chr8:7194707 AND '
             'cadd.chrom:9 OR cadd.chrom:8'
         })
+
+
+class TestIssue133(BiothingsWebAppTest):
+    TEST_DATA_DIR_NAME = 'mv_app_test'
+
+    def test_multiple_rsid(self):
+        variants = ['rs771931171', 'rs1555101858', 'rs10474608', 'rs1047781'
+                    'rs10479013', 'rs10479542', 'rs1048169', 'rs1048374']
+        ids = ','.join([f'"{variant}"' for variant in variants])
+        res = self.request('variant', method='POST',
+                           data={'ids': ids}).json()
+        for variant in variants:
+            # we don't really care about the results
+            assert self.value_in_result(variant, res, 'query')
+        # this document is actually present, doesn't hurt to check
+        assert self.value_in_result('rs771931171', res, 'dbsnp.rsid')
