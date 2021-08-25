@@ -103,7 +103,6 @@ class BaseVariantIndexer(Indexer):
         yield from asyncio.sleep(3*60)
         idxer = ESIndexer(
             index=self.es_index_name,
-            doc_type=self.doc_type,
             es_host=self.es_client_args.get('hosts'))
         self.logger.info("Updating 'stats' by querying index '%s'" % self.es_index_name)
         return update_stats(idxer, self.assembly)
