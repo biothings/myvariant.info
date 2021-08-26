@@ -92,6 +92,7 @@ INDEX_CONFIG = {
                         "retry_on_timeout": True,
                         "max_retries": 10,
                     },
+                    "concurrency": HUB_MAX_WORKERS
             },
             "index": [
                 # keys match build_config_key value
@@ -107,6 +108,7 @@ INDEX_CONFIG = {
                         "retry_on_timeout": True,
                         "max_retries": 10,
                     },
+                    "concurrency": HUB_MAX_WORKERS
             },
             "index": [
                 # "hg19/hg38" are flags used to filter compatible index from the UI
