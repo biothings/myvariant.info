@@ -2,7 +2,7 @@ import time
 import asyncio
 
 import config
-from biothings.hub.dataindex.indexer import Indexer, IndexManager, ColdHotIndexer
+from biothings.hub.dataindex.indexer import Indexer, IndexManager, ColdHotIndexer, _BuildDoc
 from biothings.hub.dataexport.ids import export_ids, upload_ids
 from biothings.utils.hub_db import get_src_build
 from biothings.utils.es import ESIndexer
@@ -135,5 +135,10 @@ class VariantIndexer(BaseVariantIndexer):
     pass
 
 
-class ColdHotVariantIndexer(ColdHotIndexer, BaseVariantIndexer):
-    pass
+class ColdHotVariantIndexer(ColdHotIndexer):
+    def __init__(self, build_doc, indexer_env, index_name):
+        hot_build_doc = _BuildDoc(build_doc)
+        cold_build_doc = hot_build_doc.extract_coldbuild()
+
+        self.hot = BaseVariantIndexer(hot_build_doc, indexer_env, index_name)
+        self.cold = BaseVariantIndexer(cold_build_doc, indexer_env, self.hot.es_index_name)
