@@ -136,9 +136,4 @@ class VariantIndexer(BaseVariantIndexer):
 
 
 class ColdHotVariantIndexer(ColdHotIndexer):
-    def __init__(self, build_doc, indexer_env, index_name):
-        hot_build_doc = _BuildDoc(build_doc)
-        cold_build_doc = hot_build_doc.extract_coldbuild()
-
-        self.hot = BaseVariantIndexer(hot_build_doc, indexer_env, index_name)
-        self.cold = BaseVariantIndexer(cold_build_doc, indexer_env, self.hot.es_index_name)
+    INDEXER = BaseVariantIndexer
