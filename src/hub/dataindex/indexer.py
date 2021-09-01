@@ -1,17 +1,16 @@
-import time
 import asyncio
 
 import config
 from biothings.hub.dataindex.indexer import Indexer, IndexManager, ColdHotIndexer, _BuildDoc
 from biothings.hub.dataexport.ids import export_ids, upload_ids
 from biothings.utils.hub_db import get_src_build
-from biothings.utils.es import ESIndexer
-from utils.stats import update_stats
+from utils.es import ElasticsearchIndexingService
 
-from elasticsearch import JSONSerializer, SerializationError
+from elasticsearch import JSONSerializer, SerializationError, Elasticsearch
 from elasticsearch.compat import string_types
 
 import orjson
+
 
 class MyVariantJSONSerializer(JSONSerializer):
     """
@@ -97,15 +96,16 @@ class BaseVariantIndexer(Indexer):
 
     @asyncio.coroutine
     def post_index(self, *args, **kwargs):
+        # No idea how come the decision to sleep for 3 minutes
         # Migrated from Sebastian's commit 1a7b7a
         # It was orginally marked "Not Tested Yet".
         self.logger.info("Sleeping for a bit while index is being fully updated...")
         yield from asyncio.sleep(3*60)
-        idxer = ESIndexer(
-            index=self.es_index_name,
-            es_host=self.es_client_args.get('hosts'))
-        self.logger.info("Updating 'stats' by querying index '%s'" % self.es_index_name)
-        return update_stats(idxer, self.assembly)
+        
+        es_client = Elasticsearch(**self.es_client_args)
+        es_service = ElasticsearchIndexingService(client=es_client, index_name=self.es_index_name)
+
+        return es_service.update_mapping_meta_stats(assembly=self.assembly)
 
 
 class MyVariantIndexerManager(IndexManager):
