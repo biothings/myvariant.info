@@ -116,4 +116,4 @@ class ElasticsearchIndexingService:
 
     def set_mapping_meta(self, meta):
         body = {"_meta": meta}
-        return self._es.indices.put_mapping(body=body, index=self.index_name)
+        return self.client.indices.put_mapping(body=body, index=self.index_name)
