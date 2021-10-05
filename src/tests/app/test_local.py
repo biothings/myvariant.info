@@ -142,9 +142,17 @@ class TestLicenseXfrm(BiothingsWebAppTest):
 
 
 class TestBeaconEndpoints(BiothingsWebAppTest):
-    pass
+    TEST_DATA_DIR_NAME = 'mv_app_test'
+
     # FIXME: document the endpoint and implement tests
     #  for /beacon/*, handlers in web.beacon.handlers
+    def test_get(self):
+        r = self.request('/beacon/query', method='get')
+        assert r
+
+    def test_post(self):
+        r = self.request('/beacon/query', method='post')
+        assert r
 
 
 class TestGenomicIntervalQuery(BiothingsWebAppTest):
