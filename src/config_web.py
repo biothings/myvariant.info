@@ -30,6 +30,8 @@ APP_LIST = [
     (r"/{pre}/metadata/?", 'web.handlers.MVMetadataSourceHandler'),
     (r"/{pre}/{ver}/metadata/fields/?", 'web.handlers.MVMetadataFieldHandler'),
     (r"/{pre}/{ver}/metadata/?", 'web.handlers.MVMetadataSourceHandler'),
+    (r"/beacon/query?", "web.beacon.handlers.BeaconHandler"),
+    (r"/beacon/info", "web.beacon.handlers.BeaconInfoHandler"),
 ]
 # *****************************************************************************
 # ES Query Pipeline

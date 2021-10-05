@@ -1,7 +1,7 @@
 from tornado.web import StaticFileHandler, RedirectHandler
 
 from biothings.web.launcher import main
-from web.beacon.handlers import BeaconHandler, BeaconInfoHandler
+
 
 if __name__ == "__main__":
     main([
@@ -11,6 +11,4 @@ if __name__ == "__main__":
          {"path": "docs/demo", "default_filename": "index.html"}),
         (r"/standalone/?()", StaticFileHandler,
          {"path": "docs/standalone", "default_filename": "index.html"}),
-        (r"/beacon/query?", BeaconHandler),
-        (r"/beacon/info", BeaconInfoHandler),
     ])
