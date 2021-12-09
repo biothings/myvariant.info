@@ -170,7 +170,12 @@ You can use **AND**/**OR**/**NOT** boolean operators and grouping to form compli
     q=dbnsfp.polyphen2.hdiv.score:>0.99 AND chrom:1                        AND operator
     q=_exists_:dbsnp AND NOT dbsnp.vartype:indel                           NOT operator
     q=_exists_:dbsnp AND (NOT dbsnp.vartype:indel)                         grouping with ()
-    
+
+Genomic interval queries can be mixed in as well, but only when surrounded by **AND** operators, and cannot be used inside parentheses.::
+
+    q=dbnsfp.genename:CDK* AND chr2:39406300-39406400
+    q=chr2:39406300-39406400 AND dbnsfp.genename:CDK*
+
     
 Escaping reserved characters
 """"""""""""""""""""""""""""

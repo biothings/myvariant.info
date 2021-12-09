@@ -1,6 +1,9 @@
 # ######### #
 # HUB VARS  #
 # ######### #
+from biothings.utils.configuration import ConfigurationError, ConfigurationDefault, ConfigurationValue
+from biothings.utils.loggers import setup_default_log
+import logging
 import os
 import copy
 
@@ -14,11 +17,12 @@ CMD_COLLECTION = 'cmd'                     # for launched/running commands in sh
 EVENT_COLLECTION = 'event'                 # for launched/running commands in shell
 
 # define valid sources to get chrom from, and for each, name of the chrom field
-CHROM_FIELDS = {'cadd':'chrom', 'clinvar':'chrom', 'cosmic':'chrom', 'dbnsfp':'chrom',
-                'dbsnp':'chrom', 'docm':'chrom', 'evs':'chrom', 'exac':'chrom'}
+CHROM_FIELDS = {'cadd': 'chrom', 'clinvar': 'chrom', 'cosmic': 'chrom', 'dbnsfp': 'chrom',
+                'dbsnp': 'chrom', 'docm': 'chrom', 'evs': 'chrom', 'exac': 'chrom'}
 
 HG38_FIELDS = ['clinvar.hg38', 'dbnsfp.hg38', 'evs.hg38']
-HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19', 'dbsnp.hg19', 'docm.hg19', 'evs.hg19', 'grasp.hg19']
+HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19',
+               'dbsnp.hg19', 'docm.hg19', 'evs.hg19', 'grasp.hg19']
 
 # Max length for vcf.alt and vcf.ref fields (must be less than 32k as a keyword field in ElasticSearch)
 # otherwise, Elasticsearch will raise an error like this:
@@ -72,145 +76,147 @@ HUB_VERSION = "0.2"
 
 # Pre-prod/test ES definitions
 INDEX_CONFIG = {
-        "build_config_key" : "assembly", # used to select proper idxr/syncer
-        "indexer_select": {
-            # default
-            None : "hub.dataindex.indexer.VariantIndexer",
-            # when there's a cold_collection definition
-            "build_config.cold_collection" : "hub.dataindex.indexer.ColdHotVariantIndexer",
-            },
-        "env" : {
-            "prod" : {
-                "host" : "<PRODSERVER>:9200",
-                "indexer" : {
-                    "args" : {
-                        "timeout" : 300,
-                        "retry_on_timeout" : True,
-                        "max_retries" : 10,
-                        },
+    "build_config_key": "assembly",  # used to select proper idxr/syncer
+    "indexer_select": {
+        # default
+        None: "hub.dataindex.indexer.VariantIndexer",
+        # when there's a cold_collection definition
+        "build_config.cold_collection": "hub.dataindex.indexer.ColdHotVariantIndexer",
+    },
+    "env": {
+        "prod": {
+            "host": "<PRODSERVER>:9200",
+            "indexer": {
+                    "args": {
+                        "timeout": 300,
+                        "retry_on_timeout": True,
+                        "max_retries": 10,
                     },
-                "index" : [
-                    # keys match build_config_key value
-                    {"index": "myvariant_current_hg19", "doc_type": "variant", "hg19": True},
-                    {"index": "myvariant_current_hg38", "doc_type": "variant", "hg38": True},
-                    ],
-                },
-            "local" : {
-                "host" : "localhost:9200",
-                "indexer" : {
-                    "args" : {
-                        "timeout" : 300,
-                        "retry_on_timeout" : True,
-                        "max_retries" : 10,
-                        },
-                    },
-                "index" : [
-                    # "hg19/hg38" are flags used to filter compatible index from the UI
-                    {"index": "myvariant_current_hg19", "doc_type": "variant", "hg19": True},
-                    {"index": "myvariant_current_hg38", "doc_type": "variant", "hg38": True},
-                    ],
-                },
+                    "concurrency": HUB_MAX_WORKERS
             },
-        }
+            "index": [
+                # keys match build_config_key value
+                {"index": "myvariant_current_hg19", "doc_type": "variant", "hg19": True},
+                {"index": "myvariant_current_hg38", "doc_type": "variant", "hg38": True},
+            ],
+        },
+        "local": {
+            "host": "localhost:9200",
+            "indexer": {
+                    "args": {
+                        "timeout": 300,
+                        "retry_on_timeout": True,
+                        "max_retries": 10,
+                    },
+                    "concurrency": HUB_MAX_WORKERS
+            },
+            "index": [
+                # "hg19/hg38" are flags used to filter compatible index from the UI
+                {"index": "myvariant_current_hg19", "doc_type": "variant", "hg19": True},
+                {"index": "myvariant_current_hg38", "doc_type": "variant", "hg38": True},
+            ],
+        },
+    },
+}
 
 # Snapshot environment configuration
 SNAPSHOT_CONFIG = {
-        "env" : {
-            "prod" : {
-                "cloud" : {
-                    "type" : "aws", # default, only one supported by now
-                    "access_key" : None,
-                    "secret_key" : None,
-                    },
-                "repository" : {
-                    "name" : "variant_repository-$(Y)",
-                    "type" : "s3",
-                    "settings" : {
-                        "bucket" : "<SNAPSHOT_BUCKET_NAME>",
-                        "base_path" : "myvariant.info/$(Y)", # per year
-                        "region" : "us-west-2",
-                        },
-                    "acl" : "private",
-                    },
-                "indexer" : {
-                    # reference to INDEX_CONFIG
-                    "env" : "local",
-                    },
-                # when creating a snapshot, how long should we wait before querying ES
-                # to check snapshot status/completion ? (in seconds)
-                "monitor_delay" : 60 * 5,
+    "env": {
+        "prod": {
+            "cloud": {
+                "type": "aws",  # default, only one supported by now
+                "access_key": None,
+                "secret_key": None,
+            },
+            "repository": {
+                "name": "variant_repository-$(Y)",
+                "type": "s3",
+                "settings": {
+                    "bucket": "<SNAPSHOT_BUCKET_NAME>",
+                    "base_path": "myvariant",
+                    "region": "us-west-2",
                 },
-            "demo" : {
-                "cloud" : {
-                    "type" : "aws", # default, only one supported by now
-                    "access_key" : None,
-                    "secret_key" : None,
-                    },
-                "repository" : {
-                    "name" : "variant_repository-demo-$(Y)",
-                    "type" : "s3",
-                    "settings" : {
-                        "bucket" : "<SNAPSHOT_DEMO_BUCKET_NAME>",
-                        "base_path" : "myvariant.info/$(Y)", # per year
-                        "region" : "us-west-2",
-                        },
-                    "acl" : "public",
-                    },
-                "indexer" : {
-                    # reference to INDEX_CONFIG
-                    "env" : "local",
-                    },
-                # when creating a snapshot, how long should we wait before querying ES
-                # to check snapshot status/completion ? (in seconds)
-                "monitor_delay" : 10,
-                }
-            }
+                "acl": "private",
+            },
+            "indexer": {
+                # reference to INDEX_CONFIG
+                "env": "local",
+            },
+            # when creating a snapshot, how long should we wait before querying ES
+            # to check snapshot status/completion ? (in seconds)
+            "monitor_delay": 60 * 5,
+        },
+        "demo": {
+            "cloud": {
+                "type": "aws",  # default, only one supported by now
+                "access_key": None,
+                "secret_key": None,
+            },
+            "repository": {
+                "name": "variant_repository-demo-$(Y)",
+                "type": "s3",
+                "settings": {
+                    "bucket": "<SNAPSHOT_DEMO_BUCKET_NAME>",
+                    "base_path": "myvariant.info/$(Y)",  # per year
+                    "region": "us-west-2",
+                },
+                "acl": "public",
+            },
+            "indexer": {
+                # reference to INDEX_CONFIG
+                "env": "local",
+            },
+            # when creating a snapshot, how long should we wait before querying ES
+            # to check snapshot status/completion ? (in seconds)
+            "monitor_delay": 10,
         }
+    }
+}
 
 # Release configuration
 # Each root keys define a release environment (test, prod, ...)
 RELEASE_CONFIG = {
-        "env" : {
-            "prod-hg19" : {
-                "cloud" : {
-                    "type" : "aws", # default, only one supported by now
-                    "access_key" : None,
-                    "secret_key" : None,
-                    },
-                "release" : {
-                    "bucket" : "<RELEASES_BUCKET_NAME>",
-                    "region" : "us-west-2",
-                    "folder" : "myvariant.info-hg19",
-                    "auto" : True, # automatically generate release-note ?
-                    },
-                "diff" : {
-                    "bucket" : "<DIFFS_BUCKET_NAME>",
-                    "folder" : "myvariant.info-hg19",
-                    "region" : "us-west-2",
-                    "auto" : True, # automatically generate diff ? Careful if lots of changes
-                    },
-                },
-            "demo-hg19": {
-                "cloud" : {
-                    "type" : "aws", # default, only one supported by now
-                    "access_key" : None,
-                    "secret_key" : None,
-                    },
-                "release" : {
-                    "bucket" : "<RELEASES_BUCKET_NAME>",
-                    "region" : "us-west-2",
-                    "folder" : "myvariant.info-demo_hg19",
-                    "auto" : True, # automatically generate release-note ?
-                    },
-                "diff" : {
-                    "bucket" : "<DIFFS_BUCKET_NAME>",
-                    "folder" : "myvariant.info-demo_hg19",
-                    "region" : "us-west-2",
-                    "auto" : True, # automatically generate diff ? Careful if lots of changes
-                    },
-                }
-            }
+    "env": {
+        "prod-hg19": {
+            "cloud": {
+                "type": "aws",  # default, only one supported by now
+                "access_key": None,
+                "secret_key": None,
+            },
+            "release": {
+                "bucket": "<RELEASES_BUCKET_NAME>",
+                "region": "us-west-2",
+                "folder": "myvariant.info-hg19",
+                "auto": True,  # automatically generate release-note ?
+            },
+            "diff": {
+                "bucket": "<DIFFS_BUCKET_NAME>",
+                "folder": "myvariant.info-hg19",
+                "region": "us-west-2",
+                "auto": True,  # automatically generate diff ? Careful if lots of changes
+            },
+        },
+        "demo-hg19": {
+            "cloud": {
+                "type": "aws",  # default, only one supported by now
+                "access_key": None,
+                "secret_key": None,
+            },
+            "release": {
+                "bucket": "<RELEASES_BUCKET_NAME>",
+                "region": "us-west-2",
+                "folder": "myvariant.info-demo_hg19",
+                "auto": True,  # automatically generate release-note ?
+            },
+            "diff": {
+                "bucket": "<DIFFS_BUCKET_NAME>",
+                "folder": "myvariant.info-demo_hg19",
+                "region": "us-west-2",
+                "auto": True,  # automatically generate diff ? Careful if lots of changes
+            },
         }
+    }
+}
 
 
 # fir hg38 it's almost the same
@@ -236,7 +242,7 @@ READONLY_HUB_API_PORT = 7081
 ################################################################################
 # The format is a dictionary of 'username': 'cryptedpassword'
 # Generate crypted passwords with 'openssl passwd -crypt'
-HUB_PASSWD = {"guest":"9RKfd8gDuNf0Q"}
+HUB_PASSWD = {"guest": "9RKfd8gDuNf0Q"}
 
 # cached data (it None, caches won't be used at all)
 CACHE_FOLDER = None
@@ -273,8 +279,6 @@ STANDALONE_CONFIG = {
 #AUTOHUB_INDEXER_FACTORY = "biothings.hub.dataindex.indexer.DynamicIndexerFactory"
 #AUTOHUB_ES_HOST = "localhost:9200"
 
-import logging
-from biothings.utils.loggers import setup_default_log
 
 ########################################
 # APP-SPECIFIC CONFIGURATION VARIABLES #
@@ -289,35 +293,38 @@ from biothings.utils.loggers import setup_default_log
 # any other variables in this file as required. Variables defined as ValueError() exceptions
 # *must* be defined
 #
-from biothings import ConfigurationError, ConfigurationDefault, ConfigurationValue
 
 # Individual source database connection
 DATA_SRC_SERVER = ConfigurationError("Define hostname for source database")
 DATA_SRC_PORT = ConfigurationError("Define port for source database")
 DATA_SRC_DATABASE = ConfigurationError("Define name for source database")
-DATA_SRC_SERVER_USERNAME = ConfigurationError("Define username for source database connection (or None if not needed)")
-DATA_SRC_SERVER_PASSWORD = ConfigurationError("Define password for source database connection (or None if not needed)")
+DATA_SRC_SERVER_USERNAME = ConfigurationError(
+    "Define username for source database connection (or None if not needed)")
+DATA_SRC_SERVER_PASSWORD = ConfigurationError(
+    "Define password for source database connection (or None if not needed)")
 
 # Target (merged collection) database connection
 DATA_TARGET_SERVER = ConfigurationError("Define hostname for target database (merged collections)")
 DATA_TARGET_PORT = ConfigurationError("Define port for target database (merged collections)")
 DATA_TARGET_DATABASE = ConfigurationError("Define name for target database (merged collections)")
-DATA_TARGET_SERVER_USERNAME = ConfigurationError("Define username for target database connection (or None if not needed)")
-DATA_TARGET_SERVER_PASSWORD = ConfigurationError("Define password for target database connection (or None if not needed)")
+DATA_TARGET_SERVER_USERNAME = ConfigurationError(
+    "Define username for target database connection (or None if not needed)")
+DATA_TARGET_SERVER_PASSWORD = ConfigurationError(
+    "Define password for target database connection (or None if not needed)")
 
 HUB_DB_BACKEND = ConfigurationError("Define Hub DB connection")
 # Internal backend. Default to mongodb
 # For now, other options are: mongodb, sqlite3, elasticsearch
-#HUB_DB_BACKEND = {
+# HUB_DB_BACKEND = {
 #        "module" : "biothings.utils.sqlite3",
 #        "sqlite_db_foder" : "./db",
 #        }
-#HUB_DB_BACKEND = {
+# HUB_DB_BACKEND = {
 #        "module" : "biothings.utils.mongo",
 #        "uri" : "mongodb://localhost:27017",
 #        #"uri" : "mongodb://user:passwd@localhost:27017", # mongodb std URI
 #        }
-#HUB_DB_BACKEND = {
+# HUB_DB_BACKEND = {
 #        "module" : "biothings.utils.es",
 #        "host" : "localhost:9200",
 #        }
@@ -325,36 +332,37 @@ HUB_DB_BACKEND = ConfigurationError("Define Hub DB connection")
 #ES_HOST = ConfigurationError("Define ElasticSearch host used for index creation (eg localhost:9200)")
 
 # Path to a folder to store all downloaded files, logs, caches, etc...
-DATA_ARCHIVE_ROOT = ConfigurationError("Define path to folder which will contain all downloaded data, cache files, etc...")
+DATA_ARCHIVE_ROOT = ConfigurationError(
+    "Define path to folder which will contain all downloaded data, cache files, etc...")
 
 # Path to a folder to store all 3rd party parsers, dumpers, etc...
 DATA_PLUGIN_FOLDER = ConfigurationDefault(
-        default="./plugins",
-        desc="Define path to folder which will contain all 3rd party parsers, dumpers, etc...")
+    default="./plugins",
+    desc="Define path to folder which will contain all 3rd party parsers, dumpers, etc...")
 
 # Path to folder containing diff files
 DIFF_PATH = ConfigurationDefault(
-        default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"diff")"""),
-        desc="Define path to folder which will contain output files from diff")
+    default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"diff")"""),
+    desc="Define path to folder which will contain output files from diff")
 
 # Path to folder containing release note files
 RELEASE_PATH = ConfigurationDefault(
-        default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"release")"""),
-        desc="Define path to folder which will contain release files")
+    default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"release")"""),
+    desc="Define path to folder which will contain release files")
 
 # this dir must be created manually
 LOG_FOLDER = ConfigurationDefault(
-        default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"logs")"""),
-        desc="Define path to folder which will contain log files")
+    default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"logs")"""),
+    desc="Define path to folder which will contain log files")
 
-IDS_S3_BUCKET =  ConfigurationDefault(
-        default="myvariant-ids",
-        desc="Define a bucket name to upload myvariant _ids to")
+IDS_S3_BUCKET = ConfigurationDefault(
+    default="myvariant-ids",
+    desc="Define a bucket name to upload myvariant _ids to")
 
 # default hub logger
 logger = ConfigurationDefault(
-        default=logging,
-        desc="Provide a default hub logger instance (use setup_default_log(name,log_folder)")
+    default=logging,
+    desc="Provide a default hub logger instance (use setup_default_log(name,log_folder)")
 
 ACTIVE_DATASOURCES = [
     # auto-updated
@@ -385,4 +393,4 @@ ACTIVE_DATASOURCES = [
 
     # generated resources
     'hub.dataload.sources.snpeff',
-    ]
+]
