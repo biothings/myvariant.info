@@ -1,9 +1,8 @@
 import json
 import glob
 
-from utils.hgvs import get_pos_start_end, trim_delseq_from_hgvs
-from biothings.utils.dataload import dict_sweep, unlist, \
-                                     value_convert_to_number
+from utils.hgvs import get_pos_start_end
+from biothings.utils.dataload import dict_sweep, unlist, value_convert_to_number
 from biothings.utils.common import open_compressed_file
 
 # QUESTION:
@@ -194,7 +193,7 @@ def load_data_file(input_file, version):
         record = parse_one_rec(version, json.loads(line.decode()))
         for _doc in record:
             new_doc = dict()
-            new_doc['_id'] = trim_delseq_from_hgvs(_doc.pop('_id'))
+            new_doc['_id'] = _doc.pop('_id')  # if _id is too long, it will be trimmed by MyVariantBasicStorage
             new_doc['dbsnp'] = _doc
             yield new_doc
 

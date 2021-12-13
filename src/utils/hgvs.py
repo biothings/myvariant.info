@@ -146,6 +146,7 @@ def get_pos_start_end(chr, pos, ref, alt):
         raise ValueError("Invalid position %s" % repr(pos))
     if not alt:
         raise ValueError("Cannot decide start/end from {}.".format((chr, pos, ref, alt)))
+
     if len(ref) == len(alt) == 1:
         # end is the same as start for snp
         start = end = pos
@@ -216,7 +217,7 @@ def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col, skip_unmatched=False):
             yield doc
 
 
-def trim_delseq_from_hgvs(hgvs, remove_ins=False):
+def trim_delseq_from_hgvs(hgvs):
     """Remove the deleted nucleotides from hgvs ID
     set remove_ins to be true during snpeff annotation to remove those
     long inserted nucleotides
@@ -227,7 +228,7 @@ def trim_delseq_from_hgvs(hgvs, remove_ins=False):
     re_dup = re.compile("(.*dup)[A-Z]+$")
     if re_delins.match(hgvs):
         hgvs = "".join(re_delins.match(hgvs).groups())
-    elif remove_ins and re_ins.match(hgvs):
+    elif re_ins.match(hgvs):
         hgvs = "".join(re_ins.match(hgvs).groups())
     elif re_del.match(hgvs):
         hgvs = "".join(re_del.match(hgvs).groups())
@@ -284,7 +285,7 @@ class DocEncoder:
 
         encoded = False
         if len(doc[cls.key_to_id]) > max_len:
-            prefix = trim_delseq_from_hgvs(doc[cls.key_to_id], remove_ins=True)
+            prefix = trim_delseq_from_hgvs(doc[cls.key_to_id])
             seq = doc[cls.key_to_id].replace(prefix, "")
             seq_hashed = blake2b(seq.encode(), digest_size=16).hexdigest()
 

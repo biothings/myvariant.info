@@ -308,8 +308,7 @@ class SnpeffAnnotator(object):
                             "transcript_biotype": transcript_biotype,
                             "rank": rank,
                             "total": total,
-                            "hgvs_c": trim_delseq_from_hgvs(hgvs_coding,
-                                                            remove_ins=True), # trim long sequence
+                            "hgvs_c": trim_delseq_from_hgvs(hgvs_coding),  # trim long sequence
                             "hgvs_p": hgvs_protein,
                             "cdna": {
                                 "position": cdna_position,
