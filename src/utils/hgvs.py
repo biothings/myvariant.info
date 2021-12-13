@@ -69,7 +69,7 @@ def _normalized_vcf(chr, pos, ref, alt):
     # ref and alt are exactly the same,
     # something is wrong with this VCF record
     # assert not (_ref is None and _alt is None)
-    if (_ref is None and _alt is None):
+    if _ref is None and _alt is None:
         raise ValueError('"ref" and "alt" cannot be the same: {}'.format(
             (chr, pos, ref, alt)
         ))
@@ -144,6 +144,7 @@ def get_pos_start_end(chr, pos, ref, alt):
         pos = int(pos)
     except ValueError:
         raise ValueError("Invalid position %s" % repr(pos))
+
     if not alt:
         raise ValueError("Cannot decide start/end from {}.".format((chr, pos, ref, alt)))
 
@@ -156,8 +157,8 @@ def get_pos_start_end(chr, pos, ref, alt):
         start = pos + 1
         end = pos + len(ref) - 1
         if start == end:
-            end += 1    # end is start+1 for single nt deletion
-                        # TODO: double-check this is the right convention
+            # TODO: double-check this is the right convention
+            end += 1  # end is start+1 for single nt deletion
     elif len(ref) == 1 and len(alt) > 1:
         # this is a insertion
         assert alt[0] == ref
@@ -239,10 +240,13 @@ def trim_delseq_from_hgvs(hgvs):
 
 
 class DocEncoder:
-    key_to_id = "_id"
-    key_to_seq_map = "_seqhashed"  # doc["_seqhashed"] saves all <seq_hashed : seq> mapping
-    key_to_ref_seq = "ref"
-    key_to_alt_seq = "alt"
+    KEY_ID = "_id"
+    KEY_SEQ_MAP = "_seqhashed"  # doc["_seqhashed"] saves all <seq_hashed : seq> mapping
+    KEY_REF = "ref"
+    KEY_ALT = "alt"
+
+    ID_INFIX = "seqhashed"
+    SEQ_INFIX = "fullseqhashed"
 
     @classmethod
     def __save_seq_map(cls, doc, seq_hashed, seq):
@@ -250,30 +254,28 @@ class DocEncoder:
         `seq_hashed` is the the blake2b-encoded `seq`
         A dictionary or entry of <seq_hashed, seq> will be inserted into `doc["_seqhashed"]`
         """
-        if cls.key_to_seq_map in doc:
-            doc[cls.key_to_seq_map][seq_hashed] = seq
+        if cls.KEY_SEQ_MAP in doc:
+            doc[cls.KEY_SEQ_MAP][seq_hashed] = seq
         else:
-            doc[cls.key_to_seq_map] = {seq_hashed: seq}
+            doc[cls.KEY_SEQ_MAP] = {seq_hashed: seq}
 
         return doc
 
     @classmethod
     def __new_id(cls, prefix, seq_hashed):
         # the encoded id will have a pattern of `<prefix>_<infix>_<seq_hashed>`
-        infix = "seqhashed"
-        new_id = "{prefix}_{infix}_{seq_hashed}".format(prefix=prefix, infix=infix, seq_hashed=seq_hashed)
+        new_id = "{prefix}_{infix}_{seq_hashed}".format(prefix=prefix, infix=cls.ID_INFIX, seq_hashed=seq_hashed)
         return new_id
 
     @classmethod
     def __new_seq(cls, seq_hashed, seq, max_len):
         # the encoded seq will have a pattern of `<prefix>_<infix>_<seq_hashed>`
-        infix = "fullseqhashed"
 
         # make sure the length of the `<prefix>_<infix>_<seq_hashed>` string is max_len
-        prefix_length = max_len - len(seq_hashed) - len(infix) - 2
+        prefix_length = max_len - len(seq_hashed) - len(cls.SEQ_INFIX) - 2
         prefix = seq[0: prefix_length]
 
-        new_seq = "{prefix}_{infix}_{seq_hashed}".format(prefix=prefix, infix=infix, seq_hashed=seq_hashed)
+        new_seq = "{prefix}_{infix}_{seq_hashed}".format(prefix=prefix, infix=cls.SEQ_INFIX, seq_hashed=seq_hashed)
         return new_seq
 
     @classmethod
@@ -281,15 +283,15 @@ class DocEncoder:
         """
         Encode long `doc["_id"]` whose length exceed `max_len`.
         """
-        assert cls.key_to_id in doc
+        assert cls.KEY_ID in doc
 
         encoded = False
-        if len(doc[cls.key_to_id]) > max_len:
-            prefix = trim_delseq_from_hgvs(doc[cls.key_to_id])
-            seq = doc[cls.key_to_id].replace(prefix, "")
+        if len(doc[cls.KEY_ID]) > max_len:
+            prefix = trim_delseq_from_hgvs(doc[cls.KEY_ID])
+            seq = doc[cls.KEY_ID].replace(prefix, "")
             seq_hashed = blake2b(seq.encode(), digest_size=16).hexdigest()
 
-            doc[cls.key_to_id] = cls.__new_id(prefix, seq_hashed)
+            doc[cls.KEY_ID] = cls.__new_id(prefix, seq_hashed)
             doc = cls.__save_seq_map(doc, seq_hashed, seq)
 
             encoded = True
@@ -320,7 +322,7 @@ class DocEncoder:
         assert key in doc
 
         encoded = False
-        for seq_key in [cls.key_to_ref_seq, cls.key_to_alt_seq]:
+        for seq_key in [cls.KEY_REF, cls.KEY_ALT]:
             seq = doc[key].get(seq_key, None)
             if seq and len(seq) > max_len:
                 seq_hashed = blake2b(seq.encode(), digest_size=16).hexdigest()

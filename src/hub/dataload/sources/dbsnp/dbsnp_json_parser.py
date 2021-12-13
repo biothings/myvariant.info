@@ -85,28 +85,6 @@ def restructure_allele_freq_info(allele_annotations):
     return alleles_data
 
 
-"""
-def normalize_delins_hgvs(hgvs):
-    # handle delins, where no deleted nucleotides is specified
-    if 'delins' in hgvs:
-        return hgvs
-    # handle delins, where deleted nucleotides is specified
-    elif 'del' in hgvs and 'ins' in hgvs:
-        prefix, suffix = hgvs.split('del')
-        deleted, inserted = suffix.split('ins')
-        return prefix + 'delins' + inserted
-    # handle deletions
-    elif 'del' in hgvs:
-        return hgvs.split('del')[0] + 'del'
-    # handle snv, ins, dup
-    elif '>' in hgvs or 'ins' in hgvs or 'dup' in hgvs or '[' in hgvs or 'inv' in hgvs:
-        return hgvs
-    else:
-        print('hgvs not delins or snv or dup', hgvs)
-        return hgvs
-"""
-
-
 def restructure_gene_info(allele_annotations):
     """Restructure information related to gene
     """
