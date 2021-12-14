@@ -3,49 +3,79 @@ import copy
 from hashlib import blake2b
 
 
-def is_snp(hgvs_id):
-    """return True/False if a hgvs id a SNP or not."""
-    pat = 'chr(\w+):g\.(\d+)(\w)\>(\w)'
-    mat = re.match(pat, hgvs_id)
-    return mat is not None
+class HGVSHelper:
+    """
+    A helper class that collects all the global variables used for HGVS functionality in this module
+    """
+
+    SNP_PATTERN = re.compile('(chr\w+:g\.\d+)(\w)\>(\w)')
+    INS_PATTERN = re.compile('(chr\w+:g\.\d+_\d+)ins(\w+)')
+    DELINS_PATTERN = re.compile('(chr\w+:g\.\d+_\d+)delins(\w+)')
+    """
+    To match hgvs IDs like:
+    
+        'chr19:g.58863869C>-'
+        'chr10:g.52596077->T'
+        'chr10:g.52596077->T'
+        'chr12:g.8998751T>-'
+        'chr12:g.9004916C>-'
+    """
+    MINUS_SIGN_PATTERN = re.compile('(chr\w+:g\.(\d+))([\w-])\>([\w-])')
+
+    # Patterns for trimming long hgvs IDs
+    DELINS_TRIMMER = re.compile("(.*del)[A-Z]+(ins.*)")
+    INS_TRIMMER = re.compile("(.*ins)[A-Z]+$")
+    DEL_TRIMMER = re.compile("(.*del)[A-Z]+$")
+    DUP_TRIMMER = re.compile("(.*dup)[A-Z]+$")
 
 
-def reverse_complement_seq(seq):
-    seq_d = {
+class SeqHelper:
+    """
+    A helper class that collects all the global variables used for nucleotide functionality in this module
+    """
+
+    COMPLEMENT_MAP = {
         "A": "T",
         "T": "A",
         "C": "G",
         "G": "C"
     }
-    for k in seq_d.keys():
-        seq_d[k.lower()] = seq_d[k].lower()
-    return ''.join(seq_d[base] for base in reversed(seq))
+    SEQ_PATTERN = re.compile('^[ACGTN]+$')
+
+
+def is_snp(hgvs_id):
+    """return True/False if a hgvs id a SNP or not."""
+    return re.match(HGVSHelper.SNP_PATTERN, hgvs_id) is not None
+
+
+def reverse_complement_seq(seq):
+    return ''.join(SeqHelper.COMPLEMENT_MAP[base] for base in reversed(seq))
 
 
 def reverse_complement_hgvs(hgvs_id):
-    """return a complementary version of hgvs_id.
-    works only for SNP, ins, delins variant for now."""
-    pat_snp = '(chr\w+:g\.\d+)(\w)\>(\w)'
-    pat_ins = '(chr\w+:g\.\d+_\d+)ins(\w+)'
-    pat_del_ins = '(chr\w+:g\.\d+_\d+)delins(\w+)'
+    """
+    Return a complementary version of hgvs_id.
+    Works only for SNP, ins, delins variant for now.
+    """
     # complement SNP ID
-    if re.match(pat_snp, hgvs_id):
-        g = re.match(pat_snp, hgvs_id).groups()
-        return '{}{}>{}'.format(g[0],
-                                reverse_complement_seq(g[1]),
-                                reverse_complement_seq(g[2]))
+    snp_match = re.match(HGVSHelper.SNP_PATTERN, hgvs_id)
+    if snp_match:
+        g = snp_match.groups()
+        return '{}{}>{}'.format(g[0], reverse_complement_seq(g[1]), reverse_complement_seq(g[2]))
+
     # reverse complement ins ID
-    elif re.match(pat_ins, hgvs_id):
-        g = re.match(pat_ins, hgvs_id).groups()
-        return '{}ins{}'.format(g[0],
-                                reverse_complement_seq(g[1]))
+    ins_match = re.match(HGVSHelper.INS_PATTERN, hgvs_id)
+    if ins_match:
+        g = ins_match.groups()
+        return '{}ins{}'.format(g[0], reverse_complement_seq(g[1]))
+
     # reverse complement del_ins ID
-    elif re.match(pat_del_ins, hgvs_id):
-        g = re.match(pat_del_ins, hgvs_id).groups()
-        return '{}delins{}'.format(g[0],
-                                   reverse_complement_seq(g[1]))
-    else:
-        raise ValueError("Not a Valid HGVS ID")
+    delins_match = re.match(HGVSHelper.DELINS_PATTERN, hgvs_id)
+    if delins_match:
+        g = delins_match.groups()
+        return '{}delins{}'.format(g[0], reverse_complement_seq(g[1]))
+
+    raise ValueError("Not a Valid HGVS ID")
 
 
 def _normalized_vcf(chr, pos, ref, alt):
@@ -65,9 +95,7 @@ def _normalized_vcf(chr, pos, ref, alt):
         if _ref is None or _alt is None or _ref != _alt:
             break
 
-    # _ref/_alt cannot be both None, if so,
-    # ref and alt are exactly the same,
-    # something is wrong with this VCF record
+    # _ref/_alt cannot be both None, if so, ref and alt are exactly the same, something is wrong with this VCF record
     # assert not (_ref is None and _alt is None)
     if _ref is None and _alt is None:
         raise ValueError('"ref" and "alt" cannot be the same: {}'.format(
@@ -91,8 +119,9 @@ def _normalized_vcf(chr, pos, ref, alt):
 
 def get_hgvs_from_vcf(chr, pos, ref, alt, mutant_type=None):
     """get a valid hgvs name from VCF-style "chr, pos, ref, alt" data."""
-    if not (re.match('^[ACGTN]+$', ref) and re.match('^[ACGTN*]+$', alt)):
+    if not (re.match(SeqHelper.SEQ_PATTERN, ref) and re.match(SeqHelper.SEQ_PATTERN, alt)):
         raise ValueError("Cannot convert {} into HGVS id.".format((chr, pos, ref, alt)))
+
     if len(ref) == len(alt) == 1:
         # this is a SNP
         hgvs = 'chr{0}:g.{1}{2}>{3}'.format(chr, pos, ref, alt)
@@ -132,6 +161,7 @@ def get_hgvs_from_vcf(chr, pos, ref, alt, mutant_type=None):
             var_type = 'delins'
     else:
         raise ValueError("Cannot convert {} into HGVS id.".format((chr, pos, ref, alt)))
+
     if mutant_type:
         return hgvs, var_type
     else:
@@ -151,22 +181,28 @@ def get_pos_start_end(chr, pos, ref, alt):
     if len(ref) == len(alt) == 1:
         # end is the same as start for snp
         start = end = pos
-    elif len(ref) > 1 and len(alt) == 1:
+        return start, end
+
+    if len(ref) > 1 and len(alt) == 1:
         # this is a deletion:
         assert ref[0] == alt
+
         start = pos + 1
         end = pos + len(ref) - 1
         if start == end:
             # TODO: double-check this is the right convention
             end += 1  # end is start+1 for single nt deletion
-    elif len(ref) == 1 and len(alt) > 1:
+        return start, end
+
+    if len(ref) == 1 and len(alt) > 1:
         # this is a insertion
         assert alt[0] == ref
+
         start = pos
         end = pos + 1
-    else:
-        raise ValueError("Cannot decide start/end from {}.".format((chr, pos, ref, alt)))
-    return start, end
+        return start, end
+
+    raise ValueError("Cannot decide start/end from {}.".format((chr, pos, ref, alt)))
 
 
 def fix_hgvs_indel(hgvs_id):
@@ -178,9 +214,10 @@ def fix_hgvs_indel(hgvs_id):
          'chr12:g.9004916C>-',
     """
     _hgvs_id = None
-    pat_snp = '(chr\w+:g\.(\d+))([\w-])\>([\w-])'
-    if re.match(pat_snp, hgvs_id):
-        g = re.match(pat_snp, hgvs_id).groups()
+
+    match = re.match(HGVSHelper.MINUS_SIGN_PATTERN, hgvs_id)
+    if match:
+        g = match.groups()
         pos, ref, alt = g[1:]
         if ref == '-':
             # should be insertion
@@ -193,6 +230,7 @@ def fix_hgvs_indel(hgvs_id):
             print("Error: either cannot fix or no need to fix: ", hgvs_id)
     else:
         print("Error: hgvs id not in a fixable format: ", hgvs_id)
+
     return _hgvs_id
 
 
@@ -207,6 +245,8 @@ def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col, skip_unmatched=False):
         rsid = rsid_fn(doc)
         if rsid is None:
             yield doc
+            # TODO add a `continue` statement here?
+
         hits = [d for d in dbsnp_col.find({"dbsnp.rsid": rsid})]
         if hits:
             for hit in hits:
@@ -219,23 +259,26 @@ def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col, skip_unmatched=False):
 
 
 def trim_delseq_from_hgvs(hgvs):
-    """Remove the deleted nucleotides from hgvs ID
-    set remove_ins to be true during snpeff annotation to remove those
-    long inserted nucleotides
     """
-    re_delins = re.compile("(.*del)[A-Z]+(ins.*)")
-    re_ins = re.compile("(.*ins)[A-Z]+$")
-    re_del = re.compile("(.*del)[A-Z]+$")
-    re_dup = re.compile("(.*dup)[A-Z]+$")
-    if re_delins.match(hgvs):
-        hgvs = "".join(re_delins.match(hgvs).groups())
-    elif re_ins.match(hgvs):
-        hgvs = "".join(re_ins.match(hgvs).groups())
-    elif re_del.match(hgvs):
-        hgvs = "".join(re_del.match(hgvs).groups())
-    elif re_dup.match(hgvs):
-        hgvs = "".join(re_dup.match(hgvs).groups())
+    Remove the deleted nucleotides from hgvs ID
+    """
+    delins_match = HGVSHelper.DELINS_TRIMMER.match(hgvs)
+    if delins_match:
+        return "".join(delins_match.groups())
 
+    ins_match = HGVSHelper.INS_TRIMMER.match(hgvs)
+    if ins_match:
+        return "".join(ins_match.groups())
+
+    del_match = HGVSHelper.DEL_TRIMMER.match(hgvs)
+    if del_match:
+        return "".join(del_match.groups())
+
+    dup_match = HGVSHelper.DUP_TRIMMER.match(hgvs)
+    if dup_match:
+        return "".join(dup_match.groups())
+
+    # TODO if none of the patterns matches, it should be an error. At least log it.
     return hgvs
 
 
@@ -333,4 +376,3 @@ class DocEncoder:
                 encoded = True
 
         return encoded, doc
-
