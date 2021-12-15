@@ -8,6 +8,7 @@ class HGVSHelper:
     A helper class that collects all the global variables used for HGVS functionality in this module
     """
 
+    # Patterns for determining the variant types
     SNP_PATTERN = re.compile('(chr\w+:g\.\d+)(\w)\>(\w)')
     INS_PATTERN = re.compile('(chr\w+:g\.\d+_\d+)ins(\w+)')
     DELINS_PATTERN = re.compile('(chr\w+:g\.\d+_\d+)delins(\w+)')
@@ -27,6 +28,7 @@ class HGVSHelper:
     INS_TRIMMER = re.compile("(.*ins)[A-Z]+$")
     DEL_TRIMMER = re.compile("(.*del)[A-Z]+$")
     DUP_TRIMMER = re.compile("(.*dup)[A-Z]+$")
+    LONG_SEQ_TRIMMER = re.compile('chr\w+:g\.\d+_\d+')
 
 
 class SeqHelper:
@@ -45,7 +47,7 @@ class SeqHelper:
 
 def is_snp(hgvs_id):
     """return True/False if a hgvs id a SNP or not."""
-    return re.match(HGVSHelper.SNP_PATTERN, hgvs_id) is not None
+    return HGVSHelper.SNP_PATTERN.match(hgvs_id) is not None
 
 
 def reverse_complement_seq(seq):
@@ -58,19 +60,19 @@ def reverse_complement_hgvs(hgvs_id):
     Works only for SNP, ins, delins variant for now.
     """
     # complement SNP ID
-    snp_match = re.match(HGVSHelper.SNP_PATTERN, hgvs_id)
+    snp_match = HGVSHelper.SNP_PATTERN.match(hgvs_id)
     if snp_match:
         g = snp_match.groups()
         return '{}{}>{}'.format(g[0], reverse_complement_seq(g[1]), reverse_complement_seq(g[2]))
 
     # reverse complement ins ID
-    ins_match = re.match(HGVSHelper.INS_PATTERN, hgvs_id)
+    ins_match = HGVSHelper.INS_PATTERN.match(hgvs_id)
     if ins_match:
         g = ins_match.groups()
         return '{}ins{}'.format(g[0], reverse_complement_seq(g[1]))
 
     # reverse complement del_ins ID
-    delins_match = re.match(HGVSHelper.DELINS_PATTERN, hgvs_id)
+    delins_match = HGVSHelper.DELINS_PATTERN.match(hgvs_id)
     if delins_match:
         g = delins_match.groups()
         return '{}delins{}'.format(g[0], reverse_complement_seq(g[1]))
@@ -119,7 +121,7 @@ def _normalized_vcf(chr, pos, ref, alt):
 
 def get_hgvs_from_vcf(chr, pos, ref, alt, mutant_type=None):
     """get a valid hgvs name from VCF-style "chr, pos, ref, alt" data."""
-    if not (re.match(SeqHelper.SEQ_PATTERN, ref) and re.match(SeqHelper.SEQ_PATTERN, alt)):
+    if not (SeqHelper.SEQ_PATTERN.match(ref) and SeqHelper.SEQ_PATTERN.match(alt)):
         raise ValueError("Cannot convert {} into HGVS id.".format((chr, pos, ref, alt)))
 
     if len(ref) == len(alt) == 1:
@@ -215,7 +217,7 @@ def fix_hgvs_indel(hgvs_id):
     """
     _hgvs_id = None
 
-    match = re.match(HGVSHelper.MINUS_SIGN_PATTERN, hgvs_id)
+    match = HGVSHelper.MINUS_SIGN_PATTERN.match(hgvs_id)
     if match:
         g = match.groups()
         pos, ref, alt = g[1:]
@@ -277,6 +279,10 @@ def trim_delseq_from_hgvs(hgvs):
     dup_match = HGVSHelper.DUP_TRIMMER.match(hgvs)
     if dup_match:
         return "".join(dup_match.groups())
+
+    long_match = HGVSHelper.LONG_SEQ_TRIMMER.match(hgvs)
+    if long_match:
+        return long_match.group()  # no subgroups, return the entire match
 
     # TODO if none of the patterns matches, it should be an error. At least log it.
     return hgvs
