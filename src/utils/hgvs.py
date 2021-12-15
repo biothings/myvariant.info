@@ -9,7 +9,7 @@ class HGVSHelper:
     """
 
     # Patterns for determining the variant types
-    SNP_PATTERN = re.compile('(chr\w+:g\.\d+)(\w)\>(\w)')
+    SNP_PATTERN = re.compile('(chr\w+:g\.\d+)(\w)>(\w)')
     INS_PATTERN = re.compile('(chr\w+:g\.\d+_\d+)ins(\w+)')
     DELINS_PATTERN = re.compile('(chr\w+:g\.\d+_\d+)delins(\w+)')
     """
@@ -21,7 +21,7 @@ class HGVSHelper:
         'chr12:g.8998751T>-'
         'chr12:g.9004916C>-'
     """
-    MINUS_SIGN_PATTERN = re.compile('(chr\w+:g\.(\d+))([\w-])\>([\w-])')
+    MINUS_SIGN_PATTERN = re.compile('(chr\w+:g\.(\d+))([\w-])>([\w-])')
 
     # Patterns for trimming long hgvs IDs
     DELINS_TRIMMER = re.compile("(.*del)[A-Z]+(ins.*)")
