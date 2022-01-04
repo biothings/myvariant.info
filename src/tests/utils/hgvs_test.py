@@ -8,7 +8,7 @@ class TestDocEncoder(unittest.TestCase):
         self.fake_seq = "CTAACTAACTAA"
         self.fake_id = self.fake_prefix + self.fake_seq
         self.fake_doc = {
-            DocEncoder.key_to_id: self.fake_id
+            DocEncoder.KEY_ID: self.fake_id
         }
 
     def test_encode_long_hgvs_id_with_no_change(self):
@@ -27,25 +27,25 @@ class TestDocEncoder(unittest.TestCase):
         encoded, doc = DocEncoder.encode_long_hgvs_id(self.fake_doc, max_len=max_len)
 
         self.assertTrue(encoded, "Must have been encoded")
-        self.assertTrue(doc[DocEncoder.key_to_id].startswith(self.fake_prefix),
+        self.assertTrue(doc[DocEncoder.KEY_ID].startswith(self.fake_prefix),
                         "New ID must starts with the orig prefix")
-        self.assertTrue(DocEncoder.key_to_seq_map in doc, "Must have the seq mapping key")
-        self.assertEqual(len(doc[DocEncoder.key_to_seq_map]), 1, "Seq mapping must have only 1 element here")
-        self.assertEqual(list(doc[DocEncoder.key_to_seq_map].values())[0], self.fake_seq,
+        self.assertTrue(DocEncoder.KEY_SEQ_MAP in doc, "Must have the seq mapping key")
+        self.assertEqual(len(doc[DocEncoder.KEY_SEQ_MAP]), 1, "Seq mapping must have only 1 element here")
+        self.assertEqual(list(doc[DocEncoder.KEY_SEQ_MAP].values())[0], self.fake_seq,
                          "Seq mapping must contain the orig sequence")
 
     def test_encode_long_hgvs_id_with_seq_map_key(self):
-        self.fake_doc[DocEncoder.key_to_seq_map] = {"foo": "bar"}
+        self.fake_doc[DocEncoder.KEY_SEQ_MAP] = {"foo": "bar"}
 
         max_len = len(self.fake_id) // 2  # Ensure it to be encoded
         encoded, doc = DocEncoder.encode_long_hgvs_id(self.fake_doc, max_len=max_len)
 
         self.assertTrue(encoded, "Must have been encoded")
-        self.assertTrue(doc[DocEncoder.key_to_id].startswith(self.fake_prefix),
+        self.assertTrue(doc[DocEncoder.KEY_ID].startswith(self.fake_prefix),
                         "New ID must starts with the orig prefix")
-        self.assertEqual(len(doc[DocEncoder.key_to_seq_map]), 2, "Seq mapping must have only 2 elements here")
+        self.assertEqual(len(doc[DocEncoder.KEY_SEQ_MAP]), 2, "Seq mapping must have only 2 elements here")
 
-        for key, value in doc[DocEncoder.key_to_seq_map].items():
+        for key, value in doc[DocEncoder.KEY_SEQ_MAP].items():
             if key != "foo":
                 self.assertEqual(value, self.fake_seq, "Seq mapping must contain the orig sequence")
 
@@ -63,10 +63,10 @@ class TestDocEncoder(unittest.TestCase):
         encoded, doc = DocEncoder.encode_long_ref_alt_seq(self.fake_doc, key=fake_source_key, max_len=max_len)
 
         self.assertTrue(encoded, "Must have been encoded")
-        self.assertTrue(DocEncoder.key_to_seq_map in doc, "Must have the seq mapping key")
-        self.assertEqual(len(doc[DocEncoder.key_to_seq_map]), 2, "Seq mapping must have only 2 element here")
+        self.assertTrue(DocEncoder.KEY_SEQ_MAP in doc, "Must have the seq mapping key")
+        self.assertEqual(len(doc[DocEncoder.KEY_SEQ_MAP]), 2, "Seq mapping must have only 2 element here")
 
-        seqs = doc[DocEncoder.key_to_seq_map].values()
+        seqs = doc[DocEncoder.KEY_SEQ_MAP].values()
         self.assertIn(fake_ref_seq, seqs, "ref seq must in the seq mapping")
         self.assertIn(fake_alt_seq, seqs, "alt seq must in the seq mapping")
 
