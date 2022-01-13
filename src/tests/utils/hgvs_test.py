@@ -1,5 +1,6 @@
 import unittest
 from utils.hgvs import *
+from utils.hgvs import _normalized_vcf
 
 
 class TestFunctions(unittest.TestCase):
@@ -30,42 +31,42 @@ class TestFunctions(unittest.TestCase):
         pass
         # TODO it uses the buggy `test_reverse_complement_seq`
 
-    # def test_normalized_vcf(self):
-    #     # TODO rename `_normalized_vcf` to make it non-private
-    #
-    #     input_vcf = ("X", 100, "CTTTT", "CT")
-    #     output_vcf = ('X', 101, 'TTTT', 'T')
-    #     self.assertEqual(output_vcf, normalized_vcf(*input_vcf))
-    #
-    #     input_vcf = ("X", 100, "TC", "TG")
-    #     output_vcf = ('X', 101, 'C', 'G')
-    #     self.assertEqual(output_vcf, normalized_vcf(*input_vcf))
-    #
-    #     input_vcf = ("X", 123, "T", "C")
-    #     output_vcf = ('X', 123, 'T', 'C')
-    #     self.assertEqual(output_vcf, normalized_vcf(*input_vcf))
-    #
-    #     input_vcf = ("X", 123, "CC", "CCT")
-    #     output_vcf = ('X', 124, 'C', 'CT')
-    #     self.assertEqual(output_vcf, normalized_vcf(*input_vcf))
-    #
-    #     # TODO failed
-    #     # input_vcf = ("X", 123, "TCCCCT", "CCCCT")
-    #     # output_vcf = ('X', 123, 'TC', 'C')
-    #     # self.assertEqual(output_vcf, normalized_vcf(*input_vcf))
-    #
-    #     input_vcf = ("X", 123, "TCCCCTA", "CCCCT")
-    #     output_vcf = ('X', 123, 'TCCCCTA', 'CCCCT')
-    #     self.assertEqual(output_vcf, normalized_vcf(*input_vcf))
-    #
-    #     # TODO failed
-    #     # input_vcf = ("X", 123, 'AAATCCCCTA', 'AAACCCCTA')
-    #     # output_vcf = ('X', 125, 'AT', 'A')
-    #     # self.assertEqual(output_vcf, normalized_vcf(*input_vcf))
-    #
-    #     input_vcf = ("X", 123, 'CAAATCCCCTAG', 'AAACCCCTA')
-    #     output_vcf = ('X', 123, 'CAAATCCCCTAG', 'AAACCCCTA')
-    #     self.assertEqual(output_vcf, normalized_vcf(*input_vcf))
+    def test_normalized_vcf(self):
+        # TODO rename `_normalized_vcf` to make it non-private
+
+        input_vcf = ("X", 100, "CTTTT", "CT")
+        output_vcf = ('X', 101, 'TTTT', 'T')
+        self.assertEqual(output_vcf, _normalized_vcf(*input_vcf))
+
+        input_vcf = ("X", 100, "TC", "TG")
+        output_vcf = ('X', 101, 'C', 'G')
+        self.assertEqual(output_vcf, _normalized_vcf(*input_vcf))
+
+        input_vcf = ("X", 123, "T", "C")
+        output_vcf = ('X', 123, 'T', 'C')
+        self.assertEqual(output_vcf, _normalized_vcf(*input_vcf))
+
+        input_vcf = ("X", 123, "CC", "CCT")
+        output_vcf = ('X', 124, 'C', 'CT')
+        self.assertEqual(output_vcf, _normalized_vcf(*input_vcf))
+
+        # TODO failed
+        # input_vcf = ("X", 123, "TCCCCT", "CCCCT")
+        # output_vcf = ('X', 123, 'TC', 'C')
+        # self.assertEqual(output_vcf, _normalized_vcf(*input_vcf))
+
+        input_vcf = ("X", 123, "TCCCCTA", "CCCCT")
+        output_vcf = ('X', 123, 'TCCCCTA', 'CCCCT')
+        self.assertEqual(output_vcf, _normalized_vcf(*input_vcf))
+
+        # TODO failed
+        # input_vcf = ("X", 123, 'AAATCCCCTA', 'AAACCCCTA')
+        # output_vcf = ('X', 125, 'AT', 'A')
+        # self.assertEqual(output_vcf, _normalized_vcf(*input_vcf))
+
+        input_vcf = ("X", 123, 'CAAATCCCCTAG', 'AAACCCCTA')
+        output_vcf = ('X', 123, 'CAAATCCCCTAG', 'AAACCCCTA')
+        self.assertEqual(output_vcf, _normalized_vcf(*input_vcf))
 
     def test_get_hgvs_from_vcf(self):
         input_vcf = ("X", 100, "A", "C")
