@@ -24,15 +24,35 @@ class TestFunctions(unittest.TestCase):
         self.assertFalse(is_snp(hgvs))
 
     def test_reverse_complement_seq(self):
-        pass
-        # TODO fix bug
+        input_seq = "ACTG"
+        expected_seq = "CAGT"
+        self.assertEqual(expected_seq, reverse_complement_seq(input_seq))
+
+        input_seq = "XYZ"
+        self.assertRaises(KeyError, reverse_complement_seq, input_seq)
 
     def test_reverse_complement_hgvs(self):
-        pass
-        # TODO it uses the buggy `test_reverse_complement_seq`
+        input_hgvs = "chrY:g.100C>A"
+        expected_hgvs = "chrY:g.100G>T"
+        self.assertEqual(expected_hgvs, reverse_complement_hgvs(input_hgvs))
+
+        input_hgvs = "chrX:g.100_101delinsAC"
+        expected_output = "chrX:g.100_101delinsGT"
+        self.assertEqual(expected_output, reverse_complement_hgvs(input_hgvs))
+
+        input_hgvs = "chrX:g.123_124insAGC"
+        expected_output = "chrX:g.123_124insGCT"
+        self.assertEqual(expected_output, reverse_complement_hgvs(input_hgvs))
+
+        input_hgvs = "chrX:g.123_124del"
+        self.assertRaises(ValueError, reverse_complement_hgvs, input_hgvs)
+
+        input_hgvs = "chrX:g.123_124dup"
+        self.assertRaises(ValueError, reverse_complement_hgvs, input_hgvs)
+
 
     def test_normalized_vcf(self):
-        # TODO rename `_normalized_vcf` to make it non-private
+        # TODO see https://github.com/biothings/myvariant.info/issues/140
 
         input_vcf = ("X", 100, "CTTTT", "CT")
         output_vcf = ('X', 101, 'TTTT', 'T')
@@ -165,39 +185,68 @@ class TestFunctions(unittest.TestCase):
         input_vcf = ("X", "100", "AC", "GT")
         self.assertRaises(ValueError, get_pos_start_end, *input_vcf)
 
-    def test_fix_hgvs_indel(self):
+    def test_prune_minus_sign(self):
         input_hgvs = "chr19:g.58863869C>-"
         expected_hgvs = "chr19:g.58863869_58863869del"
-        self.assertEqual(expected_hgvs, fix_hgvs_indel(input_hgvs))
+        self.assertEqual(expected_hgvs, prune_minus_sign(input_hgvs))
 
         input_hgvs = "chr10:g.52596077->T"
         expected_hgvs = "chr10:g.52596077insT"
-        self.assertEqual(expected_hgvs, fix_hgvs_indel(input_hgvs))
+        self.assertEqual(expected_hgvs, prune_minus_sign(input_hgvs))
 
         input_hgvs = "chr19:g.58863869A>C"
         expected_hgvs = None
-        self.assertEqual(expected_hgvs, fix_hgvs_indel(input_hgvs))
+        self.assertEqual(expected_hgvs, prune_minus_sign(input_hgvs))
 
-    def test_trim_delseq_from_hgvs(self):
+    def test_prune_legacy_hgvs(self):
+        # Non-legacy hgvs should not be pruned
+
+        input_hgvs = "chrX:g.100_101delinsA"
+        expected_output = "chrX:g.100_101delinsA"
+        self.assertEqual(expected_output, prune_redundant_seq(input_hgvs))
+
+        input_hgvs = "chrX:g.123_124insAGC"
+        expected_output = "chrX:g.123_124insAGC"
+        self.assertEqual(expected_output, prune_redundant_seq(input_hgvs))
+
+        input_hgvs = "chrX:g.102_104del"
+        expected_output = "chrX:g.102_104del"
+        self.assertEqual(expected_output, prune_redundant_seq(input_hgvs))
+
+        input_hgvs = "chrX:g.102_104dup"
+        expected_output = "chrX:g.102_104dup"
+        self.assertEqual(expected_output, prune_redundant_seq(input_hgvs))
+
+        # Legacy hgvs with redundant sequences will be pruned
+
+        input_hgvs = "chrX:g.76_78delACT"
+        expected_output = "chrX:g.76_78del"
+        self.assertEqual(expected_output, prune_redundant_seq(input_hgvs))
+
+        input_hgvs = "chrX:g.77_79dupCTG"
+        expected_output = "chrX:g.77_79dup"
+        self.assertEqual(expected_output, prune_redundant_seq(input_hgvs))
+
+        input_hgvs = "chrX:g.112_117delAGGTCAinsTG"
+        expected_output = "chrX:g.112_117delinsTG"
+        self.assertEqual(expected_output, prune_redundant_seq(input_hgvs))
+
+    def test_get_hgvs_stem(self):
         input_hgvs = "chrX:g.100_101delinsA"
         expected_prefix = "chrX:g.100_101delins"
-        self.assertEqual(expected_prefix, trim_delseq_from_hgvs(input_hgvs, True))
+        self.assertEqual(expected_prefix, get_hgvs_stem(input_hgvs))
 
         input_hgvs = "chrX:g.100_101insT"
         expected_prefix = "chrX:g.100_101ins"
-        self.assertEqual(expected_prefix, trim_delseq_from_hgvs(input_hgvs, True))
+        self.assertEqual(expected_prefix, get_hgvs_stem(input_hgvs))
 
         input_hgvs = "chrX:g.102_104del"
         expected_prefix = "chrX:g.102_104del"
-        self.assertEqual(expected_prefix, trim_delseq_from_hgvs(input_hgvs, True))
+        self.assertEqual(expected_prefix, get_hgvs_stem(input_hgvs))
 
         input_hgvs = "chrX:g.102_104dup"
         expected_prefix = "chrX:g.102_104dup"
-        self.assertEqual(expected_prefix, trim_delseq_from_hgvs(input_hgvs, True))
-
-        input_hgvs = "chrX:g.102_104dup"
-        expected_prefix = "chrX:g.102_104dup"
-        self.assertEqual(expected_prefix, trim_delseq_from_hgvs(input_hgvs, True))
+        self.assertEqual(expected_prefix, get_hgvs_stem(input_hgvs))
 
 
 class TestDocEncoder(unittest.TestCase):

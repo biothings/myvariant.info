@@ -2,33 +2,64 @@ import re
 import copy
 from hashlib import blake2b
 
+"""
+Some of the HGVS related functions dated back to 2015, and the recommendations changed a lot nowadays.
+The legacy recommendations can be found at https://www.hgvs.org/mutnomen/.
+At the time of writing this comment, the latest recommendations are http://varnomen.hgvs.org/.
+
+(We only focus on the "DNA-level" recommendations in this module.)
+"""
+
 
 class HGVSHelper:
     """
     A helper class that collects all the global variables used for HGVS functionality in this module
     """
 
-    # Patterns for determining the variant types
-    SNP_PATTERN = re.compile('(chr\w+:g\.\d+)(\w)>(\w)')
-    INS_PATTERN = re.compile('(chr\w+:g\.\d+_\d+)ins(\w+)')
-    DELINS_PATTERN = re.compile('(chr\w+:g\.\d+_\d+)delins(\w+)')
-    """
-    To match hgvs IDs like:
-    
-        'chr19:g.58863869C>-'
-        'chr10:g.52596077->T'
-        'chr10:g.52596077->T'
-        'chr12:g.8998751T>-'
-        'chr12:g.9004916C>-'
-    """
-    MINUS_SIGN_PATTERN = re.compile('(chr\w+:g\.(\d+))([\w-])>([\w-])')
+    _SINGLE_POSITION_PATTERN = 'chr\w+:g\.\d+'
+    _DOUBLE_POSITION_PATTERN = 'chr\w+:g\.\d+_\d+'
 
-    # Patterns for trimming long hgvs IDs
-    DELINS_TRIMMER = re.compile("(.*del)[A-Z]+(ins.*)")
-    INS_TRIMMER = re.compile("(.*ins)[A-Z]+$")
-    DEL_TRIMMER = re.compile("(.*del)[A-Z]+$")
-    DUP_TRIMMER = re.compile("(.*dup)[A-Z]+$")
-    LONG_SEQ_TRIMMER = re.compile('chr\w+:g\.\d+_\d+')
+    """
+    Modern (at the time of writing) HGVS formats in our application, 
+    as described in http://varnomen.hgvs.org/recommendations/DNA/
+    """
+    # chr<i>:g.<pos><ref>&gt;<alt>, e.g. chrX:g.123A>G
+    SNP_PATTERN = re.compile(f'({_SINGLE_POSITION_PATTERN})(\w)>(\w)')
+    # chr<i>:g.<start>_<end>ins<seq>, e.g. chrX:g.123_124insAGC
+    INS_PATTERN = re.compile(f'({_DOUBLE_POSITION_PATTERN})ins(\w+)')
+    # chr<i>:g.<start>_<end>delins<seq>, e.g. chrX:g.123_127delinsAG
+    DELINS_PATTERN = re.compile(f'({_DOUBLE_POSITION_PATTERN})delins(\w+)')
+    # chr<i>:g.<start>_<end>del, e.g. chrX:g.123_127del
+    # DEL_PATTERN = re.compile(f'({_DOUBLE_POSITION_PATTERN})del')
+    # chr<i>:g.<start>_<end>dup, e.g. chrX:g.123_345dup
+    # DUP_PATTERN = re.compile(f'({_DOUBLE_POSITION_PATTERN})'dup')
+
+    # UNIQUE REPEAT => chr<i>:g.<pos>_<seq>[<num>], e.g. chrX:g.123CAG[23]
+    # MIXED REPEAT  => chr<i>:g.<start>_<end><seq1>[<num1>]<seq2>[<num2>]..., e.g. chrX:g.123_191CAG[19]CAA[4]
+    # A stem of a repeated sequence can be either "chr<i>:g.<pos>" or "chr<i>:g.<start>_<end>"
+    # This stem pattern is so general that it SHOULD only be used when the HGVS is a repeated sequence.
+    REP_SEQ_STEM_PATTERN = re.compile("chr\w+:g\.\d+(_\d+)?")
+    INS_STEM_PATTERN = re.compile(_DOUBLE_POSITION_PATTERN + 'ins')
+    DELINS_STEM_PATTERN = re.compile(_DOUBLE_POSITION_PATTERN + 'delins')
+
+    """
+    To match hgvs IDs like: 'chr19:g.58863869C>-', 'chr10:g.52596077->T'
+    Such indels can be converted to insertions or deletions.
+    This format must be legacy and I cannot find any document on it.
+    """
+    LEGACY_MINUS_SIGN_PATTERN = re.compile('(chr\w+:g\.(\d+))([\w-])>([\w-])')
+    """
+    Patterns for pruning legacy HGVS. E.g.:
+    
+        c.76_78delACT => c.76_78del
+        c.77_79dupCTG => c.77_79dup
+        c.112_117delAGGTCAinsTG => c.112_117delinsTG
+        
+    The above examples are from https://www.hgvs.org/mutnomen/recs-DNA.html#DNA
+    """
+    LEGACY_DELINS_REDUNDANT_SEQ_PATTERN = re.compile("(.*del)[A-Z]+(ins.*)")
+    LEGACY_DEL_REDUNDANT_SEQ_PATTERN = re.compile("(.*del)[A-Z]+$")
+    LEGACY_DUP_REDUNDANT_SEQ_PATTERN = re.compile("(.*dup)[A-Z]+$")
 
 
 class SeqHelper:
@@ -45,34 +76,35 @@ class SeqHelper:
     SEQ_PATTERN = re.compile('^[ACGTN]+$')
 
 
-def is_snp(hgvs_id):
+def is_snp(hgvs: str):
     """return True/False if a hgvs id a SNP or not."""
-    return HGVSHelper.SNP_PATTERN.match(hgvs_id) is not None
+    return HGVSHelper.SNP_PATTERN.match(hgvs) is not None
 
 
-def reverse_complement_seq(seq):
+def reverse_complement_seq(seq: str):
     return ''.join(SeqHelper.COMPLEMENT_MAP[base] for base in reversed(seq))
 
 
-def reverse_complement_hgvs(hgvs_id):
+def reverse_complement_hgvs(hgvs: str):
+    # TODO this function is never used and costs time to write tests for it. Can we delete it?
     """
-    Return a complementary version of hgvs_id.
+    Return a complementary version of hgvs.
     Works only for SNP, ins, delins variant for now.
     """
     # complement SNP ID
-    snp_match = HGVSHelper.SNP_PATTERN.match(hgvs_id)
+    snp_match = HGVSHelper.SNP_PATTERN.match(hgvs)
     if snp_match:
         g = snp_match.groups()
         return '{}{}>{}'.format(g[0], reverse_complement_seq(g[1]), reverse_complement_seq(g[2]))
 
     # reverse complement ins ID
-    ins_match = HGVSHelper.INS_PATTERN.match(hgvs_id)
+    ins_match = HGVSHelper.INS_PATTERN.match(hgvs)
     if ins_match:
         g = ins_match.groups()
         return '{}ins{}'.format(g[0], reverse_complement_seq(g[1]))
 
-    # reverse complement del_ins ID
-    delins_match = HGVSHelper.DELINS_PATTERN.match(hgvs_id)
+    # reverse complement delins ID
+    delins_match = HGVSHelper.DELINS_PATTERN.match(hgvs)
     if delins_match:
         g = delins_match.groups()
         return '{}delins{}'.format(g[0], reverse_complement_seq(g[1]))
@@ -108,8 +140,8 @@ def _normalized_vcf(chr, pos, ref, alt):
     if _ref is None or _alt is None:
         # if either is None, del or ins types
         _pos = _pos + i - 1
-        _ref = ref[i-1:]
-        _alt = alt[i-1:]
+        _ref = ref[i - 1:]
+        _alt = alt[i - 1:]
     else:
         # both _ref/_alt are not None
         _pos = _pos + i
@@ -177,7 +209,7 @@ def get_pos_start_end(chr, pos, ref, alt):
     except ValueError:
         raise ValueError("Invalid position %s" % repr(pos))
 
-    if not alt:
+    if not ref or not alt:
         raise ValueError("Cannot decide start/end from {}.".format((chr, pos, ref, alt)))
 
     if len(ref) == len(alt) == 1:
@@ -207,7 +239,7 @@ def get_pos_start_end(chr, pos, ref, alt):
     raise ValueError("Cannot decide start/end from {}.".format((chr, pos, ref, alt)))
 
 
-def fix_hgvs_indel(hgvs_id):
+def prune_minus_sign(hgvs: str):
     """Fix hgvs id like these:
          'chr19:g.58863869C>-',
          'chr10:g.52596077->T',
@@ -215,31 +247,31 @@ def fix_hgvs_indel(hgvs_id):
          'chr12:g.8998751T>-',
          'chr12:g.9004916C>-',
     """
-    _hgvs_id = None
+    new_hgvs = None
 
-    match = HGVSHelper.MINUS_SIGN_PATTERN.match(hgvs_id)
+    match = HGVSHelper.LEGACY_MINUS_SIGN_PATTERN.match(hgvs)
     if match:
         g = match.groups()
         pos, ref, alt = g[1:]
         if ref == '-':
             # should be insertion
-            _hgvs_id = '{}ins{}'.format(g[0], alt)
+            new_hgvs = '{}ins{}'.format(g[0], alt)
         elif alt == '-':
             # should be deletion
             end = int(pos) + len(ref) - 1
-            _hgvs_id = '{0}_{1}del'.format(g[0], end)
+            new_hgvs = '{0}_{1}del'.format(g[0], end)
         else:
-            print("Error: either cannot fix or no need to fix: ", hgvs_id)
+            print("Error: either cannot fix or no need to fix: ", hgvs)
     else:
-        print("Error: hgvs id not in a fixable format: ", hgvs_id)
+        print("Error: hgvs id not in a fixable format: ", hgvs)
 
-    return _hgvs_id
+    return new_hgvs
 
 
 def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col, skip_unmatched=False):
     """input doc_li is a list doc with rsid, rsid_fn is a function to return rsid from
        each doc. dbsnp_col is a mongo collection object for dbSNP data
-       It will return a generator with the _id as the matching hgvs_id for a given rsid.
+       It will return a generator with the _id as the matching hgvs for a given rsid.
        if a rsid matches multiple hgvs ids, it will produce duplicated docs with each hgvs id.
        If rsid_fn returns None, then the original document is yielded
     """
@@ -247,7 +279,7 @@ def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col, skip_unmatched=False):
         rsid = rsid_fn(doc)
         if rsid is None:
             yield doc
-            # TODO add a `continue` statement here?
+            continue
 
         hits = [d for d in dbsnp_col.find({"dbsnp.rsid": rsid})]
         if hits:
@@ -260,31 +292,61 @@ def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col, skip_unmatched=False):
             yield doc
 
 
-def trim_delseq_from_hgvs(hgvs):
+def prune_redundant_seq(hgvs: str):
     """
-    Remove the deleted nucleotides from hgvs ID
+    Some of the legacy HGVS have redundant sequences that can be pruned. E.g.:
+
+        c.76_78delACT => c.76_78del  (tailing ACT can be pruned)
+        c.77_79dupCTG => c.77_79dup  (tailing CTG can be pruned)
+        c.112_117delAGGTCAinsTG => c.112_117delinsTG  (AGGTCA in the middle can be pruned)
+
+    The above examples are from https://www.hgvs.org/mutnomen/recs-DNA.html#DNA
     """
-    delins_match = HGVSHelper.DELINS_TRIMMER.match(hgvs)
+    delins_match = HGVSHelper.LEGACY_DELINS_REDUNDANT_SEQ_PATTERN.match(hgvs)
     if delins_match:
         return "".join(delins_match.groups())
 
-    ins_match = HGVSHelper.INS_TRIMMER.match(hgvs)
-    if ins_match:
-        return "".join(ins_match.groups())
-
-    del_match = HGVSHelper.DEL_TRIMMER.match(hgvs)
+    del_match = HGVSHelper.LEGACY_DEL_REDUNDANT_SEQ_PATTERN.match(hgvs)
     if del_match:
         return "".join(del_match.groups())
 
-    dup_match = HGVSHelper.DUP_TRIMMER.match(hgvs)
+    dup_match = HGVSHelper.LEGACY_DUP_REDUNDANT_SEQ_PATTERN.match(hgvs)
     if dup_match:
         return "".join(dup_match.groups())
 
-    long_match = HGVSHelper.LONG_SEQ_TRIMMER.match(hgvs)
-    if long_match:
-        return long_match.group()  # no subgroups, return the entire match
+    return hgvs
 
-    # TODO if none of the patterns matches, it should be an error. At least log it.
+
+def get_hgvs_stem(hgvs: str):
+    """
+    Trim the input hgvs ID to get a stem.
+    A stem is defined as a hgvs ID without its tailing sequences.
+    This function is usually used to encode long hgvs IDs.
+    """
+    if hgvs.endswith("del") or hgvs.endswith("dup"):
+        return hgvs
+
+    delins_match = HGVSHelper.DELINS_STEM_PATTERN.match(hgvs)
+    if delins_match:
+        return delins_match.group()  # no subgroups, return the entire match
+
+    ins_match = HGVSHelper.INS_STEM_PATTERN.match(hgvs)
+    if ins_match:
+        return ins_match.group()  # no subgroups, return the entire match
+
+    """
+    Some repeated sequences' HGVS can be extremely long, like:
+
+        'chr6:g.166253474_166253480TC[2]CAATTCCATCCCGTCTCCAACTCAATTCCCATCTTTATCCTCATCTGCATCTCTATCTCCATTCCCATCCGCAACTCCA
+        TCCCCATCTGCATCTCTCTCTCCATTCCCATCCCTATCTCCAACTCCATCCCCATCTTCATCCTCATCTGCATCTCCATCTCCATCTCCAACCTCATCTCCATTCTTATCA
+        TCTCCATCCCTGTCTCCATCCGCATCACCATCTCCAGCTCCATCTCCATCTCCAGCCTCATCTCCATTCTTATCTTCATCTCCATCCCCATCTGCATCTCTGTCTTCATCC
+        CCATCCTCATCCCCATCCTATCTCCAATTCATCCCATCTCCAACTCAATTCCCATCTTCATCCTCATCTGCATCTCTGTCTCCATCCCCATCTGCATCTCCATCTACAACC
+        ACATCTCCATCCCCATCTTCATCTCTCTCTCCATCCCCATCCCCATCTCCAACTCCATCCCCATCCCCCTCTCCAA[1]' (rs1780206073)
+    """
+    repeated_match = HGVSHelper.REP_SEQ_STEM_PATTERN.match(hgvs)
+    if repeated_match:
+        return repeated_match.group()  # no subgroups, return the entire match
+
     return hgvs
 
 
@@ -336,7 +398,7 @@ class DocEncoder:
 
         encoded = False
         if len(doc[cls.KEY_ID]) > max_len:
-            prefix = trim_delseq_from_hgvs(doc[cls.KEY_ID])
+            prefix = get_hgvs_stem(doc[cls.KEY_ID])
             seq = doc[cls.KEY_ID].replace(prefix, "")
             seq_hashed = blake2b(seq.encode(), digest_size=16).hexdigest()
 
