@@ -17,3 +17,4 @@ src/run/*.pickle
 src/run/done/*.pickle
 src/.idea/
 .vscode
+.idea

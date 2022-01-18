@@ -19,7 +19,7 @@ class MyVariantBasicStorage(BasicStorage):
         encoded, doc = DocEncoder.encode_long_hgvs_id(doc, max_len=MAX_ID_LENGTH)
         if encoded:
             # required to query _exists_:_seqhashed
-            doc[DocEncoder.key_to_seq_map]["_flag"] = True
+            doc[DocEncoder.KEY_SEQ_MAP]["_flag"] = True
             self.logger.info("Encoded a long hgvs id. New id = {}".format(doc["_id"]))
 
         return doc
@@ -40,7 +40,7 @@ class MyVariantTrimmingStorage(MyVariantBasicStorage):
 
     # Known fields in every doc that cannot have "ref" and "alt" sequences for sure
     # excluded_keys = {"_id", "_seqhashed"}
-    excluded_keys = {DocEncoder.key_to_id, DocEncoder.key_to_seq_map}
+    excluded_keys = {DocEncoder.KEY_ID, DocEncoder.KEY_SEQ_MAP}
 
     def trim_long_ref_alt_seq(self, doc):
         """
