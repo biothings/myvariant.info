@@ -1,5 +1,5 @@
 # biothings
-git+git://github.com/biothings/biothings.api@0.10.x#egg=biothings[web_extra]
+git+git://github.com/biothings/biothings.api@0.11.x#egg=biothings[web_extra]
 
 # for sentry monitoring
 raven
