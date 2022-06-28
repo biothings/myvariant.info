@@ -9,7 +9,7 @@ from biothings.web.settings.default import (
 # *****************************************************************************
 ES_HOST = 'es6.biothings.io'
 ES_ARGS = {
-    'timeout': 120,
+    'timeout': 210,
 }
 ES_INDICES = {
     None: 'myvariant_current_hg19',
