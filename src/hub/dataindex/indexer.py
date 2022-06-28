@@ -1,13 +1,14 @@
 import asyncio
 
 import config
-from biothings.hub.dataindex.indexer import Indexer, IndexManager, ColdHotIndexer, _BuildDoc
+from biothings.hub.dataindex.indexer import Indexer, IndexManager, ColdHotIndexer
 from biothings.hub.dataexport.ids import export_ids, upload_ids
 from biothings.utils.hub_db import get_src_build
 from utils.es import ElasticsearchIndexingService
 
 from elasticsearch import JSONSerializer, SerializationError, Elasticsearch
 from elasticsearch.compat import string_types
+from pymongo.mongo_client import MongoClient
 
 import orjson
 
@@ -67,6 +68,10 @@ class BaseVariantIndexer(Indexer):
     def __init__(self, build_doc, indexer_env, index_name):
         super().__init__(build_doc, indexer_env, index_name)
 
+        # TODO should we use _BuildDoc to wrap build_doc?
+        # TODO or should we make Indexer._build_doc a visible member?
+        self.build_doc = build_doc
+
         # Changing the `es_client_args` object might affect top level config serialization.
         # we have an endpoint to print the config, it might be safer to avoid changing the `es_client_args` object.
         self.es_client_args = dict(self.es_client_args)
@@ -101,11 +106,43 @@ class BaseVariantIndexer(Indexer):
         # It was orginally marked "Not Tested Yet".
         self.logger.info("Sleeping for a bit while index is being fully updated...")
         yield from asyncio.sleep(3*60)
-        
-        es_client = Elasticsearch(**self.es_client_args)
-        es_service = ElasticsearchIndexingService(client=es_client, index_name=self.es_index_name)
 
-        return es_service.update_mapping_meta_stats(assembly=self.assembly)
+        # update _meta.stats in ES mapping
+        with Elasticsearch(**self.es_client_args) as es_client:
+            es_service = ElasticsearchIndexingService(client=es_client, index_name=self.es_index_name)
+            meta_stats = es_service.update_mapping_meta_stats(assembly=self.assembly)
+            self.logger.info(f"_meta.stats updated to {meta_stats} for index {self.es_index_name}")
+
+        # update _meta.stats in myvariant_hubdb.src_build
+
+        # DO NOT use the following client because the `_build_doc.parse_backend()` in Indexer.__init__() won't work
+        #   for a build_doc. It results in `self.mongo_database_name` equal to "myvariant" and
+        #   `self.mongo_collection_name` equal to `self.build_doc["_id"]`
+        #
+        #   mongo_client = MongoClient(**self.mongo_client_args)
+        #   mongo_database = mongo_client[self.mongo_database_name]
+        #   mongo_collection = mongo_database[self.mongo_collection_name]
+        src_build_collection = get_src_build()
+        self.logger.debug(f"{src_build_collection.database.client}")
+        self.logger.debug(f"{src_build_collection.full_name}")
+
+        self.logger.info(f"_meta.stats of document {self.build_doc['_id']} is {self.build_doc['_meta']['stats']} "
+                         f"before post-index update")
+        self.build_doc["_meta"]["stats"] = meta_stats
+        result = src_build_collection.replace_one({"_id": self.build_doc["_id"]}, self.build_doc)
+
+        if result.matched_count != 1:
+            raise ValueError(f"cannot find document {self.build_doc['_id']} "
+                             f"in collection {src_build_collection.full_name}")
+
+        if result.modified_count != 1:
+            raise ValueError(f"failed to update _meta.stats for document {self.build_doc['_id']} "
+                             f"in collection {src_build_collection.full_name}")
+
+        self.logger.info(f"_meta.stats updated to {meta_stats} for document {self.build_doc['_id']} "
+                         f"in collection {src_build_collection.full_name}")
+
+        return meta_stats
 
 
 class MyVariantIndexerManager(IndexManager):
