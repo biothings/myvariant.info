@@ -8,7 +8,6 @@ from utils.es import ElasticsearchIndexingService
 
 from elasticsearch import JSONSerializer, SerializationError, Elasticsearch
 from elasticsearch.compat import string_types
-from pymongo.mongo_client import MongoClient
 
 import orjson
 
