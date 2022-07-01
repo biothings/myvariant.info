@@ -115,12 +115,14 @@ class BaseVariantIndexer(Indexer):
         # update _meta.stats in myvariant_hubdb.src_build
 
         # DO NOT use the following client because the `_build_doc.parse_backend()` in Indexer.__init__() won't work
-        #   for a build_doc. It results in `self.mongo_database_name` equal to "myvariant" and
+        #   for a MyVariant build_doc. It results in `self.mongo_database_name` equal to "myvariant" and
         #   `self.mongo_collection_name` equal to `self.build_doc["_id"]`
         #
         #   mongo_client = MongoClient(**self.mongo_client_args)
         #   mongo_database = mongo_client[self.mongo_database_name]
         #   mongo_collection = mongo_database[self.mongo_collection_name]
+        #
+        # TODO revise if https://github.com/biothings/biothings.api/issues/238 fixed
         src_build_collection = get_src_build()
         self.logger.debug(f"{src_build_collection.database.client}")
         self.logger.debug(f"{src_build_collection.full_name}")
