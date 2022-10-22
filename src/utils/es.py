@@ -6,8 +6,7 @@ class ElasticsearchVersionException(Exception):
         self.required_version = required
         self.installed_version = installed
 
-        message = f"Required Elasticsearch version {self.required_version}. " \
-                  f"Found version {self.installed_version} installed."
+        message = f"Required Elasticsearch version {self.required_version}. Found version {self.installed_version} installed."
         super.__init__(message)
 
 
@@ -30,8 +29,8 @@ class ElasticsearchIndexingService:
 
     def update_mapping_meta_stats(self, assembly):
         """
-        Update the "stats" entry inside "_meta" of the index's mapping. Typically there are 4 fields inside the "stats"
-        entry, and its structure is illustrated below.
+        Update the "stats" entry inside "_meta" of the index's mapping. Typically there are 4 fields inside the "stats" entry, and its structure is illustrated
+        below.
 
         {
             "<index_name>": {
@@ -112,7 +111,7 @@ class ElasticsearchIndexingService:
 
     def get_mapping_meta(self) -> dict:
         mapping_dict = self.get_mapping()
-        return mapping_dict["_meta"]  # TODO can we assume that it always exists?
+        return mapping_dict["_meta"]
 
     def set_mapping_meta(self, meta):
         body = {"_meta": meta}

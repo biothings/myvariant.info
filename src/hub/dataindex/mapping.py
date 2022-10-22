@@ -1,13 +1,13 @@
-#ES mapping
+# ES mapping
 import importlib
 
 
 def get_mapping(sources=None):
     if sources is None:
-        #sources = ['cadd', 'clinvar', 'cosmic2', 'dbnsfp', 'dbsnp', 'drugbank', 'emv', 'evs', 'grasp']
+        # sources = ['cadd', 'clinvar', 'cosmic2', 'dbnsfp', 'dbsnp', 'drugbank', 'emv', 'evs', 'grasp']
         sources = sources or ['dbsnp', "cadd", "evs", "snpedia", "wellderly",
                               'dbnsfp', 'emv', 'mutdb', 'docm', 'cosmic',
-                              'clinvar', 'gwassnps','exac','grasp','snpeff']   # , 'uniprot']
+                              'clinvar', 'gwassnps', 'exac', 'grasp', 'snpeff']  # , 'uniprot']
         # extra_mapping_li = [mapping_snpedia, mapping_wellderly]
         extra_mapping_li = []
     else:
@@ -78,7 +78,6 @@ mapping_snpedia = {
     }
 }
 
-
 mapping_wellderly = {
     "wellderly": {
         "properties": {
@@ -121,7 +120,6 @@ mapping_wellderly = {
     }
 }
 
-
 # this is a minimal mapping for myvariant_merged index
 # each data source field just need to index one common field
 # (that is, this field need to exist in every documents)
@@ -133,7 +131,7 @@ minimal_field_d = {
     "mutdb": "chrom",
     "gwassnps": "chrom",
     "cosmic": "chrom",
-    "docm": "chrom",     # TODO: change chromosome_name to chrom
+    "docm": "chrom",  # TODO: change chromosome_name to chrom
     "snpedia": "text",
     "evs": "chrom",
     "emv": "egl_classification",

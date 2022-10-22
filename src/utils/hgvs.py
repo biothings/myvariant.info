@@ -77,7 +77,7 @@ class SeqHelper:
 
 
 def is_snp(hgvs: str):
-    """return True/False if a hgvs id a SNP or not."""
+    """return True/False if an hgvs id a SNP or not."""
     return HGVSHelper.SNP_PATTERN.match(hgvs) is not None
 
 
@@ -175,7 +175,7 @@ def get_hgvs_from_vcf(chr, pos, ref, alt, mutant_type=None):
             hgvs = 'chr{0}:g.{1}_{2}delins{3}'.format(chr, pos, end, alt)
             var_type = 'delins'
     elif len(ref) == 1 and len(alt) > 1:
-        # this is a insertion
+        # this is an insertion
         if alt[0] == ref:
             hgvs = 'chr{0}:g.{1}_{2}ins'.format(chr, pos, int(pos) + 1)
             ins_seq = alt[1:]
@@ -229,7 +229,7 @@ def get_pos_start_end(chr, pos, ref, alt):
         return start, end
 
     if len(ref) == 1 and len(alt) > 1:
-        # this is a insertion
+        # this is an insertion
         assert alt[0] == ref
 
         start = pos
@@ -294,7 +294,7 @@ def get_hgvs_from_rsid(doc_li, rsid_fn, dbsnp_col, skip_unmatched=False):
 
 def prune_redundant_seq(hgvs: str):
     """
-    Some of the legacy HGVS have redundant sequences that can be pruned. E.g.:
+    Some legacy HGVS have redundant sequences that can be pruned. E.g.:
 
         c.76_78delACT => c.76_78del  (tailing ACT can be pruned)
         c.77_79dupCTG => c.77_79dup  (tailing CTG can be pruned)
@@ -362,7 +362,7 @@ class DocEncoder:
     @classmethod
     def __save_seq_map(cls, doc, seq_hashed, seq):
         """
-        `seq_hashed` is the the blake2b-encoded `seq`
+        `seq_hashed` is the blake2b-encoded `seq`
         A dictionary or entry of <seq_hashed, seq> will be inserted into `doc["_seqhashed"]`
         """
         if cls.KEY_SEQ_MAP in doc:

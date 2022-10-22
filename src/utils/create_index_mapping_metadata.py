@@ -1,5 +1,5 @@
-''' This program will create a JSON object from the elasticsearch index
-metadata. '''
+""" This program will create a JSON object from the elasticsearch index
+metadata. """
 import argparse
 import os
 import sys
@@ -45,7 +45,7 @@ def main():
                         db_type = prefix.lstrip('.').split('.')[0]
                         r[prefix + '.' + k]['example'] = 'q=_id:' + EXAMPLES[db_type] + '&fields=' + prefix.lstrip('.') + '.' + k
                 elif 'properties' in v:
-                        r.update(get_indexed_properties_in_dict(v['properties'], prefix + '.' + k))
+                    r.update(get_indexed_properties_in_dict(v['properties'], prefix + '.' + k))
         return r
 
     # get the dictionary, strip the leading . from the key names, and write the output

@@ -6,17 +6,14 @@ from biothings.utils.hub_db import get_src_build
 
 
 class MyVariantDifferManager(differ.DifferManager):
-
-     def post_publish(self, s3_folder, old_db_col_names, new_db_col_names, diff_folder,
-                      release_folder, steps, s3_bucket, *args, **kwargs):
-        bdoc = get_src_build().find_one({"_id" : new_db_col_names})
+    def post_publish(self, s3_folder, old_db_col_names, new_db_col_names, diff_folder, release_folder, steps, s3_bucket, *args, **kwargs):
+        bdoc = get_src_build().find_one({"_id": new_db_col_names})
         assert bdoc, "Can't find build doc associated with index '%s' (should be named the same)" % new_db_col_names
         ids_file = export_ids(new_db_col_names)
         redir = "%s_ids.xz" % bdoc["build_config"]["assembly"]
         if "demo" in new_db_col_names:
             redir = "demo_%s" % redir
-        upload_ids(ids_file, redir, 
-                s3_bucket=config.IDS_S3_BUCKET,
-                aws_key=config.AWS_KEY,
-                aws_secret=config.AWS_SECRET)
-
+        upload_ids(ids_file, redir,
+                   s3_bucket=config.IDS_S3_BUCKET,
+                   aws_key=config.AWS_KEY,
+                   aws_secret=config.AWS_SECRET)
