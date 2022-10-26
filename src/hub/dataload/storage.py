@@ -1,7 +1,7 @@
 from biothings.hub.dataload.storage import BasicStorage, IgnoreDuplicatedStorage
 from utils.hgvs import DocEncoder
 from config import MAX_REF_ALT_LEN, MAX_ID_LENGTH
-from collections import Mapping
+from collections.abc import Mapping
 
 
 class MyVariantBasicStorage(BasicStorage):
