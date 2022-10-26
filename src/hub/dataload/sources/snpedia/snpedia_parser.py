@@ -33,4 +33,4 @@ for article in snps.getAllMembersGen(namespaces=[0]):   # get all snp-names as l
                     dict[hgvs] = {"_id": hgvs, "text": text}
             except (ValueError, AttributeError, UnicodeEncodeError) as e:
                 error = "Value not found on page"
-print json.dumps(dict)
+print(json.dumps(dict))
