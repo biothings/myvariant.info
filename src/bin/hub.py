@@ -58,19 +58,19 @@ class MyVariantHubServer(HubServer):
         sources = [src for src in sources if not src.startswith("snpeff")]
         self.logger.info("Sequentially running snpeff on %s" % repr(sources))
 
-        @asyncio.coroutine
-        def do(srcs):
+        async def do(srcs):
             for src in srcs:
                 self.logger.info("Running snpeff on '%s'" % src)
                 job = self.managers["upload_manager"].upload_src(src, steps="post", force_use_cache=force_use_cache)
-                yield from asyncio.wait(job)
+                await asyncio.wait(job)
 
-        task = asyncio.ensure_future(do(sources))
+        task = asyncio.create_task(do(sources))
         return task
 
     def rebuild_cache(self, build_name=None, sources=None, target=None, force_build=False):
-        """Rebuild cache files for all sources involved in build_name, as well as 
-        the latest merged collection found for that build"""
+        """
+        Rebuild cache files for all sources involved in build_name, as well as the latest merged collection found for that build
+        """
         if build_name:
             sources = mongo.get_source_fullnames(self.managers["build_manager"].list_sources(build_name))
             target = mongo.get_latest_build(build_name)
@@ -81,10 +81,11 @@ class MyVariantHubServer(HubServer):
 
         def rebuild(col):
             cur = mongo.id_feeder(col, batch_size=10000, logger=self.logger, force_build=force_build)
-            [i for i in cur]  # just iterate
+            # just iterate, using the side effect to build caches
+            for _ in cur:
+                pass
 
-        @asyncio.coroutine
-        def do(srcs, tgt):
+        async def do(srcs, tgt):
             pinfo = {"category": "cache",
                      "source": None,
                      "step": "rebuild",
@@ -97,17 +98,17 @@ class MyVariantHubServer(HubServer):
                 self.logger.info("Rebuilding cache for source '%s'" % src)
                 col = mongo.get_src_db()[src]
                 pinfo["source"] = src
-                job = yield from self.managers["job_manager"].defer_to_thread(pinfo, partial(rebuild, col))
-                yield from job
+                job = await self.managers["job_manager"].defer_to_thread(pinfo, partial(rebuild, col))
+                await job
                 self.logger.info("Done rebuilding cache for source '%s'" % src)
             if tgt:
                 self.logger.info("Rebuilding cache for target '%s'" % tgt)
                 col = mongo.get_target_db()[tgt]
                 pinfo["source"] = tgt
-                job = self.managers["job_manager"].defer_to_thread(pinfo, partial(rebuild, col))
-                yield from job
+                job = await self.managers["job_manager"].defer_to_thread(pinfo, partial(rebuild, col))
+                await job
 
-        task = asyncio.ensure_future(do(sources, target))
+        task = asyncio.create_task(do(sources, target))
         return task
 
     def configure_build_manager(self):
