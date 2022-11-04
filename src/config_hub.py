@@ -1,75 +1,10 @@
 # ######### #
 # HUB VARS  #
 # ######### #
-from biothings.utils.configuration import ConfigurationError, ConfigurationDefault, ConfigurationValue
-from biothings.utils.loggers import setup_default_log
-import logging
-import os
 import copy
 
-DATA_HUB_DB_DATABASE = "variant_hubdb"     # db containing the following (internal use)
-DATA_SRC_MASTER_COLLECTION = 'src_master'  # for metadata of each src collections
-DATA_SRC_DUMP_COLLECTION = 'src_dump'      # for src data download information
-DATA_SRC_BUILD_COLLECTION = 'src_build'    # for src data build information
-DATA_PLUGIN_COLLECTION = 'data_plugin'     # for data plugins information
-API_COLLECTION = 'api'                     # for api information (running under hub control)
-CMD_COLLECTION = 'cmd'                     # for launched/running commands in shell
-EVENT_COLLECTION = 'event'                 # for launched/running commands in shell
-
-# define valid sources to get chrom from, and for each, name of the chrom field
-CHROM_FIELDS = {'cadd': 'chrom', 'clinvar': 'chrom', 'cosmic': 'chrom', 'dbnsfp': 'chrom',
-                'dbsnp': 'chrom', 'docm': 'chrom', 'evs': 'chrom', 'exac': 'chrom'}
-
-HG38_FIELDS = ['clinvar.hg38', 'dbnsfp.hg38', 'evs.hg38']
-HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19',
-               'dbsnp.hg19', 'docm.hg19', 'evs.hg19', 'grasp.hg19']
-
-# Max length for vcf.alt and vcf.ref fields (must be less than 32k as a keyword field in ElasticSearch)
-# otherwise, Elasticsearch will raise an error like this:
-#   "type": "max_bytes_length_exceeded_exception",
-#   "reason": "bytes can be at most 32766 in length; got 32770"
-MAX_REF_ALT_LEN = 10000
-
-# reporting diff results, number of IDs to consider (to avoid too much mem usage)
-MAX_REPORTED_IDS = 1000
-# for diff updates, number of IDs randomly picked as examples when rendering the report
-MAX_RANDOMLY_PICKED = 10
-# size in bytes for a diff file (used in diff/reduce step)
-MAX_DIFF_SIZE = 10 * 1024**2
-
-# max length for _id field
-MAX_ID_LENGTH = 512
-
-# cache file format ("": ascii/text uncompressed, or "gz|zip|xz"
-CACHE_FORMAT = "xz"
-
-# How much memory hub is allowed to use:
-# - "auto", let hub decides (will use 50%-60% of available RAM)
-# - None: no limit
-# - otherwise specify a number in bytes
-HUB_MAX_MEM_USAGE = None
-
-# Max number of *processes* hub can access to run jobs
-HUB_MAX_WORKERS = int(os.cpu_count() / 4)
-# Max number of *threads* hub can use (will default to HUB_MAX_WORKERS if undefined)
-HUB_MAX_THREADS = HUB_MAX_WORKERS
-MAX_SYNC_WORKERS = HUB_MAX_WORKERS
-
-# Max queued jobs in job manager
-# this shouldn't be 0 to make sure a job is pending and ready to be processed
-# at any time (avoiding job submission preparation) but also not a huge number
-# as any pending job will consume some memory).
-MAX_QUEUED_JOBS = os.cpu_count() * 4
-
-# Hub environment (like, prod, dev, ...)
-# Used to generate remote metadata file, like "latest.json", "versions.json"
-# If non-empty, this constant will be used to generate those url, as a prefix
-# with "-" between. So, if "dev", we'll have "dev-latest.json", etc...
-# "" means production
-HUB_ENV = ""
-
 # Hub name/icon url/version, for display purpose
-HUB_NAME = "MyVariant"
+HUB_NAME = "MyVariant Data Hub"
 HUB_ICON = "http://biothings.io/static/img/myvariant-logo-shiny.svg"
 HUB_VERSION = "0.2"
 
@@ -92,7 +27,11 @@ INDEX_CONFIG = {
                         "retry_on_timeout": True,
                         "max_retries": 10,
                     },
-                    "concurrency": HUB_MAX_WORKERS
+                    #"concurrency": HUB_MAX_WORKERS,
+                    "bulk": {
+                        "chunk_size": 500,  # 500 by default
+                        "max_chunk_bytes": 104857600  # 100Mb by default
+                    }
             },
             "index": [
                 # keys match build_config_key value
@@ -108,7 +47,11 @@ INDEX_CONFIG = {
                         "retry_on_timeout": True,
                         "max_retries": 10,
                     },
-                    "concurrency": HUB_MAX_WORKERS
+                    #"concurrency": HUB_MAX_WORKERS,
+                    "bulk": {
+                        "chunk_size": 500,  # 500 by default
+                        "max_chunk_bytes": 104857600  # 100Mb by default
+                    }
             },
             "index": [
                 # "hg19/hg38" are flags used to filter compatible index from the UI
@@ -232,27 +175,6 @@ RELEASE_CONFIG["env"]["demo-hg38"]["diff"]["folder"] = "myvariant.info-demo_hg38
 
 SLACK_WEBHOOK = None
 
-# SSH port for hub console
-HUB_SSH_PORT = 7022
-HUB_API_PORT = 7080
-READONLY_HUB_API_PORT = 7081
-
-################################################################################
-# HUB_PASSWD
-################################################################################
-# The format is a dictionary of 'username': 'cryptedpassword'
-# Generate crypted passwords with 'openssl passwd -crypt'
-HUB_PASSWD = {"guest": "9RKfd8gDuNf0Q"}
-
-# cached data (it None, caches won't be used at all)
-CACHE_FOLDER = None
-
-# Autohub configuration
-STANDALONE_AWS_CREDENTIALS = {
-    "AWS_ACCESS_KEY_ID": "",
-    "AWS_SECRET_ACCESS_KEY": ""
-}
-
 # when publishing releases, specify the targetted (ie. required) standalone version
 STANDALONE_VERSION = {"branch": "standalone_v3"}
 
@@ -294,76 +216,6 @@ STANDALONE_CONFIG = {
 # *must* be defined
 #
 
-# Individual source database connection
-DATA_SRC_SERVER = ConfigurationError("Define hostname for source database")
-DATA_SRC_PORT = ConfigurationError("Define port for source database")
-DATA_SRC_DATABASE = ConfigurationError("Define name for source database")
-DATA_SRC_SERVER_USERNAME = ConfigurationError(
-    "Define username for source database connection (or None if not needed)")
-DATA_SRC_SERVER_PASSWORD = ConfigurationError(
-    "Define password for source database connection (or None if not needed)")
-
-# Target (merged collection) database connection
-DATA_TARGET_SERVER = ConfigurationError("Define hostname for target database (merged collections)")
-DATA_TARGET_PORT = ConfigurationError("Define port for target database (merged collections)")
-DATA_TARGET_DATABASE = ConfigurationError("Define name for target database (merged collections)")
-DATA_TARGET_SERVER_USERNAME = ConfigurationError(
-    "Define username for target database connection (or None if not needed)")
-DATA_TARGET_SERVER_PASSWORD = ConfigurationError(
-    "Define password for target database connection (or None if not needed)")
-
-HUB_DB_BACKEND = ConfigurationError("Define Hub DB connection")
-# Internal backend. Default to mongodb
-# For now, other options are: mongodb, sqlite3, elasticsearch
-# HUB_DB_BACKEND = {
-#        "module" : "biothings.utils.sqlite3",
-#        "sqlite_db_foder" : "./db",
-#        }
-# HUB_DB_BACKEND = {
-#        "module" : "biothings.utils.mongo",
-#        "uri" : "mongodb://localhost:27017",
-#        #"uri" : "mongodb://user:passwd@localhost:27017", # mongodb std URI
-#        }
-# HUB_DB_BACKEND = {
-#        "module" : "biothings.utils.es",
-#        "host" : "localhost:9200",
-#        }
-
-#ES_HOST = ConfigurationError("Define ElasticSearch host used for index creation (eg localhost:9200)")
-
-# Path to a folder to store all downloaded files, logs, caches, etc...
-DATA_ARCHIVE_ROOT = ConfigurationError(
-    "Define path to folder which will contain all downloaded data, cache files, etc...")
-
-# Path to a folder to store all 3rd party parsers, dumpers, etc...
-DATA_PLUGIN_FOLDER = ConfigurationDefault(
-    default="./plugins",
-    desc="Define path to folder which will contain all 3rd party parsers, dumpers, etc...")
-
-# Path to folder containing diff files
-DIFF_PATH = ConfigurationDefault(
-    default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"diff")"""),
-    desc="Define path to folder which will contain output files from diff")
-
-# Path to folder containing release note files
-RELEASE_PATH = ConfigurationDefault(
-    default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"release")"""),
-    desc="Define path to folder which will contain release files")
-
-# this dir must be created manually
-LOG_FOLDER = ConfigurationDefault(
-    default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"logs")"""),
-    desc="Define path to folder which will contain log files")
-
-IDS_S3_BUCKET = ConfigurationDefault(
-    default="myvariant-ids",
-    desc="Define a bucket name to upload myvariant _ids to")
-
-# default hub logger
-logger = ConfigurationDefault(
-    default=logging,
-    desc="Provide a default hub logger instance (use setup_default_log(name,log_folder)")
-
 ACTIVE_DATASOURCES = [
     # auto-updated
     'hub.dataload.sources.clinvar',
@@ -394,3 +246,24 @@ ACTIVE_DATASOURCES = [
     # generated resources
     'hub.dataload.sources.snpeff',
 ]
+
+# ####################### #-
+# MyVariant Specific VARS #
+# ####################### #
+
+# define valid sources to get chrom from, and for each, name of the chrom field
+CHROM_FIELDS = {'cadd': 'chrom', 'clinvar': 'chrom', 'cosmic': 'chrom', 'dbnsfp': 'chrom',
+                'dbsnp': 'chrom', 'docm': 'chrom', 'evs': 'chrom', 'exac': 'chrom'}
+
+HG38_FIELDS = ['clinvar.hg38', 'dbnsfp.hg38', 'evs.hg38']
+HG19_FIELDS = ['clinvar.hg19', 'cosmic.hg19', 'dbnsfp.hg19',
+               'dbsnp.hg19', 'docm.hg19', 'evs.hg19', 'grasp.hg19']
+
+# Max length for vcf.alt and vcf.ref fields (must be less than 32k as a keyword field in ElasticSearch)
+# otherwise, Elasticsearch will raise an error like this:
+#   "type": "max_bytes_length_exceeded_exception",
+#   "reason": "bytes can be at most 32766 in length; got 32770"
+MAX_REF_ALT_LEN = 10000
+
+# max length for _id field
+MAX_ID_LENGTH = 512
