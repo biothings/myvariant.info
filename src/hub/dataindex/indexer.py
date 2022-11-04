@@ -47,7 +47,7 @@ class MyVariantJSONSerializer(JSONSerializer):
             # return json.dumps(
             #     data, default=self.default, ensure_ascii=False, separators=(",", ":")
             # )
-            
+
             """
             `orjson.dumps()` will escape all incoming non-ASCII characters and output the encoded bytestrings.
             We decode the output bytestrings into string, and as a result, those escaped characters are un-escaped.
@@ -98,13 +98,11 @@ class BaseVariantIndexer(Indexer):
         }
         self.assembly = build_doc["build_config"]["assembly"]
 
-    @asyncio.coroutine
-    def post_index(self, *args, **kwargs):
+    async def post_index(self, *args, **kwargs):
         # No idea how come the decision to sleep for 3 minutes
-        # Migrated from Sebastian's commit 1a7b7a
-        # It was orginally marked "Not Tested Yet".
+        # Migrated from Sebastian's commit 1a7b7a. It was orginally marked "Not Tested Yet".
         self.logger.info("Sleeping for a bit while index is being fully updated...")
-        yield from asyncio.sleep(3*60)
+        await asyncio.sleep(3 * 60)
 
         # update _meta.stats in ES mapping
         with Elasticsearch(**self.es_client_args) as es_client:

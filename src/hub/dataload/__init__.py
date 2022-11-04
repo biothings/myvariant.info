@@ -1,4 +1,1 @@
-
-__sources_dict__ = [
-    ]
-
+__sources_dict__ = []

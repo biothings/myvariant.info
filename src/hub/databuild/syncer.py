@@ -1,33 +1,36 @@
-import os, json, time
-import asyncio
-from functools import partial
+import time
 
 import biothings.hub.databuild.syncer as syncer
 from biothings.hub.databuild.backend import create_backend
 from utils.stats import update_stats
 
+
 class MyVariantBaseSyncer(syncer.BaseSyncer):
 
-    def post_sync_cols(self, diff_folder, batch_size, mode, force, target_backend,steps):
+    def post_sync_cols(self, diff_folder, batch_size, mode, force, target_backend, steps):
         assert self.target_backend_type == "es", "Only support ElasticSearch backend (got: %s)" % self.target_backend_type
         assert not self._meta is None, "Metadata not loaded (use load_metadata(diff_folder))"
         self.logger.info("Sleeping for a bit while index is being fully updated...")
-        time.sleep(3*60)
+        time.sleep(3 * 60)
         backend_info = self.get_target_backend()
         self.logger.info("Updating 'stats' by querying index '%s'" % backend_info[1])
         indexer = create_backend(backend_info).target_esidxer
         # compute stats using ES index
         assembly = self._meta["build_config"]["assembly"]
-        return update_stats(indexer,assembly)
+        return update_stats(indexer, assembly)
 
-class MyVariantThrottledESJsonDiffSelfContainedSyncer(MyVariantBaseSyncer,syncer.ThrottledESJsonDiffSelfContainedSyncer):
+
+class MyVariantThrottledESJsonDiffSelfContainedSyncer(MyVariantBaseSyncer, syncer.ThrottledESJsonDiffSelfContainedSyncer):
     pass
 
-class MyVariantThrottledESColdHotJsonDiffSelfContainedSyncer(MyVariantBaseSyncer,syncer.ThrottledESColdHotJsonDiffSelfContainedSyncer):
+
+class MyVariantThrottledESColdHotJsonDiffSelfContainedSyncer(MyVariantBaseSyncer, syncer.ThrottledESColdHotJsonDiffSelfContainedSyncer):
     pass
 
-class MyVariantESColdHotJsonDiffSelfContainedSyncer(MyVariantBaseSyncer,syncer.ESColdHotJsonDiffSelfContainedSyncer):
+
+class MyVariantESColdHotJsonDiffSelfContainedSyncer(MyVariantBaseSyncer, syncer.ESColdHotJsonDiffSelfContainedSyncer):
     pass
 
-class MyVariantESJsonDiffSelfContainedSyncer(MyVariantBaseSyncer,syncer.ESJsonDiffSelfContainedSyncer):
+
+class MyVariantESJsonDiffSelfContainedSyncer(MyVariantBaseSyncer, syncer.ESJsonDiffSelfContainedSyncer):
     pass

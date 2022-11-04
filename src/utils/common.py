@@ -5,16 +5,15 @@ import random
 import string
 import sys
 import time
-from itertools import islice
-from contextlib import contextmanager
 import os.path
 from shlex import shlex
-import pickle
+
+from biothings.utils.common import ask, is_str, addsuffix
 
 if sys.version_info.major == 3:
     str_types = str
     import pickle       # noqa
-else:
+else:  # TODO do we still need Python2 compatability?
     str_types = (str, unicode)    # noqa
     import cPickle as pickle
 
@@ -25,7 +24,7 @@ else:
 
 
 def split_ids(q):
-    '''split input query string into list of ids.
+    """split input query string into list of ids.
        any of " \t\n\x0b\x0c\r|,+" as the separator,
         but perserving a phrase if quoted
         (either single or double quoted)
@@ -33,7 +32,7 @@ def split_ids(q):
         http://docs.python.org/2/library/shlex.html#parsing-rules
         e.g. split_ids('CDK2 CDK3') --> ['CDK2', 'CDK3']
              split_ids('"CDK2 CDK3"\n CDk4')  --> ['CDK2 CDK3', 'CDK4']
-    '''
+    """
     # Python3 strings are already unicode, .encode
     # now returns a bytearray, which cannot be searched with
     # shlex.  For now, do this terrible thing until we discuss
@@ -53,9 +52,9 @@ def split_ids(q):
 
 
 def get_compressed_outfile(filename, compress='gzip'):
-    '''Get a output file handler with given compress method.
+    """Get a output file handler with given compress method.
        currently support gzip/bz2/lzma, lzma only available in py3
-    '''
+    """
     if compress == "gzip":
         import gzip
         out_f = gzip.GzipFile(filename, 'wb')
@@ -71,9 +70,9 @@ def get_compressed_outfile(filename, compress='gzip'):
 
 
 def open_compressed_file(filename):
-    '''Get a read-only file-handler for compressed file,
+    """Get a read-only file-handler for compressed file,
        currently support gzip/bz2/lzma, lzma only available in py3
-    '''
+    """
     in_f = open(filename, 'rb')
     sig = in_f.read(5)
     in_f.close()
@@ -95,9 +94,9 @@ def open_compressed_file(filename):
 
 
 def dump(obj, filename, bin=2, compress='gzip', verbose=False):
-    '''Saves a compressed object to disk
+    """Saves a compressed object to disk
        binary protocol 2 is compatible with py2, 3 and 4 are for py3
-    '''
+    """
     if verbose:
         print('Dumping into "%s"...' % filename, end='')
     out_f = get_compressed_outfile(filename, compress=compress)
@@ -108,7 +107,7 @@ def dump(obj, filename, bin=2, compress='gzip', verbose=False):
 
 
 def dump2gridfs(object, filename, db, bin=2):
-    '''Save a compressed (support gzip only) object to MongoDB gridfs.'''
+    """Save a compressed (support gzip only) object to MongoDB gridfs."""
     import gridfs
     import gzip
     print('Dumping into "MongoDB:%s/%s"...' % (db.name, filename), end='')
@@ -126,11 +125,11 @@ def dump2gridfs(object, filename, db, bin=2):
 
 
 def loadobj(filename, mode='file'):
-    '''Loads a compressed object from disk file (or file-like handler) or
+    """Loads a compressed object from disk file (or file-like handler) or
         MongoDB gridfs file (mode='gridfs')
            obj = loadobj('data.pyobj')
            obj = loadobj(('data.pyobj', mongo_db), mode='gridfs')
-    '''
+    """
     if mode == 'gridfs':
         import gridfs
         filename, db = filename   # input is a tuple of (filename, mongo_db)
@@ -152,7 +151,7 @@ def loadobj(filename, mode='file'):
 
 
 def list2dict(a_list, keyitem, alwayslist=False):
-    '''Return a dictionary with specified keyitem as key, others as values.
+    """Return a dictionary with specified keyitem as key, others as values.
        keyitem can be an index or a sequence of indexes.
        For example: li=[['A','a',1],
                         ['B','a',2],
@@ -162,7 +161,7 @@ def list2dict(a_list, keyitem, alwayslist=False):
        if alwayslist is True, values are always a list even there is only one item in it.
                     list2dict(li,0,True)---> {'A':[('a',1),('b',3)],
                                               'B':[('a',2),]}
-    '''
+    """
     _dict = {}
     for x in a_list:
         if isinstance(keyitem, int):      # single item as key
@@ -188,7 +187,7 @@ def list2dict(a_list, keyitem, alwayslist=False):
 
 
 def get_random_string():
-    return base64.b64encode(os.urandom(6), random.sample(string.letters, 2))
+    return base64.b64encode(os.urandom(6), random.sample(string.ascii_letters, 2))
 
 
 def get_timestamp():
@@ -197,9 +196,9 @@ def get_timestamp():
 
 class LogPrint:
     def __init__(self, log_f, log=1, timestamp=0):
-        '''If this class is set to sys.stdout, it will output both log_f and __stdout__.
+        """If this class is set to sys.stdout, it will output both log_f and __stdout__.
            log_f is a file handler.
-        '''
+        """
         self.log_f = log_f
         self.log = log
         self.timestamp = timestamp
@@ -235,9 +234,9 @@ class LogPrint:
 
 
 def safewfile(filename, prompt=True, default='C', mode='w'):
-    '''return a file handle in 'w' mode,use alternative name if same name exist.
+    """return a file handle in 'w' mode,use alternative name if same name exist.
        if prompt == 1, ask for overwriting,appending or changing name,
-       else, changing to available name automatically.'''
+       else, changing to available name automatically."""
     suffix = 1
     while 1:
         if not os.path.exists(filename):
@@ -263,7 +262,7 @@ def safewfile(filename, prompt=True, default='C', mode='w'):
 
 
 def find_doc(k, keys):
-    ''' Used by jsonld insertion in www.api.es._insert_jsonld '''
+    """ Used by jsonld insertion in www.api.es._insert_jsonld """
     n = len(keys)
     for i in range(n):
         # if k is a dictionary, then directly get its value

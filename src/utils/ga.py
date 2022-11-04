@@ -1,6 +1,5 @@
 from tornado.httpclient import HTTPRequest, AsyncHTTPClient
-from pyga.requests import (Tracker, Page, Session, Visitor,
-                           Event, PageViewRequest, EventRequest)
+from pyga.requests import Tracker, Page, Session, Visitor, Event, PageViewRequest, EventRequest
 import config
 
 
@@ -11,14 +10,12 @@ class GAMixIn:
         is_prod = getattr(config, 'RUN_IN_PROD', False)
         if not no_tracking and is_prod and hasattr(config, "GA_ACCOUNT"):
             _req = self.request
-            remote_ip = _req.headers.get("X-Real-Ip",
-                        _req.headers.get("X-Forwarded-For",
-                        _req.remote_ip))
+            remote_ip = _req.headers.get("X-Real-Ip", _req.headers.get("X-Forwarded-For", _req.remote_ip))
             user_agent = _req.headers.get("User-Agent", None)
             visitor = Visitor()
             visitor.ip_address = remote_ip
             visitor.user_agent = user_agent
-            #get visitor.locale
+            # get visitor.locale
             visitor.extract_from_server_meta(
                 {"HTTP_ACCEPT_LANGUAGE": _req.headers.get("Accept-Language", None)}
             )
@@ -38,7 +35,7 @@ class GAMixIn:
                                          body=r.data))
             if event:
                 evt = Event(**event)
-                #tracker.track_event(evt, session, visitor)  #this is non-async request
+                # tracker.track_event(evt, session, visitor)  #this is non-async request
                 er = EventRequest(config=tracker.config,
                                   tracker=tracker,
                                   visitor=visitor,
@@ -50,7 +47,7 @@ class GAMixIn:
                                              headers=r.headers,
                                              body=r.data))
 
-            #now send actual async requests
+            # now send actual async requests
             http_client = AsyncHTTPClient()
             for _req in _req_list:
                 http_client.fetch(_req)
