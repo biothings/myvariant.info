@@ -29,7 +29,7 @@ class DBNSFPDumper(GoogleDriveDumper):
     # also, sometimes there's a "v", sometimes not...
     RELEASE_PAT = "dbNSFPv?(\d+\..*\d+a)\.zip"
 
-    SCHEDULE = "0 9 * * *" # disabled until we have a new parser for rel. 4.0
+    SCHEDULE = "0 9 1 * *"  # 9AM every 1st day of month 
 
     def get_newest_info(self):
         ftp = FTP('dbnsfp.softgenetics.com')
