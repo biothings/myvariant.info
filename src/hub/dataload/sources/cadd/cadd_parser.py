@@ -9,6 +9,7 @@ from utils.hgvs import get_hgvs_from_vcf
 VALID_COLUMN_NO = 116
 cadd_file_path = '/opt/myvariant.info/load_archive/cadd/whole_genome_SNVs_inclAnno.tsv.gz'
 
+
 # convert one snp to json
 def _map_line_to_json(fields):
     assert len(fields) == VALID_COLUMN_NO
@@ -192,6 +193,7 @@ def load_contig(contig):
     for doc in data:
         yield doc
 
+
 def fetch_generator(tabix, contig):
     dbfile_path = 'home/kevinxin/cadd/' + 'cadd_id' + contig
     db = dbm.open(dbfile_path)
@@ -208,7 +210,8 @@ def fetch_generator(tabix, contig):
     row_groups = (it for (key, it) in groupby(json_rows, lambda row: row["_id"]))
     return (merge_duplicate_rows(rg, "cadd") for rg in row_groups)
 
+
 def load_data(data_folder):
-    for contig in [i for i in range(1,24)] + ["X","Y"]:
+    for contig in [i for i in range(1, 24)] + ["X", "Y"]:
         load_contig(contig)
 

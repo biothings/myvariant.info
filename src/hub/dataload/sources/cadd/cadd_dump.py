@@ -1,9 +1,7 @@
-import os
 import os.path
-import sys
-import time
 
-import biothings, config
+import biothings
+import config
 biothings.config_for_app(config)
 
 from config import DATA_ARCHIVE_ROOT
@@ -16,7 +14,7 @@ class CADDDumper(ManualDumper):
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
 
     def __init__(self, *args, **kwargs):
-        super(CADDDumper,self).__init__(*args,**kwargs)
+        super(CADDDumper, self).__init__(*args, **kwargs)
         self.logger.info("""
 Assuming manual download from: http://cadd.gs.washington.edu
 of files (.tsv.gz and .tsv.gz.tbi) looking like:
@@ -25,10 +23,3 @@ of files (.tsv.gz and .tsv.gz.tbi) looking like:
 - ExAC.r0.2_inclAn"no
 - ESP6500SI_inclAn"no"
 """)
-
-def main():
-    dumper = CADDDumper()
-    dumper.dump()
-
-if __name__ == "__main__":
-    main()

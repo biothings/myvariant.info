@@ -3,21 +3,22 @@ from .cadd_parser import load_data
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
 
+
 class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
 
     keep_archive = 1
 
     name = "cadd"
     __metadata__ = {
-        "assembly" : "hg19",
-        "src_meta" : {
-            "url" : "http://cadd.gs.washington.edu/home",
-            "license_url" : "http://cadd.gs.washington.edu/contact",
+        "assembly": "hg19",
+        "src_meta": {
+            "url": "http://cadd.gs.washington.edu/home",
+            "license_url": "http://cadd.gs.washington.edu/contact",
             "license_url_short": "http://bit.ly/2TIuab9"
         }
     }
 
-    def load_data(self,data_folder):
+    def load_data(self, data_folder):
         self.logger.info("Load data from folder '%s'" % data_folder)
         return load_data(data_folder)
 
@@ -36,57 +37,57 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                     },
                     "anc": {
                         "type": "text",
-                        "index" : False
+                        "index": False
                     },
                     "length": {
                         "type": "integer",
-                        "index" : False
+                        "index": False
                     },
                     "istv": {
                         "type": "text",
-                        "index" : False
+                        "index": False
                     },
                     "isderived": {
                         "type": "text",
-                        "index" : False
+                        "index": False
                     },
                     "gc": {
                         "type": "float",
-                        "index" : False
+                        "index": False
                     },
                     "cpg": {
                         "type": "float",
-                        "index" : False
+                        "index": False
                     },
                     "mapability": {
                         "properties": {
                             "20bp": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "35bp": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             }
                         }
                     },
                     "scoresegdup": {
                         "type": "float",
-                        "index" : False
+                        "index": False
                     },
                     "phast_cons": {
                         "properties": {
                             "primate": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "mammalian": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "vertebrate": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             }
                         }
                     },
@@ -94,15 +95,15 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                         "properties": {
                             "primate": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "mammalian": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "vertebrate": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             }
                         }
                     },
@@ -110,47 +111,47 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                         "properties": {
                             "n": {
                                 "type": "integer",
-                                "index" : False
+                                "index": False
                             },
                             "s": {
                                 "type": "integer",
-                                "index" : False
+                                "index": False
                             },
                             "rs": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "rs_pval": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             }
                         }
                     },
                     "bstatistic": {
                         "type": "integer",
-                        "index" : False
+                        "index": False
                     },
                     "mutindex": {
                         "type": "integer",
-                        "index" : False
+                        "index": False
                     },
                     "dna": {
                         "properties": {
                             "helt": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "mgw": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "prot": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "roll": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             }
                         }
                     },
@@ -158,83 +159,83 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                         "properties": {
                             "score": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "e": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "aln": {
                                 "type": "integer",
-                                "index" : False
+                                "index": False
                             }
                         }
                     },
                     "targetscans": {
                         "type": "integer",
-                        "index" : False
+                        "index": False
                     },
                     "fitcons": {
                         "type": "float",
-                        "index" : False
+                        "index": False
                     },
                     "chmm": {
                         "properties": {
                             "tssa": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "tssaflnk": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "txflnk": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "tx": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "txwk": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "enh": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "znfrpts": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "het": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "tssbiv": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "bivflnk": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "enhbiv": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "reprpc": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "reprpcwk": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "quies": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             }
                         }
                     },
@@ -242,53 +243,53 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                         "properties": {
                             "exp": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "h3k27ac": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "h3k4me1": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "h3k4me3": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "nucleo": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "occ": {
                                 "type": "integer",
-                                "index" : False
+                                "index": False
                             },
                             "p_val": {
                                 "properties": {
                                     "comb": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "dnas": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "faire": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "polii": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "ctcf": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "mycp": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     }
                                 }
                             },
@@ -296,23 +297,23 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                                 "properties": {
                                     "dnase": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "faire": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "polii": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "ctcf": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "myc": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     }
                                 }
                             }
@@ -321,35 +322,35 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                     "segway": {
                         "type": "text",
                         "analyzer": "string_lowercase",
-                        "index" : False
+                        "index": False
                     },
                     "motif": {
                         "properties": {
                             "toverlap": {
                                 "type": "integer",
-                                "index" : False
+                                "index": False
                             },
                             "dist": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "ecount": {
                                 "type": "integer",
-                                "index" : False
+                                "index": False
                             },
                             "ename": {
                                 "type": "text",
                                 "analyzer": "string_lowercase",
-                                "index" : False
+                                "index": False
                             },
                             "ehipos": {
                                 "type": "text",
                                 "analyzer": "string_lowercase",
-                                "index" : False
+                                "index": False
                             },
                             "escorechng": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             }
                         }
                     },
@@ -357,22 +358,22 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                         "properties": {
                             "bs": {
                                 "type": "integer",
-                                "index" : False
+                                "index": False
                             },
                             "bs_peaks": {
                                 "type": "integer",
-                                "index" : False
+                                "index": False
                             },
                             "bs_peaks_max": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             }
                         }
                     },
                     "isknownvariant": {
                         "type": "text",
                         "analyzer": "string_lowercase",
-                        "index" : False
+                        "index": False
                     },
                     "consequence": {
                         "type": "text",
@@ -407,11 +408,11 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                             },
                             "afr": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "eur": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             }
                         }
                     },
@@ -422,19 +423,19 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                             },
                             "asn": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "amr": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "afr": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             },
                             "eur": {
                                 "type": "float",
-                                "index" : False
+                                "index": False
                             }
                         }
                     },
@@ -459,11 +460,11 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                                 "properties": {
                                     "protpos": {
                                         "type": "integer",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "rel_prot_pos": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "domain": {
                                         "type": "text",
@@ -474,30 +475,30 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                             "feature_id": {
                                 "type": "text",
                                 "analyzer": "string_lowercase",
-                                "index" : False
+                                "index": False
                             },
                             "ccds_id": {
                                 "type": "text",
                                 "analyzer": "string_lowercase",
-                                "index" : False
+                                "index": False
                             },
                             "cds": {
                                 "properties": {
                                     "cdna_pos": {
                                         "type": "integer",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "cds_pos": {
                                         "type": "integer",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "rel_cdna_pos": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     },
                                     "rel_cds_pos": {
                                         "type": "float",
-                                        "index" : False
+                                        "index": False
                                     }
                                 }
                             }
@@ -513,22 +514,22 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
                     "exon": {
                         "type": "text",
                         "analyzer": "string_lowercase",
-                        "index" : False
+                        "index": False
                     },
                     "intron": {
                         "type": "text",
                         "analyzer": "string_lowercase",
-                        "index" : False
+                        "index": False
                     },
                     "oaa": {
                         "type": "text",
                         "analyzer": "string_lowercase",
-                        "index" : False
+                        "index": False
                     },
                     "naa": {
                         "type": "text",
                         "analyzer": "string_lowercase",
-                        "index" : False
+                        "index": False
                     },
                     "grantham": {
                         "type": "integer"
@@ -565,5 +566,3 @@ class CADDUploader(uploader.DummySourceUploader, SnpeffPostUpdateUploader):
             }
         }
         return mapping
-
-
