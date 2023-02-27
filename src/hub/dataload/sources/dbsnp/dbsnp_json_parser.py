@@ -19,9 +19,11 @@ from biothings.utils.common import open_compressed_file
 # TODO
 # Index geneid field as string
 
-# Note that hg38 data of dbsnp release 154 are based on "GRCh38.p12",
-#   while release 155 based on "GRCh38.p13"
-ASSEMBLY_NAME_MAPPING = {"hg19": "GRCh37.p13", "hg38": "GRCh38.p13"}
+# Note on dbsnp hg38 data:
+#   release 154 are based on "GRCh38.p12",
+#   release 155 on "GRCh38.p13"
+#   release 156 on "GRCh38.p14"
+ASSEMBLY_NAME_MAPPING = {"hg19": "GRCh37.p13", "hg38": "GRCh38.p14"}
 
 
 def parse_one_rec(assembly, record):
