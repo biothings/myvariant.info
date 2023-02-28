@@ -21,10 +21,10 @@ keep them up-to-date, so that you don't have to do it:
 .. _COSMIC: http://cancer.sanger.ac.uk/cancergenome/projects/cosmic/
 .. _DOCM: http://docm.genome.wustl.edu/
 .. _SNPedia: http://www.snpedia.com
-.. _EMVClass: http://geneticslab.emory.edu/emvclass/emvclass.php
+.. _EMVClass: https://www.ncbi.nlm.nih.gov/clinvar/submitters/500060/
 .. _Scripps Wellderly: http://www.stsiweb.org/wellderly/
 .. _EXAC: http://exac.broadinstitute.org/
-.. _GRASP: http://iapps.nhlbi.nih.gov/GRASP
+.. _GRASP: https://grasp.nhlbi.nih.gov/
 .. _UniProt: ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/variants/README
 .. _CIViC: https://civic.genome.wustl.edu/home
 .. _Cancer Genome Interpreter: https://www.cancergenomeinterpreter.org/home
