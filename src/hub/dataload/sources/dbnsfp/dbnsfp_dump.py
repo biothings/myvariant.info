@@ -1,22 +1,19 @@
 import os
-import os.path
 import re
 import requests
+from urllib.parse import urlparse, parse_qs
 from ftplib import FTP
 from bs4 import BeautifulSoup
 import zipfile
 
-import biothings, config
-biothings.config_for_app(config)
-
 from config import DATA_ARCHIVE_ROOT
-from biothings.hub.dataload.dumper import GoogleDriveDumper, DumperException
+from biothings.hub.dataload.dumper import HTTPDumper, DumperException
 from biothings.utils.common import unzipall
 
 
-class DBNSFPDumper(GoogleDriveDumper):
+class DBNSFPDumper(HTTPDumper):
     """
-    Mixed dumper (use FTP and HTTP/GoogleDrive) to dump dbNSFP:
+    Mixed dumper (use FTP and HTTP) to dump dbNSFP:
     - FTP: to get the latest version
     - HTTP: to actually get the data (because their FTP server is sooo slow)
     """
@@ -37,14 +34,15 @@ class DBNSFPDumper(GoogleDriveDumper):
     def get_newest_info(self):
         release_map = dict()  # a dict of <release_num, file_name>
 
-        ftp = FTP('dbnsfp.softgenetics.com')
-        ftp.login('dbnsfp', 'dbnsfp')
+        ftp = FTP("dbnsfp.softgenetics.com")
+        ftp.login("dbnsfp", "dbnsfp")
         for filename in ftp.nlst():
             filename_match = self.FILENAME_PATTERN.match(filename)
             if filename_match:
                 release = filename_match.groups()[0]
                 release_map[release] = filename
 
+        # get the last item in the list, which is the latest version
         newest_release = sorted(release_map.keys())[-1]
 
         beta_release_match = self.BETA_RELEASE_PATTERN.match(newest_release)
@@ -54,76 +52,135 @@ class DBNSFPDumper(GoogleDriveDumper):
 
             # If the inferred stable release is available, use it instead of the beta release
             if stable_release in release_map:
-                self.logger.info("Found non-beta release '%s'" % stable_release)
+                self.logger.info(f"Stable release {stable_release} detected; beta release {newest_release} discarded.")
                 newest_release = stable_release
             # Otherwise just use the beta release
             # else:
             #     pass
 
-        # get the last item in the list, which is the latest version
         self.release = newest_release
         self.newest_file = release_map[newest_release]
 
     def new_release_available(self):
         current_release = self.src_doc.get("download", {}).get("release")
         if not current_release or self.release > current_release:
-            self.logger.info("New release '%s' found" % self.release)
+            self.logger.info(f"New release {self.release} available, over current release {current_release}.")
             return True
         else:
-            self.logger.debug("No new release found")
+            self.logger.debug(f"No new release available over current release {current_release}.")
             return False
 
-    def get_drive_url(self, filename):
-        # ok, so let's get the main page data. in this page there are links for both
-        # FTP and Google Drive. We're assuming here that just after FTP link, there's
-        # the corresponding one for Drive (parse will ensure we downloaded the correct
-        # version, and also the correct licensed one - academic only)
-        res = requests.get("https://sites.google.com/site/jpopgen/dbNSFP")
-        html = BeautifulSoup(res.text, "html.parser")
-        ftplink = html.findAll(attrs={"href": re.compile(filename)})
-        if ftplink:
-            ftplink = ftplink.pop()
-        else:
-            raise DumperException("Can't find a FTP link for '%s'" % filename)
-        # let's cross fingers here...
-        drivelink = ftplink.findNextSibling()
-        href = drivelink.get("href")
-        if href:
-            return href
-        else:
-            raise DumperException("Can't find a href in drive link element: %s" % drivelink)
+    @classmethod
+    def get_box_url(cls, filename):
+        """
+        Given a filename, find its Box download link from parsing the index page.
 
-    def create_todump_list(self, force=False):
+        dbNSFP main page provides 3 types of downloads for each release, in the following order:
+        1. Amazon AWS (somehow cannot access)
+        2. Box (direct link, or wrapped in www.google.com/url?q=<Box_URL>)
+        3. Google Drive (a download page, not direct link)
+
+        However only the Amazon AWS download URL will contain the filename. E.g. "dbNSFP4.3a.zip" and
+        "https://www.google.com/url?q=https%3A%2F%2Fdbnsfp.s3.amazonaws.com%2FdbNSFP4.3a.zip&amp;sa=D&amp;sntz=1&amp;usg=AOvVaw2jxs6oSlLKGuD0pfWzazXd".
+
+        The algorithm here is:
+        1. Find the Amazon AWS download URL containing the filename.
+        2. Find the first Box download URL right after the above Amazon AWS URL.
+
+        Note: The above algorithm may fail once the HTML structure of the main page changed.
+        """
+
+        amazon_anchor_text = "Amazon"
+        box_anchor_text = "Box"
+        # google_drive_anchor_text = "googledrive"
+        # to find anchor elements containing text "Amazon", or "Box"
+        anchor_text_pattern = re.compile(f"^{amazon_anchor_text}|{box_anchor_text}$")
+
+        html_response = requests.get("https://sites.google.com/site/jpopgen/dbNSFP")
+        html_text = html_response.text
+        soup = BeautifulSoup(html_text, "html.parser")
+        anchors = soup.find_all("a", href=True, text=anchor_text_pattern)
+
+        amazon_anchor_index = None
+        for index, anchor in enumerate(anchors):
+            if filename in anchor["href"] and anchor.text == amazon_anchor_text:
+                amazon_anchor_index = index
+
+        if amazon_anchor_index is None:
+            raise DumperException(f"Cannot find an {amazon_anchor_text} anchor element containing filename {filename}.")
+
+        box_anchor = None
+        for anchor in anchors[amazon_anchor_index:]:
+            if anchor.text == box_anchor_text:
+                box_anchor = anchor
+                break
+
+        if box_anchor is None:
+            raise DumperException(f"Cannot find a {box_anchor_text} anchor element after the {amazon_anchor_text} anchor of "
+                                  f"{anchors[amazon_anchor_index]['href']}.")
+
+        box_url = box_anchor["href"]
+
+        # The Box download URL might be a "www.google.com/url" URL wrapping the true Box URL. E.g.
+        # "https://www.google.com/url?q=https%3A%2F%2Fusf.box.com%2Fshared%2Fstatic%2Fq1kufbnww5dy3fs2t1yp5ay0w93eufq7"
+        box_url_parse_result = urlparse(box_url)
+        if box_url_parse_result.netloc == "www.google.com":
+            qs_result = parse_qs(box_url_parse_result.query)
+            q = qs_result.get("q", None)
+            if q is None:
+                raise DumperException(f"Cannot find q in the query string of {box_url} for {filename}.")
+            return q[0]  # The wrapped Box URL should be the only element in "q"
+        elif box_url_parse_result.netloc.endswith("box.com"):  # direct Box.com download link
+            return box_url
+        else:
+            raise DumperException(f"Cannot recognized the Box download URL {box_url} for {filename}.")
+
+    def create_todump_list(self, force=False, **kwargs):
         self.get_newest_info()
+
         new_localfile = os.path.join(self.new_data_folder, os.path.basename(self.newest_file))
         try:
             current_localfile = os.path.join(self.current_data_folder, os.path.basename(self.newest_file))
         except TypeError:
             # current data folder doesn't even exist
             current_localfile = new_localfile
+
         if force or not os.path.exists(current_localfile) or self.new_release_available():
-            # register new release (will be stored in backend)
-            self.release = self.release
-            remote = self.get_drive_url(self.newest_file)
+            remote = self.get_box_url(self.newest_file)
             self.to_dump.append({"remote": remote, "local": new_localfile})
 
     def post_download(self, remote, local):
+        """
+        Run some sanity checks after downloading
+        """
+
+        """
+        Check #1: The filename of the downloaded archive must contain the release tag.
+        """
         filename = os.path.basename(local)
-        if not self.release in filename:
-            raise DumperException("Weird, filename is wrong ('%s')" % filename)
-        # make sure we downloaded to correct one, and that it's the academic version
+        if self.release not in filename:
+            raise DumperException(f"Weird, filename is wrong ({filename}); should contain release tag {self.release}.")
+
+        """
+        Check #2: The downloaded archive must contain a README whole filename must contain the release tag.
+        """
         zf = zipfile.ZipFile(local)
         readme = None
         for f in zf.filelist:
             if "readme" in f.filename:
                 readme = f
                 break
-        if not readme:
-            raise DumperException("Can't find a readme in the archive (I was checking version/license)")
-        if not self.release in readme.filename:
-            raise DumperException("Version in readme filename ('%s') doesn't match expected version %s" % (readme.filename, self.release))
-        assert self.release.endswith("a"), "Release '%s' isn't academic version (how possible ?)" % self.release
-        # good to go...
+        if readme is None:
+            raise DumperException(f"Can't find a README in the archive {local} (for the purpose of checking version/license).")
+        if self.release not in readme.filename:
+            raise DumperException(f"Version in readme filename ({readme.filename}) doesn't match release tag {self.release}.")
+
+        """
+        Check #3: Must be a academic release. 
+        """
+        assert self.release.endswith("a"), f"Release {self.release} isn't academic version (how possible?)"
+
+        # More checks go here...
 
     def post_dump(self, *args, **kwargs):
         self.logger.info("Unzipping files in '%s'" % self.new_data_folder)
