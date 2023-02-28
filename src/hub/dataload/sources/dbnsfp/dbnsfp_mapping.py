@@ -150,7 +150,11 @@ mapping = {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "sift": {  # Column 37-39
+            "chagyrskaya_neandertal": {  # Column 37
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "sift": {  # Column 38-40
                 "properties": {
                     "score": {
                         "type": "float"
@@ -164,7 +168,7 @@ mapping = {
                     }
                 }
             },
-            "sift4g": {  # Column 40-42
+            "sift4g": {  # Column 41-43
                 "properties": {
                     "score": {
                         "type": "float"
@@ -178,7 +182,7 @@ mapping = {
                     }
                 }
             },
-            "polyphen2": {  # Column 43-48
+            "polyphen2": {  # Column 44-49
                 "properties": {
                     "hdiv": {
                         "properties": {
@@ -210,7 +214,7 @@ mapping = {
                     }
                 }
             },
-            "lrt": {  # Column 49-52
+            "lrt": {  # Column 50-53
                 "properties": {
                     "score": {
                         "type": "float"
@@ -227,7 +231,7 @@ mapping = {
                     }
                 }
             },
-            "mutationtaster": {  # Column 53-57
+            "mutationtaster": {  # Column 54-58
                 "properties": {
                     "score": {
                         "type": "float"
@@ -248,7 +252,7 @@ mapping = {
                     }
                 }
             },
-            "mutationassessor": {  # Column 58-60
+            "mutationassessor": {  # Column 59-61
                 "properties": {
                     "score": {
                         "type": "float"
@@ -262,7 +266,7 @@ mapping = {
                     }
                 }
             },
-            "fathmm": {  # Column 61-63
+            "fathmm": {  # Column 62-64
                 "properties": {
                     "score": {
                         "type": "float"
@@ -276,7 +280,7 @@ mapping = {
                     }
                 }
             },
-            "provean": {  # Column 64-66
+            "provean": {  # Column 65-67
                 "properties": {
                     "score": {
                         "type": "float"
@@ -290,7 +294,7 @@ mapping = {
                     }
                 }
             },
-            "vest4": {  # Column 67-68
+            "vest4": {  # Column 68-69
                 "properties": {
                     "score": {
                         "type": "float"
@@ -300,21 +304,7 @@ mapping = {
                     }
                 }
             },
-            "metasvm": {  # Column 69-71
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "metalr": {  # Column 72-74
+            "metasvm": {  # Column 70-72
                 "properties": {
                     "score": {
                         "type": "float"
@@ -328,10 +318,24 @@ mapping = {
                     }
                 }
             },
-            "reliability_index": {  # Column 75
+            "metalr": {  # Column 73-75
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "reliability_index": {  # Column 76
                 "type": "integer"
             },
-            "metarnn": {  # Column 76-78
+            "metarnn": {  # Column 77-79
                 "properties": {
                     "score": {
                         "type": "float"
@@ -345,7 +349,7 @@ mapping = {
                     }
                 }
             },
-            "m-cap": {  # Column 79-81
+            "m-cap": {  # Column 80-82
                 "properties": {
                     "score": {
                         "type": "float"
@@ -359,7 +363,7 @@ mapping = {
                     }
                 }
             },
-            "revel": {  # Column 82-83
+            "revel": {  # Column 83-84
                 "properties": {
                     "score": {
                         "type": "float"
@@ -369,7 +373,7 @@ mapping = {
                     }
                 }
             },
-            "mutpred": {  # Column 84-88
+            "mutpred": {  # Column 85-89
                 "properties": {
                     "score": {
                         "type": "float"
@@ -397,7 +401,7 @@ mapping = {
                     }
                 }
             },
-            "mvp": {  # Column 89-90
+            "mvp": {  # Column 90-91
                 "properties": {
                     "score": {
                         "type": "float"
@@ -407,7 +411,7 @@ mapping = {
                     }
                 }
             },
-            "mpc": {  # Column 91-92
+            "mpc": {  # Column 92-93
                 "properties": {
                     "score": {
                         "type": "float"
@@ -417,21 +421,7 @@ mapping = {
                     }
                 }
             },
-            "primateai": {  # Column 93-95
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "deogen2": {  # Column 96-98
+            "primateai": {  # Column 94-96
                 "properties": {
                     "score": {
                         "type": "float"
@@ -445,7 +435,21 @@ mapping = {
                     }
                 }
             },
-            "bayesdel": {  # Column 43-48
+            "deogen2": {  # Column 97-99
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "bayesdel": {  # Column 100-105
                 "properties": {
                     "add_af": {
                         "properties": {
@@ -477,7 +481,7 @@ mapping = {
                     }
                 }
             },
-            "clinpred": {  # Column 105-107
+            "clinpred": {  # Column 106-108
                 "properties": {
                     "score": {
                         "type": "float"
@@ -491,7 +495,7 @@ mapping = {
                     }
                 }
             },
-            "list-s2": {  # Column 108-110
+            "list-s2": {  # Column 109-111
                 "properties": {
                     "score": {
                         "type": "float"
@@ -505,7 +509,7 @@ mapping = {
                     }
                 }
             },
-            "aloft": {  # Column 111-116
+            "aloft": {  # Column 112-117
                 "properties": {
                     "prob_tolerant": {
                         "type": "keyword",
@@ -532,7 +536,12 @@ mapping = {
                     }
                 }
             },
-            "cadd": {  # Column 117-119
+            "cadd": {
+                # Column 118-123
+                #   Column 118-120 are hg38
+                #   Column 121-123 are hg19
+                # Only column 117-119 will be included in the document for "hg38"
+                # No CADD fields will be included when "hg19"
                 "properties": {
                     "raw_score": {
                         "type": "float"
@@ -546,7 +555,7 @@ mapping = {
                     }
                 }
             },
-            "dann": {  # Column 123-124
+            "dann": {  # Column 124-125
                 "properties": {
                     "score": {
                         "type": "float"
@@ -556,7 +565,7 @@ mapping = {
                     }
                 }
             },
-            "fathmm-mkl": {  # Column 125-128
+            "fathmm-mkl": {  # Column 126-129
                 "properties": {
                     "coding_score": {
                         "type": "float"
@@ -574,7 +583,7 @@ mapping = {
                     }
                 }
             },
-            "fathmm-xf": {  # Column 129-131
+            "fathmm-xf": {  # Column 130-132
                 "properties": {
                     "coding_score": {
                         "type": "float"
@@ -588,7 +597,7 @@ mapping = {
                     }
                 }
             },
-            "eigen": {  # Column 132-134
+            "eigen": {  # Column 133-135
                 "properties": {
                     "raw_coding": {
                         "type": "float"
@@ -601,7 +610,7 @@ mapping = {
                     }
                 }
             },
-            "eigen-pc": {  # Column 135-137
+            "eigen-pc": {  # Column 136-138
                 "properties": {
                     "raw_coding": {
                         "type": "float"
@@ -614,7 +623,7 @@ mapping = {
                     },
                 }
             },
-            "genocanyon": {  # Column 138-139
+            "genocanyon": {  # Column 139-140
                 "properties": {
                     "score": {
                         "type": "float"
@@ -624,7 +633,7 @@ mapping = {
                     }
                 }
             },
-            "integrated": {  # Column 140-142
+            "integrated": {  # Column 141-143
                 "properties": {
                     "fitcons_score": {
                         "type": "float"
@@ -637,7 +646,7 @@ mapping = {
                     }
                 }
             },
-            "gm12878": {  # Column 143-145
+            "gm12878": {  # Column 144-146
                 "properties": {
                     "fitcons_score": {
                         "type": "float"
@@ -650,7 +659,7 @@ mapping = {
                     }
                 }
             },
-            "h1-hesc": {  # Column 146-148
+            "h1-hesc": {  # Column 147-149
                 "properties": {
                     "fitcons_score": {
                         "type": "float"
@@ -663,7 +672,7 @@ mapping = {
                     }
                 }
             },
-            "huvec": {  # Column 149-151
+            "huvec": {  # Column 150-152
                 "properties": {
                     "fitcons_score": {
                         "type": "float"
@@ -676,7 +685,7 @@ mapping = {
                     }
                 }
             },
-            "linsight": {  # Column 152-153
+            "linsight": {  # Column 153-154
                 "properties": {
                     "score": {
                         "type": "float"
@@ -686,7 +695,7 @@ mapping = {
                     }
                 }
             },
-            "gerp++": {  # Column 154-156
+            "gerp++": {  # Column 155-157
                 "properties": {
                     "nr": {
                         "type": "float"
@@ -699,7 +708,7 @@ mapping = {
                     }
                 }
             },
-            "phylop": {  # Column 157-162
+            "phylop": {  # Column 158-163
                 "properties": {
                     "100way_vertebrate": {
                         "properties": {
@@ -733,7 +742,7 @@ mapping = {
                     }
                 }
             },
-            "phastcons": {  # Column 163-168
+            "phastcons": {  # Column 164-169
                 "properties": {
                     "100way_vertebrate": {
                         "properties": {
@@ -767,7 +776,7 @@ mapping = {
                     }
                 }
             },
-            "siphy_29way": {  # Column 169-171
+            "siphy_29way": {  # Column 170-172
                 "properties": {
                     "pi": {
                         "properties": {
@@ -793,7 +802,7 @@ mapping = {
                     }
                 }
             },
-            "bstatistic": {  # Column 172-173
+            "bstatistic": {  # Column 173-174
                 "properties": {
                     "score": {
                         "type": "integer"
@@ -803,7 +812,7 @@ mapping = {
                     }
                 }
             },
-            "1000gp3": {  # Column 174-185
+            "1000gp3": {  # Column 175-186
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -843,7 +852,7 @@ mapping = {
                     }
                 }
             },
-            "twinsuk": {  # Column 186-187
+            "twinsuk": {  # Column 187-188
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -853,7 +862,7 @@ mapping = {
                     }
                 }
             },
-            "alspac": {  # Column 188-189
+            "alspac": {  # Column 189-190
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -863,7 +872,7 @@ mapping = {
                     }
                 }
             },
-            "uk10k": {  # Column 190-191
+            "uk10k": {  # Column 191-192
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -873,7 +882,7 @@ mapping = {
                     }
                 }
             },
-            "esp6500": {  # Column 192-195
+            "esp6500": {  # Column 193-196
                 "properties": {
                     "aa_ac": {
                         "type": "integer"
@@ -889,7 +898,7 @@ mapping = {
                     }
                 }
             },
-            "exac": {  # Column 196-211
+            "exac": {  # Column 197-212
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -941,7 +950,7 @@ mapping = {
                     }
                 }
             },
-            "exac_nontcga": {  # Column 212-227
+            "exac_nontcga": {  # Column 213-228
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -993,7 +1002,7 @@ mapping = {
                     }
                 }
             },
-            "exac_nonpsych": {  # Column 228-243
+            "exac_nonpsych": {  # Column 229-244
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -1045,8 +1054,10 @@ mapping = {
                     }
                 }
             },
-            # Column 245-629 are gnomAD_* columns. Skipped.
-            "clinvar": {  # Column 630-638
+
+            # Column 245-630 are gnomAD_* columns. Skipped.
+
+            "clinvar": {  # Column 631-639
                 "properties": {
                     "clinvar_id": {
                         "type": "integer"
@@ -1081,10 +1092,10 @@ mapping = {
                     }
                 }
             },
-            "interpro_domain": {  # Column 639
+            "interpro_domain": {  # Column 640
                 "type": "text"
             },
-            "gtex": {  # Column 640-641
+            "gtex": {  # Column 641-642
                 "properties": {
                     "gene": {
                         "type": "keyword",
@@ -1096,7 +1107,7 @@ mapping = {
                     }
                 }
             },
-            "geuvadis_eqtl_target_gene": {  # Column 642
+            "geuvadis_eqtl_target_gene": {  # Column 643
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             }

@@ -486,7 +486,7 @@ class DbnsfpReader:
                 #   Column 118-120 are hg38
                 #   Column 121-123 are hg19
                 # Only column 117-119 will be included in the document when verison == "hg38"
-                # No CADD fields will be included verison == "hg19"
+                # No CADD fields will be included when verison == "hg19"
                 "cadd": cls.map_CADD_to_json(row, version),
                 # Column 124-125
                 "dann": cls.map_score_rankscore_to_json(row, col_prefix="DANN"),
