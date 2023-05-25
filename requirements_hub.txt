@@ -23,6 +23,6 @@ PyVCF>=0.6.7        # used in various VCF parsers
 pysam>=0.8.1        # used in hub.dataload.sources.cadd.cadd_parser
 
 # testing new packages
-tornado==6.1.0
+tornado==6.3.2
 asyncssh==2.5.0
 sockjs-tornado==1.0.7
