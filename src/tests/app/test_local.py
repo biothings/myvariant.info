@@ -8,7 +8,7 @@ class TestMetadataAssemblyAware(BiothingsWebAppTest):
     TEST_DATA_DIR_NAME = 'mv_app_test'
 
     def test_metadata_source_assembly(self):
-        metadata_url = f'{self.prefix}/' + 'metadata/fields'
+        metadata_url = 'metadata/fields'
         res_default = self.request(metadata_url)
         res_hg19 = self.request(metadata_url, params={'assembly': 'hg19'})
         res_hg38 = self.request(metadata_url, params={'assembly': 'hg38'})
@@ -16,7 +16,7 @@ class TestMetadataAssemblyAware(BiothingsWebAppTest):
         assert res_hg19.json() != res_hg38.json()  # I am not certain this will hold true
 
     def test_metadata_field_assembly(self):
-        metadata_url = f'{self.prefix}/' + 'metadata'
+        metadata_url = 'metadata'
         res_default = self.request(metadata_url)
         res_hg19 = self.request(metadata_url, params={'assembly': 'hg19'})
         res_hg38 = self.request(metadata_url, params={'assembly': 'hg38'})
