@@ -8,6 +8,8 @@ from bitarray import bitarray
 from biothings.utils.common import loadobj, is_str, open_anyfile, timesofar
 from biothings.utils.mongo import get_src_db, doc_feeder
 
+from warnings import warn
+
 
 def nuc_to_bit(sequence):
     '''encode nucleotide into bit form'''
@@ -235,6 +237,12 @@ class VariantValidator:
     def validate_generator(self, generator, return_false=False,
                      return_none=False, return_true=False, verbose=False, flag_invalid=False):
         '''Validate hgvs ids from a src collection.'''
+
+        warn(
+            RuntimeWarning("Method validate_generator is not correctly implemented. "
+                           "See https://github.com/biothings/myvariant.info/blob/master/CONTRIBUTE.md#variant_id-validation"),
+            stacklevel=2,  # unwind 2 calls in the callstack
+        )
 
         return_dict = {
             False: return_false,
