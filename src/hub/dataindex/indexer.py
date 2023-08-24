@@ -4,7 +4,7 @@ import config
 from biothings.hub.dataindex.indexer import Indexer, IndexManager, ColdHotIndexer
 from biothings.hub.dataexport.ids import export_ids, upload_ids
 from biothings.utils.hub_db import get_src_build
-from utils.es import ElasticsearchIndexingService
+from utils.stats import ESMappingMetaStatsService, BuildDocMetaStatsService
 
 from elasticsearch import JSONSerializer, SerializationError, Elasticsearch
 from elasticsearch.compat import string_types
@@ -44,20 +44,16 @@ class MyVariantJSONSerializer(JSONSerializer):
                           If false, these characters will be output as-is.
             separators: an (item_separator, key_separator) tuple, specifying the separators in the output.
             """
-            # return json.dumps(
-            #     data, default=self.default, ensure_ascii=False, separators=(",", ":")
-            # )
+            # return json.dumps(data, default=self.default, ensure_ascii=False, separators=(",", ":"))
 
             """
-            `orjson.dumps()` will escape all incoming non-ASCII characters and output the encoded bytestrings.
-            We decode the output bytestrings into string, and as a result, those escaped characters are un-escaped.
+            `orjson.dumps()` will escape all incoming non-ASCII characters and output the encoded byte-strings.
+            We decode the output byte-strings into string, and as a result, those escaped characters are un-escaped.
             In Python 3, the default encoding is "utf-8" (see https://docs.python.org/3/library/stdtypes.html#bytes.decode).
 
             `orjson.dumps()` will output compact JSON representation, effectively the same behavior with json.dumps(separators=(",", ":"))
             """
-            return orjson.dumps(
-                data, default=self.default
-            ).decode()
+            return orjson.dumps(data, default=self.default).decode()
         except (ValueError, TypeError) as e:
             raise SerializationError(data, e)
 
@@ -67,13 +63,11 @@ class BaseVariantIndexer(Indexer):
     def __init__(self, build_doc, indexer_env, index_name):
         super().__init__(build_doc, indexer_env, index_name)
 
-        # TODO should we use _BuildDoc to wrap build_doc?
-        # TODO or should we make Indexer._build_doc a visible member?
-        self.build_doc = build_doc
-
         # Changing the `es_client_args` object might affect top level config serialization.
         # we have an endpoint to print the config, it might be safer to avoid changing the `es_client_args` object.
-        self.es_client_args = dict(self.es_client_args)
+        # self.es_client_args = dict(self.es_client_args)
+        self.logger.info(f"BaseVariantIndexer.__init__() received indexer_env={indexer_env}")
+
         self.es_client_args["serializer"] = MyVariantJSONSerializer()
 
         self.es_index_mappings["properties"]["chrom"] = {
@@ -91,57 +85,44 @@ class BaseVariantIndexer(Indexer):
                 }
             }
         }
+
         self.es_index_settings["mapping"] = {
             "total_fields": {
                 "limit": 2000
             }
         }
+
         self.assembly = build_doc["build_config"]["assembly"]
 
     async def post_index(self, *args, **kwargs):
         # No idea how come the decision to sleep for 3 minutes
-        # Migrated from Sebastian's commit 1a7b7a. It was orginally marked "Not Tested Yet".
+        # Migrated from Sebastian's commit 1a7b7a. It was originally marked "Not Tested Yet".
         self.logger.info("Sleeping for a bit while index is being fully updated...")
         await asyncio.sleep(3 * 60)
 
-        # update _meta.stats in ES mapping
+        # STEP 1: update _meta.stats in ES mapping
         with Elasticsearch(**self.es_client_args) as es_client:
-            es_service = ElasticsearchIndexingService(client=es_client, index_name=self.es_index_name)
-            meta_stats = es_service.update_mapping_meta_stats(assembly=self.assembly)
+            mapping_service = ESMappingMetaStatsService(client=es_client, index_name=self.es_index_name)
+            meta_stats = mapping_service.update_mapping_meta_stats(assembly=self.assembly)
             self.logger.info(f"_meta.stats updated to {meta_stats} for index {self.es_index_name}")
 
-        # update _meta.stats in myvariant_hubdb.src_build
+        # STEP 2: update _meta.stats in MongoDB myvariant_hubdb.src_build
 
         # DO NOT use the following client because the `_build_doc.parse_backend()` in Indexer.__init__() won't work
         #   for a MyVariant build_doc. It results in `self.mongo_database_name` equal to "myvariant" and
-        #   `self.mongo_collection_name` equal to `self.build_doc["_id"]`
+        #   `self.mongo_collection_name` equal to `build_doc["_id"]`
+        # TODO revise if https://github.com/biothings/biothings.api/issues/238 fixed
         #
         #   mongo_client = MongoClient(**self.mongo_client_args)
         #   mongo_database = mongo_client[self.mongo_database_name]
         #   mongo_collection = mongo_database[self.mongo_collection_name]
-        #
-        # TODO revise if https://github.com/biothings/biothings.api/issues/238 fixed
-        src_build_collection = get_src_build()
-        self.logger.debug(f"{src_build_collection.database.client}")
-        self.logger.debug(f"{src_build_collection.full_name}")
 
-        self.logger.info(f"_meta.stats of document {self.build_doc['_id']} is {self.build_doc['_meta']['stats']} "
-                         f"before post-index update")
-        self.build_doc["_meta"]["stats"] = meta_stats
-        result = src_build_collection.replace_one({"_id": self.build_doc["_id"]}, self.build_doc)
+        src_build = get_src_build()
+        build_service = BuildDocMetaStatsService(src_build=src_build, build_name=self.build_name, logger=self.logger)
+        build_service.update_build_meta_stats(meta_stats)
 
-        if result.matched_count != 1:
-            raise ValueError(f"cannot find document {self.build_doc['_id']} "
-                             f"in collection {src_build_collection.full_name}")
-
-        if result.modified_count != 1:
-            raise ValueError(f"failed to update _meta.stats for document {self.build_doc['_id']} "
-                             f"in collection {src_build_collection.full_name}")
-
-        self.logger.info(f"_meta.stats updated to {meta_stats} for document {self.build_doc['_id']} "
-                         f"in collection {src_build_collection.full_name}")
-
-        return meta_stats
+        # return nothing, otherwise the returned values would be written to the associated build_doc by PostIndexJSR
+        return
 
 
 class MyVariantIndexerManager(IndexManager):
