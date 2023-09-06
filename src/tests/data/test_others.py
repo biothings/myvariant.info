@@ -1,4 +1,3 @@
-import pytest
 from pprint import pformat
 
 from biothings.tests.web import BiothingsDataTest
@@ -62,6 +61,5 @@ class TestMyvariant(BiothingsDataTest):
     def test_320_index_count_hg19(self):
         self.check_index_count("hg19")
 
-    @pytest.mark.skip("TODO remove for testing")
     def test_321_index_count_hg38(self):
         self.check_index_count("hg38")
