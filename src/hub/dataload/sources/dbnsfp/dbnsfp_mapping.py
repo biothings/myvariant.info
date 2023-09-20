@@ -75,11 +75,11 @@ mapping = {
                     }
                 }
             },
-            "genename": {  # Column 13
+            "genename": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "ensembl": {  # Column 14-16
+            "ensembl": {
                 "properties": {
                     "geneid": {
                         "type": "keyword",
@@ -95,7 +95,7 @@ mapping = {
                     }
                 }
             },
-            "uniprot": {  # Column 17-18
+            "uniprot": {
                 "properties": {
                     "acc": {
                         "type": "keyword",
@@ -107,54 +107,54 @@ mapping = {
                     }
                 }
             },
-            "hgvsc": {  # Column 19-21
+            "hgvsc": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "hgvsp": {  # Column 22-24
+            "hgvsp": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "appris": {  # Column 25
+            "appris": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "genecode_basic": {  # Column 26
+            "genecode_basic": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "tsl": {  # Column 27
+            "tsl": {
                 "type": "integer"
             },
-            "vep_canonical": {  # Column 28
+            "vep_canonical": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "cds_strand": {  # Column 29
+            "cds_strand": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "ancestral_allele": {  # Column 33
+            "ancestral_allele": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "altai_neandertal": {  # Column 34
+            "altai_neandertal": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "denisova": {  # Column 35
+            "denisova": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "vindijia_neandertal": {  # Column 36
+            "vindijia_neandertal": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "chagyrskaya_neandertal": {  # Column 37
+            "chagyrskaya_neandertal": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "sift": {  # Column 38-40
+            "sift": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -168,7 +168,7 @@ mapping = {
                     }
                 }
             },
-            "sift4g": {  # Column 41-43
+            "sift4g": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -182,7 +182,7 @@ mapping = {
                     }
                 }
             },
-            "polyphen2": {  # Column 44-49
+            "polyphen2": {
                 "properties": {
                     "hdiv": {
                         "properties": {
@@ -214,7 +214,7 @@ mapping = {
                     }
                 }
             },
-            "lrt": {  # Column 50-53
+            "lrt": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -231,7 +231,7 @@ mapping = {
                     }
                 }
             },
-            "mutationtaster": {  # Column 54-58
+            "mutationtaster": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -247,12 +247,12 @@ mapping = {
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer"
                     },
-                    "AAE": {
+                    "aae": {
                         "type": "text"
                     }
                 }
             },
-            "mutationassessor": {  # Column 59-61
+            "mutationassessor": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -266,7 +266,7 @@ mapping = {
                     }
                 }
             },
-            "fathmm": {  # Column 62-64
+            "fathmm": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -280,7 +280,7 @@ mapping = {
                     }
                 }
             },
-            "provean": {  # Column 65-67
+            "provean": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -294,7 +294,7 @@ mapping = {
                     }
                 }
             },
-            "vest4": {  # Column 68-69
+            "vest4": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -304,21 +304,7 @@ mapping = {
                     }
                 }
             },
-            "metasvm": {  # Column 70-72
-                "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "metalr": {  # Column 73-75
+            "metasvm": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -332,10 +318,24 @@ mapping = {
                     }
                 }
             },
-            "reliability_index": {  # Column 76
+            "metalr": {
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "reliability_index": {
                 "type": "integer"
             },
-            "metarnn": {  # Column 77-79
+            "metarnn": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -349,7 +349,7 @@ mapping = {
                     }
                 }
             },
-            "m-cap": {  # Column 80-82
+            "m-cap": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -363,7 +363,7 @@ mapping = {
                     }
                 }
             },
-            "revel": {  # Column 83-84
+            "revel": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -373,7 +373,7 @@ mapping = {
                     }
                 }
             },
-            "mutpred": {  # Column 85-89
+            "mutpred": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -401,7 +401,7 @@ mapping = {
                     }
                 }
             },
-            "mvp": {  # Column 90-91
+            "mvp": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -411,7 +411,7 @@ mapping = {
                     }
                 }
             },
-            "mpc": {  # Column 92-93
+            "gmvp": {  # new in 4.4.a
                 "properties": {
                     "score": {
                         "type": "float"
@@ -421,7 +421,17 @@ mapping = {
                     }
                 }
             },
-            "primateai": {  # Column 94-96
+            "mpc": {
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    }
+                }
+            },
+            "primateai": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -435,7 +445,7 @@ mapping = {
                     }
                 }
             },
-            "deogen2": {  # Column 97-99
+            "deogen2": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -449,7 +459,7 @@ mapping = {
                     }
                 }
             },
-            "bayesdel": {  # Column 100-105
+            "bayesdel": {
                 "properties": {
                     "add_af": {
                         "properties": {
@@ -481,7 +491,7 @@ mapping = {
                     }
                 }
             },
-            "clinpred": {  # Column 106-108
+            "clinpred": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -495,7 +505,7 @@ mapping = {
                     }
                 }
             },
-            "list-s2": {  # Column 109-111
+            "list-s2": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -509,8 +519,52 @@ mapping = {
                     }
                 }
             },
-            "aloft": {  # Column 112-117
+            "varity_r": {
                 "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    }
+                }
+            },
+            "varity_er": {
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    }
+                }
+            },
+            "varity_r_loo": {
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    }
+                }
+            },
+            "varity_er_loo": {
+                "properties": {
+                    "score": {
+                        "type": "float"
+                    },
+                    "rankscore": {
+                        "type": "float"
+                    }
+                }
+            },
+            "aloft": {
+                "properties": {
+                    "fraction_transcripts_affected": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
                     "prob_tolerant": {
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer"
@@ -527,21 +581,14 @@ mapping = {
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer"
                     },
-                    "fraction_transcripts_affected": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
                     "confidence": {
                         "type": "text"
                     }
                 }
             },
             "cadd": {
-                # Column 118-123
-                #   Column 118-120 are hg38
-                #   Column 121-123 are hg19
-                # Only column 117-119 will be included in the document for "hg38"
-                # No CADD fields will be included when "hg19"
+                # Only for "hg38"
+                # No CADD fields will be included for "hg19"
                 "properties": {
                     "raw_score": {
                         "type": "float"
@@ -555,7 +602,7 @@ mapping = {
                     }
                 }
             },
-            "dann": {  # Column 124-125
+            "dann": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -565,7 +612,7 @@ mapping = {
                     }
                 }
             },
-            "fathmm-mkl": {  # Column 126-129
+            "fathmm-mkl": {
                 "properties": {
                     "coding_score": {
                         "type": "float"
@@ -583,7 +630,7 @@ mapping = {
                     }
                 }
             },
-            "fathmm-xf": {  # Column 130-132
+            "fathmm-xf": {
                 "properties": {
                     "coding_score": {
                         "type": "float"
@@ -597,7 +644,7 @@ mapping = {
                     }
                 }
             },
-            "eigen": {  # Column 133-135
+            "eigen": {
                 "properties": {
                     "raw_coding": {
                         "type": "float"
@@ -610,7 +657,7 @@ mapping = {
                     }
                 }
             },
-            "eigen-pc": {  # Column 136-138
+            "eigen-pc": {
                 "properties": {
                     "raw_coding": {
                         "type": "float"
@@ -623,7 +670,7 @@ mapping = {
                     },
                 }
             },
-            "genocanyon": {  # Column 139-140
+            "genocanyon": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -633,59 +680,115 @@ mapping = {
                     }
                 }
             },
-            "integrated": {  # Column 141-143
+            # "integrated": {
+            #     "properties": {
+            #         "fitcons_score": {
+            #             "type": "float"
+            #         },
+            #         "fitcons_rankscore": {
+            #             "type": "float"
+            #         },
+            #         "confidence_value": {
+            #             "type": "integer"
+            #         }
+            #     }
+            # },
+            # "gm12878": {
+            #     "properties": {
+            #         "fitcons_score": {
+            #             "type": "float"
+            #         },
+            #         "fitcons_rankscore": {
+            #             "type": "float"
+            #         },
+            #         "confidence_value": {
+            #             "type": "integer"
+            #         }
+            #     }
+            # },
+            # "h1-hesc": {
+            #     "properties": {
+            #         "fitcons_score": {
+            #             "type": "float"
+            #         },
+            #         "fitcons_rankscore": {
+            #             "type": "float"
+            #         },
+            #         "confidence_value": {
+            #             "type": "integer"
+            #         }
+            #     }
+            # },
+            # "huvec": {
+            #     "properties": {
+            #         "fitcons_score": {
+            #             "type": "float"
+            #         },
+            #         "fitcons_rankscore": {
+            #             "type": "float"
+            #         },
+            #         "confidence_value": {
+            #             "type": "integer"
+            #         }
+            #     }
+            # },
+            "fitcons": {
                 "properties": {
-                    "fitcons_score": {
-                        "type": "float"
+                    "integrated": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "confidence_value": {
+                                "type": "int"
+                            }
+                        }
                     },
-                    "fitcons_rankscore": {
-                        "type": "float"
+                    "gm12878": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "confidence_value": {
+                                "type": "int"
+                            }
+                        }
                     },
-                    "confidence_value": {
-                        "type": "integer"
-                    }
+                    "h1-hesc": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "confidence_value": {
+                                "type": "int"
+                            }
+                        }
+                    },
+                    "huvec": {
+                        "properties": {
+                            "score": {
+                                "type": "float"
+                            },
+                            "rankscore": {
+                                "type": "float"
+                            },
+                            "confidence_value": {
+                                "type": "int"
+                            }
+                        }
+                    },
                 }
             },
-            "gm12878": {  # Column 144-146
-                "properties": {
-                    "fitcons_score": {
-                        "type": "float"
-                    },
-                    "fitcons_rankscore": {
-                        "type": "float"
-                    },
-                    "confidence_value": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "h1-hesc": {  # Column 147-149
-                "properties": {
-                    "fitcons_score": {
-                        "type": "float"
-                    },
-                    "fitcons_rankscore": {
-                        "type": "float"
-                    },
-                    "confidence_value": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "huvec": {  # Column 150-152
-                "properties": {
-                    "fitcons_score": {
-                        "type": "float"
-                    },
-                    "fitcons_rankscore": {
-                        "type": "float"
-                    },
-                    "confidence_value": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "linsight": {  # Column 153-154
+            "linsight": {
                 "properties": {
                     "score": {
                         "type": "float"
@@ -695,7 +798,7 @@ mapping = {
                     }
                 }
             },
-            "gerp++": {  # Column 155-157
+            "gerp++": {
                 "properties": {
                     "nr": {
                         "type": "float"
@@ -708,7 +811,7 @@ mapping = {
                     }
                 }
             },
-            "phylop": {  # Column 158-163
+            "phylop": {
                 "properties": {
                     "100way_vertebrate": {
                         "properties": {
@@ -720,7 +823,7 @@ mapping = {
                             }
                         }
                     },
-                    "30way_mammalian": {
+                    "470way_mammalian": {  # replaced 30way_mammalian in 4.4.a
                         "properties": {
                             "score": {
                                 "type": "float"
@@ -742,7 +845,7 @@ mapping = {
                     }
                 }
             },
-            "phastcons": {  # Column 164-169
+            "phastcons": {
                 "properties": {
                     "100way_vertebrate": {
                         "properties": {
@@ -754,7 +857,7 @@ mapping = {
                             }
                         }
                     },
-                    "30way_mammalian": {
+                    "470way_mammalian": {  # replaced 30way_mammalian in 4.4.a
                         "properties": {
                             "score": {
                                 "type": "float"
@@ -776,7 +879,7 @@ mapping = {
                     }
                 }
             },
-            "siphy_29way": {  # Column 170-172
+            "siphy_29way": {
                 "properties": {
                     "pi": {
                         "properties": {
@@ -802,7 +905,7 @@ mapping = {
                     }
                 }
             },
-            "bstatistic": {  # Column 173-174
+            "bstatistic": {
                 "properties": {
                     "score": {
                         "type": "integer"
@@ -812,7 +915,7 @@ mapping = {
                     }
                 }
             },
-            "1000gp3": {  # Column 175-186
+            "1000gp3": {  # changed since 4.4.a
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -820,39 +923,89 @@ mapping = {
                     "af": {
                         "type": "float"
                     },
-                    "afr_ac": {
-                        "type": "integer"
+                    # "afr_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "afr_af": {
+                    #     "type": "float"
+                    # },
+                    "afr": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
                     },
-                    "afr_af": {
-                        "type": "float"
+                    # "eur_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "eur_af": {
+                    #     "type": "float"
+                    # },
+                    "eur": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
                     },
-                    "eur_ac": {
-                        "type": "integer"
+                    # "amr_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "amr_af": {
+                    #     "type": "float"
+                    # },
+                    "amr": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
                     },
-                    "eur_af": {
-                        "type": "float"
+                    # "eas_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "eas_af": {
+                    #     "type": "float"
+                    # },
+                    "eas": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
                     },
-                    "amr_ac": {
-                        "type": "integer"
-                    },
-                    "amr_af": {
-                        "type": "float"
-                    },
-                    "eas_ac": {
-                        "type": "integer"
-                    },
-                    "eas_af": {
-                        "type": "float"
-                    },
-                    "sas_ac": {
-                        "type": "integer"
-                    },
-                    "sas_af": {
-                        "type": "float"
+                    # "sas_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "sas_af": {
+                    #     "type": "float"
+                    # }
+                    "sas": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
                     }
                 }
             },
-            "twinsuk": {  # Column 187-188
+            "twinsuk": {
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -862,7 +1015,7 @@ mapping = {
                     }
                 }
             },
-            "alspac": {  # Column 189-190
+            "alspac": {
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -872,7 +1025,7 @@ mapping = {
                     }
                 }
             },
-            "uk10k": {  # Column 191-192
+            "uk10k": {
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -882,127 +1035,43 @@ mapping = {
                     }
                 }
             },
-            "esp6500": {  # Column 193-196
+            "esp6500": {  # changed since 4.4.a
                 "properties": {
-                    "aa_ac": {
-                        "type": "integer"
+                    # "aa_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "aa_af": {
+                    #     "type": "float"
+                    # },
+                    "aa": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
                     },
-                    "aa_af": {
-                        "type": "float"
+                    # "ea_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "ea_af": {
+                    #     "type": "float"
+                    # }
+                    "ea": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
                     },
-                    "ea_ac": {
-                        "type": "integer"
-                    },
-                    "ea_af": {
-                        "type": "float"
-                    }
                 }
             },
-            "exac": {  # Column 197-212
-                "properties": {
-                    "ac": {
-                        "type": "integer"
-                    },
-                    "af": {
-                        "type": "float"
-                    },
-                    "adj_ac": {
-                        "type": "integer"
-                    },
-                    "adj_af": {
-                        "type": "float"
-                    },
-                    "afr_ac": {
-                        "type": "integer"
-                    },
-                    "afr_af": {
-                        "type": "float"
-                    },
-                    "amr_ac": {
-                        "type": "integer"
-                    },
-                    "amr_af": {
-                        "type": "float"
-                    },
-                    "eas_ac": {
-                        "type": "integer"
-                    },
-                    "eas_af": {
-                        "type": "float"
-                    },
-                    "fin_ac": {
-                        "type": "integer"
-                    },
-                    "fin_af": {
-                        "type": "float"
-                    },
-                    "nfe_ac": {
-                        "type": "integer"
-                    },
-                    "nfe_af": {
-                        "type": "float"
-                    },
-                    "sas_ac": {
-                        "type": "integer"
-                    },
-                    "sas_af": {
-                        "type": "float"
-                    }
-                }
-            },
-            "exac_nontcga": {  # Column 213-228
-                "properties": {
-                    "ac": {
-                        "type": "integer"
-                    },
-                    "af": {
-                        "type": "float"
-                    },
-                    "adj_ac": {
-                        "type": "integer"
-                    },
-                    "adj_af": {
-                        "type": "float"
-                    },
-                    "afr_ac": {
-                        "type": "integer"
-                    },
-                    "afr_af": {
-                        "type": "float"
-                    },
-                    "amr_ac": {
-                        "type": "integer"
-                    },
-                    "amr_af": {
-                        "type": "float"
-                    },
-                    "eas_ac": {
-                        "type": "integer"
-                    },
-                    "eas_af": {
-                        "type": "float"
-                    },
-                    "fin_ac": {
-                        "type": "integer"
-                    },
-                    "fin_af": {
-                        "type": "float"
-                    },
-                    "nfe_ac": {
-                        "type": "integer"
-                    },
-                    "nfe_af": {
-                        "type": "float"
-                    },
-                    "sas_ac": {
-                        "type": "integer"
-                    },
-                    "sas_af": {
-                        "type": "float"
-                    }
-                }
-            },
-            "exac_nonpsych": {  # Column 229-244
+            "exac": {  # changed since 4.4.a
                 "properties": {
                     "ac": {
                         "type": "integer"
@@ -1016,48 +1085,489 @@ mapping = {
                     "adj_af": {
                         "type": "float"
                     },
-                    "afr_ac": {
-                        "type": "integer"
+                    # "afr_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "afr_af": {
+                    #     "type": "float"
+                    # },
+                    "afr": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
                     },
-                    "afr_af": {
-                        "type": "float"
+                    # "amr_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "amr_af": {
+                    #     "type": "float"
+                    # },
+                    "amr": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
                     },
-                    "amr_ac": {
-                        "type": "integer"
+                    # "eas_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "eas_af": {
+                    #     "type": "float"
+                    # },
+                    "eas": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
                     },
-                    "amr_af": {
-                        "type": "float"
+                    # "fin_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "fin_af": {
+                    #     "type": "float"
+                    # },
+                    "fin": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
                     },
-                    "eas_ac": {
-                        "type": "integer"
+                    # "nfe_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "nfe_af": {
+                    #     "type": "float"
+                    # },
+                    "nfe": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
                     },
-                    "eas_af": {
-                        "type": "float"
-                    },
-                    "fin_ac": {
-                        "type": "integer"
-                    },
-                    "fin_af": {
-                        "type": "float"
-                    },
-                    "nfe_ac": {
-                        "type": "integer"
-                    },
-                    "nfe_af": {
-                        "type": "float"
-                    },
-                    "sas_ac": {
-                        "type": "integer"
-                    },
-                    "sas_af": {
-                        "type": "float"
+                    # "sas_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "sas_af": {
+                    #     "type": "float"
+                    # }
+                    "sas": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
                     }
                 }
             },
-
-            # Column 245-630 are gnomAD_* columns. Skipped.
-
-            "clinvar": {  # Column 631-639
+            "exac_nontcga": {  # changed since 4.4.a
+                "properties": {
+                    "ac": {
+                        "type": "integer"
+                    },
+                    "af": {
+                        "type": "float"
+                    },
+                    "adj_ac": {
+                        "type": "integer"
+                    },
+                    "adj_af": {
+                        "type": "float"
+                    },
+                    # "afr_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "afr_af": {
+                    #     "type": "float"
+                    # },
+                    "afr": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    # "amr_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "amr_af": {
+                    #     "type": "float"
+                    # },
+                    "amr": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    # "eas_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "eas_af": {
+                    #     "type": "float"
+                    # },
+                    "eas": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    # "fin_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "fin_af": {
+                    #     "type": "float"
+                    # },
+                    "fin": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    # "nfe_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "nfe_af": {
+                    #     "type": "float"
+                    # },
+                    "nfe": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    # "sas_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "sas_af": {
+                    #     "type": "float"
+                    # }
+                    "sas": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    }
+                }
+            },
+            "exac_nonpsych": {  # changed since 4.4.a
+                "properties": {
+                    "ac": {
+                        "type": "integer"
+                    },
+                    "af": {
+                        "type": "float"
+                    },
+                    "adj_ac": {
+                        "type": "integer"
+                    },
+                    "adj_af": {
+                        "type": "float"
+                    },
+                    # "afr_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "afr_af": {
+                    #     "type": "float"
+                    # },
+                    "afr": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    # "amr_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "amr_af": {
+                    #     "type": "float"
+                    # },
+                    "amr": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    # "eas_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "eas_af": {
+                    #     "type": "float"
+                    # },
+                    "eas": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    # "fin_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "fin_af": {
+                    #     "type": "float"
+                    # },
+                    "fin": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    # "nfe_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "nfe_af": {
+                    #     "type": "float"
+                    # },
+                    "nfe": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    # "sas_ac": {
+                    #     "type": "integer"
+                    # },
+                    # "sas_af": {
+                    #     "type": "float"
+                    # }
+                    "sas": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    }
+                }
+            },
+            "alfa": {  # new in 4.4.a
+                "properties": {
+                    "european": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "an": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "african_others": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "an": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "east_asian": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "an": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "african_american": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "an": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "latin_american_1": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "an": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "latin_american_2": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "an": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "other_asian": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "an": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "south_asian": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "an": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "other": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "an": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "african": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "an": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "asian": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "an": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                    "total": {
+                        "properties": {
+                            "ac": {
+                                "type": "integer"
+                            },
+                            "an": {
+                                "type": "integer"
+                            },
+                            "af": {
+                                "type": "float"
+                            }
+                        }
+                    },
+                }
+            },
+            "clinvar": {
                 "properties": {
                     "clinvar_id": {
                         "type": "integer"
@@ -1078,24 +1588,28 @@ mapping = {
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer"
                     },
+                    "var_source": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
                     "medgen": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "omim": {
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer"
                     },
                     "orphanet": {
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "var_source": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
                     }
                 }
             },
-            "interpro_domain": {  # Column 640
+            "interpro_domain": {
                 "type": "text"
             },
-            "gtex": {  # Column 641-642
+            "gtex": {
                 "properties": {
                     "gene": {
                         "type": "keyword",
@@ -1107,7 +1621,7 @@ mapping = {
                     }
                 }
             },
-            "geuvadis_eqtl_target_gene": {  # Column 643
+            "geuvadis_eqtl_target_gene": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             }
