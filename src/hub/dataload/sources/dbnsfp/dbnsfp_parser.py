@@ -354,7 +354,7 @@ COLUMNS = [
     Column("Aloft_prob_Dominant", dest="aloft.prob_dominant", transform=split_str),
     Column("Aloft_pred", transform=split_str),
     Column("Aloft_Confidence", transform=split_str),
-    Column("CADD_raw", dest="cadd.raw_score", transform=split_float, assembly="hg38"),  # TODO CADD will have hg38 next update
+    Column("CADD_raw", dest="cadd.raw_score", transform=split_float, assembly="hg38"),  # TODO CADD will have hg38 next update. Deprecate these 3 field then.
     Column("CADD_raw_rankscore", dest="cadd.raw_rankscore", transform=split_float, assembly="hg38"),
     Column("CADD_phred", transform=split_float, assembly="hg38"),  # CADD phred-like scores, not as other predications of string type
     # Column("CADD_raw_hg19", assembly="hg19"),  # discarded because Myvariant.info already has a hg19-only datasource of CADD.

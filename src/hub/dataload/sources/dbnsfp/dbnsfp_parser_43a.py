@@ -12,7 +12,7 @@ VALID_COLUMN_NO = 643  # for 4.2a
 
 
 """
-This parser is for dbNSFP v4.3a downloaded from https://sites.google.com/site/jpopgen/dbNSFP
+Deprecated. This parser is for dbNSFP v4.3a downloaded from https://sites.google.com/site/jpopgen/dbNSFP
 """
 
 
