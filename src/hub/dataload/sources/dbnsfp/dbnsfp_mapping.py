@@ -1,3 +1,23 @@
+start_pos_field = {"start": {"type": "integer"}}
+end_pos_field = {"end": {"type": "integer"}}
+
+score_field = {"score": {"type": "float"}}
+converted_rankscore_field = {"converted_rankscore": {"type": "float"}}
+rankscore_field = {"rankscore": {"type": "float"}}
+confidence_value_field = {"confidence_value": {"type": "int"}}
+pred_field = {
+    "pred": {
+        "type": "keyword",
+        "normalizer": "keyword_lowercase_normalizer"
+    }
+}
+
+allele_count_field = {"ac": {"type": "integer"}}
+allele_num_field = {"an": {"type": "integer"}}
+allele_freq_field = {"af": {"type": "float"}}
+adj_allele_count_field = {"adj_ac": {"type": "integer"}}
+adj_allele_freq_field = {"adj_af": {"type": "float"}}
+
 mapping = {
     "dbnsfp": {
         "properties": {
@@ -11,32 +31,20 @@ mapping = {
             },
             "hg19": {
                 "properties": {
-                    "start": {
-                        "type": "integer"
-                    },
-                    "end": {
-                        "type": "integer"
-                    }
+                    **start_pos_field,
+                    **end_pos_field
                 }
             },
             "hg18": {
                 "properties": {
-                    "start": {
-                        "type": "integer"
-                    },
-                    "end": {
-                        "type": "integer"
-                    }
+                    **start_pos_field,
+                    **end_pos_field
                 }
             },
             "hg38": {
                 "properties": {
-                    "start": {
-                        "type": "integer"
-                    },
-                    "end": {
-                        "type": "integer"
-                    }
+                    **start_pos_field,
+                    **end_pos_field
                 }
             },
             "ref": {
@@ -156,76 +164,41 @@ mapping = {
             },
             "sift": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "converted_rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    **score_field,
+                    **converted_rankscore_field,
+                    **pred_field
                 }
             },
             "sift4g": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "converted_rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **converted_rankscore_field,
+                    **pred_field
                 }
             },
             "polyphen2": {
                 "properties": {
                     "hdiv": {
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "pred": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            }
+                            **score_field,
+                            **rankscore_field,
+                            **pred_field
                         }
                     },
                     "hvar": {
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "pred": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            }
+                            **score_field,
+                            **rankscore_field,
+                            **pred_field
                         }
                     }
                 }
             },
             "lrt": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "converted_rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
+                    **score_field,
+                    **converted_rankscore_field,
+                    **pred_field,
                     "omega": {
                         "type": "float"
                     }
@@ -233,16 +206,9 @@ mapping = {
             },
             "mutationtaster": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "converted_rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
+                    **score_field,
+                    **converted_rankscore_field,
+                    **pred_field,
                     "model": {
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer"
@@ -254,82 +220,43 @@ mapping = {
             },
             "mutationassessor": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    **score_field,
+                    **rankscore_field,
+                    **pred_field,
                 }
             },
             "fathmm": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    **score_field,
+                    **converted_rankscore_field,
+                    **pred_field
                 }
             },
             "provean": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    **score_field,
+                    **converted_rankscore_field,
+                    **pred_field
                 }
             },
             "vest4": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **rankscore_field
                 }
             },
             "metasvm": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    **score_field,
+                    **rankscore_field,
+                    **pred_field
                 }
             },
             "metalr": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    **score_field,
+                    **rankscore_field,
+                    **pred_field
                 }
             },
             "reliability_index": {
@@ -337,50 +264,28 @@ mapping = {
             },
             "metarnn": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    **score_field,
+                    **rankscore_field,
+                    **pred_field
                 }
             },
             "m-cap": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    **score_field,
+                    **rankscore_field,
+                    **pred_field
                 }
             },
             "revel": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **rankscore_field
                 }
             },
             "mutpred": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
+                    **score_field,
+                    **rankscore_field,
                     "accession": {
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer"
@@ -403,160 +308,90 @@ mapping = {
             },
             "mvp": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **rankscore_field
                 }
             },
             "gmvp": {  # new in 4.4.a
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **rankscore_field
                 }
             },
             "mpc": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **rankscore_field
                 }
             },
             "primateai": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    **score_field,
+                    **rankscore_field,
+                    **pred_field
                 }
             },
             "deogen2": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    **score_field,
+                    **rankscore_field,
+                    **pred_field
                 }
             },
             "bayesdel": {
                 "properties": {
                     "add_af": {
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "pred": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            }
+                            **score_field,
+                            **rankscore_field,
+                            **pred_field
                         }
                     },
                     "no_af": {
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "pred": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            }
+                            **score_field,
+                            **rankscore_field,
+                            **pred_field
                         }
                     }
                 }
             },
             "clinpred": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    **score_field,
+                    **rankscore_field,
+                    **pred_field
                 }
             },
             "list-s2": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    **score_field,
+                    **rankscore_field,
+                    **pred_field
                 }
             },
             "varity_r": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **rankscore_field
                 }
             },
             "varity_er": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **rankscore_field
                 }
             },
             "varity_r_loo": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **rankscore_field
                 }
             },
             "varity_er_loo": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **rankscore_field
                 }
             },
             "aloft": {
@@ -597,19 +432,14 @@ mapping = {
                         "type": "float"
                     },
                     "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
+                        "type": "float"  # CADD phred-like scores, not as other predications of string type
                     }
                 }
             },
             "dann": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **rankscore_field
                 }
             },
             "fathmm-mkl": {
@@ -672,130 +502,74 @@ mapping = {
             },
             "genocanyon": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **rankscore_field
                 }
             },
             # "integrated": {
             #     "properties": {
-            #         "fitcons_score": {
-            #             "type": "float"
-            #         },
-            #         "fitcons_rankscore": {
-            #             "type": "float"
-            #         },
-            #         "confidence_value": {
-            #             "type": "integer"
-            #         }
+            #         "fitcons_score": { "type": "float" },
+            #         "fitcons_rankscore": { "type": "float" },
+            #         "confidence_value": { "type": "integer" }
             #     }
             # },
             # "gm12878": {
             #     "properties": {
-            #         "fitcons_score": {
-            #             "type": "float"
-            #         },
-            #         "fitcons_rankscore": {
-            #             "type": "float"
-            #         },
-            #         "confidence_value": {
-            #             "type": "integer"
-            #         }
+            #         "fitcons_score": { "type": "float" },
+            #         "fitcons_rankscore": { "type": "float" },
+            #         "confidence_value": { "type": "integer" }
             #     }
             # },
             # "h1-hesc": {
             #     "properties": {
-            #         "fitcons_score": {
-            #             "type": "float"
-            #         },
-            #         "fitcons_rankscore": {
-            #             "type": "float"
-            #         },
-            #         "confidence_value": {
-            #             "type": "integer"
-            #         }
+            #         "fitcons_score": { "type": "float" },
+            #         "fitcons_rankscore": { "type": "float" },
+            #         "confidence_value": { "type": "integer" }
             #     }
             # },
             # "huvec": {
             #     "properties": {
-            #         "fitcons_score": {
-            #             "type": "float"
-            #         },
-            #         "fitcons_rankscore": {
-            #             "type": "float"
-            #         },
-            #         "confidence_value": {
-            #             "type": "integer"
-            #         }
+            #         "fitcons_score": { "type": "float" },
+            #         "fitcons_rankscore": { "type": "float" },
+            #         "confidence_value": { "type": "integer" }
             #     }
             # },
             "fitcons": {
                 "properties": {
                     "integrated": {
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "confidence_value": {
-                                "type": "int"
-                            }
+                            **score_field,
+                            **rankscore_field,
+                            **confidence_value_field
                         }
                     },
                     "gm12878": {
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "confidence_value": {
-                                "type": "int"
-                            }
+                            **score_field,
+                            **rankscore_field,
+                            **confidence_value_field
                         }
                     },
                     "h1-hesc": {
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "confidence_value": {
-                                "type": "int"
-                            }
+                            **score_field,
+                            **rankscore_field,
+                            **confidence_value_field
                         }
                     },
                     "huvec": {
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            },
-                            "confidence_value": {
-                                "type": "int"
-                            }
+                            **score_field,
+                            **rankscore_field,
+                            **confidence_value_field
                         }
                     },
                 }
             },
             "linsight": {
                 "properties": {
-                    "score": {
-                        "type": "float"
-                    },
-                    "rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **rankscore_field
                 }
             },
             "gerp++": {
@@ -815,32 +589,20 @@ mapping = {
                 "properties": {
                     "100way_vertebrate": {
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            }
+                            **score_field,
+                            **rankscore_field
                         }
                     },
                     "470way_mammalian": {  # replaced 30way_mammalian in 4.4.a
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            }
+                            **score_field,
+                            **rankscore_field
                         }
                     },
                     "17way_primate": {
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            }
+                            **score_field,
+                            **rankscore_field
                         }
                     }
                 }
@@ -849,32 +611,20 @@ mapping = {
                 "properties": {
                     "100way_vertebrate": {
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            }
+                            **score_field,
+                            **rankscore_field
                         }
                     },
                     "470way_mammalian": {  # replaced 30way_mammalian in 4.4.a
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            }
+                            **score_field,
+                            **rankscore_field
                         }
                     },
                     "17way_primate": {
                         "properties": {
-                            "score": {
-                                "type": "float"
-                            },
-                            "rankscore": {
-                                "type": "float"
-                            }
+                            **score_field,
+                            **rankscore_field
                         }
                     }
                 }
@@ -907,502 +657,258 @@ mapping = {
             },
             "bstatistic": {
                 "properties": {
-                    "score": {
-                        "type": "integer"
-                    },
-                    "converted_rankscore": {
-                        "type": "float"
-                    }
+                    **score_field,
+                    **converted_rankscore_field
                 }
             },
             "1000gp3": {  # changed since 4.4.a
                 "properties": {
-                    "ac": {
-                        "type": "integer"
-                    },
-                    "af": {
-                        "type": "float"
-                    },
-                    # "afr_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "afr_af": {
-                    #     "type": "float"
-                    # },
+                    **allele_count_field,
+                    **allele_freq_field,
+                    # "afr_ac": { "type": "integer" },
+                    # "afr_af": { "type": "float" },
                     "afr": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "eur_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "eur_af": {
-                    #     "type": "float"
-                    # },
+                    # "eur_ac": { "type": "integer" },
+                    # "eur_af": { "type": "float" },
                     "eur": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "amr_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "amr_af": {
-                    #     "type": "float"
-                    # },
+                    # "amr_ac": { "type": "integer" },
+                    # "amr_af": { "type": "float" },
                     "amr": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "eas_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "eas_af": {
-                    #     "type": "float"
-                    # },
+                    # "eas_ac": { "type": "integer" },
+                    # "eas_af": { "type": "float" },
                     "eas": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "sas_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "sas_af": {
-                    #     "type": "float"
-                    # }
+                    # "sas_ac": { "type": "integer" },
+                    # "sas_af": { "type": "float"}
                     "sas": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     }
                 }
             },
             "twinsuk": {
                 "properties": {
-                    "ac": {
-                        "type": "integer"
-                    },
-                    "af": {
-                        "type": "float"
-                    }
+                    **allele_count_field,
+                    **allele_freq_field
                 }
             },
             "alspac": {
                 "properties": {
-                    "ac": {
-                        "type": "integer"
-                    },
-                    "af": {
-                        "type": "float"
-                    }
+                    **allele_count_field,
+                    **allele_freq_field
                 }
             },
             "uk10k": {
                 "properties": {
-                    "ac": {
-                        "type": "integer"
-                    },
-                    "af": {
-                        "type": "float"
-                    }
+                    **allele_count_field,
+                    **allele_freq_field
                 }
             },
             "esp6500": {  # changed since 4.4.a
                 "properties": {
-                    # "aa_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "aa_af": {
-                    #     "type": "float"
-                    # },
+                    # "aa_ac": { "type": "integer" },
+                    # "aa_af": { "type": "float" },
                     "aa": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "ea_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "ea_af": {
-                    #     "type": "float"
-                    # }
+                    # "ea_ac": { "type": "integer" },
+                    # "ea_af": { "type": "float" }
                     "ea": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
                 }
             },
             "exac": {  # changed since 4.4.a
                 "properties": {
-                    "ac": {
-                        "type": "integer"
-                    },
-                    "af": {
-                        "type": "float"
-                    },
-                    "adj_ac": {
-                        "type": "integer"
-                    },
-                    "adj_af": {
-                        "type": "float"
-                    },
-                    # "afr_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "afr_af": {
-                    #     "type": "float"
-                    # },
+                    **allele_count_field,
+                    **allele_freq_field,
+                    **adj_allele_count_field,
+                    **adj_allele_freq_field,
+                    # "afr_ac": { "type": "integer" },
+                    # "afr_af": { "type": "float" },
                     "afr": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "amr_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "amr_af": {
-                    #     "type": "float"
-                    # },
+                    # "amr_ac": { "type": "integer" },
+                    # "amr_af": { "type": "float" },
                     "amr": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "eas_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "eas_af": {
-                    #     "type": "float"
-                    # },
+                    # "eas_ac": { "type": "integer" },
+                    # "eas_af": { "type": "float" },
                     "eas": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "fin_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "fin_af": {
-                    #     "type": "float"
-                    # },
+                    # "fin_ac": { "type": "integer" },
+                    # "fin_af": { "type": "float" },
                     "fin": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "nfe_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "nfe_af": {
-                    #     "type": "float"
-                    # },
+                    # "nfe_ac": { "type": "integer" },
+                    # "nfe_af": { "type": "float" },
                     "nfe": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "sas_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "sas_af": {
-                    #     "type": "float"
-                    # }
+                    # "sas_ac": { "type": "integer" },
+                    # "sas_af": { "type": "float" }
                     "sas": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     }
                 }
             },
             "exac_nontcga": {  # changed since 4.4.a
                 "properties": {
-                    "ac": {
-                        "type": "integer"
-                    },
-                    "af": {
-                        "type": "float"
-                    },
-                    "adj_ac": {
-                        "type": "integer"
-                    },
-                    "adj_af": {
-                        "type": "float"
-                    },
-                    # "afr_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "afr_af": {
-                    #     "type": "float"
-                    # },
+                    **allele_count_field,
+                    **allele_freq_field,
+                    **adj_allele_count_field,
+                    **adj_allele_freq_field,
+                    # "afr_ac": { "type": "integer" },
+                    # "afr_af": { "type": "float" },
                     "afr": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "amr_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "amr_af": {
-                    #     "type": "float"
-                    # },
+                    # "amr_ac": { "type": "integer" },
+                    # "amr_af": { "type": "float" },
                     "amr": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "eas_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "eas_af": {
-                    #     "type": "float"
-                    # },
+                    # "eas_ac": { "type": "integer" },
+                    # "eas_af": { "type": "float" },
                     "eas": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "fin_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "fin_af": {
-                    #     "type": "float"
-                    # },
+                    # "fin_ac": { "type": "integer" },
+                    # "fin_af": { "type": "float" },
                     "fin": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "nfe_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "nfe_af": {
-                    #     "type": "float"
-                    # },
+                    # "nfe_ac": { "type": "integer" },
+                    # "nfe_af": { "type": "float" },
                     "nfe": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "sas_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "sas_af": {
-                    #     "type": "float"
-                    # }
+                    # "sas_ac": { "type": "integer" },
+                    # "sas_af": { "type": "float" }
                     "sas": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     }
                 }
             },
             "exac_nonpsych": {  # changed since 4.4.a
                 "properties": {
-                    "ac": {
-                        "type": "integer"
-                    },
-                    "af": {
-                        "type": "float"
-                    },
-                    "adj_ac": {
-                        "type": "integer"
-                    },
-                    "adj_af": {
-                        "type": "float"
-                    },
-                    # "afr_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "afr_af": {
-                    #     "type": "float"
-                    # },
+                    **allele_count_field,
+                    **allele_freq_field,
+                    **adj_allele_count_field,
+                    **adj_allele_freq_field,
+                    # "afr_ac": { "type": "integer" },
+                    # "afr_af": { "type": "float" },
                     "afr": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "amr_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "amr_af": {
-                    #     "type": "float"
-                    # },
+                    # "amr_ac": { "type": "integer" },
+                    # "amr_af": { "type": "float" },
                     "amr": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "eas_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "eas_af": {
-                    #     "type": "float"
-                    # },
+                    # "eas_ac": { "type": "integer" },
+                    # "eas_af": { "type": "float" },
                     "eas": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "fin_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "fin_af": {
-                    #     "type": "float"
-                    # },
+                    # "fin_ac": { "type": "integer" },
+                    # "fin_af": { "type": "float" },
                     "fin": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "nfe_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "nfe_af": {
-                    #     "type": "float"
-                    # },
+                    # "nfe_ac": { "type": "integer" },
+                    # "nfe_af": { "type": "float" },
                     "nfe": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     },
-                    # "sas_ac": {
-                    #     "type": "integer"
-                    # },
-                    # "sas_af": {
-                    #     "type": "float"
-                    # }
+                    # "sas_ac": { "type": "integer" },
+                    # "sas_af": { "type": "float" }
                     "sas": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_freq_field
                         }
                     }
                 }
@@ -1411,158 +917,86 @@ mapping = {
                 "properties": {
                     "european": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "an": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_num_field,
+                            **allele_freq_field
                         }
                     },
                     "african_others": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "an": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_num_field,
+                            **allele_freq_field
                         }
                     },
                     "east_asian": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "an": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_num_field,
+                            **allele_freq_field
                         }
                     },
                     "african_american": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "an": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_num_field,
+                            **allele_freq_field
                         }
                     },
                     "latin_american_1": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "an": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_num_field,
+                            **allele_freq_field
                         }
                     },
                     "latin_american_2": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "an": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_num_field,
+                            **allele_freq_field
                         }
                     },
                     "other_asian": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "an": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_num_field,
+                            **allele_freq_field
                         }
                     },
                     "south_asian": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "an": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_num_field,
+                            **allele_freq_field
                         }
                     },
                     "other": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "an": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_num_field,
+                            **allele_freq_field
                         }
                     },
                     "african": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "an": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_num_field,
+                            **allele_freq_field
                         }
                     },
                     "asian": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "an": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_num_field,
+                            **allele_freq_field
                         }
                     },
                     "total": {
                         "properties": {
-                            "ac": {
-                                "type": "integer"
-                            },
-                            "an": {
-                                "type": "integer"
-                            },
-                            "af": {
-                                "type": "float"
-                            }
+                            **allele_count_field,
+                            **allele_num_field,
+                            **allele_freq_field
                         }
                     },
                 }
