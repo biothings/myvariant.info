@@ -1,6 +1,5 @@
 import re
 import csv
-import glob
 from enum import Flag
 from dataclasses import dataclass
 from itertools import chain
@@ -265,10 +264,10 @@ COLUMNS = [
     Column("VindijiaNeandertal", dest="vindijia_neandertal", transform=split_genotype),
     Column("ChagyrskayaNeandertal", dest="chagyrskaya_neandertal", transform=split_genotype),
     Column("SIFT_score", transform=split_float),
-    Column("SIFT_converted_rankscore", transform=split_float),
+    Column("SIFT_converted_rankscore", dest="sift.converted_rankscore", transform=split_float),
     Column("SIFT_pred", transform=split_str),
     Column("SIFT4G_score", transform=split_float),
-    Column("SIFT4G_converted_rankscore", transform=split_float),
+    Column("SIFT4G_converted_rankscore", dest="sift4g.converted_rankscore", transform=split_float),
     Column("SIFT4G_pred", transform=split_str),
     Column("Polyphen2_HDIV_score", transform=split_float),
     Column("Polyphen2_HDIV_rankscore", transform=split_float),
@@ -277,11 +276,11 @@ COLUMNS = [
     Column("Polyphen2_HVAR_rankscore", transform=split_float),
     Column("Polyphen2_HVAR_pred", transform=split_str),
     Column("LRT_score", transform=split_float),
-    Column("LRT_converted_rankscore", transform=split_float),
+    Column("LRT_converted_rankscore", dest="lrt.converted_rankscore", transform=split_float),
     Column("LRT_pred", transform=split_str),
     Column("LRT_Omega", transform=split_float),
     Column("MutationTaster_score", transform=split_float),
-    Column("MutationTaster_converted_rankscore", transform=split_float),
+    Column("MutationTaster_converted_rankscore", dest="mutationtaster.converted_rankscore", transform=split_float),
     Column("MutationTaster_pred", transform=split_str),
     Column("MutationTaster_model", transform=split_str),
     Column("MutationTaster_AAE", transform=split_str),
@@ -289,10 +288,10 @@ COLUMNS = [
     Column("MutationAssessor_rankscore", transform=split_float),
     Column("MutationAssessor_pred", transform=split_str),
     Column("FATHMM_score", transform=split_float),
-    Column("FATHMM_converted_rankscore", transform=split_float),
+    Column("FATHMM_converted_rankscore", dest="fathmm.converted_rankscore", transform=split_float),
     Column("FATHMM_pred", transform=split_str),
     Column("PROVEAN_score", transform=split_float),
-    Column("PROVEAN_converted_rankscore", transform=split_float),
+    Column("PROVEAN_converted_rankscore", dest="provean.converted_rankscore", transform=split_float),
     Column("PROVEAN_pred", transform=split_str),
     Column("VEST4_score", transform=split_float),
     Column("VEST4_rankscore", transform=split_float),
@@ -340,7 +339,7 @@ COLUMNS = [
     Column("LIST-S2_score", transform=split_float),
     Column("LIST-S2_rankscore", transform=split_float),
     Column("LIST-S2_pred", transform=split_str),
-    Column("VARITY_R_score", dest="varity_r.score", transform=split_float),  # VARITY new in 4.4.a
+    Column("VARITY_R_score", dest="varity_r.score", transform=split_float),  # new in 4.4.a
     Column("VARITY_R_rankscore", dest="varity_r.rankscore", transform=split_float),
     Column("VARITY_ER_score", dest="varity_er.score", transform=split_float),
     Column("VARITY_ER_rankscore", dest="varity_er.rankscore", transform=split_float),
@@ -481,7 +480,7 @@ COLUMNS = [
     Column("ExAC_nonpsych_NFE_AF", dest="exac_nonpsych.nfe.af", transform=float),
     Column("ExAC_nonpsych_SAS_AC", dest="exac_nonpsych.sas.ac", transform=int),
     Column("ExAC_nonpsych_SAS_AF", dest="exac_nonpsych.sas.af", transform=float),
-    Column("ALFA_European_AC", dest="alfa.european.ac", transform=int),  # new ALFA field, add mapping
+    Column("ALFA_European_AC", dest="alfa.european.ac", transform=int),
     Column("ALFA_European_AN", dest="alfa.european.an", transform=int),
     Column("ALFA_European_AF", dest="alfa.european.af", transform=float),
     Column("ALFA_African_Others_AC", dest="alfa.african_others.ac", transform=int),
