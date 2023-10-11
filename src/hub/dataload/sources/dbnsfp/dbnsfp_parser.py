@@ -251,7 +251,7 @@ COLUMNS = [
     Column("HGVSc_VEP", tag=COLUMN_TAG.HGVS_CODING),  # ditto
     Column("HGVSp_VEP", tag=COLUMN_TAG.HGVS_PROTEIN),  # ditto
     Column("APPRIS", transform=split_str),
-    Column("GENCODE_basic", dest="genecode_basic", transform=split_str),
+    Column("GENCODE_basic", dest="gencode_basic", transform=split_str),
     Column("TSL", transform=split_int),
     Column("VEP_canonical", dest="vep_canonical", transform=split_str),
     Column("cds_strand", dest="cds_strand", transform=split_str),

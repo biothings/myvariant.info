@@ -127,7 +127,7 @@ mapping = {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-            "genecode_basic": {
+            "gencode_basic": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
