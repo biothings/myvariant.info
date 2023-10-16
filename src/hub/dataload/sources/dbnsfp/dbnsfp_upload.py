@@ -2,7 +2,7 @@ import os
 import glob
 
 from .dbnsfp_mapping import mapping
-from .dbnsfp_parser import load_file
+from .dbnsfp_parser_44a_v1 import load_file
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
 from hub.dataload.storage import MyVariantIgnoreDuplicatedStorage
