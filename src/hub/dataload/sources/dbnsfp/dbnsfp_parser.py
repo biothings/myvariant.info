@@ -144,11 +144,11 @@ def make_zero_based(pos: str):
 
 def parse_mutpred_top5features(value):
     """
-    `mutpred_mechanisms` is a string combined from 5 clauses, separated by semicolons (with whitespaces).
+    `mutpred_mechanisms` is a string combined from 5 clauses, separated by semicolons.
     Each clause has the same pattern of "<mechanism> (P = <p_val>)".
 
-    E.g. "Loss of helix (P = 0.0444); Gain of loop (P = 0.0502); Gain of catalytic residue at A444 (P = 0.1876); \
-    Gain of solvent accessibility (P = 0.2291); Loss of disorder (P = 0.9475)"
+    E.g. "Loss of helix (P = 0.0444);Gain of loop (P = 0.0502);Gain of catalytic residue at A444 (P = 0.1876);\
+    Gain of solvent accessibility (P = 0.2291);Loss of disorder (P = 0.9475)"
 
     Here we apply regex to parse this string
 
@@ -165,7 +165,7 @@ def parse_mutpred_top5features(value):
     if value is None:
         return None
 
-    mp_list = [tuple(e for e in MUTPRED_TOP5FEATURES_PATTERN.split(s) if e.strip()) for s in value.split("; ")]
+    mp_list = [tuple(e for e in MUTPRED_TOP5FEATURES_PATTERN.split(s) if e.strip()) for s in value.split(";")]
     result = [{"mechanism": mp[0], "p_val": float(mp[1])} for mp in mp_list if mp and len(mp) == 2]
 
     return _check_length(result)
