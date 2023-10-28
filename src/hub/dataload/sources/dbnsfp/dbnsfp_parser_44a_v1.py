@@ -150,12 +150,7 @@ def parse_mutpred_top5features(value):
     E.g. "Loss of helix (P = 0.0444);Gain of loop (P = 0.0502);Gain of catalytic residue at A444 (P = 0.1876);\
     Gain of solvent accessibility (P = 0.2291);Loss of disorder (P = 0.9475)"
 
-    Here we apply regex to parse this string
-
-        regex = re.compile(r" \(P = ([eE0-9.-]*)\)$")
-        [(e for e in regex.split(s) if e.strip()) for s in string.split("; ")]
-
-    and get a list of 5 tuples like
+    Here we apply regex to parse this string and get a list of 5 tuples like
 
         [('Loss of helix', '0.0444'), ('Gain of loop', '0.0502'), ('Gain of catalytic residue at A444', '0.1876'),
         ('Gain of solvent accessibility', '0.2291'), ('Loss of disorder', '0.9475')]
@@ -339,14 +334,14 @@ COLUMNS = [
     Column("LIST-S2_score", transform=split_float),
     Column("LIST-S2_rankscore", transform=split_float),
     Column("LIST-S2_pred", transform=split_str),
-    Column("VARITY_R_score", dest="varity_r.score", transform=split_float),  # new in 4.4.a
-    Column("VARITY_R_rankscore", dest="varity_r.rankscore", transform=split_float),
-    Column("VARITY_ER_score", dest="varity_er.score", transform=split_float),
-    Column("VARITY_ER_rankscore", dest="varity_er.rankscore", transform=split_float),
-    Column("VARITY_R_LOO_score", dest="varity_r_loo.score", transform=split_float),
-    Column("VARITY_R_LOO_rankscore", dest="varity_r_loo.rankscore", transform=split_float),
-    Column("VARITY_ER_LOO_score", dest="varity_er_loo.score", transform=split_float),
-    Column("VARITY_ER_LOO_rankscore", dest="varity_er_loo.rankscore", transform=split_float),
+    Column("VARITY_R_score", transform=split_float),  # new in 4.4.a
+    Column("VARITY_R_rankscore", transform=split_float),
+    Column("VARITY_ER_score", transform=split_float),
+    Column("VARITY_ER_rankscore", transform=split_float),
+    Column("VARITY_R_LOO_score", dest="varity.r_loo.score", transform=split_float),
+    Column("VARITY_R_LOO_rankscore", dest="varity.r_loo.rankscore", transform=split_float),
+    Column("VARITY_ER_LOO_score", dest="varity.er_loo.score", transform=split_float),
+    Column("VARITY_ER_LOO_rankscore", dest="varity.er_loo.rankscore", transform=split_float),
     Column("Aloft_Fraction_transcripts_affected", dest="aloft.fraction_transcripts_affected", transform=split_str),
     Column("Aloft_prob_Tolerant", dest="aloft.prob_tolerant", transform=split_str),
     Column("Aloft_prob_Recessive", dest="aloft.prob_recessive", transform=split_str),
