@@ -206,15 +206,19 @@ mapping = {
             },
             "mutationtaster": {
                 "properties": {
-                    **score_field,
                     **converted_rankscore_field,
-                    **pred_field,
-                    "model": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "aae": {
-                        "type": "text"
+                    "analysis": {  # see prune_mutation_taster()
+                        "properties": {
+                            **pred_field,
+                            **score_field,
+                            "model": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "aae": {
+                                "type": "text"
+                            }
+                        }
                     }
                 }
             },
@@ -370,28 +374,30 @@ mapping = {
                     **pred_field
                 }
             },
-            "varity_r": {
-                "properties": {
-                    **score_field,
-                    **rankscore_field
-                }
-            },
-            "varity_er": {
-                "properties": {
-                    **score_field,
-                    **rankscore_field
-                }
-            },
-            "varity_r_loo": {
-                "properties": {
-                    **score_field,
-                    **rankscore_field
-                }
-            },
-            "varity_er_loo": {
-                "properties": {
-                    **score_field,
-                    **rankscore_field
+            "varity": {
+                "r": {
+                    "properties": {
+                        **score_field,
+                        **rankscore_field
+                    }
+                },
+                "er": {
+                    "properties": {
+                        **score_field,
+                        **rankscore_field
+                    }
+                },
+                "r_loo": {
+                    "properties": {
+                        **score_field,
+                        **rankscore_field
+                    }
+                },
+                "er_loo": {
+                    "properties": {
+                        **score_field,
+                        **rankscore_field
+                    }
                 }
             },
             "aloft": {
