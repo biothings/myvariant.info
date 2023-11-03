@@ -1,8 +1,11 @@
 import os
 import glob
 
-from .dbnsfp_mapping import mapping
-from .dbnsfp_parser import load_data_file as load_common
+from .dbnsfp_mapping_44a_v1 import mapping as mapping_v1
+from .dbnsfp_parser_44a_v1 import load_file as load_file_v1
+from .dbnsfp_mapping_44a_v2 import mapping as mapping_v2
+from .dbnsfp_parser_44a_v2 import load_file as load_file_v2
+
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
 from hub.dataload.storage import MyVariantIgnoreDuplicatedStorage
@@ -15,28 +18,46 @@ SRC_META = {
 }
 
 
-class DBNSFPBaseUploader(uploader.ParallelizedSourceUploader,
-                         SnpeffPostUpdateUploader):
+class DBNSFPBaseUploaderV1(uploader.ParallelizedSourceUploader, SnpeffPostUpdateUploader):
 
     storage_class = MyVariantIgnoreDuplicatedStorage
     GLOB_PATTERN = "dbNSFP*_variant.chr*"
 
     @classmethod
-    def get_mapping(klass):
-        return mapping
+    def get_mapping(cls):
+        return mapping_v1
 
     def jobs(self):
-        # tuple(input_file,version), where version is either hg38 or hg19)
-        return map(lambda e: (e, self.__class__.__metadata__["assembly"]),
-                   glob.glob(os.path.join(self.data_folder, self.__class__.GLOB_PATTERN)))
+        paths = glob.glob(os.path.join(self.data_folder, self.__class__.GLOB_PATTERN))
+        assembly = self.__class__.__metadata__["assembly"]
+        return map(lambda path: (path, assembly), paths)
 
-    def load_data(self, input_file, hg):
-        self.logger.debug("loading file " + input_file)
-        return load_common(input_file, version=hg)
+    def load_data(self, path, assembly):
+        self.logger.debug("loading file " + path)
+        return load_file_v1(path, version=assembly)
 
 
-class DBNSFPHG38Uploader(DBNSFPBaseUploader):
-    name = "dbnsfp_hg38"
+class DBNSFPBaseUploaderV2(uploader.ParallelizedSourceUploader, SnpeffPostUpdateUploader):
+
+    storage_class = MyVariantIgnoreDuplicatedStorage
+    GLOB_PATTERN = "dbNSFP*_variant.chr*"
+
+    @classmethod
+    def get_mapping(cls):
+        return mapping_v2
+
+    def jobs(self):
+        paths = glob.glob(os.path.join(self.data_folder, self.__class__.GLOB_PATTERN))
+        assembly = self.__class__.__metadata__["assembly"]
+        return map(lambda path: (path, assembly), paths)
+
+    def load_data(self, path, assembly):
+        self.logger.debug("loading file " + path)
+        return load_file_v2(path, version=assembly)
+
+
+class DBNSFPHG38UploaderV1(DBNSFPBaseUploaderV1):
+    name = "dbnsfp_hg38_v1"
     main_source = "dbnsfp"
     __metadata__ = {
         "assembly": "hg38",
@@ -44,8 +65,26 @@ class DBNSFPHG38Uploader(DBNSFPBaseUploader):
     }
 
 
-class DBNSFPHG19Uploader(DBNSFPBaseUploader):
-    name = "dbnsfp_hg19"
+class DBNSFPHG19UploaderV1(DBNSFPBaseUploaderV1):
+    name = "dbnsfp_hg19_v1"
+    main_source = "dbnsfp"
+    __metadata__ = {
+        "assembly": "hg19",
+        "src_meta": SRC_META
+    }
+
+
+class DBNSFPHG38UploaderV2(DBNSFPBaseUploaderV2):
+    name = "dbnsfp_hg38_v2"
+    main_source = "dbnsfp"
+    __metadata__ = {
+        "assembly": "hg38",
+        "src_meta": SRC_META
+    }
+
+
+class DBNSFPHG19UploaderV2(DBNSFPBaseUploaderV2):
+    name = "dbnsfp_hg19_v2"
     main_source = "dbnsfp"
     __metadata__ = {
         "assembly": "hg19",

@@ -12,8 +12,7 @@ VALID_COLUMN_NO = 643  # for 4.2a
 
 
 """
-this parser is for dbNSFP v4.3a downloaded from
-https://sites.google.com/site/jpopgen/dbNSFP
+Deprecated. This parser is for dbNSFP v4.3a downloaded from https://sites.google.com/site/jpopgen/dbNSFP
 """
 
 
@@ -644,7 +643,6 @@ def data_generator(input_file, version):
         for row in file_reader:
             row = dict(zip(header, row))
 
-            # use transposed matrix to have 1 line with N 187 columns
             current_row = DbnsfpReader.map_row_to_json(row, version=version)
             if previous_row and current_row:
                 if current_row["_id"] == previous_row["_id"]:
