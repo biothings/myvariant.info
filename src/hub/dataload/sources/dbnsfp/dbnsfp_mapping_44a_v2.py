@@ -266,8 +266,6 @@ mapping = {
                     },
                 }
             },
-
-
             "cds_strand": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"

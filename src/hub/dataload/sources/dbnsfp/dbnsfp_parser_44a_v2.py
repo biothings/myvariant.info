@@ -874,7 +874,7 @@ def load_file(path: str, assembly: str):
                 # We guarantee that the protein field is always a list at this moment. See prune_protein()
                 # if not isinstance(last_protein_field, list):
                 #     last_protein_field = [last_protein_field]
-                last_protein_field.append(curr_protein_field)
+                last_protein_field.extend(curr_protein_field)
 
                 last_doc["dbnsfp"]["protein"] = last_protein_field
                 continue
