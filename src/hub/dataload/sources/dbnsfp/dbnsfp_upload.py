@@ -34,7 +34,7 @@ class DBNSFPBaseUploaderV1(uploader.ParallelizedSourceUploader, SnpeffPostUpdate
 
     def load_data(self, path, assembly):
         self.logger.debug("loading file " + path)
-        return load_file_v1(path, version=assembly)
+        return load_file_v1(path, assembly=assembly)
 
 
 class DBNSFPBaseUploaderV2(uploader.ParallelizedSourceUploader, SnpeffPostUpdateUploader):
@@ -53,7 +53,7 @@ class DBNSFPBaseUploaderV2(uploader.ParallelizedSourceUploader, SnpeffPostUpdate
 
     def load_data(self, path, assembly):
         self.logger.debug("loading file " + path)
-        return load_file_v2(path, version=assembly)
+        return load_file_v2(path, assembly=assembly)
 
 
 class DBNSFPHG38UploaderV1(DBNSFPBaseUploaderV1):
