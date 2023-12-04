@@ -10,6 +10,8 @@
         "clinvar.rcv.conditions.identifiers.omim": "http://identifiers.org/omim/",
         "clinvar.rcv.conditions.identifiers.efo": "http://identifiers.org/efo/",
         "clinvar.rcv.conditions.identifiers.orphanet": "http://identifiers.org/orphanet/",
+        "clinvar.rcv.conditions.identifiers.mesh": "http://identifiers.org/mesh/",
+        "clinvar.rcv.conditions.identifiers.mondo": "http://identifiers.org/mondo/",
         "clinvar.gene.symbol": "http://identifiers.org/hgnc.symbol/",
         "clinvar.gene.id": "http://identifiers.org/ncbigene/",
         "dbnsfp.rsid": "http://identifiers.org/dbsnp/",
