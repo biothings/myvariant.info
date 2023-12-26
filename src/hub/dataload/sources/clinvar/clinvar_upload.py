@@ -159,6 +159,14 @@ class ClinvarBaseUploader(SnpeffPostUpdateUploader):
                                             "human_phenotype_ontology": {
                                                 "type": "text",
                                                 "analyzer": "string_lowercase"
+                                            },
+                                            "mondo": {
+                                                "type": "text",
+                                                "analyzer": "string_lowercase"
+                                            },
+                                            "mesh": {
+                                                "type": "text",
+                                                "analyzer": "string_lowercase"
                                             }
                                         }
                                     },
