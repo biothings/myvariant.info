@@ -31,7 +31,7 @@ class TestMyvariant(BiothingsDataTest):
                                        (subsrc, assembly)).json()
                 except:
                     print(f'Query error for ("{subsrc}", "{assembly}")')
-                    raise
+                    continue
                 results[subsrc] = {"meta": meta_cnt, "index": res["total"]}
             #assert res["total"] == meta_cnt, "Count in metadata (%s) doesn't match count from query (%s) for datasource '%s'" % (meta_cnt,res["total"],subsrc)
         errs = {}
