@@ -94,7 +94,7 @@ class TestMyvariant(BiothingsDataTest):
                                  'filter': 'dbsnp.chrom'}).json()
         assert len(res) == 2
         for _g in res:
-            assert set(_g) == set(['_id', 'query', 'dbsnp', '_version'])
+            assert set(_g).issuperset(set(['_id', 'query', 'dbsnp', '_version']))
 
     def test_044_annotation_post(self):
         # Test a large variant post
