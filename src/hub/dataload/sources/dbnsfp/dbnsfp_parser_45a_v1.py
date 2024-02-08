@@ -12,7 +12,8 @@ from biothings.utils.common import anyfile
 # VALID_COLUMN_NO = 367  # for 4.1a
 # VALID_COLUMN_NO = 642  # for 4.2a
 # VALID_COLUMN_NO = 643  # for 4.3a
-VALID_COLUMN_NO = 689  # for 4.4a
+# VALID_COLUMN_NO = 689  # for 4.4a
+VALID_COLUMN_NO = 708  # for 4.5a
 
 MUTPRED_TOP5FEATURES_PATTERN = re.compile(r" \(P = ([eE0-9.-]*)\)$")
 
