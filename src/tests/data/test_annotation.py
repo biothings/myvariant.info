@@ -91,7 +91,7 @@ class TestMyvariant(BiothingsDataTest):
         # TODO redo this test, doesn't test much really....
         res = self.request("variant", method='POST',
                            data={'ids': 'chr16:g.28883241A>G,chr8:g.19813529A>G',
-                                 'filter': 'dbsnp.chrom'}).json()
+                                 'fields': 'dbsnp.chrom'}).json()
         assert len(res) == 2
         for _g in res:
             assert set(_g) == set(['_id', 'query', 'dbsnp', '_version'])
