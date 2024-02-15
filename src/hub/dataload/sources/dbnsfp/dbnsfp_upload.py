@@ -46,7 +46,7 @@ class DBNSFPBaseUploaderV2(uploader.ParallelizedSourceUploader, SnpeffPostUpdate
 
     @classmethod
     def get_mapping(cls):
-        return mapping_v2
+        return mapping_v1
 
     def jobs(self):
         paths = glob.glob(os.path.join(self.data_folder, self.__class__.GLOB_PATTERN))
