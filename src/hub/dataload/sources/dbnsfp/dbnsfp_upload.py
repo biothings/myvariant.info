@@ -7,6 +7,8 @@ import glob
 # from .dbnsfp_parser_44a_v2 import load_file as load_file_v2
 from .dbnsfp_mapping_45a_v1 import mapping as mapping_v1
 from .dbnsfp_parser_45a_v1 import load_file as load_file_v1
+from .dbnsfp_mapping_45a_v2 import mapping as mapping_v2
+from .dbnsfp_parser_45a_v2 import load_file as load_file_v2
 
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
@@ -46,7 +48,7 @@ class DBNSFPBaseUploaderV2(uploader.ParallelizedSourceUploader, SnpeffPostUpdate
 
     @classmethod
     def get_mapping(cls):
-        return mapping_v1
+        return mapping_v2
 
     def jobs(self):
         paths = glob.glob(os.path.join(self.data_folder, self.__class__.GLOB_PATTERN))

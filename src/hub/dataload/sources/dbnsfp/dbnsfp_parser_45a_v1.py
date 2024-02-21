@@ -2,6 +2,7 @@ import re
 import csv
 from enum import Flag
 from dataclasses import dataclass
+from itertools import chain
 from typing import Callable
 from types import SimpleNamespace
 from utils.table import TableColumn, create_tag_column_map
@@ -27,7 +28,6 @@ NA_VALUES = frozenset({
     r"Not Available", r"unknown"
 })
 
-# A tag can be any of string value; columns with the same tag are looked-up as a group
 COLUMN_TAG = SimpleNamespace()
 COLUMN_TAG.HG38_POS = "hg38_pos"  # for "pos(1-based)"
 COLUMN_TAG.HG19_POS = "hg19_pos"  # for "hg19_pos(1-based)"
@@ -35,19 +35,12 @@ COLUMN_TAG.HG38_CHROM = "hg38_chrom"  # for "#chr"
 COLUMN_TAG.HG19_CHROM = "hg19_chrom"  # for "hg19_chr"
 COLUMN_TAG.REF_ALLELE = "ref"
 COLUMN_TAG.ALT_ALLELE = "alt"
+COLUMN_TAG.UNIPROT_ACC = "uniprot_acc"
+COLUMN_TAG.UNIPROT_ENTRY = "uniprot_entry"
+COLUMN_TAG.HGVS_CODING = "hgvsc"  # for "HGVSc_ANNOVAR", "HGVSc_snpEff", and "HGVSc_VEP"
+COLUMN_TAG.HGVS_PROTEIN = "hgvsp"  # for "HGVSp_ANNOVAR", "HGVSp_snpEff", and "HGVSp_VEP"
 COLUMN_TAG.GTEX_GENE = "gtex_gene"
 COLUMN_TAG.GTEX_TISSUE = "gtex_tissue"
-# Note that column "MutationTaster_converted_rankscore" is not tagged
-COLUMN_TAG.MUTATION_TASTER_AAE = "MutationTaster_AAE"
-COLUMN_TAG.MUTATION_TASTER_MODEL = "MutationTaster_model"
-COLUMN_TAG.MUTATION_TASTER_PRED = "MutationTaster_pred"
-COLUMN_TAG.MUTATION_TASTER_SCORE = "MutationTaster_score"
-COLUMN_TAG.ALOFT_FRACTION_TRANSCRIPTS_AFFECTED = "Aloft_Fraction_transcripts_affected"
-COLUMN_TAG.ALOFT_PROB_TOLERANT = "Aloft_prob_Tolerant"
-COLUMN_TAG.ALOFT_PROB_RECESSIVE = "Aloft_prob_Recessive"
-COLUMN_TAG.ALOFT_PROB_DOMINANT = "Aloft_prob_Dominant"
-COLUMN_TAG.ALOFT_PRED = "Aloft_pred"
-COLUMN_TAG.ALOFT_CONFIDENCE = "Aloft_Confidence"
 
 
 def _check_length(lst: list):
@@ -108,57 +101,30 @@ class Column(TableColumn):
         return bool(self.assembly & Assembly.HG38)  # true if self.assembly is HG38 or BOTH
 
 
-def split(sep: str, na_values: set = NA_VALUES, drop_na: bool = False):
-    def _func_drop_na(value: str):
+def split(sep: str, na_values: set = NA_VALUES):
+    def _func(value: str):
         result = [v for v in value.split(sep) if v not in na_values]
-        return result
+        return _check_length(result)
 
-    def _func_keep_na(value: str):
-        result = [v if v not in na_values else None for v in value.split(sep)]
-        if all(v is None for v in result):  # we keep NA values in the result; however if every value in the result is None, we treat whole result as None
-            return None
-        return result
-
-    return _func_drop_na if drop_na else _func_keep_na
-
-
-def split_cast(sep: str, astype: Callable, na_values: set = NA_VALUES, drop_na: bool = False):
-    def _func_drop_na(value: str):
-        result = [astype(v) for v in value.split(sep) if v not in na_values]
-        return result
-
-    def _func_keep_na(value: str):
-        result = [astype(v) if v not in na_values else None for v in value.split(sep)]
-        if all(v is None for v in result):  # we keep NA values in the result; however if every value in the result is None, we treat whole result as None
-            return None
-        return result
-
-    return _func_drop_na if drop_na else _func_keep_na
-
-
-def compose(_split_func: Callable, _unlist_func: Callable):
-    def _func(value):
-        split_result = _split_func(value)
-        if split_result is None:
-            return None
-        return _unlist_func(split_result)
     return _func
 
 
-# Transforming functions for "protein" data sources
-# We don't compose with _check_length because it would be easier to apply "zip" on the split results if all values are lists
+def split_cast(sep: str, astype: Callable, na_values: set = NA_VALUES):
+    def _func(value: str):
+        result = [astype(v) for v in value.split(sep) if v not in na_values]
+        return _check_length(result)
+
+    return _func
+
+
+# transforming functions for common data sources
 split_str = split(";")
 split_float = split_cast(";", float)
 split_int = split_cast(";", int)
 
-# Transforming functions for other common non-"protein" data sources
-split_str_drop_na = compose(split(";", drop_na=True), _check_length)
-split_float_drop_na = compose(split_cast(";", float, drop_na=True), _check_length)
-split_int_drop_na = compose(split_cast(";", int, drop_na=True), _check_length)
-
-# Transforming functions for specific data sources
-split_clinvar = compose(split(r"|", drop_na=True), _check_length)
-split_genotype = compose(split(r"/", drop_na=True), _check_length)  # for "AltaiNeandertal", "Denisova", "VindijiaNeandertal", and "ChagyrskayaNeandertal"
+# transforming functions for specific data sources
+split_clinvar = split(r"|")
+split_genotype = split(r"/")  # for "AltaiNeandertal", "Denisova", "VindijiaNeandertal", and "ChagyrskayaNeandertal"
 
 
 def normalize_chrom(chr: str):
@@ -216,13 +182,16 @@ def parse_siphy_29way_pi(value: str):
     return pi_dict
 
 
-def split_zip(values: list[str], sep: str, na_values: set = NA_VALUES):
+def split_zip(a_value: str, b_value: str, sep: str, na_values: set = NA_VALUES):
     """
-    Split each string in values by sep into a list, and generate tuples from all the lists.
+    Split a_value and b_value by sep into two lists, and generate pairs from the two lists.
+
+    This function assumes that the split two lists have the same length.
 
     E.g. with the following input,
 
-        values = ["P54578-2;P54578-3;A6NJA2;P54578", "UBP14_HUMAN;UBP14_HUMAN;A6NJA2_HUMAN;UBP14_HUMAN"]
+        a_value = "P54578-2;P54578-3;A6NJA2;P54578"
+        b_value = UBP14_HUMAN;UBP14_HUMAN;A6NJA2_HUMAN;UBP14_HUMAN
 
     the returned generator can make:
 
@@ -230,20 +199,26 @@ def split_zip(values: list[str], sep: str, na_values: set = NA_VALUES):
          ('P54578-3', 'UBP14_HUMAN'),
          ('A6NJA2', 'A6NJA2_HUMAN'),
          ('P54578', 'UBP14_HUMAN')]
-
-    Reference implementation: https://docs.python.org/3.3/library/functions.html#zip
     """
-    sentinel = object()
-    iterators = [(v if v not in na_values else None for v in value.split(sep)) for value in values]
+    a_list = [v if v not in na_values else None for v in a_value.split(sep)]
+    b_list = [v if v not in na_values else None for v in b_value.split(sep)]
 
-    while iterators:  # always true if iterators is not empty
-        result = []
-        for it in iterators:
-            element = next(it, sentinel)
-            if element is sentinel:  # terminate at once when a `it` is fully consumed
-                return
-            result.append(element)
-        yield tuple(result)
+    result = ((a, b) for (a, b) in zip(a_list, b_list) if (a, b) != (None, None))
+    # DO NOT use _check_length(result) otherwise the generator will be consumed
+    return result
+
+
+def split_dedup(values: list, sep: str, na_values: set = NA_VALUES):
+    """
+    Split each value from the input values by the separator, merge all the split results, and remove duplicates from the merged result.
+
+    E.g. when values=["a;b;c", "b;c", "d"] and sep=";", the result is ["a", "b", "c", "d"]
+    """
+    value_list = [value.split(sep=sep) for value in values]  # a list of lists
+    value_set = set(chain.from_iterable(value_list))  # flatten and dedup
+
+    result = list(v for v in value_set if v not in na_values)
+    return _check_length(result)
 
 
 COLUMNS = [
@@ -258,198 +233,198 @@ COLUMNS = [
     Column("hg19_pos(1-based)", dest="hg19", transform=make_zero_based, tag=COLUMN_TAG.HG19_POS),
     # Column("hg18_chr"),  # Not Used
     Column("hg18_pos(1-based)", dest="hg18", transform=make_zero_based),
-    Column("aapos", dest="protein.aa.pos", transform=split_int),
-    Column("genename", dest="protein.genename", transform=split_str),
-    Column("Ensembl_geneid", dest="protein.geneid", transform=split_str),
-    Column("Ensembl_transcriptid", dest="protein.transcriptid", transform=split_str),
-    Column("Ensembl_proteinid", dest="protein.proteinid", transform=split_str),
-    Column("Uniprot_acc", dest="protein.uniprot.acc", transform=split_str),
-    Column("Uniprot_entry", dest="protein.uniprot.entry", transform=split_str),
-    Column("HGVSc_ANNOVAR", dest="protein.hgvsc.annovar", transform=split_str),
-    Column("HGVSp_ANNOVAR", dest="protein.hgvsp.annovar", transform=split_str),
-    Column("HGVSc_snpEff", dest="protein.hgvsc.snpeff", transform=split_str),
-    Column("HGVSp_snpEff", dest="protein.hgvsp.snpeff", transform=split_str),
-    Column("HGVSc_VEP", dest="protein.hgvsc.vep", transform=split_str),
-    Column("HGVSp_VEP", dest="protein.hgvsp.vep", transform=split_str),
-    Column("APPRIS", dest="protein.appris", transform=split_str),
-    Column("GENCODE_basic", dest="protein.gencode_basic", transform=split_str),
-    Column("TSL", dest="protein.tsl", transform=split_int),
-    Column("VEP_canonical", dest="protein.vep_canonical", transform=split_str),
-    Column("cds_strand", dest="cds_strand", transform=split_str_drop_na),
-    Column("refcodon", dest="protein.aa.refcodon", transform=split_str),
-    Column("codonpos", dest="protein.aa.codonpos", transform=split_int),
-    Column("codon_degeneracy", dest="protein.aa.codon_degeneracy", transform=split_int),
-    Column("Ancestral_allele", dest="ancestral_allele", transform=split_str_drop_na),
+    Column("aapos", dest="aa.pos", transform=split_int),
+    Column("genename", transform=split_str),
+    Column("Ensembl_geneid", transform=split_str),
+    Column("Ensembl_transcriptid", transform=split_str),
+    Column("Ensembl_proteinid", transform=split_str),
+    Column("Uniprot_acc", tag=COLUMN_TAG.UNIPROT_ACC),  # special column, see prune_uniprot()
+    Column("Uniprot_entry", tag=COLUMN_TAG.UNIPROT_ENTRY),  # special column, see prune_uniprot()
+    Column("HGVSc_ANNOVAR", tag=COLUMN_TAG.HGVS_CODING),  # special column, see prune_hgvsc_hgvsp()
+    Column("HGVSp_ANNOVAR", tag=COLUMN_TAG.HGVS_PROTEIN),  # ditto
+    Column("HGVSc_snpEff", tag=COLUMN_TAG.HGVS_CODING),  # ditto
+    Column("HGVSp_snpEff", tag=COLUMN_TAG.HGVS_PROTEIN),  # ditto
+    Column("HGVSc_VEP", tag=COLUMN_TAG.HGVS_CODING),  # ditto
+    Column("HGVSp_VEP", tag=COLUMN_TAG.HGVS_PROTEIN),  # ditto
+    Column("APPRIS", transform=split_str),
+    Column("GENCODE_basic", dest="gencode_basic", transform=split_str),
+    Column("TSL", transform=split_int),
+    Column("VEP_canonical", dest="vep_canonical", transform=split_str),
+    Column("cds_strand", dest="cds_strand", transform=split_str),
+    Column("refcodon", dest="aa.refcodon", transform=split_str),
+    Column("codonpos", dest="aa.codonpos", transform=split_int),
+    Column("codon_degeneracy", dest="aa.codon_degeneracy", transform=split_int),
+    Column("Ancestral_allele", dest="ancestral_allele", transform=split_str),
     Column("AltaiNeandertal", dest="altai_neandertal", transform=split_genotype),
     Column("Denisova", transform=split_genotype),
     Column("VindijiaNeandertal", dest="vindijia_neandertal", transform=split_genotype),
     Column("ChagyrskayaNeandertal", dest="chagyrskaya_neandertal", transform=split_genotype),
-    Column("SIFT_score", dest="protein.sift.score", transform=split_float),
-    Column("SIFT_converted_rankscore", dest="sift.converted_rankscore", transform=split_float_drop_na),
-    Column("SIFT_pred", dest="protein.sift.pred", transform=split_str),
-    Column("SIFT4G_score", dest="protein.sift4g.score", transform=split_float),
-    Column("SIFT4G_converted_rankscore", dest="sift4g.converted_rankscore", transform=split_float_drop_na),
-    Column("SIFT4G_pred", dest="protein.sift4g.pred", transform=split_str),
-    Column("Polyphen2_HDIV_score", dest="protein.polyphen2.hdiv.score", transform=split_float),
-    Column("Polyphen2_HDIV_rankscore", transform=split_float_drop_na),
-    Column("Polyphen2_HDIV_pred", dest="protein.polyphen2.hdiv.pred", transform=split_str),
-    Column("Polyphen2_HVAR_score", dest="protein.polyphen2.hvar.score", transform=split_float),
-    Column("Polyphen2_HVAR_rankscore", transform=split_float_drop_na),
-    Column("Polyphen2_HVAR_pred", dest="protein.polyphen2.hvar.pred", transform=split_str),
-    Column("LRT_score", transform=split_float_drop_na),
-    Column("LRT_converted_rankscore", dest="lrt.converted_rankscore", transform=split_float_drop_na),
-    Column("LRT_pred", transform=split_str_drop_na),
-    Column("LRT_Omega", transform=split_float_drop_na),
-    Column("MutationTaster_score", tag=COLUMN_TAG.MUTATION_TASTER_SCORE),
-    Column("MutationTaster_converted_rankscore", dest="mutationtaster.converted_rankscore", transform=split_float_drop_na),
-    Column("MutationTaster_pred", tag=COLUMN_TAG.MUTATION_TASTER_PRED),
-    Column("MutationTaster_model", tag=COLUMN_TAG.MUTATION_TASTER_MODEL),
-    Column("MutationTaster_AAE", tag=COLUMN_TAG.MUTATION_TASTER_AAE),
-    Column("MutationAssessor_score", dest="protein.mutationassessor.score", transform=split_float),
-    Column("MutationAssessor_rankscore", transform=split_float_drop_na),
-    Column("MutationAssessor_pred", dest="protein.mutationassessor.pred", transform=split_str),
-    Column("FATHMM_score", dest="protein.fathmm.score", transform=split_float),
-    Column("FATHMM_converted_rankscore", dest="fathmm.converted_rankscore", transform=split_float_drop_na),
-    Column("FATHMM_pred", dest="protein.fathmm.pred", transform=split_str),
-    Column("PROVEAN_score", dest="protein.provean.score", transform=split_float),
-    Column("PROVEAN_converted_rankscore", dest="provean.converted_rankscore", transform=split_float_drop_na),
-    Column("PROVEAN_pred", dest="protein.provean.pred", transform=split_str),
-    Column("VEST4_score", dest="protein.vest4.score", transform=split_float),
-    Column("VEST4_rankscore", transform=split_float_drop_na),
-    Column("MetaSVM_score", transform=split_float_drop_na),
-    Column("MetaSVM_rankscore", transform=split_float_drop_na),
-    Column("MetaSVM_pred", transform=split_str_drop_na),
-    Column("MetaLR_score", transform=split_float_drop_na),
-    Column("MetaLR_rankscore", transform=split_float_drop_na),
-    Column("MetaLR_pred", transform=split_str_drop_na),
+    Column("SIFT_score", transform=split_float),
+    Column("SIFT_converted_rankscore", dest="sift.converted_rankscore", transform=split_float),
+    Column("SIFT_pred", transform=split_str),
+    Column("SIFT4G_score", transform=split_float),
+    Column("SIFT4G_converted_rankscore", dest="sift4g.converted_rankscore", transform=split_float),
+    Column("SIFT4G_pred", transform=split_str),
+    Column("Polyphen2_HDIV_score", transform=split_float),
+    Column("Polyphen2_HDIV_rankscore", transform=split_float),
+    Column("Polyphen2_HDIV_pred", transform=split_str),
+    Column("Polyphen2_HVAR_score", transform=split_float),
+    Column("Polyphen2_HVAR_rankscore", transform=split_float),
+    Column("Polyphen2_HVAR_pred", transform=split_str),
+    Column("LRT_score", transform=split_float),
+    Column("LRT_converted_rankscore", dest="lrt.converted_rankscore", transform=split_float),
+    Column("LRT_pred", transform=split_str),
+    Column("LRT_Omega", transform=split_float),
+    Column("MutationTaster_score", transform=split_float),
+    Column("MutationTaster_converted_rankscore", dest="mutationtaster.converted_rankscore", transform=split_float),
+    Column("MutationTaster_pred", transform=split_str),
+    Column("MutationTaster_model", transform=split_str),
+    Column("MutationTaster_AAE", transform=split_str),
+    Column("MutationAssessor_score", transform=split_float),
+    Column("MutationAssessor_rankscore", transform=split_float),
+    Column("MutationAssessor_pred", transform=split_str),
+    Column("FATHMM_score", transform=split_float),
+    Column("FATHMM_converted_rankscore", dest="fathmm.converted_rankscore", transform=split_float),
+    Column("FATHMM_pred", transform=split_str),
+    Column("PROVEAN_score", transform=split_float),
+    Column("PROVEAN_converted_rankscore", dest="provean.converted_rankscore", transform=split_float),
+    Column("PROVEAN_pred", transform=split_str),
+    Column("VEST4_score", transform=split_float),
+    Column("VEST4_rankscore", transform=split_float),
+    Column("MetaSVM_score", transform=split_float),
+    Column("MetaSVM_rankscore", transform=split_float),
+    Column("MetaSVM_pred", transform=split_str),
+    Column("MetaLR_score", transform=split_float),
+    Column("MetaLR_rankscore", transform=split_float),
+    Column("MetaLR_pred", transform=split_str),
     Column("Reliability_index", dest="reliability_index", transform=int),
-    Column("MetaRNN_score", transform=split_float_drop_na),
-    Column("MetaRNN_rankscore", transform=split_float_drop_na),
-    Column("MetaRNN_pred", transform=split_str_drop_na),
-    Column("M-CAP_score", transform=split_float_drop_na),
-    Column("M-CAP_rankscore", transform=split_float_drop_na),
-    Column("M-CAP_pred", transform=split_str_drop_na),
-    Column("REVEL_score", dest="protein.revel.score", transform=split_float),
-    Column("REVEL_rankscore", transform=split_float_drop_na),
-    Column("MutPred_score", transform=split_float_drop_na),
-    Column("MutPred_rankscore", transform=split_float_drop_na),
-    Column("MutPred_protID", dest="mutpred.accession", transform=split_str_drop_na),
-    Column("MutPred_AAchange", dest="mutpred.aa_change", transform=split_str_drop_na),
+    Column("MetaRNN_score", transform=split_float),
+    Column("MetaRNN_rankscore", transform=split_float),
+    Column("MetaRNN_pred", transform=split_str),
+    Column("M-CAP_score", transform=split_float),
+    Column("M-CAP_rankscore", transform=split_float),
+    Column("M-CAP_pred", transform=split_str),
+    Column("REVEL_score", transform=split_float),
+    Column("REVEL_rankscore", transform=split_float),
+    Column("MutPred_score", transform=split_float),
+    Column("MutPred_rankscore", transform=split_float),
+    Column("MutPred_protID", dest="mutpred.accession", transform=split_str),
+    Column("MutPred_AAchange", dest="mutpred.aa_change", transform=split_str),
     Column("MutPred_Top5features", dest="mutpred.pred", transform=parse_mutpred_top5features),
-    Column("MVP_score", dest="protein.mvp.score", transform=split_float),
-    Column("MVP_rankscore", transform=split_float_drop_na),
-    Column("gMVP_score", dest="protein.gmvp.score", transform=split_float),  # new in 4.4.a
-    Column("gMVP_rankscore", transform=split_float_drop_na),  # new in 4.4.a
-    Column("MPC_score", dest="protein.mpc.score", transform=split_float),
-    Column("MPC_rankscore", transform=split_float_drop_na),
-    Column("PrimateAI_score", transform=split_float_drop_na),
-    Column("PrimateAI_rankscore", transform=split_float_drop_na),
-    Column("PrimateAI_pred", transform=split_str_drop_na),
-    Column("DEOGEN2_score", transform=split_float_drop_na),
-    Column("DEOGEN2_rankscore", transform=split_float_drop_na),
-    Column("DEOGEN2_pred", transform=split_str_drop_na),
-    Column("BayesDel_addAF_score", dest="bayesdel.add_af.score", transform=split_float_drop_na),
-    Column("BayesDel_addAF_rankscore", dest="bayesdel.add_af.rankscore", transform=split_float_drop_na),
-    Column("BayesDel_addAF_pred", dest="bayesdel.add_af.pred", transform=split_str_drop_na),
-    Column("BayesDel_noAF_score", dest="bayesdel.no_af.score", transform=split_float_drop_na),
-    Column("BayesDel_noAF_rankscore", dest="bayesdel.no_af.rankscore", transform=split_float_drop_na),
-    Column("BayesDel_noAF_pred", dest="bayesdel.no_af.pred", transform=split_str_drop_na),
-    Column("ClinPred_score", transform=split_float_drop_na),
-    Column("ClinPred_rankscore", transform=split_float_drop_na),
-    Column("ClinPred_pred", transform=split_str_drop_na),
-    Column("LIST-S2_score", transform=split_float_drop_na),
-    Column("LIST-S2_rankscore", transform=split_float_drop_na),
-    Column("LIST-S2_pred", transform=split_str_drop_na),
-    Column("VARITY_R_score", transform=split_float_drop_na),  # new in 4.4.a
-    Column("VARITY_R_rankscore", transform=split_float_drop_na),
-    Column("VARITY_ER_score", transform=split_float_drop_na),
-    Column("VARITY_ER_rankscore", transform=split_float_drop_na),
-    Column("VARITY_R_LOO_score", dest="varity.r_loo.score", transform=split_float_drop_na),
-    Column("VARITY_R_LOO_rankscore", dest="varity.r_loo.rankscore", transform=split_float_drop_na),
-    Column("VARITY_ER_LOO_score", dest="varity.er_loo.score", transform=split_float_drop_na),
-    Column("VARITY_ER_LOO_rankscore", dest="varity.er_loo.rankscore", transform=split_float_drop_na),
+    Column("MVP_score", transform=split_float),
+    Column("MVP_rankscore", transform=split_float),
+    Column("gMVP_score", transform=split_float),  # new in 4.4.a
+    Column("gMVP_rankscore", transform=split_float),  # new in 4.4.a
+    Column("MPC_score", transform=split_float),
+    Column("MPC_rankscore", transform=split_float),
+    Column("PrimateAI_score", transform=split_float),
+    Column("PrimateAI_rankscore", transform=split_float),
+    Column("PrimateAI_pred", transform=split_str),
+    Column("DEOGEN2_score", transform=split_float),
+    Column("DEOGEN2_rankscore", transform=split_float),
+    Column("DEOGEN2_pred", transform=split_str),
+    Column("BayesDel_addAF_score", dest="bayesdel.add_af.score", transform=split_float),
+    Column("BayesDel_addAF_rankscore", dest="bayesdel.add_af.rankscore", transform=split_float),
+    Column("BayesDel_addAF_pred", dest="bayesdel.add_af.pred", transform=split_str),
+    Column("BayesDel_noAF_score", dest="bayesdel.no_af.score", transform=split_float),
+    Column("BayesDel_noAF_rankscore", dest="bayesdel.no_af.rankscore", transform=split_float),
+    Column("BayesDel_noAF_pred", dest="bayesdel.no_af.pred", transform=split_str),
+    Column("ClinPred_score", transform=split_float),
+    Column("ClinPred_rankscore", transform=split_float),
+    Column("ClinPred_pred", transform=split_str),
+    Column("LIST-S2_score", transform=split_float),
+    Column("LIST-S2_rankscore", transform=split_float),
+    Column("LIST-S2_pred", transform=split_str),
+    Column("VARITY_R_score", transform=split_float),  # new in 4.4.a
+    Column("VARITY_R_rankscore", transform=split_float),
+    Column("VARITY_ER_score", transform=split_float),
+    Column("VARITY_ER_rankscore", transform=split_float),
+    Column("VARITY_R_LOO_score", dest="varity.r_loo.score", transform=split_float),
+    Column("VARITY_R_LOO_rankscore", dest="varity.r_loo.rankscore", transform=split_float),
+    Column("VARITY_ER_LOO_score", dest="varity.er_loo.score", transform=split_float),
+    Column("VARITY_ER_LOO_rankscore", dest="varity.er_loo.rankscore", transform=split_float),
     Column("ESM1b_score", dest="esm1b.score", transform=split_float),  # new in 4.5.a
-    Column("ESM1b_rankscore", dest="esm1b.rankscore", transform=split_float_drop_na),  # new in 4.5.a
-    Column("ESM1b_pred", dest="esm1b.pred", transform=split_float_drop_na),  # new in 4.5.a
+    Column("ESM1b_rankscore", dest="esm1b.rankscore", transform=split_float),  # new in 4.5.a
+    Column("ESM1b_pred", dest="esm1b.pred", transform=split_str),  # new in 4.5.a
     Column("EVE_score", dest="eve.score", transform=split_float),  # new in 4.5.a
-    Column("EVE_rankscore", dest="eve.rankscore", transform=split_float_drop_na),  # new in 4.5.a
-    Column("EVE_Class10_pred", dest="eve.class10.pred", transform=split_float_drop_na),  # new in 4.5.a
-    Column("EVE_Class20_pred", dest="eve.class20.pred", transform=split_float_drop_na),  # new in 4.5.a
-    Column("EVE_Class25_pred", dest="eve.class25.pred", transform=split_float_drop_na),  # new in 4.5.a
-    Column("EVE_Class30_pred", dest="eve.class30.pred", transform=split_float_drop_na),  # new in 4.5.a
-    Column("EVE_Class40_pred", dest="eve.class40.pred", transform=split_float_drop_na),  # new in 4.5.a
-    Column("EVE_Class50_pred", dest="eve.class50.pred", transform=split_float_drop_na),  # new in 4.5.a
-    Column("EVE_Class60_pred", dest="eve.class60.pred", transform=split_float_drop_na),  # new in 4.5.a
-    Column("EVE_Class70_pred", dest="eve.class70.pred", transform=split_float_drop_na),  # new in 4.5.a
-    Column("EVE_Class75_pred", dest="eve.class75.pred", transform=split_float_drop_na),  # new in 4.5.a
-    Column("EVE_Class80_pred", dest="eve.class80.pred", transform=split_float_drop_na),  # new in 4.5.a
-    Column("EVE_Class90_pred", dest="eve.class90.pred", transform=split_float_drop_na),  # new in 4.5.a
+    Column("EVE_rankscore", dest="eve.rankscore", transform=split_float),  # new in 4.5.a
+    Column("EVE_Class10_pred", dest="eve.class10_pred", transform=split_str),  # new in 4.5.a
+    Column("EVE_Class20_pred", dest="eve.class20_pred", transform=split_str),  # new in 4.5.a
+    Column("EVE_Class25_pred", dest="eve.class25_pred", transform=split_str),  # new in 4.5.a
+    Column("EVE_Class30_pred", dest="eve.class30_pred", transform=split_str),  # new in 4.5.a
+    Column("EVE_Class40_pred", dest="eve.class40_pred", transform=split_str),  # new in 4.5.a
+    Column("EVE_Class50_pred", dest="eve.class50_pred", transform=split_str),  # new in 4.5.a
+    Column("EVE_Class60_pred", dest="eve.class60_pred", transform=split_str),  # new in 4.5.a
+    Column("EVE_Class70_pred", dest="eve.class70_pred", transform=split_str),  # new in 4.5.a
+    Column("EVE_Class75_pred", dest="eve.class75_pred", transform=split_str),  # new in 4.5.a
+    Column("EVE_Class80_pred", dest="eve.class80_pred", transform=split_str),  # new in 4.5.a
+    Column("EVE_Class90_pred", dest="eve.class90_pred", transform=split_str),  # new in 4.5.a
     Column("AlphaMissense_score", dest="alphamissense.score", transform=split_float),  # new in 4.5.a
-    Column("AlphaMissense_rankscore", dest="alphamissense.rankscore", transform=split_float_drop_na),  # new in 4.5.a
-    Column("AlphaMissense_pred", dest="alphamissense.pred", transform=split_float_drop_na),  # new in 4.5.a
-    Column("Aloft_Fraction_transcripts_affected", dest="protein.aloft.fraction_transcripts_affected", transform=split_str, tag=COLUMN_TAG.ALOFT_FRACTION_TRANSCRIPTS_AFFECTED),
-    Column("Aloft_prob_Tolerant", dest="protein.aloft.prob_tolerant", transform=split_str, tag=COLUMN_TAG.ALOFT_PROB_TOLERANT),
-    Column("Aloft_prob_Recessive", dest="protein.aloft.prob_recessive", transform=split_str, tag=COLUMN_TAG.ALOFT_PROB_RECESSIVE),
-    Column("Aloft_prob_Dominant", dest="protein.aloft.prob_dominant", transform=split_str, tag=COLUMN_TAG.ALOFT_PROB_DOMINANT),
-    Column("Aloft_pred", dest="protein.aloft.pred", transform=split_str, tag=COLUMN_TAG.ALOFT_PRED),
-    Column("Aloft_Confidence", dest="protein.aloft.confidence", transform=split_str, tag=COLUMN_TAG.ALOFT_CONFIDENCE),
-    Column("CADD_raw", dest="cadd.raw_score", transform=split_float_drop_na, assembly="hg38"),  # TODO CADD will have hg38 next update. Deprecate these 3 field then.
-    Column("CADD_raw_rankscore", dest="cadd.raw_rankscore", transform=split_float_drop_na, assembly="hg38"),
-    Column("CADD_phred", transform=split_float_drop_na, assembly="hg38"),  # CADD phred-like scores, not as other predications of string type
+    Column("AlphaMissense_rankscore", dest="alphamissense.rankscore", transform=split_float),  # new in 4.5.a
+    Column("AlphaMissense_pred", dest="alphamissense.pred", transform=split_str),  # new in 4.5.a
+    Column("Aloft_Fraction_transcripts_affected", dest="aloft.fraction_transcripts_affected", transform=split_str),
+    Column("Aloft_prob_Tolerant", dest="aloft.prob_tolerant", transform=split_str),
+    Column("Aloft_prob_Recessive", dest="aloft.prob_recessive", transform=split_str),
+    Column("Aloft_prob_Dominant", dest="aloft.prob_dominant", transform=split_str),
+    Column("Aloft_pred", transform=split_str),
+    Column("Aloft_Confidence", transform=split_str),
+    Column("CADD_raw", dest="cadd.raw_score", transform=split_float, assembly="hg38"),  # TODO CADD will have hg38 next update. Deprecate these 3 field then.
+    Column("CADD_raw_rankscore", dest="cadd.raw_rankscore", transform=split_float, assembly="hg38"),
+    Column("CADD_phred", transform=split_float, assembly="hg38"),  # CADD phred-like scores, not as other predications of string type
     # Column("CADD_raw_hg19", assembly="hg19"),  # discarded because Myvariant.info already has a hg19-only datasource of CADD.
     # Column("CADD_raw_rankscore_hg19", assembly="hg19"),  # ditto
     # Column("CADD_phred_hg19", assembly="hg19"),  # ditto
-    Column("DANN_score", transform=split_float_drop_na),
-    Column("DANN_rankscore", transform=split_float_drop_na),
-    Column("fathmm-MKL_coding_score", dest="fathmm-mkl.coding_score", transform=split_float_drop_na),
-    Column("fathmm-MKL_coding_rankscore", dest="fathmm-mkl.coding_rankscore", transform=split_float_drop_na),
-    Column("fathmm-MKL_coding_pred", dest="fathmm-mkl.coding_pred", transform=split_str_drop_na),
-    Column("fathmm-MKL_coding_group", dest="fathmm-mkl.coding_group", transform=split_str_drop_na),
-    Column("fathmm-XF_coding_score", dest="fathmm-xf.coding_score", transform=split_float_drop_na),
-    Column("fathmm-XF_coding_rankscore", dest="fathmm-xf.coding_rankscore", transform=split_float_drop_na),
-    Column("fathmm-XF_coding_pred", dest="fathmm-xf.coding_pred", transform=split_str_drop_na),
-    Column("Eigen-raw_coding", dest="eigen.raw_coding", transform=split_float_drop_na),
-    Column("Eigen-raw_coding_rankscore", dest="eigen.raw_coding_rankscore", transform=split_float_drop_na),
-    Column("Eigen-phred_coding", dest="eigen.phred_coding", transform=split_float_drop_na),
-    Column("Eigen-PC-raw_coding", dest="eigen-pc.raw_coding", transform=split_float_drop_na),
-    Column("Eigen-PC-raw_coding_rankscore", dest="eigen-pc.raw_coding_rankscore", transform=split_float_drop_na),
-    Column("Eigen-PC-phred_coding", dest="eigen-pc.phred_coding", transform=split_float_drop_na),
-    Column("GenoCanyon_score", transform=split_float_drop_na),
-    Column("GenoCanyon_rankscore", transform=split_float_drop_na),
-    Column("integrated_fitCons_score", dest="fitcons.integrated.score", transform=split_float_drop_na),
-    Column("integrated_fitCons_rankscore", dest="fitcons.integrated.rankscore", transform=split_float_drop_na),
-    Column("integrated_confidence_value", dest="fitcons.integrated.confidence_value", transform=split_int_drop_na),
-    Column("GM12878_fitCons_score", dest="fitcons.gm12878.score", transform=split_float_drop_na),
-    Column("GM12878_fitCons_rankscore", dest="fitcons.gm12878.rankscore", transform=split_float_drop_na),
-    Column("GM12878_confidence_value", dest="fitcons.gm12878.confidence_value", transform=split_int_drop_na),
-    Column("H1-hESC_fitCons_score", dest="fitcons.h1-hesc.score", transform=split_float_drop_na),
-    Column("H1-hESC_fitCons_rankscore", dest="fitcons.h1-hesc.rankscore", transform=split_float_drop_na),
-    Column("H1-hESC_confidence_value", dest="fitcons.h1-hesc.confidence_value", transform=split_int_drop_na),
-    Column("HUVEC_fitCons_score", dest="fitcons.huvec.score", transform=split_float_drop_na),
-    Column("HUVEC_fitCons_rankscore", dest="fitcons.huvec.rankscore", transform=split_float_drop_na),
-    Column("HUVEC_confidence_value", dest="fitcons.huvec.confidence_value", transform=split_int_drop_na),
-    Column("LINSIGHT", dest="linsight.score", transform=split_float_drop_na),
-    Column("LINSIGHT_rankscore", transform=split_float_drop_na),
-    Column("GERP++_NR", transform=split_float_drop_na),
-    Column("GERP++_RS", transform=split_float_drop_na),
-    Column("GERP++_RS_rankscore", dest="gerp++.rs_rankscore", transform=split_float_drop_na),
-    Column("phyloP100way_vertebrate", dest="phylop.100way_vertebrate.score", transform=split_float_drop_na),
-    Column("phyloP100way_vertebrate_rankscore", dest="phylop.100way_vertebrate.rankscore", transform=split_float_drop_na),
-    Column("phyloP470way_mammalian", dest="phylop.470way_mammalian.score", transform=split_float_drop_na),  # replaced 30way_mammalian in 4.4.a
-    Column("phyloP470way_mammalian_rankscore", dest="phylop.470way_mammalian.rankscore", transform=split_float_drop_na),  # replaced 30way_mammalian in 4.4.a
-    Column("phyloP17way_primate", dest="phylop.17way_primate.score", transform=split_float_drop_na),
-    Column("phyloP17way_primate_rankscore", dest="phylop.17way_primate.rankscore", transform=split_float_drop_na),
-    Column("phastCons100way_vertebrate", dest="phastcons.100way_vertebrate.score", transform=split_float_drop_na),
-    Column("phastCons100way_vertebrate_rankscore", dest="phastcons.100way_vertebrate.rankscore", transform=split_float_drop_na),
-    Column("phastCons470way_mammalian", dest="phastcons.470way_mammalian.score", transform=split_float_drop_na),  # replaced 30way_mammalian in 4.4.a
-    Column("phastCons470way_mammalian_rankscore", dest="phastcons.470way_mammalian.rankscore", transform=split_float_drop_na),  # replaced 30way_mammalian in 4.4.a
-    Column("phastCons17way_primate", dest="phastcons.17way_primate.score", transform=split_float_drop_na),
-    Column("phastCons17way_primate_rankscore", dest="phastcons.17way_primate.rankscore", transform=split_float_drop_na),
+    Column("DANN_score", transform=split_float),
+    Column("DANN_rankscore", transform=split_float),
+    Column("fathmm-MKL_coding_score", dest="fathmm-mkl.coding_score", transform=split_float),
+    Column("fathmm-MKL_coding_rankscore", dest="fathmm-mkl.coding_rankscore", transform=split_float),
+    Column("fathmm-MKL_coding_pred", dest="fathmm-mkl.coding_pred", transform=split_str),
+    Column("fathmm-MKL_coding_group", dest="fathmm-mkl.coding_group", transform=split_str),
+    Column("fathmm-XF_coding_score", dest="fathmm-xf.coding_score", transform=split_float),
+    Column("fathmm-XF_coding_rankscore", dest="fathmm-xf.coding_rankscore", transform=split_float),
+    Column("fathmm-XF_coding_pred", dest="fathmm-xf.coding_pred", transform=split_str),
+    Column("Eigen-raw_coding", dest="eigen.raw_coding", transform=split_float),
+    Column("Eigen-raw_coding_rankscore", dest="eigen.raw_coding_rankscore", transform=split_float),
+    Column("Eigen-phred_coding", dest="eigen.phred_coding", transform=split_float),
+    Column("Eigen-PC-raw_coding", dest="eigen-pc.raw_coding", transform=split_float),
+    Column("Eigen-PC-raw_coding_rankscore", dest="eigen-pc.raw_coding_rankscore", transform=split_float),
+    Column("Eigen-PC-phred_coding", dest="eigen-pc.phred_coding", transform=split_float),
+    Column("GenoCanyon_score", transform=split_float),
+    Column("GenoCanyon_rankscore", transform=split_float),
+    Column("integrated_fitCons_score", dest="fitcons.integrated.score", transform=split_float),
+    Column("integrated_fitCons_rankscore", dest="fitcons.integrated.rankscore", transform=split_float),
+    Column("integrated_confidence_value", dest="fitcons.integrated.confidence_value", transform=split_int),
+    Column("GM12878_fitCons_score", dest="fitcons.gm12878.score", transform=split_float),
+    Column("GM12878_fitCons_rankscore", dest="fitcons.gm12878.rankscore", transform=split_float),
+    Column("GM12878_confidence_value", dest="fitcons.gm12878.confidence_value", transform=split_int),
+    Column("H1-hESC_fitCons_score", dest="fitcons.h1-hesc.score", transform=split_float),
+    Column("H1-hESC_fitCons_rankscore", dest="fitcons.h1-hesc.rankscore", transform=split_float),
+    Column("H1-hESC_confidence_value", dest="fitcons.h1-hesc.confidence_value", transform=split_int),
+    Column("HUVEC_fitCons_score", dest="fitcons.huvec.score", transform=split_float),
+    Column("HUVEC_fitCons_rankscore", dest="fitcons.huvec.rankscore", transform=split_float),
+    Column("HUVEC_confidence_value", dest="fitcons.huvec.confidence_value", transform=split_int),
+    Column("LINSIGHT", dest="linsight.score", transform=split_float),
+    Column("LINSIGHT_rankscore", transform=split_float),
+    Column("GERP++_NR", transform=split_float),
+    Column("GERP++_RS", transform=split_float),
+    Column("GERP++_RS_rankscore", dest="gerp++.rs_rankscore", transform=split_float),
+    Column("phyloP100way_vertebrate", dest="phylop.100way_vertebrate.score", transform=split_float),
+    Column("phyloP100way_vertebrate_rankscore", dest="phylop.100way_vertebrate.rankscore", transform=split_float),
+    Column("phyloP470way_mammalian", dest="phylop.470way_mammalian.score", transform=split_float),  # replaced 30way_mammalian in 4.4.a
+    Column("phyloP470way_mammalian_rankscore", dest="phylop.470way_mammalian.rankscore", transform=split_float),  # replaced 30way_mammalian in 4.4.a
+    Column("phyloP17way_primate", dest="phylop.17way_primate.score", transform=split_float),
+    Column("phyloP17way_primate_rankscore", dest="phylop.17way_primate.rankscore", transform=split_float),
+    Column("phastCons100way_vertebrate", dest="phastcons.100way_vertebrate.score", transform=split_float),
+    Column("phastCons100way_vertebrate_rankscore", dest="phastcons.100way_vertebrate.rankscore", transform=split_float),
+    Column("phastCons470way_mammalian", dest="phastcons.470way_mammalian.score", transform=split_float),  # replaced 30way_mammalian in 4.4.a
+    Column("phastCons470way_mammalian_rankscore", dest="phastcons.470way_mammalian.rankscore", transform=split_float),  # replaced 30way_mammalian in 4.4.a
+    Column("phastCons17way_primate", dest="phastcons.17way_primate.score", transform=split_float),
+    Column("phastCons17way_primate_rankscore", dest="phastcons.17way_primate.rankscore", transform=split_float),
     Column("SiPhy_29way_pi", dest="siphy_29way.pi", transform=parse_siphy_29way_pi),
-    Column("SiPhy_29way_logOdds", dest="siphy_29way.logodds_score", transform=split_float_drop_na),
-    Column("SiPhy_29way_logOdds_rankscore", dest="siphy_29way.logodds_rankscore", transform=split_float_drop_na),
-    Column("bStatistic", dest="bstatistic.score", transform=split_float_drop_na),
-    Column("bStatistic_converted_rankscore", dest="bstatistic.converted_rankscore", transform=split_float_drop_na),
+    Column("SiPhy_29way_logOdds", dest="siphy_29way.logodds_score", transform=split_float),
+    Column("SiPhy_29way_logOdds_rankscore", dest="siphy_29way.logodds_rankscore", transform=split_float),
+    Column("bStatistic", dest="bstatistic.score", transform=split_float),
+    Column("bStatistic_converted_rankscore", dest="bstatistic.converted_rankscore", transform=split_float),
     Column("1000Gp3_AC", dest="1000gp3.ac", transform=int),
     Column("1000Gp3_AF", dest="1000gp3.af", transform=float),
     Column("1000Gp3_AFR_AC", dest="1000gp3.afr.ac", transform=int),  # dest changed since 4.4.a
@@ -565,15 +540,14 @@ COLUMNS = [
     Column("clinvar_MedGen_id", dest="clinvar.medgen", transform=split_clinvar),
     Column("clinvar_OMIM_id", dest="clinvar.omim", transform=split_clinvar),
     Column("clinvar_Orphanet_id", dest="clinvar.orphanet", transform=split_clinvar),
-    Column("Interpro_domain", transform=split_str_drop_na),
-    Column("GTEx_V8_gene", dest="gtex.gene", tag=COLUMN_TAG.GTEX_GENE),  # special column, see prune_gtex()
-    Column("GTEx_V8_tissue", dest="gtex.tissue", tag=COLUMN_TAG.GTEX_TISSUE),  # special column, see prune_gtex()
-    Column("Geuvadis_eQTL_target_gene", transform=split_str_drop_na)
+    Column("Interpro_domain", transform=split_str),
+    Column("GTEx_V8_gene", dest="gtex.gene", tag=COLUMN_TAG.GTEX_GENE),  # special column, see prune_uniprot()
+    Column("GTEx_V8_tissue", dest="gtex.tissue", tag=COLUMN_TAG.GTEX_TISSUE),  # special column, see prune_uniprot()
+    Column("Geuvadis_eQTL_target_gene", transform=split_str)
 ]
 
 HG19_COLUMNS = [c for c in COLUMNS if c.is_hg19()]
 HG38_COLUMNS = [c for c in COLUMNS if c.is_hg38()]
-PROTEIN_COLUMNS = [c for c in COLUMNS if c.dest.startswith(r"protein.")]
 
 # Currently not necessary to make assembly-specific tag-column maps.
 TAG_COLUMN_MAP = create_tag_column_map(COLUMNS)
@@ -598,35 +572,65 @@ def verify_hg38_row(row: dict, na_values: set = NA_VALUES):
     return verify_pos(row, pos_column=pos_column, na_values=na_values)
 
 
-def normalize_hg19_row(row: dict):
+def prune_uniprot(raw_doc: dict, acc_column: Column, entry_column: Column, na_values: set = NA_VALUES):
     """
-    For unknown reasons, 4 MutationTaster columns and 6 Aloft columns have values ending in ";", which leads to an empty string when splitting the value by ";".
-    This function remove the tailing ";" in those values.
+    Map each UniProt accession number and entry name from the raw document into a dictionary,
+    and assign all such dictionaries to the raw document's top "uniprot" field.
+
+    E.g. with the following input value:
+
+        raw_doc["uniprot.acc"] = "P54578-2;P54578-3;A6NJA2;P54578"
+        raw_doc["uniprot.entry"] = "UBP14_HUMAN;UBP14_HUMAN;A6NJA2_HUMAN;UBP14_HUMAN"
+
+    raw_doc will be assigned as:
+
+        raw_doc["uniprot"] = [
+            {'acc': 'P54578-2', 'entry': 'UBP14_HUMAN'},
+            {'acc': 'P54578-3', 'entry': 'UBP14_HUMAN'},
+            {'acc': 'A6NJA2', 'entry': 'A6NJA2_HUMAN'},
+            {'acc': 'P54578', 'entry': 'UBP14_HUMAN'}
+        ]
     """
-    columns = [
-        # MutationTaster columns
-        TAG_COLUMN_MAP[COLUMN_TAG.MUTATION_TASTER_AAE][0],
-        TAG_COLUMN_MAP[COLUMN_TAG.MUTATION_TASTER_MODEL][0],
-        TAG_COLUMN_MAP[COLUMN_TAG.MUTATION_TASTER_PRED][0],
-        TAG_COLUMN_MAP[COLUMN_TAG.MUTATION_TASTER_SCORE][0],
-        # Aloft columns
-        TAG_COLUMN_MAP[COLUMN_TAG.ALOFT_FRACTION_TRANSCRIPTS_AFFECTED][0],
-        TAG_COLUMN_MAP[COLUMN_TAG.ALOFT_PROB_TOLERANT][0],
-        TAG_COLUMN_MAP[COLUMN_TAG.ALOFT_PROB_RECESSIVE][0],
-        TAG_COLUMN_MAP[COLUMN_TAG.ALOFT_PROB_DOMINANT][0],
-        TAG_COLUMN_MAP[COLUMN_TAG.ALOFT_PRED][0],
-        TAG_COLUMN_MAP[COLUMN_TAG.ALOFT_CONFIDENCE][0]
-    ]
+    # acc_column = TAG_COLUMN_MAP[COLUMN_TAG.UNIPROT_ACC][0]
+    # entry_column = TAG_COLUMN_MAP[COLUMN_TAG.UNIPROT_ENTRY][0]
 
-    for c in columns:
-        if row[c.name] and row[c.name][-1] == ";":
-            row[c.name] = row[c.name][:-1]
+    if (acc_column.dest in raw_doc) and (entry_column.dest in raw_doc):
+        acc_value = raw_doc[acc_column.dest]
+        entry_value = raw_doc[entry_column.dest]
 
-    return row
+        uniprot_result = [{"acc": acc, "entry": entry} for (acc, entry) in split_zip(acc_value, entry_value, sep=";", na_values=na_values)]
+        uniprot_result = _check_length(uniprot_result)
+        if uniprot_result is not None:
+            raw_doc["uniprot"] = uniprot_result
+
+        del raw_doc[acc_column.dest]
+        del raw_doc[entry_column.dest]
+
+    return raw_doc
 
 
-def normalize_hg38_row(row: dict):
-    return normalize_hg19_row(row)
+def prune_hgvsc_hgvsp(raw_doc: dict, hgvsc_columns: list[Column], hgvsp_columns: list[Column], na_values: set = NA_VALUES):
+    """
+    Split "HGVSc_ANNOVAR", "HGVSc_snpEff", and "HGVSc_VEP" values into "hgvsc" field;
+    split "HGVSp_ANNOVAR", "HGVSp_snpEff", and "HGVSp_VEP" values into "hgvsp" field.
+    """
+    coding_values = [raw_doc[c.dest] for c in hgvsc_columns if c.dest in raw_doc]
+    protein_values = [raw_doc[c.dest] for c in hgvsp_columns if c.dest in raw_doc]
+
+    coding_result = split_dedup(coding_values, sep=";", na_values=na_values)
+    protein_result = split_dedup(protein_values, sep=";", na_values=na_values)
+
+    if coding_result is not None:
+        raw_doc["hgvsc"] = coding_result
+    if protein_result is not None:
+        raw_doc["hgvsp"] = protein_result
+
+    for c in hgvsc_columns:
+        raw_doc.pop(c.dest, None)  # safely delete the key because it can be absent
+    for c in hgvsp_columns:
+        raw_doc.pop(c.dest, None)  # safely delete the key because it can be absent
+
+    return raw_doc
 
 
 def prune_gtex(raw_doc: dict, gene_column: Column, tissue_column: Column, na_values: set = NA_VALUES):
@@ -636,8 +640,8 @@ def prune_gtex(raw_doc: dict, gene_column: Column, tissue_column: Column, na_val
 
     E.g. with the following input value:
 
-        row["gtex.gene"] = "ENOSF1|ENOSF1"
-        row["gtex.tissue"] = "Adipose_Subcutaneous|Muscle_Skeletal"
+        row["gtex_gene"] = "ENOSF1|ENOSF1"
+        row["gtex_tissue"] = "Adipose_Subcutaneous|Muscle_Skeletal"
 
     raw_doc will be assigned as:
 
@@ -652,7 +656,7 @@ def prune_gtex(raw_doc: dict, gene_column: Column, tissue_column: Column, na_val
         tissue_value = raw_doc[tissue_column.dest]
 
         # special separator "|" for GTEx
-        gtex_result = [{"gene": acc, "tissue": entry} for (acc, entry) in split_zip([gene_value, tissue_value], sep=r"|", na_values=na_values)]
+        gtex_result = [{"gene": acc, "tissue": entry} for (acc, entry) in split_zip(gene_value, tissue_value, sep=r"|", na_values=na_values)]
         gtex_result = _check_length(gtex_result)
         if gtex_result is not None:
             raw_doc["gtex"] = gtex_result
@@ -663,100 +667,18 @@ def prune_gtex(raw_doc: dict, gene_column: Column, tissue_column: Column, na_val
     return raw_doc
 
 
-def prune_mutation_taster(raw_doc: dict, aae_column: Column, model_column: Column, pred_column: Column, score_column: Column, na_values: set = NA_VALUES):
-    """
-    Map each MutationTaster AAE, model, pred, and score value from the raw document into a dictionary,
-    and assign all such dictionaries to the raw document's "mutationtaster.analysis" field.
-
-    E.g. with the following input value:
-
-        row["mutationtaster.aae"] = "Y518*;Y518*;D532E"
-        row["mutationtaster.model"] = "complex_aae;complex_aae;simple_aae"
-        row["mutationtaster.pred"] = "D;D;N"
-        row["mutationtaster.score"] = "1;1;1"
-
-    raw_doc will be assigned as:
-
-         row["mutationtaster.analysis"] = [
-            {'aae': 'Y518*', 'model': 'complex_aae', 'pred': 'D', 'score': 1},
-            {'aae': 'Y518*', 'model': 'complex_aae', 'pred': 'D', 'score': 1},
-            {'aae': 'D532E', 'model': 'simple_aae', 'pred': 'N', 'score': 1}
-        ]
-    """
-    if (aae_column.dest in raw_doc) and (model_column.dest in raw_doc) and (pred_column.dest in raw_doc) and (score_column.dest in raw_doc):
-        aae_value = raw_doc[aae_column.dest]
-        model_value = raw_doc[model_column.dest]
-        pred_value = raw_doc[pred_column.dest]
-        score_value = raw_doc[score_column.dest]
-
-        analysis_values = split_zip([aae_value, model_value, pred_value, score_value], sep=r";", na_values=na_values)
-        analysis_result = [{"aae": aae, "model": model, "pred": pred, "score": float(score)} for (aae, model, pred, score) in analysis_values]
-        analysis_result = _check_length(analysis_result)
-        if analysis_result is not None:
-            raw_doc["mutationtaster.analysis"] = analysis_result
-
-        del raw_doc[aae_column.dest]
-        del raw_doc[model_column.dest]
-        del raw_doc[pred_column.dest]
-        del raw_doc[score_column.dest]
-
-        # note that raw_doc[mutationtaster.converted_rankscore] is kept as-is
-
-    return raw_doc
-
-
-def prune_protein(raw_doc: set, protein_columns: list[Column]):
-    protein_fields = {c.dest: raw_doc[c.dest] for c in protein_columns}
-
-    # assert len(set(map(len, protein_fields.values()))) == 1  # assert all values (as lists) in protein_fields have the same length before zipping
-
-    """
-    Convert protein fields (as a dictionary of lists) to a list of dictionaries. E.g.
-    
-        protein_field = {
-            'protein.transcriptid': ['ENST00000624406', 'ENST00000398168'],
-            'protein.proteinid': ['ENSP00000485669', 'ENSP00000381234']
-        }
-        
-    will be converted to
-    
-        protein_result = [
-            {'protein.transcriptid': 'ENST00000624406', 'protein.proteinid': 'ENSP00000485669'},
-            {'protein.transcriptid': 'ENST00000398168', 'protein.proteinid': 'ENSP00000381234'}
-        ]
-    """
-    protein_result = []
-    protein_keys = protein_fields.keys()
-    for protein_values in zip(*protein_fields.values()):
-        elem = dict((key, value) for key, value in zip(protein_keys, protein_values) if value is not None)
-        elem = parse_dot_fields(elem)["protein"]
-        protein_result.append(elem)
-    # We keep protein_result as a list for easier merging
-    # protein_result = _check_length(protein_result)
-    # if protein_result is not None:
-    #     raw_doc["protein"] = protein_result
-    raw_doc["protein"] = protein_result
-
-    for c in protein_columns:
-        del raw_doc[c.dest]
-
-    return raw_doc
-
-
 def prune_hg19_doc(doc: dict, na_values: set = NA_VALUES):
-    protein_columns = [c for c in PROTEIN_COLUMNS if c.dest in doc]
-    doc = prune_protein(doc, protein_columns=protein_columns)
+    uniprot_acc_column = TAG_COLUMN_MAP[COLUMN_TAG.UNIPROT_ACC][0]
+    uniprot_entry_column = TAG_COLUMN_MAP[COLUMN_TAG.UNIPROT_ENTRY][0]
+    doc = prune_uniprot(doc, acc_column=uniprot_acc_column, entry_column=uniprot_entry_column, na_values=na_values)
+
+    hgvs_coding_columns = TAG_COLUMN_MAP[COLUMN_TAG.HGVS_CODING]
+    hgvs_protein_columns = TAG_COLUMN_MAP[COLUMN_TAG.HGVS_PROTEIN]
+    doc = prune_hgvsc_hgvsp(doc, hgvsc_columns=hgvs_coding_columns, hgvsp_columns=hgvs_protein_columns, na_values=na_values)
 
     gtex_gene_column = TAG_COLUMN_MAP[COLUMN_TAG.GTEX_GENE][0]
     gtex_tissue_column = TAG_COLUMN_MAP[COLUMN_TAG.GTEX_TISSUE][0]
     doc = prune_gtex(doc, gene_column=gtex_gene_column, tissue_column=gtex_tissue_column, na_values=na_values)
-
-    mutation_taster_aae_column = TAG_COLUMN_MAP[COLUMN_TAG.MUTATION_TASTER_AAE][0]
-    mutation_taster_model_column = TAG_COLUMN_MAP[COLUMN_TAG.MUTATION_TASTER_MODEL][0]
-    mutation_taster_pred_column = TAG_COLUMN_MAP[COLUMN_TAG.MUTATION_TASTER_PRED][0]
-    mutation_taster_score_column = TAG_COLUMN_MAP[COLUMN_TAG.MUTATION_TASTER_SCORE][0]
-    doc = prune_mutation_taster(doc, aae_column=mutation_taster_aae_column, model_column=mutation_taster_model_column,
-                                pred_column=mutation_taster_pred_column, score_column=mutation_taster_score_column, na_values=na_values)
 
     return doc
 
@@ -834,7 +756,6 @@ def construct_hg19_doc(row: dict, na_values: set = NA_VALUES):
     if not verified:
         return None
 
-    row = normalize_hg19_row(row)
     raw_doc = construct_hg19_raw_doc(row, na_values=na_values)
     raw_doc = prune_hg19_doc(raw_doc, na_values=na_values)
     hgvs_id = make_hg19_hgvs_id(raw_doc)
@@ -851,7 +772,6 @@ def construct_hg38_doc(row: dict, na_values: set = NA_VALUES):
     if not verified:
         return None
 
-    row = normalize_hg38_row(row)
     raw_doc = construct_hg38_raw_doc(row, na_values=na_values)
     raw_doc = prune_hg38_doc(raw_doc, na_values=na_values)
     hgvs_id = make_hg38_hgvs_id(raw_doc)
@@ -881,34 +801,29 @@ def load_file(path: str, assembly: str):
 
     last_doc = None
     for row in file_reader:
-        curr_doc = _construct_doc(row, na_values=NA_VALUES)
+        current_doc = _construct_doc(row, na_values=NA_VALUES)
 
-        if curr_doc is None:
+        if current_doc is None:
             continue
 
         if last_doc is not None:
-            if curr_doc["_id"] == last_doc["_id"]:
-                last_protein_field = last_doc["dbnsfp"]["protein"]
-                curr_protein_field = curr_doc["dbnsfp"]["protein"]
+            if current_doc["_id"] == last_doc["_id"]:
+                last_aa = last_doc["dbnsfp"]["aa"]
+                current_aa = current_doc["dbnsfp"]["aa"]
 
-                # We guarantee that the protein field is always a list at this moment. See prune_protein()
-                # if not isinstance(last_protein_field, list):
-                #     last_protein_field = [last_protein_field]
-                last_protein_field.extend(curr_protein_field)
+                if not isinstance(last_aa, list):
+                    last_aa = [last_aa]
+                last_aa.append(current_aa)
 
-                last_doc["dbnsfp"]["protein"] = last_protein_field
+                last_doc["dbnsfp"]["aa"] = last_aa
                 continue
             else:
-                if len(last_doc["dbnsfp"]["protein"]) == 1:
-                    last_doc["dbnsfp"]["protein"] = last_doc["dbnsfp"]["protein"][0]
                 yield last_doc
 
-        last_doc = curr_doc
+        last_doc = current_doc
 
     # yield the very last doc
     if last_doc:
-        if len(last_doc["dbnsfp"]["protein"]) == 1:
-            last_doc["dbnsfp"]["protein"] = last_doc["dbnsfp"]["protein"][0]
         yield last_doc
 
     file.close()
