@@ -25,7 +25,8 @@ SRC_META = {
 class DBNSFPBaseUploaderV1(uploader.ParallelizedSourceUploader, SnpeffPostUpdateUploader):
 
     storage_class = MyVariantIgnoreDuplicatedStorage
-    GLOB_PATTERN = "dbNSFP*_variant.chr*"
+    # GLOB_PATTERN = "dbNSFP*_variant.chr*"
+    GLOB_PATTERN = "dbNSFP4.5a_variant.chrM"  # TODO: Rollback this line
 
     @classmethod
     def get_mapping(cls):
