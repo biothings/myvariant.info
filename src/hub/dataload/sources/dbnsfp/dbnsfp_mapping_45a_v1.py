@@ -65,92 +65,7 @@ mapping = {
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer"
                     },
-
-                }
-            },
-            "protein": {
-                "properties": {
-                    "aa": {
-                        "properties": {
-                            "pos": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            },
-
-                        }
-                    },
-                    "genename": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "geneid": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "transcriptid": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "proteinid": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "uniprot": {
-                        "properties": {
-                            "acc": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            },
-                            "entry": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            }
-                        }
-                    },
-                    "hgvsc": {
-                        "properties": {
-                            "annovar": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            },
-                            "snpeff": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            },
-                            "vep": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            }
-                        }
-                    },
-                    "hgvsp": {
-                        "properties": {
-                            "annovar": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            },
-                            "snpeff": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            },
-                            "vep": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            }
-                        }
-                    },
-                    "appris": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "gencode_basic": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "tsl": {
-                        "type": "integer"
-                    },
-                    "vep_canonical": {
+                    "pos": {
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer"
                     },
@@ -165,106 +80,63 @@ mapping = {
                     "codon_degeneracy": {
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "sift": {
-                        "properties": {
-                            **score_field,
-                            **pred_field
-                        }
-                    },
-                    "sift4g": {
-                        "properties": {
-                            **score_field,
-                            **pred_field
-                        }
-                    },
-                    "polyphen2": {
-                        "properties": {
-                            "hdiv": {
-                                "properties": {
-                                    **score_field,
-                                    **pred_field
-                                }
-                            },
-                            "hvar": {
-                                "properties": {
-                                    **score_field,
-                                    **pred_field
-                                }
-                            }
-                        }
-                    },
-                    "mutationassessor": {
-                        "properties": {
-                            **score_field,
-                            **pred_field,
-                        }
-                    },
-                    "fathmm": {
-                        "properties": {
-                            **score_field,
-                            **pred_field
-                        }
-                    },
-                    "provean": {
-                        "properties": {
-                            **score_field,
-                            **pred_field
-                        }
-                    },
-                    "vest4": {
-                        "properties": {
-                            **score_field,
-                        }
-                    },
-                    "revel": {
-                        "properties": {
-                            **score_field,
-                        }
-                    },
-                    "mvp": {
-                        "properties": {
-                            **score_field,
-                        }
-                    },
-                    "gmvp": {  # new in 4.4.a
-                        "properties": {
-                            **score_field,
-                        }
-                    },
-                    "mpc": {
-                        "properties": {
-                            **score_field,
-                        }
-                    },
-                    "aloft": {
-                        "properties": {
-                            "fraction_transcripts_affected": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            },
-                            "prob_tolerant": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            },
-                            "prob_recessive": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            },
-                            "prob_dominant": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            },
-                            "pred": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            },
-                            "confidence": {
-                                "type": "text"
-                            }
-                        }
-                    },
+                    }
                 }
+            },
+            "genename": {
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "ensembl": {
+                "properties": {
+                    "geneid": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "transcriptid": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "proteinid": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "uniprot": {
+                "properties": {
+                    "acc": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "entry": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    }
+                }
+            },
+            "hgvsc": {
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "hgvsp": {
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "appris": {
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "gencode_basic": {
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
+            },
+            "tsl": {
+                "type": "integer"
+            },
+            "vep_canonical": {
+                "type": "keyword",
+                "normalizer": "keyword_lowercase_normalizer"
             },
             "cds_strand": {
                 "type": "keyword",
@@ -290,27 +162,34 @@ mapping = {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer"
             },
-
             "sift": {
                 "properties": {
+                    **score_field,
                     **converted_rankscore_field,
+                    **pred_field
                 }
             },
             "sift4g": {
                 "properties": {
+                    **score_field,
                     **converted_rankscore_field,
+                    **pred_field
                 }
             },
             "polyphen2": {
                 "properties": {
                     "hdiv": {
                         "properties": {
+                            **score_field,
                             **rankscore_field,
+                            **pred_field
                         }
                     },
                     "hvar": {
                         "properties": {
+                            **score_field,
                             **rankscore_field,
+                            **pred_field
                         }
                     }
                 }
@@ -327,35 +206,46 @@ mapping = {
             },
             "mutationtaster": {
                 "properties": {
-                    **score_field,
                     **converted_rankscore_field,
-                    **pred_field,
-                    "model": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "aae": {
-                        "type": "text"
+                    "analysis": {  # see prune_mutation_taster()
+                        "properties": {
+                            **pred_field,
+                            **score_field,
+                            "model": {
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer"
+                            },
+                            "aae": {
+                                "type": "text"
+                            }
+                        }
                     }
                 }
             },
             "mutationassessor": {
                 "properties": {
+                    **score_field,
                     **rankscore_field,
+                    **pred_field,
                 }
             },
             "fathmm": {
                 "properties": {
+                    **score_field,
                     **converted_rankscore_field,
+                    **pred_field
                 }
             },
             "provean": {
                 "properties": {
+                    **score_field,
                     **converted_rankscore_field,
+                    **pred_field
                 }
             },
             "vest4": {
                 "properties": {
+                    **score_field,
                     **rankscore_field
                 }
             },
@@ -392,6 +282,7 @@ mapping = {
             },
             "revel": {
                 "properties": {
+                    **score_field,
                     **rankscore_field
                 }
             },
@@ -421,16 +312,19 @@ mapping = {
             },
             "mvp": {
                 "properties": {
+                    **score_field,
                     **rankscore_field
                 }
             },
             "gmvp": {  # new in 4.4.a
                 "properties": {
+                    **score_field,
                     **rankscore_field
                 }
             },
             "mpc": {
                 "properties": {
+                    **score_field,
                     **rankscore_field
                 }
             },
@@ -503,6 +397,33 @@ mapping = {
                     "properties": {
                         **score_field,
                         **rankscore_field
+                    }
+                }
+            },
+            "aloft": {
+                "properties": {
+                    "fraction_transcripts_affected": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "prob_tolerant": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "prob_recessive": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "prob_dominant": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "pred": {
+                        "type": "keyword",
+                        "normalizer": "keyword_lowercase_normalizer"
+                    },
+                    "confidence": {
+                        "type": "text"
                     }
                 }
             },
