@@ -638,46 +638,12 @@ def normalize_hg38_row(row: dict):
     return normalize_hg19_row(row)
 
 
-def prune_gtex_sqtl(raw_doc: dict, gene_column: Column, tissue_column: Column, na_values: set = NA_VALUES):
+def prune_gtex(new_doc_key: str, raw_doc: dict, gene_column: Column, tissue_column: Column, na_values: set = NA_VALUES):
     """
     Map each GTEx gene name and tissue name from the raw document into a dictionary,
     and assign all such dictionaries to the raw document's top "gtex" field.
 
-    E.g. with the following input value:
-
-        row["gtex_gene"] = "ENOSF1|ENOSF1"
-        row["gtex_tissue"] = "Adipose_Subcutaneous|Muscle_Skeletal"
-
-    raw_doc will be assigned as:
-
-         row["gtex.sqtl"] = [
-            {'gene': 'ENOSF1', 'tissue': 'Adipose_Subcutaneous'},
-            {'gene': 'ENOSF1', 'tissue': 'Muscle_Skeletal'}
-        ]
-    """
-    # when these two keys are not present in the doc, it means the responding two values in tsv files are NA values
-    if (gene_column.dest in raw_doc) and (tissue_column.dest in raw_doc):
-        gene_value = raw_doc[gene_column.dest]
-        tissue_value = raw_doc[tissue_column.dest]
-
-        # special separator "|" for GTEx
-        gtex_result = [{"gene": acc, "tissue": entry} for (acc, entry) in split_zip([gene_value, tissue_value], sep=r"|", na_values=na_values)]
-        gtex_result = _check_length(gtex_result)
-        if gtex_result is not None:
-            raw_doc["gtex.sqtl"] = gtex_result
-
-        del raw_doc[gene_column.dest]
-        del raw_doc[tissue_column.dest]
-
-    return raw_doc
-
-
-def prune_gtex_eqtl(raw_doc: dict, gene_column: Column, tissue_column: Column, na_values: set = NA_VALUES):
-    """
-    Map each GTEx gene name and tissue name from the raw document into a dictionary,
-    and assign all such dictionaries to the raw document's top "gtex" field.
-
-    E.g. with the following input value:
+    E.g. with the following input value for GTEx eQTL:
 
         row["gtex_gene"] = "ENOSF1|ENOSF1"
         row["gtex_tissue"] = "Adipose_Subcutaneous|Muscle_Skeletal"
@@ -698,12 +664,54 @@ def prune_gtex_eqtl(raw_doc: dict, gene_column: Column, tissue_column: Column, n
         gtex_result = [{"gene": acc, "tissue": entry} for (acc, entry) in split_zip([gene_value, tissue_value], sep=r"|", na_values=na_values)]
         gtex_result = _check_length(gtex_result)
         if gtex_result is not None:
-            raw_doc["gtex.eqtl"] = gtex_result
+            raw_doc[new_doc_key] = gtex_result
 
         del raw_doc[gene_column.dest]
         del raw_doc[tissue_column.dest]
 
     return raw_doc
+
+
+def prune_gtex_sqtl(raw_doc: dict, gene_column: Column, tissue_column: Column, na_values: set = NA_VALUES):
+    """
+    Map each GTEx gene name and tissue name from the raw document into a dictionary,
+    and assign all such dictionaries to the raw document's top "gtex" field.
+
+    E.g. with the following input value:
+
+        row["gtex_gene"] = "ENOSF1|ENOSF1"
+        row["gtex_tissue"] = "Adipose_Subcutaneous|Muscle_Skeletal"
+
+    raw_doc will be assigned as:
+
+         row["gtex.sqtl"] = [
+            {'gene': 'ENOSF1', 'tissue': 'Adipose_Subcutaneous'},
+            {'gene': 'ENOSF1', 'tissue': 'Muscle_Skeletal'}
+        ]
+    """
+    doc = prune_gtex(new_doc_key="gtex.sqtl", raw_doc=raw_doc, gene_column=gene_column, tissue_column=tissue_column, na_values=na_values)
+    return doc
+
+
+def prune_gtex_eqtl(raw_doc: dict, gene_column: Column, tissue_column: Column, na_values: set = NA_VALUES):
+    """
+    Map each GTEx gene name and tissue name from the raw document into a dictionary,
+    and assign all such dictionaries to the raw document's top "gtex" field.
+
+    E.g. with the following input value:
+
+        row["gtex_gene"] = "ENOSF1|ENOSF1"
+        row["gtex_tissue"] = "Adipose_Subcutaneous|Muscle_Skeletal"
+
+    raw_doc will be assigned as:
+
+         row["gtex.eqtl"] = [
+            {'gene': 'ENOSF1', 'tissue': 'Adipose_Subcutaneous'},
+            {'gene': 'ENOSF1', 'tissue': 'Muscle_Skeletal'}
+        ]
+    """
+    doc = prune_gtex(new_doc_key="gtex.eqtl", raw_doc=raw_doc, gene_column=gene_column, tissue_column=tissue_column, na_values=na_values)
+    return doc
 
 
 def prune_mutation_taster(raw_doc: dict, aae_column: Column, model_column: Column, pred_column: Column, score_column: Column, na_values: set = NA_VALUES):
