@@ -371,10 +371,10 @@ COLUMNS = [
     Column("VARITY_R_LOO_rankscore", dest="varity.r_loo.rankscore", transform=split_float_drop_na),
     Column("VARITY_ER_LOO_score", dest="varity.er_loo.score", transform=split_float_drop_na),
     Column("VARITY_ER_LOO_rankscore", dest="varity.er_loo.rankscore", transform=split_float_drop_na),
-    Column("ESM1b_score", dest="esm1b.score", transform=split_float),  # new in 4.5.a
+    Column("ESM1b_score", dest="esm1b.score", transform=split_float_drop_na),  # new in 4.5.a
     Column("ESM1b_rankscore", dest="esm1b.rankscore", transform=split_float_drop_na),  # new in 4.5.a
     Column("ESM1b_pred", dest="esm1b.pred", transform=split_str_drop_na),  # new in 4.5.a
-    Column("EVE_score", dest="eve.score", transform=split_float),  # new in 4.5.a
+    Column("EVE_score", dest="eve.score", transform=split_float_drop_na),  # new in 4.5.a
     Column("EVE_rankscore", dest="eve.rankscore", transform=split_float_drop_na),  # new in 4.5.a
     Column("EVE_Class10_pred", dest="eve.class10_pred", transform=split_str_drop_na),  # new in 4.5.a
     Column("EVE_Class20_pred", dest="eve.class20_pred", transform=split_str_drop_na),  # new in 4.5.a
