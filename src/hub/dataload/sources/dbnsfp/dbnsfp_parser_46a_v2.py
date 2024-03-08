@@ -678,7 +678,7 @@ def prune_gtex(new_doc_key: str, raw_doc: dict, gene_column: Column, tissue_colu
                 merged_result[gene] = [tissue]
 
         # Convert dictionary to list of dictionaries
-        gtex_result = [{"gene": gene, "tissue": tissues if len(tissues) > 1 else tissues[0]} for gene, tissues in merged_result.items()]
+        gtex_result = [{"gene": gene, "tissue": tissues} for gene, tissues in merged_result.items()]
 
         gtex_result = _check_length(gtex_result)
         if gtex_result is not None:

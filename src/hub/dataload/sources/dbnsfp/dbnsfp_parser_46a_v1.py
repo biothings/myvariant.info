@@ -665,7 +665,7 @@ def prune_gtex(new_doc_key: str, raw_doc: dict, gene_column: Column, tissue_colu
         tissue_value = raw_doc[tissue_column.dest]
 
         # special separator "|" for GTEx
-        gtex_result = [{"gene": acc, "tissue": entry} for (acc, entry) in split_zip(gene_value, tissue_value, sep=r"|", na_values=na_values)]
+        gtex_result = [{"gene": acc, "tissue": entry.replace("_", " ")} for (acc, entry) in split_zip(gene_value, tissue_value, sep=r"|", na_values=na_values)]
 
         # Initialize a dictionary to store gene-tissue relationships
         merged_result = {}
@@ -682,7 +682,7 @@ def prune_gtex(new_doc_key: str, raw_doc: dict, gene_column: Column, tissue_colu
                 merged_result[gene] = [tissue]
 
         # Convert dictionary to list of dictionaries
-        gtex_result = [{"gene": gene, "tissue": tissues if len(tissues) > 1 else tissues[0]} for gene, tissues in merged_result.items()]
+        gtex_result = [{"gene": gene, "tissue": tissues} for gene, tissues in merged_result.items()]
 
         gtex_result = _check_length(gtex_result)
         if gtex_result is not None:
