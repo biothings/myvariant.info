@@ -387,7 +387,7 @@ COLUMNS = [
     Column("EVE_Class75_pred", dest="eve.class75_pred", transform=split_str_drop_na),  # new in 4.5.a
     Column("EVE_Class80_pred", dest="eve.class80_pred", transform=split_str_drop_na),  # new in 4.5.a
     Column("EVE_Class90_pred", dest="eve.class90_pred", transform=split_str_drop_na),  # new in 4.5.a
-    Column("AlphaMissense_score", dest="alphamissense.score", transform=split_float),  # new in 4.5.a
+    Column("AlphaMissense_score", dest="alphamissense.score", transform=split_float_drop_na),  # new in 4.5.a
     Column("AlphaMissense_rankscore", dest="alphamissense.rankscore", transform=split_float_drop_na),  # new in 4.5.a
     Column("AlphaMissense_pred", dest="alphamissense.pred", transform=split_str_drop_na),  # new in 4.5.a
     Column("Aloft_Fraction_transcripts_affected", dest="protein.aloft.fraction_transcripts_affected", transform=split_str, tag=COLUMN_TAG.ALOFT_FRACTION_TRANSCRIPTS_AFFECTED),
@@ -661,7 +661,25 @@ def prune_gtex(new_doc_key: str, raw_doc: dict, gene_column: Column, tissue_colu
         tissue_value = raw_doc[tissue_column.dest]
 
         # special separator "|" for GTEx
-        gtex_result = [{"gene": acc, "tissue": entry} for (acc, entry) in split_zip([gene_value, tissue_value], sep=r"|", na_values=na_values)]
+        gtex_result = [{"gene": acc, "tissue": entry.replace("_", " ")} for (acc, entry) in split_zip([gene_value, tissue_value], sep=r"|", na_values=na_values)]
+
+        # Initialize a dictionary to store gene-tissue relationships
+        merged_result = {}
+
+        # Iterate through gtex_result and merge tissues for each gene
+        for entry in gtex_result:
+            gene = entry["gene"]
+            tissue = entry["tissue"]
+            if gene in merged_result:
+                # If gene already exists, append tissue to its list
+                merged_result[gene].append(tissue)
+            else:
+                # If gene doesn't exist, create a new entry with a list containing the tissue
+                merged_result[gene] = [tissue]
+
+        # Convert dictionary to list of dictionaries
+        gtex_result = [{"gene": gene, "tissue": tissues if len(tissues) > 1 else tissues[0]} for gene, tissues in merged_result.items()]
+
         gtex_result = _check_length(gtex_result)
         if gtex_result is not None:
             raw_doc[new_doc_key] = gtex_result
