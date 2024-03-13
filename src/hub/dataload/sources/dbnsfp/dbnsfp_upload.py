@@ -5,10 +5,10 @@ import glob
 # from .dbnsfp_parser_44a_v1 import load_file as load_file_v1
 # from .dbnsfp_mapping_44a_v2 import mapping as mapping_v2
 # from .dbnsfp_parser_44a_v2 import load_file as load_file_v2
-from .dbnsfp_mapping_45a_v1 import mapping as mapping_v1
-from .dbnsfp_parser_45a_v1 import load_file as load_file_v1
-from .dbnsfp_mapping_45a_v2 import mapping as mapping_v2
-from .dbnsfp_parser_45a_v2 import load_file as load_file_v2
+from .dbnsfp_mapping_46a_v1 import mapping as mapping_v1
+from .dbnsfp_parser_46a_v1 import load_file as load_file_v1
+from .dbnsfp_mapping_46a_v2 import mapping as mapping_v2
+from .dbnsfp_parser_46a_v2 import load_file as load_file_v2
 
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
@@ -25,8 +25,7 @@ SRC_META = {
 class DBNSFPBaseUploaderV1(uploader.ParallelizedSourceUploader, SnpeffPostUpdateUploader):
 
     storage_class = MyVariantIgnoreDuplicatedStorage
-    # GLOB_PATTERN = "dbNSFP*_variant.chr*"
-    GLOB_PATTERN = "dbNSFP4.5a_variant.chrM"  # TODO: Rollback this line
+    GLOB_PATTERN = "dbNSFP*_variant.chr*"
 
     @classmethod
     def get_mapping(cls):
