@@ -5,11 +5,12 @@ score_field = {"score": {"type": "float"}}
 converted_rankscore_field = {"converted_rankscore": {"type": "float"}}
 rankscore_field = {"rankscore": {"type": "float"}}
 confidence_value_field = {"confidence_value": {"type": "int"}}
+keyword_value_field = {
+    "type": "keyword",
+    "normalizer": "keyword_lowercase_normalizer"
+}
 pred_field = {
-    "pred": {
-        "type": "keyword",
-        "normalizer": "keyword_lowercase_normalizer"
-    }
+    "pred": **keyword_value_field
 }
 
 allele_count_field = {"ac": {"type": "integer"}}
@@ -21,14 +22,8 @@ adj_allele_freq_field = {"adj_af": {"type": "float"}}
 mapping = {
     "dbnsfp": {
         "properties": {
-            "rsid": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "chrom": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
+            "rsid": **keyword_value_field,
+            "chrom": **keyword_value_field,
             "hg19": {
                 "properties": {
                     **start_pos_field,
@@ -47,121 +42,46 @@ mapping = {
                     **end_pos_field
                 }
             },
-            "ref": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "alt": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
+            "ref": **keyword_value_field,
+            "alt": **keyword_value_field,
             "aa": {
                 "properties": {
-                    "ref": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "alt": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "pos": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "refcodon": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "codonpos": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "codon_degeneracy": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    "ref": **keyword_value_field,
+                    "alt": **keyword_value_field,
+                    "pos": **keyword_value_field,
+                    "refcodon": **keyword_value_field,
+                    "codonpos": **keyword_value_field,
+                    "codon_degeneracy": **keyword_value_field
                 }
             },
-            "genename": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
+            "genename": **keyword_value_field,
             "ensembl": {
                 "properties": {
-                    "geneid": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "transcriptid": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "proteinid": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    "geneid": **keyword_value_field,
+                    "transcriptid": **keyword_value_field,
+                    "proteinid": **keyword_value_field
                 }
             },
             "uniprot": {
                 "properties": {
-                    "acc": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "entry": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    "acc": **keyword_value_field,
+                    "entry": **keyword_value_field
                 }
             },
-            "hgvsc": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "hgvsp": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "appris": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "gencode_basic": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
+            "hgvsc": **keyword_value_field,
+            "hgvsp": **keyword_value_field,
+            "appris": **keyword_value_field,
+            "gencode_basic": **keyword_value_field,
             "tsl": {
                 "type": "integer"
             },
-            "vep_canonical": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "cds_strand": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "ancestral_allele": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "altai_neandertal": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "denisova": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "vindijia_neandertal": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
-            "chagyrskaya_neandertal": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
+            "vep_canonical": **keyword_value_field,
+            "cds_strand": **keyword_value_field,
+            "ancestral_allele": **keyword_value_field,
+            "altai_neandertal": **keyword_value_field,
+            "denisova": **keyword_value_field,
+            "vindijia_neandertal": **keyword_value_field,
+            "chagyrskaya_neandertal": **keyword_value_field,
             "sift": {
                 "properties": {
                     **score_field,
@@ -211,10 +131,7 @@ mapping = {
                         "properties": {
                             **pred_field,
                             **score_field,
-                            "model": {
-                                "type": "keyword",
-                                "normalizer": "keyword_lowercase_normalizer"
-                            },
+                            "model": **keyword_value_field,
                             "aae": {
                                 "type": "text"
                             }
@@ -290,14 +207,8 @@ mapping = {
                 "properties": {
                     **score_field,
                     **rankscore_field,
-                    "accession": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "aa_change": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
+                    "accession": **keyword_value_field,
+                    "aa_change": **keyword_value_field,
                     "pred": {
                         "properties": {
                             "p_val": {
@@ -402,26 +313,11 @@ mapping = {
             },
             "aloft": {
                 "properties": {
-                    "fraction_transcripts_affected": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "prob_tolerant": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "prob_recessive": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "prob_dominant": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
+                    "fraction_transcripts_affected": **keyword_value_field,
+                    "prob_tolerant": **keyword_value_field,
+                    "prob_recessive": **keyword_value_field,
+                    "prob_dominant": **keyword_value_field,
+                    "pred": **keyword_value_field,
                     "confidence": {
                         "type": "text"
                     }
@@ -456,14 +352,8 @@ mapping = {
                     "coding_rankscore": {
                         "type": "float"
                     },
-                    "coding_pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "coding_group": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    "coding_pred": **keyword_value_field,
+                    "coding_group": **keyword_value_field
                 }
             },
             "fathmm-xf": {
@@ -474,10 +364,7 @@ mapping = {
                     "coding_rankscore": {
                         "type": "float"
                     },
-                    "coding_pred": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    "coding_pred": **keyword_value_field
                 }
             },
             "eigen": {
@@ -1009,62 +896,21 @@ mapping = {
             },
             "clinvar": {
                 "properties": {
-                    "clinvar_id": {
-                        "type": "integer"
-                    },
-                    "clinsig": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "trait": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "review": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "hgvs": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "var_source": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "medgen": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "omim": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "orphanet": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
+                    "clinvar_id": **keyword_value_field,
+                    "clinsig": **keyword_value_field,
+                    "trait": **keyword_value_field,
+                    "review": **keyword_value_field,
+                    "hgvs": **keyword_value_field,
+                    "var_source": **keyword_value_field,
+                    "medgen": **keyword_value_field,
+                    "omim": **keyword_value_field,
+                    "orphanet": **keyword_value_field
                 }
             },
             "interpro_domain": {
                 "type": "text"
             },
-            "gtex": {
-                "properties": {
-                    "gene": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    },
-                    "tissue": {
-                        "type": "keyword",
-                        "normalizer": "keyword_lowercase_normalizer"
-                    }
-                }
-            },
-            "geuvadis_eqtl_target_gene": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
+            "geuvadis_eqtl_target_gene": **keyword_value_field,
             "esm1b": {  # new in 4.5.a
                 "properties": {
                     **score_field,
@@ -1076,61 +922,17 @@ mapping = {
                 "properties": {
                     **score_field,
                     **rankscore_field,
-                    "class10": {
-                        "properties": {
-                            **pred_field
-                        }
-                    },
-                    "class20": {
-                        "properties": {
-                            **pred_field
-                        }
-                    },
-                    "class25": {
-                        "properties": {
-                            **pred_field
-                        }
-                    },
-                    "class30": {
-                        "properties": {
-                            **pred_field
-                        }
-                    },
-                    "class40": {
-                        "properties": {
-                            **pred_field
-                        }
-                    },
-                    "class50": {
-                        "properties": {
-                            **pred_field
-                        }
-                    },
-                    "class60": {
-                        "properties": {
-                            **pred_field
-                        }
-                    },
-                    "class70": {
-                        "properties": {
-                            **pred_field
-                        }
-                    },
-                    "class75": {
-                        "properties": {
-                            **pred_field
-                        }
-                    },
-                    "class80": {
-                        "properties": {
-                            **pred_field
-                        }
-                    },
-                    "class90": {
-                        "properties": {
-                            **pred_field
-                        }
-                    }
+                    "class10_pred": **keyword_value_field,
+                    "class20_pred": **keyword_value_field,
+                    "class25_pred": **keyword_value_field,
+                    "class30_pred": **keyword_value_field,
+                    "class40_pred": **keyword_value_field,
+                    "class50_pred": **keyword_value_field,
+                    "class60_pred": **keyword_value_field,
+                    "class70_pred": **keyword_value_field,
+                    "class75_pred": **keyword_value_field,
+                    "class80_pred": **keyword_value_field,
+                    "class90_pred": **keyword_value_field
                 }
             },
             "alphamissense": {
@@ -1138,6 +940,34 @@ mapping = {
                     **score_field,
                     **rankscore_field,
                     **pred_field
+                }
+            },
+            "gtex": {
+                "properties": {
+                    "eqtl": {
+                        "properties": {
+                            "gene": **keyword_value_field,
+                            "tissue": {
+                                "type": "text"
+                            }
+                        }
+                    },
+                    "sqtl": {
+                        "properties": {
+                            "gene": **keyword_value_field,
+                            "tissue": {
+                                "type": "text"
+                            }
+                        }
+                    }
+                }
+            },
+            "eqtlgen": {
+                "properties": {
+                    "snp_id": **keyword_value_field,
+                    "gene_id": **keyword_value_field,
+                    "gene_symbol": **keyword_value_field,
+                    "cis_or_trans": **keyword_value_field
                 }
             }
         }
