@@ -9,9 +9,7 @@ keyword_value_field = {
     "type": "keyword",
     "normalizer": "keyword_lowercase_normalizer"
 }
-pred_field = {
-    "pred": **keyword_value_field
-}
+pred_field = {"pred": keyword_value_field}
 
 allele_count_field = {"ac": {"type": "integer"}}
 allele_num_field = {"an": {"type": "integer"}}
@@ -22,8 +20,8 @@ adj_allele_freq_field = {"adj_af": {"type": "float"}}
 mapping = {
     "dbnsfp": {
         "properties": {
-            "rsid": **keyword_value_field,
-            "chrom": **keyword_value_field,
+            "rsid": keyword_value_field,
+            "chrom": keyword_value_field,
             "hg19": {
                 "properties": {
                     **start_pos_field,
@@ -42,46 +40,46 @@ mapping = {
                     **end_pos_field
                 }
             },
-            "ref": **keyword_value_field,
-            "alt": **keyword_value_field,
+            "ref": keyword_value_field,
+            "alt": keyword_value_field,
             "aa": {
                 "properties": {
-                    "ref": **keyword_value_field,
-                    "alt": **keyword_value_field,
-                    "pos": **keyword_value_field,
-                    "refcodon": **keyword_value_field,
-                    "codonpos": **keyword_value_field,
-                    "codon_degeneracy": **keyword_value_field
+                    "ref": keyword_value_field,
+                    "alt": keyword_value_field,
+                    "pos": keyword_value_field,
+                    "refcodon": keyword_value_field,
+                    "codonpos": keyword_value_field,
+                    "codon_degeneracy": keyword_value_field
                 }
             },
-            "genename": **keyword_value_field,
+            "genename": keyword_value_field,
             "ensembl": {
                 "properties": {
-                    "geneid": **keyword_value_field,
-                    "transcriptid": **keyword_value_field,
-                    "proteinid": **keyword_value_field
+                    "geneid": keyword_value_field,
+                    "transcriptid": keyword_value_field,
+                    "proteinid": keyword_value_field
                 }
             },
             "uniprot": {
                 "properties": {
-                    "acc": **keyword_value_field,
-                    "entry": **keyword_value_field
+                    "acc": keyword_value_field,
+                    "entry": keyword_value_field
                 }
             },
-            "hgvsc": **keyword_value_field,
-            "hgvsp": **keyword_value_field,
-            "appris": **keyword_value_field,
-            "gencode_basic": **keyword_value_field,
+            "hgvsc": keyword_value_field,
+            "hgvsp": keyword_value_field,
+            "appris": keyword_value_field,
+            "gencode_basic": keyword_value_field,
             "tsl": {
                 "type": "integer"
             },
-            "vep_canonical": **keyword_value_field,
-            "cds_strand": **keyword_value_field,
-            "ancestral_allele": **keyword_value_field,
-            "altai_neandertal": **keyword_value_field,
-            "denisova": **keyword_value_field,
-            "vindijia_neandertal": **keyword_value_field,
-            "chagyrskaya_neandertal": **keyword_value_field,
+            "vep_canonical": keyword_value_field,
+            "cds_strand": keyword_value_field,
+            "ancestral_allele": keyword_value_field,
+            "altai_neandertal": keyword_value_field,
+            "denisova": keyword_value_field,
+            "vindijia_neandertal": keyword_value_field,
+            "chagyrskaya_neandertal": keyword_value_field,
             "sift": {
                 "properties": {
                     **score_field,
@@ -131,7 +129,7 @@ mapping = {
                         "properties": {
                             **pred_field,
                             **score_field,
-                            "model": **keyword_value_field,
+                            "model": keyword_value_field,
                             "aae": {
                                 "type": "text"
                             }
@@ -207,8 +205,8 @@ mapping = {
                 "properties": {
                     **score_field,
                     **rankscore_field,
-                    "accession": **keyword_value_field,
-                    "aa_change": **keyword_value_field,
+                    "accession": keyword_value_field,
+                    "aa_change": keyword_value_field,
                     "pred": {
                         "properties": {
                             "p_val": {
@@ -313,11 +311,11 @@ mapping = {
             },
             "aloft": {
                 "properties": {
-                    "fraction_transcripts_affected": **keyword_value_field,
-                    "prob_tolerant": **keyword_value_field,
-                    "prob_recessive": **keyword_value_field,
-                    "prob_dominant": **keyword_value_field,
-                    "pred": **keyword_value_field,
+                    "fraction_transcripts_affected": keyword_value_field,
+                    "prob_tolerant": keyword_value_field,
+                    "prob_recessive": keyword_value_field,
+                    "prob_dominant": keyword_value_field,
+                    "pred": keyword_value_field,
                     "confidence": {
                         "type": "text"
                     }
@@ -352,8 +350,8 @@ mapping = {
                     "coding_rankscore": {
                         "type": "float"
                     },
-                    "coding_pred": **keyword_value_field,
-                    "coding_group": **keyword_value_field
+                    "coding_pred": keyword_value_field,
+                    "coding_group": keyword_value_field
                 }
             },
             "fathmm-xf": {
@@ -364,7 +362,7 @@ mapping = {
                     "coding_rankscore": {
                         "type": "float"
                     },
-                    "coding_pred": **keyword_value_field
+                    "coding_pred": keyword_value_field
                 }
             },
             "eigen": {
@@ -896,21 +894,21 @@ mapping = {
             },
             "clinvar": {
                 "properties": {
-                    "clinvar_id": **keyword_value_field,
-                    "clinsig": **keyword_value_field,
-                    "trait": **keyword_value_field,
-                    "review": **keyword_value_field,
-                    "hgvs": **keyword_value_field,
-                    "var_source": **keyword_value_field,
-                    "medgen": **keyword_value_field,
-                    "omim": **keyword_value_field,
-                    "orphanet": **keyword_value_field
+                    "clinvar_id": keyword_value_field,
+                    "clinsig": keyword_value_field,
+                    "trait": keyword_value_field,
+                    "review": keyword_value_field,
+                    "hgvs": keyword_value_field,
+                    "var_source": keyword_value_field,
+                    "medgen": keyword_value_field,
+                    "omim": keyword_value_field,
+                    "orphanet": keyword_value_field
                 }
             },
             "interpro_domain": {
                 "type": "text"
             },
-            "geuvadis_eqtl_target_gene": **keyword_value_field,
+            "geuvadis_eqtl_target_gene": keyword_value_field,
             "esm1b": {  # new in 4.5.a
                 "properties": {
                     **score_field,
@@ -922,17 +920,17 @@ mapping = {
                 "properties": {
                     **score_field,
                     **rankscore_field,
-                    "class10_pred": **keyword_value_field,
-                    "class20_pred": **keyword_value_field,
-                    "class25_pred": **keyword_value_field,
-                    "class30_pred": **keyword_value_field,
-                    "class40_pred": **keyword_value_field,
-                    "class50_pred": **keyword_value_field,
-                    "class60_pred": **keyword_value_field,
-                    "class70_pred": **keyword_value_field,
-                    "class75_pred": **keyword_value_field,
-                    "class80_pred": **keyword_value_field,
-                    "class90_pred": **keyword_value_field
+                    "class10_pred": keyword_value_field,
+                    "class20_pred": keyword_value_field,
+                    "class25_pred": keyword_value_field,
+                    "class30_pred": keyword_value_field,
+                    "class40_pred": keyword_value_field,
+                    "class50_pred": keyword_value_field,
+                    "class60_pred": keyword_value_field,
+                    "class70_pred": keyword_value_field,
+                    "class75_pred": keyword_value_field,
+                    "class80_pred": keyword_value_field,
+                    "class90_pred": keyword_value_field
                 }
             },
             "alphamissense": {
@@ -946,7 +944,7 @@ mapping = {
                 "properties": {
                     "eqtl": {
                         "properties": {
-                            "gene": **keyword_value_field,
+                            "gene": keyword_value_field,
                             "tissue": {
                                 "type": "text"
                             }
@@ -954,7 +952,7 @@ mapping = {
                     },
                     "sqtl": {
                         "properties": {
-                            "gene": **keyword_value_field,
+                            "gene": keyword_value_field,
                             "tissue": {
                                 "type": "text"
                             }
@@ -964,12 +962,13 @@ mapping = {
             },
             "eqtlgen": {
                 "properties": {
-                    "snp_id": **keyword_value_field,
-                    "gene_id": **keyword_value_field,
-                    "gene_symbol": **keyword_value_field,
-                    "cis_or_trans": **keyword_value_field
+                    "snp_id": keyword_value_field,
+                    "gene_id": keyword_value_field,
+                    "gene_symbol": keyword_value_field,
+                    "cis_or_trans": keyword_value_field
                 }
             }
         }
     }
 }
+print(mapping)
