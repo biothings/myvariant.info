@@ -940,7 +940,7 @@ mapping = {
                     **pred_field
                 }
             },
-            "gtex": {
+            "gtex": {  # new in 4.6.a
                 "properties": {
                     "eqtl": {
                         "properties": {
@@ -971,4 +971,3 @@ mapping = {
         }
     }
 }
-print(mapping)
