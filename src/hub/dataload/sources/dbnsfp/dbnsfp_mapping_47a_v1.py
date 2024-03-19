@@ -4,7 +4,7 @@ end_pos_field = {"end": {"type": "integer"}}
 score_field = {"score": {"type": "float"}}
 converted_rankscore_field = {"converted_rankscore": {"type": "float"}}
 rankscore_field = {"rankscore": {"type": "float"}}
-confidence_value_field = {"confidence_value": {"type": "int"}}
+confidence_value_field = {"confidence_value": {"type": "integer"}}
 keyword_value_field = {
     "type": "keyword",
     "normalizer": "keyword_lowercase_normalizer"
