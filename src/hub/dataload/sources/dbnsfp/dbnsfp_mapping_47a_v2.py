@@ -363,28 +363,30 @@ mapping = {
                 }
             },
             "varity": {
-                "r": {
-                    "properties": {
-                        **score_field,
-                        **rankscore_field
-                    }
-                },
-                "er": {
-                    "properties": {
-                        **score_field,
-                        **rankscore_field
-                    }
-                },
-                "r_loo": {
-                    "properties": {
-                        **score_field,
-                        **rankscore_field
-                    }
-                },
-                "er_loo": {
-                    "properties": {
-                        **score_field,
-                        **rankscore_field
+                "properties": {
+                    "r": {
+                        "properties": {
+                            **score_field,
+                            **rankscore_field
+                        }
+                    },
+                    "er": {
+                        "properties": {
+                            **score_field,
+                            **rankscore_field
+                        }
+                    },
+                    "r_loo": {
+                        "properties": {
+                            **score_field,
+                            **rankscore_field
+                        }
+                    },
+                    "er_loo": {
+                        "properties": {
+                            **score_field,
+                            **rankscore_field
+                        }
                     }
                 }
             },
