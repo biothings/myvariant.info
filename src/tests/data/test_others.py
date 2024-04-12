@@ -25,6 +25,8 @@ class TestMyvariant(BiothingsDataTest):
                 subsrc = stat.replace("_%s" % assembly, "")
                 if subsrc in ("gnomad_genomes", "gnomad_exomes"):
                     subsrc = subsrc.rstrip("s")  # plural in meta, singular in docs
+                if "dbnsfp" in subsrc:  # TODO: Remove this check when dbNSFP v1 or v2 is set to default.
+                    subsrc = subsrc.replace("_v1", "")
                 meta_cnt = meta["src"][src_name]["stats"][stat]
                 try:
                     res = self.request("query?q=_exists_:%s&size=0&assembly=%s" %
