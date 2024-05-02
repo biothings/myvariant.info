@@ -141,7 +141,7 @@ class TestMyvariant(BiothingsDataTest):
 
 
 class TestMyVariantCurieIdParsing(BiothingsDataTest):
-    host = "localhost:8000"
+    host = "myvariant.info"
     prefix = "v1"
 
     def test_001_curie_id_annotation_endpoint_GET(self):
