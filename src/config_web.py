@@ -6,8 +6,7 @@ from biothings.web.settings.default import ANNOTATION_KWARGS, APP_LIST, QUERY_KW
 # *****************************************************************************
 # Elasticsearch variables
 # *****************************************************************************
-# ES_HOST = "es6.biothings.io"
-ES_HOST = "http://es8.biothings.io:9200"
+ES_HOST = "es6.biothings.io"
 ES_ARGS = {
     "timeout": 210,
 }
