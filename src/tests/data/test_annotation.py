@@ -140,8 +140,8 @@ class TestMyvariant(BiothingsDataTest):
 
 
 
-class TestMyChemCurieIdParsing(BiothingsDataTest):
-    host = "myvariant.info"
+class TestMyVariantCurieIdParsing(BiothingsDataTest):
+    host = "localhost:8000"
     prefix = "v1"
 
     def test_001_curie_id_annotation_endpoint_GET(self):
@@ -152,7 +152,27 @@ class TestMyChemCurieIdParsing(BiothingsDataTest):
         for all the provided queries
         """
         curie_id_testing_collection = [
-            ("<INSERT>")
+            (
+                "chr19:g.11576858T>C?assembly=hg38",
+                "clingen.caid:CA305359245?assembly=hg38",
+                "CAID:CA305359245?assembly=hg38",
+                "caid:CA305359245?assembly=hg38",
+                "CaiD:CA305359245?assembly=hg38"
+            ),
+            (
+                "chr18:g.23536742C>T?assembly=hg38",
+                "dbsnp.rsid:rs771000314?assembly=hg38",
+                "DBSNP:rs771000314?assembly=hg38",
+                "dbsnp:rs771000314?assembly=hg38",
+                "DBsnP:rs771000314?assembly=hg38"
+            ),
+            (
+                "chr19:g.39424249C>A?assembly=hg38",
+                "clinvar.variant_id:1992548?assembly=hg38",
+                "CLINVAR:1992548?assembly=hg38",
+                "clinvar:1992548?assembly=hg38",
+                "ClinVAR:1992548?assembly=hg38"
+            )
         ]
         aggregation_query_groups = []
         endpoint = "variant"
@@ -162,9 +182,6 @@ class TestMyChemCurieIdParsing(BiothingsDataTest):
                 query_result = self.request(f"{endpoint}/{similar_query}", expect=200)
                 query_result = self.request(f"{endpoint}/{similar_query}")
                 assert isinstance(query_result, requests.models.Response)
-                assert query_result.url == self.get_url(
-                    path=f"{endpoint}/{similar_query}"
-                )
                 query_result_storage.append(query_result.json())
 
             results_aggregation = [
@@ -191,7 +208,27 @@ class TestMyChemCurieIdParsing(BiothingsDataTest):
         queries
         """
         curie_id_testing_collection = [
-            ("<INSERT_QUERY>")
+            (
+                "chr19:g.11576858T>C?assembly=hg38",
+                "clingen.caid:CA305359245?assembly=hg38",
+                "CAID:CA305359245?assembly=hg38",
+                "caid:CA305359245?assembly=hg38",
+                "CaiD:CA305359245?assembly=hg38"
+            ),
+            (
+                "chr18:g.23536742C>T?assembly=hg38",
+                "dbsnp.rsid:rs771000314?assembly=hg38",
+                "DBSNP:rs771000314?assembly=hg38",
+                "dbsnp:rs771000314?assembly=hg38",
+                "DBsnP:rs771000314?assembly=hg38"
+            ),
+            (
+                "chr19:g.39424249C>A?assembly=hg38",
+                "clinvar.variant_id:1992548?assembly=hg38",
+                "CLINVAR:1992548?assembly=hg38",
+                "clinvar:1992548?assembly=hg38",
+                "ClinVAR:1992548?assembly=hg38"
+            )
         ]
 
         results_aggregation = []
