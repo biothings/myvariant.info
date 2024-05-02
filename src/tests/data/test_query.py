@@ -32,7 +32,6 @@ class TestMyvariant(BiothingsDataTest):
         self.query(q="_exists_:dbnsfp.clinvar.medgen&fields=dbnsfp.clinvar")
 
     def test_121_query(self):
-        breakpoint()
         self.query(q="rs58991260")
 
     def test_122_query(self):
