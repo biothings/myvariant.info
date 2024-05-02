@@ -6,7 +6,8 @@ from biothings.web.settings.default import ANNOTATION_KWARGS, APP_LIST, QUERY_KW
 # *****************************************************************************
 # Elasticsearch variables
 # *****************************************************************************
-ES_HOST = "es6.biothings.io"
+# ES_HOST = "es6.biothings.io"
+ES_HOST = "http://es8.biothings.io:9200"
 ES_ARGS = {
     "timeout": 210,
 }
@@ -74,17 +75,17 @@ BIOLINK_MODEL_PREFIX_BIOTHINGS_VARIANT_MAPPING = {
     "DBSNP": {
         "type": "variant",
         "field": "dbsnp.rsid",
-        "regex_term_pattern": "rs[0-9]+",
+        "regex_term_pattern": "(?P<term>rs[0-9]+)"
     },
     "CLINVAR": {
         "type": "variant",
         "field": "clinvar.variant_id",
-        "regex_term_pattern": "(?P<term>[0-9]+)",
+        "regex_term_pattern": "(?P<term>[0-9]+)"
     },
     "CAID": {
         "type": "variant",
         "field": "clingen.caid",
-        "regex_term_pattern": "(?P<term>CA[0-9]+)",
+        "regex_term_pattern": "(?P<term>CA[0-9]+)"
     },
 }
 
