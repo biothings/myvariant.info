@@ -75,17 +75,17 @@ BIOLINK_MODEL_PREFIX_BIOTHINGS_VARIANT_MAPPING = {
     "DBSNP": {
         "type": "variant",
         "field": "dbsnp.rsid",
-        "regex_term_pattern": "(?P<term>rs[0-9]+)"
+        "regex_term_pattern": "(?P<term>rs[0-9]+)",
     },
     "CLINVAR": {
         "type": "variant",
         "field": "clinvar.variant_id",
-        "regex_term_pattern": "(?P<term>[0-9]+)"
+        "regex_term_pattern": "(?P<term>[0-9]+)",
     },
     "CAID": {
         "type": "variant",
         "field": "clingen.caid",
-        "regex_term_pattern": "(?P<term>CA[0-9]+)"
+        "regex_term_pattern": "(?P<term>CA[0-9]+)",
     },
 }
 
@@ -109,6 +109,7 @@ for (
 
 # Custom prefix handling for variant specific identifiers
 variant_prefix_handling = [
+    (re.compile(r"rs[0-9]+", re.I), "dbsnp.rsid"),
     (re.compile(r"rcv[0-9\.]+", re.I), "clinvar.rcv.accession"),
     (re.compile(r"var_[0-9]+", re.I), "uniprot.humsavar.ftid"),
 ]
