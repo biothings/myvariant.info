@@ -108,7 +108,7 @@ for (
 
 # Custom prefix handling for variant specific identifiers
 variant_prefix_handling = [
-    (re.compile(r'chr(.?)+', re.I), '_id'),
+    (re.compile(r"chr(.?)+", re.I), "_id"),
     (re.compile(r"rs[0-9]+", re.I), "dbsnp.rsid"),
     (re.compile(r"rcv[0-9\.]+", re.I), "clinvar.rcv.accession"),
     (re.compile(r"var_[0-9]+", re.I), "uniprot.humsavar.ftid"),
