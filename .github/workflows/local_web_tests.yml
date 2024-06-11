@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements_web.txt
       - name: Install PyTest
-        run: pip install pytest==8.2.1
+        run: pip install pytest
       - name: Run App Tests
         run: pytest test_local.py
         working-directory: src/tests/app
