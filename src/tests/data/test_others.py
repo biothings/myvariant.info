@@ -4,8 +4,8 @@ from biothings.tests.web import BiothingsDataTest
 
 
 class TestMyvariant(BiothingsDataTest):
-    prefix = 'v1'
-    host = 'myvariant.info'
+    prefix = "v1"
+    host = "myvariant.info"
 
     def check_index_count(self, assembly):
         # when run individually
@@ -25,17 +25,20 @@ class TestMyvariant(BiothingsDataTest):
                 subsrc = stat.replace("_%s" % assembly, "")
                 if subsrc in ("gnomad_genomes", "gnomad_exomes"):
                     subsrc = subsrc.rstrip("s")  # plural in meta, singular in docs
-                if "dbnsfp" in subsrc:  # TODO: Remove this check when dbNSFP v1 or v2 is set to default.
+                if (
+                    "dbnsfp" in subsrc
+                ):  # TODO: Remove this check when dbNSFP v1 or v2 is set to default.
                     subsrc = subsrc.replace("_v1", "")
                 meta_cnt = meta["src"][src_name]["stats"][stat]
                 try:
-                    res = self.request("query?q=_exists_:%s&size=0&assembly=%s" %
-                                       (subsrc, assembly)).json()
+                    res = self.request(
+                        "query?q=_exists_:%s&size=0&assembly=%s" % (subsrc, assembly)
+                    ).json()
                 except:
                     print(f'Query error for ("{subsrc}", "{assembly}")')
                     raise
                 results[subsrc] = {"meta": meta_cnt, "index": res["total"]}
-            #assert res["total"] == meta_cnt, "Count in metadata (%s) doesn't match count from query (%s) for datasource '%s'" % (meta_cnt,res["total"],subsrc)
+            # assert res["total"] == meta_cnt, "Count in metadata (%s) doesn't match count from query (%s) for datasource '%s'" % (meta_cnt,res["total"],subsrc)
         errs = {}
         for src in results:
             mc = results[src]["meta"]
@@ -49,16 +52,16 @@ class TestMyvariant(BiothingsDataTest):
         self.request("metadata").content
 
     def test_301_fields(self):
-        res = self.request('metadata/fields').json()
+        res = self.request("metadata/fields").json()
         # Check to see if there are enough keys
         assert len(res) > 480
 
         # Check some specific keys
-        assert 'cadd' in res
-        assert 'dbnsfp' in res
-        assert 'dbsnp' in res
-        assert 'wellderly' in res
-        assert 'clinvar' in res
+        assert "cadd" in res
+        assert "dbnsfp" in res
+        assert "dbsnp" in res
+        assert "wellderly" in res
+        assert "clinvar" in res
 
     def test_320_index_count_hg19(self):
         self.check_index_count("hg19")

@@ -40,7 +40,7 @@ _sys.path.insert(0, _os.path.dirname(_cfg_path))
 del CONFIG_FILE_NAME
 
 # override default
-ES_HOST = 'localhost:9200'
+ES_HOST = 'http://localhost:9200'
 ES_INDICES = {
     None: 'mvtest_hg19',
     'variant': 'mvtest_hg19',
@@ -48,5 +48,5 @@ ES_INDICES = {
     'hg38': 'mvtest_hg38'
 }
 ES_ARGS = {
-    'timeout': 120,
+    'request_timeout': 120,
 }
