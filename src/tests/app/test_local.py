@@ -106,8 +106,7 @@ class TestRedirecdt(BiothingsWebAppTest):
         assert res.headers['location'] == '/v1/variant/chrTM:g.1test'
 
     def test_redir_not(self):
-        # we don't have ES for this test class, expect 500
-        self.request('/v1/variant/chr8:g.7194707G>A', expect=500,
+        self.request('/v1/variant/chr8:g.7194707G>A', expect=404,
                      allow_redirects=False)
 
 
