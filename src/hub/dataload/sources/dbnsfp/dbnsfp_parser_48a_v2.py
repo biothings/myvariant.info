@@ -442,7 +442,7 @@ COLUMNS = [
     Column("GERP++_NR", transform=split_float_drop_na),
     Column("GERP++_RS", transform=split_float_drop_na),
     Column("GERP++_RS_rankscore", dest="gerp++.rs_rankscore", transform=split_float_drop_na),
-    Column("GERP_91_mammals", dest="gerp.91_mammals", transform=split_float_drop_na),  # new in 4.8.a
+    Column("GERP_91_mammals", dest="gerp.91_mammals.score", transform=split_float_drop_na),  # new in 4.8.a
     Column("GERP_91_mammals_rankscore", dest="gerp.91_mammals.rankscore", transform=split_float_drop_na),  # new in 4.8.a
     Column("phyloP100way_vertebrate", dest="phylop.100way_vertebrate.score", transform=split_float_drop_na),
     Column("phyloP100way_vertebrate_rankscore", dest="phylop.100way_vertebrate.rankscore", transform=split_float_drop_na),
