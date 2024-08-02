@@ -2,9 +2,9 @@ import os
 import re
 import requests
 from urllib.parse import urlparse, parse_qs
-from ftplib import FTP
 from bs4 import BeautifulSoup
 import zipfile
+import xml.etree.ElementTree as ET
 
 from config import DATA_ARCHIVE_ROOT
 from biothings.hub.dataload.dumper import HTTPDumper, DumperException
@@ -32,34 +32,53 @@ class DBNSFPDumper(HTTPDumper):
     BETA_RELEASE_PATTERN = re.compile("(\d+\.\d+)\w\d(\w)")
 
     def get_newest_info(self):
+        # Fetch the response from the endpoint
+        response = requests.get("https://dbnsfp.s3.amazonaws.com/")
+        response_content = response.content
+
+        # Parse the XML response
+        root = ET.fromstring(response_content)
+
+        # Namespace for the XML
+        namespace = {'ns': 'http://s3.amazonaws.com/doc/2006-03-01/'}
+
+        # Look for filenames ending with "a" (for Academic), not "c" (for Commercial).
+        #   Also, sometimes there's a "v", sometimes not...
+        FILENAME_PATTERN = re.compile("dbNSFPv?(\d+\..*\d+a)\.zip")
+        # Check if a release is a beta release.
+        # Tricky there, usually releases are like 4.0a, 4.0b1a, 4.0b2a.
+        #   If sorted, 4.0b2a will be the "newest", but it's a beta (b2) and 4.0a is actually the newest there
+        BETA_RELEASE_PATTERN = re.compile("(\d+\.\d+)\w\d(\w)")
+
         release_map = dict()  # a dict of <release_num, file_name>
 
-        ftp = FTP("dbnsfp.softgenetics.com")
-        ftp.login("dbnsfp", "dbnsfp")
-        for filename in ftp.nlst():
-            filename_match = self.FILENAME_PATTERN.match(filename)
+        # Iterate through each Contents element in the XML
+        for contents in root.findall('ns:Contents', namespace):
+            key = contents.find('ns:Key', namespace).text
+
+            filename_match = self.FILENAME_PATTERN.match(key)
             if filename_match:
                 release = filename_match.groups()[0]
-                release_map[release] = filename
+                release_map[release] = key
 
-        # get the last item in the list, which is the latest version
-        newest_release = sorted(release_map.keys())[-1]
+                # get the last item in the list, which is the latest version
+                newest_release = sorted(release_map.keys())[-1]
 
-        beta_release_match = self.BETA_RELEASE_PATTERN.match(newest_release)
-        if beta_release_match:
-            # If the newest release is a beta release, infer its stable release
-            stable_release = "".join(beta_release_match.groups())
+                beta_release_match = self.BETA_RELEASE_PATTERN.match(newest_release)
+                if beta_release_match:
+                    # If the newest release is a beta release, infer its stable release
+                    stable_release = "".join(beta_release_match.groups())
 
-            # If the inferred stable release is available, use it instead of the beta release
-            if stable_release in release_map:
-                self.logger.info(f"Stable release {stable_release} detected; beta release {newest_release} discarded.")
-                newest_release = stable_release
-            # Otherwise just use the beta release
-            # else:
-            #     pass
+                    # If the inferred stable release is available, use it instead of the beta release
+                    if stable_release in release_map:
+                        self.logger.info(f"Stable release {stable_release} detected; beta release {newest_release} discarded.")
+                        newest_release = stable_release
+                    # Otherwise just use the beta release
+                    # else:
+                    #     pass
 
-        self.release = newest_release
-        self.newest_file = release_map[newest_release]
+                self.release = newest_release
+                self.newest_file = release_map[newest_release]
 
     def new_release_available(self):
         current_release = self.src_doc.get("download", {}).get("release")

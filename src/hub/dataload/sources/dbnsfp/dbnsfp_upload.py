@@ -1,14 +1,10 @@
 import os
 import glob
 
-# from .dbnsfp_mapping_44a_v1 import mapping as mapping_v1
-# from .dbnsfp_parser_44a_v1 import load_file as load_file_v1
-# from .dbnsfp_mapping_44a_v2 import mapping as mapping_v2
-# from .dbnsfp_parser_44a_v2 import load_file as load_file_v2
-from .dbnsfp_mapping_47a_v1 import mapping as mapping_v1
-from .dbnsfp_parser_47a_v1 import load_file as load_file_v1
-from .dbnsfp_mapping_47a_v2 import mapping as mapping_v2
-from .dbnsfp_parser_47a_v2 import load_file as load_file_v2
+from .dbnsfp_mapping_48a_v1 import mapping as mapping_v1
+from .dbnsfp_parser_48a_v1 import load_file as load_file_v1
+from .dbnsfp_mapping_48a_v2 import mapping as mapping_v2
+from .dbnsfp_parser_48a_v2 import load_file as load_file_v2
 
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
