@@ -23,6 +23,7 @@ jobs:
       APPLICATION_NAME: "myvariant.info" # The name of the application being tested. It will be displayed in the Slack message.
       APPLICATION_METADATA_URL: "https://myvariant.info/metadata" # Path to the application metadata, typically a URL.
       APPLICATION_METADATA_FIELD: "build_date" # Notation to the build version field. Ex.: "metadata.build_version"
+      BYPASS_VERSION_CHECK: "True"
 
     strategy:
       fail-fast: false
