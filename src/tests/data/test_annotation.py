@@ -6,7 +6,6 @@ import logging
 
 import pytest
 import requests
-import unittest
 
 from biothings.tests.web import BiothingsDataTest
 
@@ -138,6 +137,7 @@ class TestMyvariant(BiothingsDataTest):
         res = self.request("variant/rs2267").json()
         assert isinstance(res, list)
         assert len(res) == 2
+
 
 
 class TestMyVariantCurieIdParsing(BiothingsDataTest):
