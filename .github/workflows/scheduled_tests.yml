@@ -41,7 +41,9 @@ jobs:
           python -m venv .venv
           source .venv/bin/activate
           pip install --upgrade pip
-          pip install -r requirements_web.txt
+          # pip install -r requirements_web.txt
+          # TODO: Remove after fixing 1.0.x for test_001_curie_id_annotation_endpoint_GET
+          pip install git+https://github.com/biothings/biothings.api.git@1.0.x
 
           git clone https://github.com/biothings/biothings_client.py.git
           cd biothings_client.py
