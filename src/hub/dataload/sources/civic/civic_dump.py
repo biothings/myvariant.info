@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 import datetime
 
@@ -72,7 +73,7 @@ class CivicDumper(HTTPDumper):
         variant_data.update(res_contributor_avatars)
 
         with open(localfile, 'wb') as f:
-            f.write(variant_data)
+            json.dump(variant_data, f)
         return variant_data
 
     def merge_dicts(self, d1, d2):
