@@ -4,7 +4,7 @@ import requests
 
 class GraphqlVariants():
 
-    OPERATION_NAME = "ListVariants"
+    OPERATION_NAME = "BrowseVariants"
 
     QUERY = """
         query BrowseVariants($variantName: String, $featureName: String, $diseaseName: String, $therapyName: String, $variantAlias: String, $variantTypeId: Int, $variantGroupId: Int, $variantTypeName: String, $hasNoVariantType: Boolean, $variantCategory: VariantCategories, $sortBy: VariantsSort, $first: Int, $last: Int, $before: String, $after: String) {
