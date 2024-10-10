@@ -36,7 +36,7 @@ class CivicDumper(HTTPDumper):
             query_variables = {
                 "after": previousPageEnd
             }
-            response = GraphqlVariants().fetch_variants()
+            response = GraphqlVariants().fetch()
             response_data = response.json()
             if response.status_code == 200:
                 # data = response_data['data']
