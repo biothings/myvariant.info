@@ -45,7 +45,7 @@ class CivicDumper(HTTPDumper):
                 # previousPageEnd = response_data['data']['browseVariants']['pageInfo']['endCursor']
 
         self.logger.info("Now download files")
-        for variant_id in ids:
+        for variant_id in ids[:5]:  # TODO: Remove the top 5 [:5]
             logging.info("### variant_id")
             logging.info(variant_id)
 
