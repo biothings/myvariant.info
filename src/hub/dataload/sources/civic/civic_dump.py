@@ -68,10 +68,8 @@ class CivicDumper(HTTPDumper):
         res_contributor_avatars = GraphqlContributorAvatars().fetch(variant_id=variant_id)
 
         variant_data = self.merge_dicts(res_summary, res_detail)
-        variant_data.update(
-            res_molecular_profiles,
-            res_contributor_avatars
-        )
+        variant_data.update(res_molecular_profiles)
+        variant_data.update(res_contributor_avatars)
 
         fout = open(localfile, 'wb')
         for chunk in variant_data.iter_content(chunk_size=512 * 1024):
