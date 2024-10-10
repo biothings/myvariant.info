@@ -288,7 +288,7 @@ class GraphqlVariantSummary():
         }
     """
 
-    def get_query(self, variant_id: int):
+    def gql(self, variant_id: int):
         query = {
             "operationName": self.OPERATION_NAME,
             "query": self.QUERY,
