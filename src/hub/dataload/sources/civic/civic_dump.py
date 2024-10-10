@@ -33,21 +33,12 @@ class CivicDumper(HTTPDumper):
         previousPageEnd = None
         # loop through all the pages
         while hasNextPage:
-            query_variables = {
-                "after": previousPageEnd
-            }
-            response = GraphqlVariants().fetch()
-            response_data = response.json()
-            if response.status_code == 200:
-                # data = response_data['data']
-                # ids.append(int(data['browseVariants']['edges']['id']))
-                for variant in response_data['data']['browseVariants']['edges']:
-                    ids.append(variant['node']['id'])
-                hasNextPage = response_data['data']['browseVariants']['pageInfo']['hasNextPage']
-                hasNextPage = False # TODO: Remove to get all pages
-                previousPageEnd = response_data['data']['browseVariants']['pageInfo']['endCursor']
-            else:
-                self.logger.error("Query failed to run by returning code of {}. {}".format(response.status_code, query_variables))
+            response_data = GraphqlVariants().fetch()
+            for variant in response_data['data']['browseVariants']['edges']:
+                ids.append(variant['node']['id'])
+            hasNextPage = response_data['data']['browseVariants']['pageInfo']['hasNextPage']
+            hasNextPage = False # TODO: Remove to get all pages
+            previousPageEnd = response_data['data']['browseVariants']['pageInfo']['endCursor']
 
         self.logger.info("Now download files")
         for variant_id in ids:
