@@ -30,7 +30,7 @@ class CivicDumper(HTTPDumper):
         self.logger.info("Find all available variant IDS")
 
         hasNextPage = True
-        previousPageEnd = None
+        # previousPageEnd = None
         # loop through all the pages
         while hasNextPage:
             response_data = GraphqlVariants().fetch()
@@ -71,11 +71,8 @@ class CivicDumper(HTTPDumper):
         variant_data.update(res_molecular_profiles)
         variant_data.update(res_contributor_avatars)
 
-        fout = open(localfile, 'wb')
-        for chunk in variant_data.iter_content(chunk_size=512 * 1024):
-            if chunk:
-                fout.write(chunk)
-        fout.close()
+        with open(localfile, 'wb'):
+            localfile.write(variant_data)
         return variant_data
 
     def merge_dicts(self, d1, d2):
