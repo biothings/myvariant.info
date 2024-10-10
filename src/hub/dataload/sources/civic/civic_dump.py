@@ -72,8 +72,9 @@ class CivicDumper(HTTPDumper):
         variant_data.update(res_molecular_profiles)
         variant_data.update(res_contributor_avatars)
 
-        with open(localfile, 'wb') as f:
+        with open(localfile, 'w') as f:
             json.dump(variant_data, f)
+
         return variant_data
 
     def merge_dicts(self, d1, d2):
