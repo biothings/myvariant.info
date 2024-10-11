@@ -94,10 +94,10 @@ class CivicDumper(HTTPDumper):
             api_url=self.API_URL, variant_id=variant_id
         )
 
-        variant_data = self.merge_dicts(res_summary, res_detail)
-        variant_data = self.merge_dicts(variant_data, res_molecular_profiles)
-        variant_data = self.merge_dicts(variant_data, res_contributor_avatars)
-        variant_data = self.merge_dicts(variant_data, res_gene_variant)
+        variant_data = self.merge_dicts(res_summary["data"]["variant"], res_detail["data"]["variant"])
+        variant_data = self.merge_dicts(variant_data, res_molecular_profiles["data"])
+        variant_data = self.merge_dicts(variant_data, res_contributor_avatars["data"])
+        variant_data = self.merge_dicts(variant_data, res_gene_variant["data"])
 
         with open(localfile, "w") as f:
             json.dump(variant_data, f)
