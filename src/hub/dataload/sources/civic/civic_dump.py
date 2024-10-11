@@ -7,15 +7,20 @@ from config import DATA_ARCHIVE_ROOT
 from biothings.hub.dataload.dumper import HTTPDumper
 
 from hub.dataload.sources.civic.graphql_variants import GraphqlVariants
-from hub.dataload.sources.civic.graphql_molecular_profiles import GraphqlMolecularProfiles
+from hub.dataload.sources.civic.graphql_molecular_profiles import (
+    GraphqlMolecularProfiles,
+)
 from hub.dataload.sources.civic.graphql_detail import GraphqlVariantDetail
-from hub.dataload.sources.civic.graphql_contributor_avatars import GraphqlContributorAvatars
+from hub.dataload.sources.civic.graphql_contributor_avatars import (
+    GraphqlContributorAvatars,
+)
 from hub.dataload.sources.civic.graphql_summary import GraphqlVariantSummary
 
 
 class CivicDumper(HTTPDumper):
 
     SRC_NAME = "civic"
+    API_URL = "https://civicdb.org/api/graphql"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     # API_PAGE = 'https://civicdb.org/api/variants/'
     SCHEDULE = "0 22 1 * *"
@@ -38,10 +43,12 @@ class CivicDumper(HTTPDumper):
             print("### response_data")
             print(response_data)
             if "data" in response_data:
-                for variant in response_data['data']['browseVariants']['edges']:
-                    ids.append(variant['node']['id'])
-                hasNextPage = response_data['data']['browseVariants']['pageInfo']['hasNextPage']
-                hasNextPage = False # TODO: Remove to get all pages
+                for variant in response_data["data"]["browseVariants"]["edges"]:
+                    ids.append(variant["node"]["id"])
+                hasNextPage = response_data["data"]["browseVariants"]["pageInfo"][
+                    "hasNextPage"
+                ]
+                hasNextPage = False  # TODO: Remove to get all pages
                 # previousPageEnd = response_data['data']['browseVariants']['pageInfo']['endCursor']
 
         self.logger.info("Now download files")
@@ -49,7 +56,14 @@ class CivicDumper(HTTPDumper):
             logging.info("### variant_id")
             logging.info(variant_id)
 
-            if force or not self.src_doc or (self.src_doc and self.src_doc.get("download", {}).get("release") < self.release):
+            if (
+                force
+                or not self.src_doc
+                or (
+                    self.src_doc
+                    and self.src_doc.get("download", {}).get("release") < self.release
+                )
+            ):
                 data_url = variant_id
                 file_name = f"variant_{str(variant_id)}.json"
                 self.set_release()
@@ -63,16 +77,25 @@ class CivicDumper(HTTPDumper):
         variant_id = remoteurl
 
         self.logger.debug("Downloading '%s' as '%s'" % (remoteurl, localfile))
-        res_summary = GraphqlVariantSummary().fetch(variant_id=variant_id)
-        res_detail = GraphqlVariantDetail().fetch(variant_id=variant_id)
-        res_molecular_profiles = GraphqlMolecularProfiles().fetch(variant_id=variant_id)
-        res_contributor_avatars = GraphqlContributorAvatars().fetch(variant_id=variant_id)
+        res_summary = GraphqlVariantSummary().fetch(
+            api_url=self.API_URL, variant_id=variant_id
+        )
+        res_detail = GraphqlVariantDetail().fetch(
+            api_url=self.API_URL, variant_id=variant_id
+        )
+        res_molecular_profiles = GraphqlMolecularProfiles().fetch(
+            api_url=self.API_URL, variant_id=variant_id
+        )
+        res_contributor_avatars = GraphqlContributorAvatars().fetch(
+            api_url=self.API_URL, variant_id=variant_id
+        )
 
+        variant_data = []
         variant_data = self.merge_dicts(res_summary, res_detail)
-        variant_data.update(res_molecular_profiles)
-        variant_data.update(res_contributor_avatars)
+        variant_data.append(res_molecular_profiles)
+        variant_data.append(res_contributor_avatars)
 
-        with open(localfile, 'w') as f:
+        with open(localfile, "w") as f:
             json.dump(variant_data, f)
 
         return variant_data
