@@ -10,7 +10,6 @@ from biothings.utils.dataload import unlist, dict_sweep, to_int
 # data_folder = "/Users/v/dev/scripps/myvariant.info-copy/src/hub/dataload/sources/civic"
 
 def load_data(data_folder):
-    print("##########")
     # number of civic ids with ref, alt, chrom
     no_case1 = 0
     # number of civic ids with chrom, ref, but no alt
@@ -25,7 +24,9 @@ def load_data(data_folder):
         logging.info(infile)
         doc = json.load(open(infile))
         if set(['error', 'status']) != set(doc.keys()):
-            if "coordinates" in doc:
+            try:
+                print("### doc")
+                print(doc)
                 [chrom, pos, ref, alt] = [doc['coordinates'][x] for x in ['chromosome', 'start', 'referenceBases', 'variantBases']]
                 variant_id = doc.pop("id")
                 new_doc = {}
@@ -55,7 +56,8 @@ def load_data(data_folder):
                 else:
                     no_case4 += 1
                     new_doc['_id'] = 'CIVIC_VARIANT:' + str(variant_id)
-
+            except Exception as e:
+                print(e)
             # for _evidence in doc['evidence_items']:
             # print(doc)
             for _molecularProfiles in doc['molecularProfiles']['nodes']:
