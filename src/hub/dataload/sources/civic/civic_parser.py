@@ -4,7 +4,7 @@ import time
 import glob
 import os
 import logging
-# from utils.hgvs import get_hgvs_from_vcf
+from utils.hgvs import get_hgvs_from_vcf
 from biothings.utils.dataload import unlist, dict_sweep, to_int
 
 # data_folder = "/Users/v/dev/scripps/myvariant.info-copy/src/hub/dataload/sources/civic"
@@ -24,40 +24,37 @@ def load_data(data_folder):
         logging.info(infile)
         doc = json.load(open(infile))
         if set(['error', 'status']) != set(doc.keys()):
-            try:
-                print("### doc")
-                print(doc)
-                [chrom, pos, ref, alt] = [doc['coordinates'][x] for x in ['chromosome', 'start', 'referenceBases', 'variantBases']]
-                variant_id = doc.pop("id")
-                new_doc = {}
-                doc['variant_id'] = variant_id
-                if chrom and ref and alt:
-                    no_case1 += 1
-                    # try:
-                    #   new_doc['_id'] = get_hgvs_from_vcf(chrom, pos, ref, alt)
-                    # except ValueError:
-                    #   logging.warning("id has ref,alt, but coudn't be converted to hgvs id: {}".format(variant_id))
-                    #   continue
-                # handle cases of deletions where only ref info is provided
-                elif chrom and ref and not alt:
-                    no_case2 += 1
-                    start = int(pos)
-                    end = int(pos) + len(ref) - 1
-                    if start == end:
-                        new_doc['_id'] = 'chr{0}:g.{1}del'.format(chrom, start)
-                    else:
-                        new_doc['_id'] = 'chr{0}:g.{1}_{2}del'.format(chrom, start, end)
-                # handle cases of insertions where only alt info is provided
-                elif chrom and alt and not ref:
-                    no_case3 += 1
-                    new_doc['_id'] = 'chr{0}:g.{1}_{2}ins{3}'.format(chrom, start, end, alt)
-                # handle cases where no ref or alt info provided,
-                # in this case, use CIVIC internal ID as the primary id for MyVariant.info, e.g. CIVIC_VARIANT:1
+            print("### doc")
+            print(doc)
+            [chrom, pos, ref, alt] = [doc['coordinates'][x] for x in ['chromosome', 'start', 'referenceBases', 'variantBases']]
+            variant_id = doc.pop("id")
+            new_doc = {}
+            doc['variant_id'] = variant_id
+            if chrom and ref and alt:
+                no_case1 += 1
+                try:
+                    new_doc['_id'] = get_hgvs_from_vcf(chrom, pos, ref, alt)
+                except ValueError:
+                    logging.warning("id has ref,alt, but coudn't be converted to hgvs id: {}".format(variant_id))
+                    continue
+            # handle cases of deletions where only ref info is provided
+            elif chrom and ref and not alt:
+                no_case2 += 1
+                start = int(pos)
+                end = int(pos) + len(ref) - 1
+                if start == end:
+                    new_doc['_id'] = 'chr{0}:g.{1}del'.format(chrom, start)
                 else:
-                    no_case4 += 1
-                    new_doc['_id'] = 'CIVIC_VARIANT:' + str(variant_id)
-            except Exception as e:
-                print(e)
+                    new_doc['_id'] = 'chr{0}:g.{1}_{2}del'.format(chrom, start, end)
+            # handle cases of insertions where only alt info is provided
+            elif chrom and alt and not ref:
+                no_case3 += 1
+                new_doc['_id'] = 'chr{0}:g.{1}_{2}ins{3}'.format(chrom, start, end, alt)
+            # handle cases where no ref or alt info provided,
+            # in this case, use CIVIC internal ID as the primary id for MyVariant.info, e.g. CIVIC_VARIANT:1
+            else:
+                no_case4 += 1
+                new_doc['_id'] = 'CIVIC_VARIANT:' + str(variant_id)
             # for _evidence in doc['evidence_items']:
             # print(doc)
             for _molecularProfiles in doc['molecularProfiles']['nodes']:
