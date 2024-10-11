@@ -23,7 +23,7 @@ def load_data(data_folder):
     print(glob.glob(os.path.join(data_folder,"variant_*.json")))
     for infile in glob.glob(os.path.join(data_folder,"variant_*.json")):
         logging.info(infile)
-        doc = json.load(open(infile))["data"]["variant"]
+        doc = json.load(open(infile))
         if set(['error', 'status']) != set(doc.keys()):
             [chrom, pos, ref, alt] = [doc['coordinates'][x] for x in ['chromosome', 'start', 'referenceBases', 'variantBases']]
             variant_id = doc.pop("id")
