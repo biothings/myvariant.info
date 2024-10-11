@@ -15,6 +15,7 @@ from hub.dataload.sources.civic.graphql_contributor_avatars import (
     GraphqlContributorAvatars,
 )
 from hub.dataload.sources.civic.graphql_summary import GraphqlVariantSummary
+from hub.dataload.sources.civic.graphql_gene import GraphqlGeneVariant
 
 
 class CivicDumper(HTTPDumper):
@@ -89,10 +90,14 @@ class CivicDumper(HTTPDumper):
         res_contributor_avatars = GraphqlContributorAvatars().fetch(
             api_url=self.API_URL, variant_id=variant_id
         )
+        res_gene_variant = GraphqlGeneVariant().fetch(
+            api_url=self.API_URL, variant_id=variant_id
+        )
 
         variant_data = self.merge_dicts(res_summary, res_detail)
         variant_data = self.merge_dicts(variant_data, res_molecular_profiles)
         variant_data = self.merge_dicts(variant_data, res_contributor_avatars)
+        variant_data = self.merge_dicts(variant_data, res_gene_variant)
 
         with open(localfile, "w") as f:
             json.dump(variant_data, f)
