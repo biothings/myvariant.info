@@ -63,17 +63,17 @@ def load_data(data_folder):
                     # print(_evidence['node'])
                     if 'disease' in _evidence['node'] and 'doid' in (_evidence['node']['disease'] or {}) and _evidence['node']['disease']['doid']:
                         _evidence['node']['disease']['doid'] = 'DOID:' + _evidence['node']['disease']['doid']
-                #     if 'source' in _evidence and 'citation_id' in _evidence['source']:
-                #         if _evidence['source']['source_type'] == "PubMed":
-                #             _evidence['source']['pubmed'] = to_int(_evidence['source']['citation_id'])
-                #             _evidence['source'].pop('source_type')
-                #             _evidence['source'].pop('citation_id')
-                #         elif _evidence['source']['source_type'] == "ASCO":
-                #             _evidence['source']['asco'] = to_int(_evidence['source']['citation_id'])
-                #             _evidence['source'].pop('source_type')
-                #             _evidence['source'].pop('citation_id')
-                #         else:
-                #             raise ValueError("The value of source_type is not one of PubMed or ASCO, it's {}, need to restructure parser".format(_evidence['source']['source_type']))
+                    if 'source' in _evidence['node'] and 'citationId' in _evidence['node']['source']:
+                        if _evidence['node']['source']['sourceType'] == "PubMed":
+                            _evidence['node']['source']['pubmed'] = to_int(_evidence['node']['source']['citationId'])
+                            _evidence['node']['source'].pop('sourceType')
+                            _evidence['node']['source'].pop('citationId')
+                        elif _evidence['node']['source']['sourceType'] == "ASCO":
+                            _evidence['node']['source']['asco'] = to_int(_evidence['node']['source']['citationId'])
+                            _evidence['node']['source'].pop('sourceType')
+                            _evidence['node']['source'].pop('citationId')
+                        else:
+                            raise ValueError("The value of source_type is not one of PubMed or ASCO, it's {}, need to restructure parser".format(_evidence['source']['source_type']))
             new_doc['civic'] = doc
             print("### new_doc")
             print(new_doc)
