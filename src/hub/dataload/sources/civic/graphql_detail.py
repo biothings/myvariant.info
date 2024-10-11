@@ -139,10 +139,10 @@ class GraphqlVariantDetail():
         }
         return query
 
-    def fetch(self, variant_id: int):
+    def fetch(self, api_url: str, variant_id: int):
         try:
             response = requests.post(
-                'https://civicdb.org/api/graphql',
+                api_url,
                 json=self.gql(variant_id=variant_id)
             )
             return response.json()

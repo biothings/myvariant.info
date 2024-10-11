@@ -95,10 +95,10 @@ class GraphqlVariants():
         }
         return query
 
-    def fetch(self):
+    def fetch(self, api_url: str):
         try:
             response = requests.post(
-                'https://civicdb.org/api/graphql',
+                api_url,
                 json=self.gql()
             )
             return response.json()
