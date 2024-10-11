@@ -39,7 +39,7 @@ class CivicDumper(HTTPDumper):
         # previousPageEnd = None
         # loop through all the pages
         while hasNextPage:
-            response_data = GraphqlVariants().fetch()
+            response_data = GraphqlVariants().fetch(api_url=self.API_URL)
             print("### response_data")
             print(response_data)
             if "data" in response_data:
