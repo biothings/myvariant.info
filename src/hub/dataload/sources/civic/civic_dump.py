@@ -60,6 +60,7 @@ class CivicDumper(HTTPDumper):
             if (
                 force
                 or not self.src_doc
+                or not self.release
                 or (
                     self.src_doc
                     and self.src_doc.get("download", {}).get("release") < self.release
