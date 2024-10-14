@@ -52,7 +52,7 @@ class ClinvarDumper(FTPDumper):
             # register new release (will be stored in backend)
             self.to_dump.append({"remote": self.newest_file, "local": new_localfile})
             # schema
-            xsd = "clinvar/xsd_public/RCV_xsd_old_format/clinvar_public.xsd"
+            xsd = "xsd_public/RCV_xsd_old_format/clinvar_public.xsd"
             localxsdfile = os.path.join(self.new_data_folder, xsd)
             self.to_dump.append({"remote": "../../%s" % xsd, "local": localxsdfile})
 
