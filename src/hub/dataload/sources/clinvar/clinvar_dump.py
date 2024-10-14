@@ -17,7 +17,7 @@ class ClinvarDumper(FTPDumper):
     SRC_NAME = "clinvar"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     FTP_HOST = 'ftp.ncbi.nlm.nih.gov'
-    CWD_DIR = '/pub/clinvar/xml'
+    CWD_DIR = '/pub/clinvar/xml/RCV_xml_old_format'
 
     SCHEDULE = "0 9 * * *"
 
