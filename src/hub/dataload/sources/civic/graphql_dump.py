@@ -32,19 +32,19 @@ class GraphqlDump():
 
     def dump_variant(self, api_url: str, variant_id: int):
         res_summary = GraphqlVariantSummary().fetch(
-            api_url=self.API_URL, variant_id=variant_id
+            api_url=api_url, variant_id=variant_id
         )
         res_detail = GraphqlVariantDetail().fetch(
-            api_url=self.API_URL, variant_id=variant_id
+            api_url=api_url, variant_id=variant_id
         )
         res_molecular_profiles = GraphqlMolecularProfiles().fetch(
-            api_url=self.API_URL, variant_id=variant_id
+            api_url=api_url, variant_id=variant_id
         )
         res_contributor_avatars = GraphqlContributorAvatars().fetch(
-            api_url=self.API_URL, variant_id=variant_id
+            api_url=api_url, variant_id=variant_id
         )
         res_gene_variant = GraphqlGeneVariant().fetch(
-            api_url=self.API_URL, variant_id=variant_id
+            api_url=api_url, variant_id=variant_id
         )
 
         variant_data = {}
