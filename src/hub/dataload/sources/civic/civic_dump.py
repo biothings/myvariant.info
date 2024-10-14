@@ -14,11 +14,9 @@ class CivicDumper(HTTPDumper):
     SRC_NAME = "civic"
     API_URL = "https://civicdb.org/api/graphql"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
-    # API_PAGE = 'https://civicdb.org/api/variants/'
     SCHEDULE = "0 22 1 * *"
-    # IGNORE_HTTP_CODE = [404]
-    # MAX_PARALLEL_DUMP = 1
-    # SLEEP_BETWEEN_DOWNLOAD = 1.0
+    MAX_PARALLEL_DUMP = 2
+    SLEEP_BETWEEN_DOWNLOAD = 1.0
 
     def set_release(self):
         self.release = datetime.date.today().strftime("%Y-%m-%d-%H:%M")
@@ -50,7 +48,7 @@ class CivicDumper(HTTPDumper):
                 logging.info(local)
                 self.to_dump.append({"remote": data_url, "local": local})
 
-    def download(self, remoteurl, localfile, headers={}):  # noqa: B006
+    def download(self, remoteurl, localfile, headers={}):
         self.prepare_local_folders(localfile)
         variant_id = remoteurl
 
