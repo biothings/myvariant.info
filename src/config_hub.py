@@ -40,7 +40,7 @@ INDEX_CONFIG = {
             ],
         },
         "local": {
-            "host": "localhost:9200",
+            "host": "http://localhost:9200",
             "indexer": {
                     "args": {
                         "timeout": 300,
@@ -181,7 +181,7 @@ STANDALONE_VERSION = {"branch": "standalone_v3"}
 # Autohub configuration, either from a static definition...
 STANDALONE_CONFIG = {
     "_default": {
-        "es_host": "localhost:9200",
+        "es_host": "http://localhost:9200",
         "index": "myvariant_test",
         "doc_type": "variant"
     },
