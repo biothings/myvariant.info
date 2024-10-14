@@ -20,7 +20,7 @@ INDEX_CONFIG = {
     },
     "env": {
         "prod": {
-            "host": "<PRODSERVER>:9200",
+            "host": "localhost:9200",
             "indexer": {
                     "args": {
                         "timeout": 300,
@@ -40,7 +40,7 @@ INDEX_CONFIG = {
             ],
         },
         "local": {
-            "host": "http://localhost:9200",
+            "host": "localhost:9200",
             "indexer": {
                     "args": {
                         "timeout": 300,
@@ -181,17 +181,17 @@ STANDALONE_VERSION = {"branch": "standalone_v3"}
 # Autohub configuration, either from a static definition...
 STANDALONE_CONFIG = {
     "_default": {
-        "es_host": "http://localhost:9200",
+        "es_host": "localhost:9200",
         "index": "myvariant_test",
         "doc_type": "variant"
     },
     "myvariant.info-hg19": {
-        "es_host": "http://prodserver:9200",
+        "es_host": "prodserver:9200",
         "index": "myvariant_prod_hg19",
         "doc_type": "variant"
     },
     "myvariant.info-hg38": {
-        "es_host": "http://prodserver:9200",
+        "es_host": "prodserver:9200",
         "index": "myvariant_prod_hg38",
         "doc_type": "variant"
     },
