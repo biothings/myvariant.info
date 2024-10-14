@@ -1,7 +1,7 @@
 from hub.dataload.sources.civic.graphql_variants import GraphqlVariants
-from hub.dataload.sources.civic.graphql_molecular_profiles import (
-    GraphqlMolecularProfiles,
-)
+# from hub.dataload.sources.civic.graphql_molecular_profiles import (
+#     GraphqlMolecularProfiles,
+# )
 from hub.dataload.sources.civic.graphql_detail import GraphqlVariantDetail
 from hub.dataload.sources.civic.graphql_contributor_avatars import (
     GraphqlContributorAvatars,
@@ -37,9 +37,9 @@ class GraphqlDump():
         res_detail = GraphqlVariantDetail().fetch(
             api_url=api_url, variant_id=variant_id
         )
-        res_molecular_profiles = GraphqlMolecularProfiles().fetch(
-            api_url=api_url, variant_id=variant_id
-        )
+        # res_molecular_profiles = GraphqlMolecularProfiles().fetch(
+        #     api_url=api_url, variant_id=variant_id
+        # )
         res_contributor_avatars = GraphqlContributorAvatars().fetch(
             api_url=api_url, variant_id=variant_id
         )
@@ -48,7 +48,7 @@ class GraphqlDump():
         )
 
         variant_data = {}
-        variant_data = self.merge_dicts(variant_data, res_molecular_profiles["data"])
+        # variant_data = self.merge_dicts(variant_data, res_molecular_profiles["data"])
         variant_data = self.merge_dicts(variant_data, res_contributor_avatars["data"])
         variant_data = self.merge_dicts(variant_data, res_gene_variant["data"]["variant"])
         variant_data = self.merge_dicts(variant_data, res_detail["data"]["variant"])
