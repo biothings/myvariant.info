@@ -19,7 +19,7 @@ class CGIUploader(SnpeffPostUpdateUploader):
 
     def load_data(self,data_folder):
         # there's one vcf file there, let's get it
-        input_file = os.path.join(data_folder,"cgi_biomarkers_per_variant.tsv")
+        input_file = os.path.join(data_folder,"cgi_biomarkers_latest.tsv")
         assert os.path.exists(input_file), "Can't find input file '%s'" % input_file
         self.logger.info("Load data from file '%s'" % input_file)
         return load_data(input_file)
