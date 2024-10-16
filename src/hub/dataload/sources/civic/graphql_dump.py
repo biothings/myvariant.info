@@ -14,14 +14,14 @@ class GraphqlDump():
     def get_variants_list(self, api_url: str):
         ids = []
         hasNextPage = True
+        end_cursor = None
         while hasNextPage:
-            response_data = GraphqlVariants().fetch(api_url=api_url)
+            response_data = GraphqlVariants().fetch(after=end_cursor, api_url=api_url)
             if "data" in response_data:
                 for variant in response_data["data"]["browseVariants"]["edges"]:
                     ids.append(variant["node"]["id"])
-                hasNextPage = response_data["data"]["browseVariants"]["pageInfo"][
-                    "hasNextPage"
-                ]
+                hasNextPage = response_data["data"]["browseVariants"]["pageInfo"]["hasNextPage"]
+                end_cursor = response_data["data"]["browseVariants"]['pageInfo']['endCursor']
             print(f"INFO:dump_civic:Count variant IDs = {len(ids)}")
             time.sleep(1)
         return ids

@@ -41,18 +41,19 @@ class GraphqlVariants():
         }
     """
 
-    def gql(self):
+    def gql(self, after: str):
         query = {
             "operationName": self.OPERATION_NAME,
-            "query": self.QUERY
+            "query": self.QUERY,
+            "variables": {"after": after},
         }
         return query
 
-    def fetch(self, api_url: str):
+    def fetch(self, after: str, api_url: str):
         try:
             response = requests.post(
                 api_url,
-                json=self.gql()
+                json=self.gql(after=after)
             )
             return response.json()
         except Exception as e:
