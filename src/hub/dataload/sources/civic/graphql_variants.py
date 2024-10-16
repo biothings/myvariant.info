@@ -21,21 +21,17 @@ class GraphqlVariants():
                     hasNextPage
                     startCursor
                     hasPreviousPage
-                    __typename
                 }
                 edges {
                     cursor
                         node {
                             ...BrowseVariantsFields
-                            __typename
                         }
-                    __typename
                 }
                 totalCount
                 filteredCount
                 pageCount
                 lastUpdated
-                __typename
             }
         }
 
