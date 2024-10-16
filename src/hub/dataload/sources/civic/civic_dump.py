@@ -15,8 +15,8 @@ class CivicDumper(HTTPDumper):
     API_URL = "https://civicdb.org/api/graphql"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     SCHEDULE = "0 22 1 * *"
-    MAX_PARALLEL_DUMP = 1
-    SLEEP_BETWEEN_DOWNLOAD = 3.0
+    MAX_PARALLEL_DUMP = 5
+    SLEEP_BETWEEN_DOWNLOAD = 0.1
 
     def set_release(self):
         self.release = datetime.date.today().strftime("%Y-%m-%d")

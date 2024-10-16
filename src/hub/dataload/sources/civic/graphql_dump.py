@@ -1,5 +1,3 @@
-import time
-
 from hub.dataload.sources.civic.graphql_variants import GraphqlVariants
 from hub.dataload.sources.civic.graphql_detail import GraphqlVariantDetail
 from hub.dataload.sources.civic.graphql_contributor_avatars import (
@@ -23,7 +21,6 @@ class GraphqlDump():
                 hasNextPage = response_data["data"]["browseVariants"]["pageInfo"]["hasNextPage"]
                 end_cursor = response_data["data"]["browseVariants"]['pageInfo']['endCursor']
             print(f"INFO:dump_civic:Count variant IDs = {len(ids)}")
-            time.sleep(1)
         return ids
 
     def dump_variant(self, api_url: str, variant_id: int):
