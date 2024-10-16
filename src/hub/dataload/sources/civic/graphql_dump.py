@@ -39,24 +39,11 @@ class GraphqlDump():
             api_url=api_url, variant_id=variant_id
         )
 
-        variant_data = {}
-        variant_data = self.merge_dicts(variant_data, res_contributor_avatars["data"])
-        variant_data = self.merge_dicts(variant_data, res_gene_variant["data"]["variant"])
-        variant_data = self.merge_dicts(variant_data, res_detail["data"]["variant"])
-        variant_data = self.merge_dicts(variant_data, res_summary["data"]["variant"])
+        variant_data = {
+            "VariantSummary": res_summary,
+            "VariantDetail": res_detail,
+            "ContributorAvatars": res_contributor_avatars,
+            "GeneVariant": res_gene_variant
+        }
 
         return variant_data
-
-    def merge_dicts(self, d1, d2):
-        merged = d1.copy()
-        for key, value in d2.items():
-            if key in merged:
-                if isinstance(merged[key], dict) and isinstance(value, dict):
-                    merged[key] = self.merge_dicts(merged[key], value)
-                elif isinstance(merged[key], list) and isinstance(value, list):
-                    merged[key] = merged[key] + value  # Concatenate lists
-                else:
-                    merged[key] = value  # Overwrite value
-            else:
-                merged[key] = value
-        return merged

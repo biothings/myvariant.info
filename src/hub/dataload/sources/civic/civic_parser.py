@@ -7,7 +7,21 @@ import logging
 from utils.hgvs import get_hgvs_from_vcf
 from biothings.utils.dataload import unlist, dict_sweep, to_int
 
-# data_folder = "/Users/v/dev/scripps/myvariant.info-copy/src/hub/dataload/sources/civic"
+
+def merge_dicts(self, d1, d2):
+    merged = d1.copy()
+    for key, value in d2.items():
+        if key in merged:
+            if isinstance(merged[key], dict) and isinstance(value, dict):
+                merged[key] = self.merge_dicts(merged[key], value)
+            elif isinstance(merged[key], list) and isinstance(value, list):
+                merged[key] = merged[key] + value  # Concatenate lists
+            else:
+                merged[key] = value  # Overwrite value
+        else:
+            merged[key] = value
+    return merged
+
 
 def load_data(data_folder):
     # number of civic ids with ref, alt, chrom
@@ -19,10 +33,17 @@ def load_data(data_folder):
     # number of civic ids with no alt and ref
     no_case4 = 0
     # for infile in glob.glob(os.path.join(data_folder,"variant_*.json")):
-    print(glob.glob(os.path.join(data_folder,"variant_*.json")))
+    # print(glob.glob(os.path.join(data_folder,"variant_*.json")))
     for infile in glob.glob(os.path.join(data_folder,"variant_*.json")):
-        logging.info(infile)
-        doc = json.load(open(infile))
+        # logging.info(infile)
+        variant_data = json.load(open(infile))
+
+        doc = {}
+        doc = merge_dicts(doc, variant_data["VariantSummary"]["data"])
+        doc = merge_dicts(doc, variant_data["VariantDetail"]["data"]["variant"])
+        doc = merge_dicts(doc, variant_data["ContributorAvatars"]["data"]["variant"])
+        doc = merge_dicts(doc, variant_data["GeneVariant"]["data"]["variant"])
+
         if set(['error', 'status']) != set(doc.keys()):
             print("### doc")
             print(doc)
