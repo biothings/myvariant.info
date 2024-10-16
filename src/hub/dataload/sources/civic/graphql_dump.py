@@ -20,6 +20,7 @@ class GraphqlDump():
                 hasNextPage = response_data["data"]["browseVariants"]["pageInfo"][
                     "hasNextPage"
                 ]
+        print(f"INFO:dump_civic:Count variant IDs = {len(ids)}")
         return ids
 
     def dump_variant(self, api_url: str, variant_id: int):

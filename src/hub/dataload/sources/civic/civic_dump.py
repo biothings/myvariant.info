@@ -15,8 +15,8 @@ class CivicDumper(HTTPDumper):
     API_URL = "https://civicdb.org/api/graphql"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     SCHEDULE = "0 22 1 * *"
-    MAX_PARALLEL_DUMP = 2
-    SLEEP_BETWEEN_DOWNLOAD = 1.0
+    MAX_PARALLEL_DUMP = 1
+    SLEEP_BETWEEN_DOWNLOAD = 3.0
 
     def set_release(self):
         self.release = datetime.date.today().strftime("%Y-%m-%d")
@@ -52,6 +52,7 @@ class CivicDumper(HTTPDumper):
         self.prepare_local_folders(localfile)
         variant_id = remoteurl
 
+        self.logger.info(f"Downloading data for variant id: {variant_id}")
         variant_data = GraphqlDump().dump_variant(variant_id=variant_id, api_url=self.API_URL)
 
         with open(localfile, "w") as f:
