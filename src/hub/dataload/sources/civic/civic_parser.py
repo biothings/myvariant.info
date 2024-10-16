@@ -35,11 +35,11 @@ def get_id(doc):
             _id = nc_id + hgvs_nc_item[1]
             return _id
         else:
-            _id = 'CIVIC_VARIANT:' + str(doc["VariantSummary"]["data"]["variant"]["id"])
+            _id = 'CIVIC_VARIANT:' + str(doc["id"])
             return _id
     except Exception as e:
         logging.error(e)
-        _id = 'CIVIC_VARIANT:' + str(doc["VariantSummary"]["data"]["variant"]["id"])
+        _id = 'CIVIC_VARIANT:' + str(doc["id"])
         return _id
 
 
