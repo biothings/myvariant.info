@@ -121,8 +121,8 @@ def load_data(data_folder):
                         raise ValueError("The value of source_type is not one of PubMed or ASCO, it's {}, need to restructure parser".format(_evidence['node']['source']['sourceType']))
         new_doc["civic"] = doc
         new_doc["civic"].pop("myVariantInfo")
-        print("### new_doc")
-        print(new_doc)
+        # print("### new_doc")
+        # print(new_doc)
         yield dict_sweep(unlist(new_doc), ['', 'null', 'N/A', None, [], {}])
 
         # change doid into its formal representation, which should be sth like DOID:1

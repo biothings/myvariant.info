@@ -14,8 +14,6 @@ class GraphqlDump():
         hasNextPage = True
         while hasNextPage:
             response_data = GraphqlVariants().fetch(api_url=api_url)
-            print("### response_data")
-            print(response_data)
             if "data" in response_data:
                 for variant in response_data["data"]["browseVariants"]["edges"]:
                     ids.append(variant["node"]["id"])
