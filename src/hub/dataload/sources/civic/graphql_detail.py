@@ -7,24 +7,21 @@ class GraphqlVariantDetail():
     OPERATION_NAME = "VariantDetail"
 
     QUERY = """
-        query VariantDetail($variantId: Int!) {
+    query VariantDetail($variantId: Int!) {
         variant(id: $variantId) {
             ...VariantDetailFields
-            __typename
         }
-        }
+    }
 
-        fragment VariantDetailFields on VariantInterface {
+    fragment VariantDetailFields on VariantInterface {
         id
         name
         deprecated
         deprecationReason
         deprecationActivity {
             parsedNote {
-            ...parsedCommentFragment
-            __typename
+                ...parsedCommentFragment
             }
-            __typename
         }
         feature {
             id
@@ -32,23 +29,18 @@ class GraphqlVariantDetail():
             link
             deprecated
             flagged
-            __typename
         }
         variantAliases
         flags(state: OPEN) {
             totalCount
-            __typename
         }
         openRevisionCount
         comments {
             totalCount
-            __typename
         }
-        __typename
-        }
+    }
 
-        fragment parsedCommentFragment on CommentBodySegment {
-        __typename
+    fragment parsedCommentFragment on CommentBodySegment {
         ... on CommentTagSegment {
             entityId
             displayName
@@ -56,14 +48,12 @@ class GraphqlVariantDetail():
             link
             revisionSetId
             feature {
-            id
-            name
-            link
-            deprecated
-            flagged
-            __typename
+                id
+                name
+                link
+                deprecated
+                flagged
             }
-            __typename
         }
         ... on CommentTagSegmentFlagged {
             entityId
@@ -73,14 +63,12 @@ class GraphqlVariantDetail():
             link
             revisionSetId
             feature {
-            id
-            name
-            link
-            deprecated
-            flagged
-            __typename
+                id
+                name
+                link
+                deprecated
+                flagged
             }
-            __typename
         }
         ... on CommentTagSegmentFlaggedAndWithStatus {
             entityId
@@ -91,14 +79,12 @@ class GraphqlVariantDetail():
             link
             revisionSetId
             feature {
-            id
-            name
-            link
-            deprecated
-            flagged
-            __typename
+                id
+                name
+                link
+                deprecated
+                flagged
             }
-            __typename
         }
         ... on CommentTagSegmentFlaggedAndDeprecated {
             entityId
@@ -109,26 +95,22 @@ class GraphqlVariantDetail():
             link
             revisionSetId
             feature {
-            id
-            name
-            link
-            deprecated
-            flagged
-            __typename
+                id
+                name
+                link
+                deprecated
+                flagged
             }
-            __typename
         }
         ... on CommentTextSegment {
             text
-            __typename
         }
         ... on User {
             id
             displayName
             role
-            __typename
         }
-        }
+    }
     """
 
     def gql(self, variant_id: int):

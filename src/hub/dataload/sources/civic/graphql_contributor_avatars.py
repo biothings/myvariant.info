@@ -7,35 +7,29 @@ class GraphqlContributorAvatars():
     OPERATION_NAME = "ContributorAvatars"
 
     QUERY = """
-        query ContributorAvatars($subscribable: SubscribableInput!) {
+    query ContributorAvatars($subscribable: SubscribableInput!) {
         contributors(subscribable: $subscribable) {
             editors {
-            ...ContributorFields
-            __typename
+                ...ContributorFields
             }
             curators {
-            ...ContributorFields
-            __typename
+                ...ContributorFields
             }
-            __typename
         }
-        }
+    }
 
-        fragment ContributorFields on ContributingUser {
+    fragment ContributorFields on ContributingUser {
         user {
             id
             profileImagePath(size: 12)
-            __typename
         }
         uniqueActions {
             action
             count
-            __typename
         }
         lastActionDate
         totalActionCount
-        __typename
-        }
+    }
     """
 
     def gql(self, variant_id: int):

@@ -7,18 +7,16 @@ class GraphqlVariantSummary():
     OPERATION_NAME = "VariantSummary"
 
     QUERY = """
-        query VariantSummary($variantId: Int!) {
+    query VariantSummary($variantId: Int!) {
         variant(id: $variantId) {
             ...VariantSummaryFields
-            __typename
         }
-        }
+    }
 
-        fragment VariantSummaryFields on VariantInterface {
+    fragment VariantSummaryFields on VariantInterface {
         id
         name
         feature {
-            __typename
             id
             name
             link
@@ -31,78 +29,62 @@ class GraphqlVariantSummary():
             link
             soid
             name
-            __typename
         }
         flags(state: OPEN) {
             totalCount
-            __typename
         }
         revisions(status: NEW) {
             totalCount
-            __typename
         }
         comments {
             totalCount
-            __typename
         }
         lastSubmittedRevisionEvent {
             originatingUser {
-            id
-            displayName
-            role
-            profileImagePath(size: 32)
-            __typename
+                id
+                displayName
+                role
+                profileImagePath(size: 32)
             }
-            __typename
         }
         lastAcceptedRevisionEvent {
             originatingUser {
-            id
-            displayName
-            role
-            profileImagePath(size: 32)
-            __typename
+                id
+                displayName
+                role
+                profileImagePath(size: 32)
             }
-            __typename
         }
         creationActivity {
             user {
-            id
-            displayName
-            role
-            profileImagePath(size: 32)
-            __typename
+                id
+                displayName
+                role
+                profileImagePath(size: 32)
             }
             createdAt
-            __typename
         }
         deprecationActivity {
             user {
-            id
-            displayName
-            role
-            profileImagePath(size: 32)
-            __typename
+                id
+                displayName
+                role
+                profileImagePath(size: 32)
             }
             createdAt
-            __typename
         }
         ... on GeneVariant {
             ...GeneVariantSummaryFields
-            __typename
         }
         ... on FactorVariant {
             ...FactorVariantSummaryFields
-            __typename
         }
         ... on FusionVariant {
             ...FusionVariantSummaryFields
-            __typename
         }
-        __typename
-        }
+    }
 
-        fragment GeneVariantSummaryFields on GeneVariant {
+    fragment GeneVariantSummaryFields on GeneVariant {
         alleleRegistryId
         openCravatUrl
         maneSelectTranscript
@@ -110,16 +92,13 @@ class GraphqlVariantSummary():
         clinvarIds
         coordinates {
             ...CoordinateFields
-            __typename
         }
         myVariantInfo {
             ...MyVariantInfoFields
-            __typename
         }
-        __typename
-        }
+    }
 
-        fragment CoordinateFields on VariantCoordinate {
+    fragment CoordinateFields on VariantCoordinate {
         referenceBuild
         ensemblVersion
         chromosome
@@ -129,10 +108,9 @@ class GraphqlVariantSummary():
         referenceBases
         variantBases
         coordinateType
-        __typename
-        }
+    }
 
-        fragment MyVariantInfoFields on MyVariantInfo {
+    fragment MyVariantInfoFields on MyVariantInfo {
         myVariantInfoId
         caddConsequence
         caddDetail
@@ -195,83 +173,67 @@ class GraphqlVariantSummary():
         siphy
         snpeffSnpEffect
         snpeffSnpImpact
-        __typename
-        }
+    }
 
-        fragment FactorVariantSummaryFields on FactorVariant {
+    fragment FactorVariantSummaryFields on FactorVariant {
         ncitId
         ncitDetails {
             ...NcitDetails
-            __typename
         }
-        __typename
-        }
+    }
 
-        fragment NcitDetails on NcitDetails {
+    fragment NcitDetails on NcitDetails {
         synonyms {
             name
             source
-            __typename
         }
         definitions {
             definition
             source
-            __typename
         }
-        __typename
-        }
+    }
 
-        fragment FusionVariantSummaryFields on FusionVariant {
+    fragment FusionVariantSummaryFields on FusionVariant {
         viccCompliantName
         fusion {
             fivePrimePartnerStatus
             fivePrimeGene {
-            id
-            name
-            link
-            deprecated
-            flagged
-            __typename
+                id
+                name
+                link
+                deprecated
+                flagged
             }
             threePrimePartnerStatus
             threePrimeGene {
-            id
-            name
-            link
-            deprecated
-            flagged
-            __typename
+                id
+                name
+                link
+                deprecated
+                flagged
             }
-            __typename
         }
         fivePrimeCoordinates {
             ...CoordinateFields
-            __typename
         }
         threePrimeCoordinates {
             ...CoordinateFields
-            __typename
         }
         fivePrimeStartExonCoordinates {
             ...ExonCoordinateFields
-            __typename
         }
         fivePrimeEndExonCoordinates {
             ...ExonCoordinateFields
-            __typename
         }
         threePrimeStartExonCoordinates {
             ...ExonCoordinateFields
-            __typename
         }
         threePrimeEndExonCoordinates {
             ...ExonCoordinateFields
-            __typename
         }
-        __typename
-        }
+    }
 
-        fragment ExonCoordinateFields on ExonCoordinate {
+    fragment ExonCoordinateFields on ExonCoordinate {
         referenceBuild
         ensemblVersion
         chromosome
@@ -284,8 +246,7 @@ class GraphqlVariantSummary():
         ensemblId
         strand
         coordinateType
-        __typename
-        }
+    }
     """
 
     def gql(self, variant_id: int):
