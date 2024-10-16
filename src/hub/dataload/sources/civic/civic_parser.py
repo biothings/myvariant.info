@@ -23,6 +23,26 @@ def merge_dicts(d1, d2):
     return merged
 
 
+def get_id(doc):
+    try:
+        if "myVariantInfo" in doc and "myVariantInfoId" in doc["myVariantInfo"]:
+            _id = doc["myVariantInfo"]["myVariantInfoId"]
+            return _id
+        elif "hgvsDescriptions" in doc:
+            hgvs_description = doc["hgvsDescriptions"]
+            hgvs_nc_item = hgvs_description[0].split(":")
+            nc_id = hgvs_nc_item[0].replace("NC_", "").split(".")[0].lstrip('0')
+            _id = nc_id + hgvs_nc_item[1]
+            return _id
+        else:
+            _id = 'CIVIC_VARIANT:' + str(doc["variant_id"])
+            return _id
+    except Exception as e:
+        logging.error(e)
+        _id = 'CIVIC_VARIANT:' + str(doc["variant_id"])
+        return _id
+
+
 def load_data(data_folder):
     # number of civic ids with ref, alt, chrom
     no_case1 = 0
@@ -44,18 +64,8 @@ def load_data(data_folder):
         doc = merge_dicts(doc, variant_data["VariantDetail"]["data"]["variant"])
         doc = merge_dicts(doc, variant_data["VariantSummary"]["data"]["variant"])
 
-        if "myVariantInfo" in doc and "myVariantInfoId" in doc["myVariantInfo"]:
-            _id = doc["myVariantInfo"]["myVariantInfoId"]
-        elif "hgvsDescriptions" in doc:
-            hgvs_description = doc["hgvsDescriptions"]
-            hgvs_nc_item = hgvs_description[0].split(":")
-            nc_id = hgvs_nc_item[0].replace("NC_", "").split(".")[0].lstrip('0')
-            _id = nc_id + hgvs_nc_item[1]
-        else:
-            _id = 'CIVIC_VARIANT:' + str(doc["variant_id"])
-
         new_doc = {}
-        new_doc["_id"] = _id
+        new_doc["_id"] = get_id(doc=doc)
 
         # if set(['error', 'status']) != set(doc.keys()):
         #     print("### doc")
