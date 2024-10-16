@@ -8,12 +8,12 @@ from utils.hgvs import get_hgvs_from_vcf
 from biothings.utils.dataload import unlist, dict_sweep, to_int
 
 
-def merge_dicts(self, d1, d2):
+def merge_dicts(d1, d2):
     merged = d1.copy()
     for key, value in d2.items():
         if key in merged:
             if isinstance(merged[key], dict) and isinstance(value, dict):
-                merged[key] = self.merge_dicts(merged[key], value)
+                merged[key] = merge_dicts(merged[key], value)
             elif isinstance(merged[key], list) and isinstance(value, list):
                 merged[key] = merged[key] + value  # Concatenate lists
             else:
@@ -39,10 +39,10 @@ def load_data(data_folder):
         variant_data = json.load(open(infile))
 
         doc = {}
-        doc = merge_dicts(doc, variant_data["VariantSummary"]["data"])
-        doc = merge_dicts(doc, variant_data["VariantDetail"]["data"]["variant"])
         doc = merge_dicts(doc, variant_data["ContributorAvatars"]["data"]["variant"])
         doc = merge_dicts(doc, variant_data["GeneVariant"]["data"]["variant"])
+        doc = merge_dicts(doc, variant_data["VariantDetail"]["data"]["variant"])
+        doc = merge_dicts(doc, variant_data["VariantSummary"]["data"])
 
         if set(['error', 'status']) != set(doc.keys()):
             print("### doc")
