@@ -27,7 +27,7 @@ class CivicDumper(HTTPDumper):
         ids = GraphqlDump().get_variants_list(api_url=self.API_URL)
 
         self.logger.info("Now download files")
-        for variant_id in ids[:5]:  # TODO: Remove the top 5 [:5]
+        for variant_id in ids:
             logging.info("### variant_id")
             logging.info(variant_id)
 

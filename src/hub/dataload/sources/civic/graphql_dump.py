@@ -22,7 +22,6 @@ class GraphqlDump():
                 hasNextPage = response_data["data"]["browseVariants"]["pageInfo"][
                     "hasNextPage"
                 ]
-                hasNextPage = False  # TODO: Remove to get all pages
         return ids
 
     def dump_variant(self, api_url: str, variant_id: int):
