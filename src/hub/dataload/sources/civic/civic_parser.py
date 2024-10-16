@@ -39,10 +39,10 @@ def load_data(data_folder):
         variant_data = json.load(open(infile))
 
         doc = {}
-        doc = merge_dicts(doc, variant_data["ContributorAvatars"]["data"]["variant"])
+        doc = merge_dicts(doc, variant_data["ContributorAvatars"]["data"])
         doc = merge_dicts(doc, variant_data["GeneVariant"]["data"]["variant"])
         doc = merge_dicts(doc, variant_data["VariantDetail"]["data"]["variant"])
-        doc = merge_dicts(doc, variant_data["VariantSummary"]["data"])
+        doc = merge_dicts(doc, variant_data["VariantSummary"]["data"]["variant"])
 
         if set(['error', 'status']) != set(doc.keys()):
             print("### doc")
