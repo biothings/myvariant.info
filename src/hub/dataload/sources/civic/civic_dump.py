@@ -19,7 +19,7 @@ class CivicDumper(HTTPDumper):
     SLEEP_BETWEEN_DOWNLOAD = 1.0
 
     def set_release(self):
-        self.release = datetime.date.today().strftime("%Y-%m-%d-%H:%M")
+        self.release = datetime.date.today().strftime("%Y-%m-%d")
 
     def create_todump_list(self, force=False, **kwargs):
 
