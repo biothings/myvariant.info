@@ -23,42 +23,30 @@ def merge_dicts(d1, d2):
     return merged
 
 
-def flatten_dict(d):
-    # List of keys to be flattened
-    keys_to_flatten = ['node', 'nodes', 'edge', 'edges']
-
-    def _flatten(d):
-        if isinstance(d, dict):
-            keys_to_remove = []
-            for key, value in list(d.items()):
-                # If the key is in the list of keys to flatten and value is a dict or list
-                if key in keys_to_flatten and isinstance(value, (dict, list)):
-                    if isinstance(value, dict):
-                        # Merge dict contents into the parent dict
-                        d.update(value)
-                    elif isinstance(value, list):
-                        for item in value:
-                            if isinstance(item, dict):
-                                # Recursively flatten each dictionary in the list
-                                _flatten(item)
-                    # Mark the key for removal
-                    keys_to_remove.append(key)
-                elif isinstance(value, dict):
-                    # Recursively flatten nested dicts
-                    _flatten(value)
-                elif isinstance(value, list):
-                    # Recursively flatten items inside lists
+def remove_nodes_and_edges(data):
+    if isinstance(data, dict):
+        # If the current data is a dictionary, iterate through its keys
+        new_data = {}
+        for key, value in data.items():
+            if key in ['node', 'nodes', 'edge', 'edges']:
+                # If the key is 'nodes' or 'edges', recursively process the value
+                if isinstance(value, list):
+                    # If 'edges' is a list, take each element (each 'nodes') and process
                     for item in value:
-                        if isinstance(item, dict):
-                            _flatten(item)
-            # Remove keys after iteration to avoid modifying dict while iterating
-            for key in keys_to_remove:
-                del d[key]
-
-    # Make a copy of the dict to avoid modifying the original
-    result = d.copy()
-    _flatten(result)
-    return result
+                        new_data.update(remove_nodes_and_edges(item.get(key, item)))
+                else:
+                    # If 'nodes' is a dictionary, just update with its content
+                    new_data.update(remove_nodes_and_edges(value))
+            else:
+                # Process the value recursively for other keys
+                new_data[key] = remove_nodes_and_edges(value)
+        return new_data
+    elif isinstance(data, list):
+        # If it's a list, apply the function recursively to each element
+        return [remove_nodes_and_edges(item) for item in data]
+    else:
+        # If it's neither a dict nor a list, return the value
+        return data
 
 
 def get_id(doc):
@@ -162,7 +150,7 @@ def load_data(data_folder):
             new_doc["civic"].pop("myVariantInfo")
         # print("### new_doc")
         # print(new_doc)
-        new_doc = flatten_dict(new_doc)
+        new_doc = remove_nodes_and_edges(new_doc)
         yield dict_sweep(unlist(new_doc), ['', 'null', 'N/A', None, [], {}])
 
         # change doid into its formal representation, which should be sth like DOID:1
