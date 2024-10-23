@@ -60,8 +60,8 @@ def remove_nodes_and_edges(obj):
     if 'edges' in obj:
         return [remove_nodes_and_edges(edge['node']) for edge in obj['edges']]
 
-    if 'nodes' in obj:
-        return [remove_nodes_and_edges(node) for node in obj['nodes']]
+    # if 'nodes' in obj:
+    #     return [remove_nodes_and_edges(node) for node in obj['nodes']]
 
     return {
         key: remove_nodes_and_edges(value)
@@ -172,6 +172,7 @@ def load_data(data_folder):
         # print("### new_doc")
         # print(new_doc)
         new_doc = remove_nodes_and_edges(new_doc)
+        new_doc["civic"]["molecularProfiles"] = new_doc["civic"]["molecularProfiles"]["nodes"]
         yield dict_sweep(unlist(new_doc), ['', 'null', 'N/A', None, [], {}])
 
         # change doid into its formal representation, which should be sth like DOID:1
