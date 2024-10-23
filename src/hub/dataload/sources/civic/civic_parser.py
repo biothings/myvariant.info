@@ -33,8 +33,8 @@ def remove_nodes_and_edges(obj):
     if 'edges' in obj:
         return [remove_nodes_and_edges(edge['node']) for edge in obj['edges']]
 
-    if 'nodes' in obj:
-        return [remove_nodes_and_edges(node) for node in obj['nodes']]
+    # if 'nodes' in obj:
+    #     return [remove_nodes_and_edges(node) for node in obj['nodes']]
 
     return {
         key: remove_nodes_and_edges(value)
