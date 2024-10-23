@@ -39,7 +39,7 @@ def remove_nodes_and_edges(obj):
     return {
         key: remove_nodes_and_edges(value)
         for key, value in obj.items()
-        if key != 'node'
+        if key != 'node' or key != 'nodes'
     }
 
 
