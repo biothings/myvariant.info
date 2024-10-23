@@ -28,19 +28,22 @@ def remove_nodes_and_edges(data):
         new_data = {}
         for key, value in data.items():
             if key in ['node', 'nodes', 'edge', 'edges']:
-                # If the value is a list (like 'edges'), process each item and keep them in a list
+                # If the key is 'node', 'nodes', 'edge', or 'edges'
                 if isinstance(value, list):
-                    new_data = remove_nodes_and_edges(value)  # Keep all items as a list
+                    # Process the list, keeping all items in the list
+                    new_data = remove_nodes_and_edges(value)
                 else:
+                    # Otherwise, process the value (if it's a dict or other type)
                     new_data.update(remove_nodes_and_edges(value))
             else:
+                # For other keys, recursively process the value
                 new_data[key] = remove_nodes_and_edges(value)
         return new_data
     elif isinstance(data, list):
-        # If it's a list, return a list of processed items
+        # If the data is a list, process each item in the list
         return [remove_nodes_and_edges(item) for item in data]
     else:
-        # If it's neither a dict nor a list, return the value as is
+        # If it's not a dict or list, return the data as is
         return data
 
 
