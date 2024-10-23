@@ -23,28 +23,21 @@ def merge_dicts(d1, d2):
     return merged
 
 
-def remove_nodes_and_edges(data):
-    if isinstance(data, dict):
-        new_data = {}
-        for key, value in data.items():
-            if key in ['node', 'nodes', 'edge', 'edges']:
-                # Recursively process the value for 'node', 'nodes', 'edge', 'edges'
-                if isinstance(value, list):
-                    # If the value is a list, process each item and return as a list
-                    new_data = remove_nodes_and_edges(value)
-                else:
-                    # If it's not a list, it's a dictionary or other structure
-                    new_data.update(remove_nodes_and_edges(value))
-            else:
-                # For other keys, recursively process the value
-                new_data[key] = remove_nodes_and_edges(value)
-        return new_data
-    elif isinstance(data, list):
-        # If it's a list, process each item in the list and return as a list
-        return [remove_nodes_and_edges(item) for item in data]
-    else:
-        # If it's neither a dict nor a list, return the value as is
-        return data
+def remove_nodes_and_edges(obj):
+    if not obj or type(obj) in [str, bool, int, float]:
+        return obj
+
+    if isinstance(obj, list):
+        return [remove_nodes_and_edges(item) for item in obj]
+
+    if 'edges' in obj:
+        return [remove_nodes_and_edges(edge['node']) for edge in obj['edges']]
+
+    return {
+        key: remove_nodes_and_edges(value)
+        for key, value in obj.items()
+        if key != 'node'
+    }
 
 
 def get_id(doc):
