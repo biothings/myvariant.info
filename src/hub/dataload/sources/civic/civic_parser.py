@@ -25,28 +25,22 @@ def merge_dicts(d1, d2):
 
 def remove_nodes_and_edges(data):
     if isinstance(data, dict):
-        # If the current data is a dictionary, iterate through its keys
         new_data = {}
         for key, value in data.items():
             if key in ['node', 'nodes', 'edge', 'edges']:
-                # If the key is 'nodes' or 'edges', recursively process the value
+                # If the value is a list (like 'edges'), process each item and keep them in a list
                 if isinstance(value, list):
-                    # If 'edges' is a list, take each element (each 'nodes') and process
-                    # for item in value:
-                    #     new_data.update(remove_nodes_and_edges(item.get(key, item)))
-                    return [new_data.remove_nodes_and_edges(item) for item in value]
+                    new_data = remove_nodes_and_edges(value)  # Keep all items as a list
                 else:
-                    # If 'nodes' is a dictionary, just update with its content
                     new_data.update(remove_nodes_and_edges(value))
             else:
-                # Process the value recursively for other keys
                 new_data[key] = remove_nodes_and_edges(value)
         return new_data
     elif isinstance(data, list):
-        # If it's a list, apply the function recursively to each element
+        # If it's a list, return a list of processed items
         return [remove_nodes_and_edges(item) for item in data]
     else:
-        # If it's neither a dict nor a list, return the value
+        # If it's neither a dict nor a list, return the value as is
         return data
 
 
