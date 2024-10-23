@@ -32,8 +32,9 @@ def remove_nodes_and_edges(data):
                 # If the key is 'nodes' or 'edges', recursively process the value
                 if isinstance(value, list):
                     # If 'edges' is a list, take each element (each 'nodes') and process
-                    for item in value:
-                        new_data.update(remove_nodes_and_edges(item.get(key, item)))
+                    # for item in value:
+                    #     new_data.update(remove_nodes_and_edges(item.get(key, item)))
+                    return [new_data.remove_nodes_and_edges(item) for item in value]
                 else:
                     # If 'nodes' is a dictionary, just update with its content
                     new_data.update(remove_nodes_and_edges(value))
