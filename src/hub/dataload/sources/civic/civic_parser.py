@@ -1,11 +1,11 @@
-# import requests
-# import json
-# import time
-# import glob
-# import os
-# import logging
-# from utils.hgvs import get_hgvs_from_vcf
-# from biothings.utils.dataload import unlist, dict_sweep, to_int
+import requests
+import json
+import time
+import glob
+import os
+import logging
+from utils.hgvs import get_hgvs_from_vcf
+from biothings.utils.dataload import unlist, dict_sweep, to_int
 
 
 def merge_dicts(d1, d2):
