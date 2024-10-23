@@ -23,6 +23,44 @@ def merge_dicts(d1, d2):
     return merged
 
 
+def flatten_dict(d):
+    # List of keys to be flattened
+    keys_to_flatten = ['node', 'nodes', 'edge', 'edges']
+
+    def _flatten(d):
+        if isinstance(d, dict):
+            keys_to_remove = []
+            for key, value in list(d.items()):
+                # If the key is in the list of keys to flatten and value is a dict or list
+                if key in keys_to_flatten and isinstance(value, (dict, list)):
+                    if isinstance(value, dict):
+                        # Merge dict contents into the parent dict
+                        d.update(value)
+                    elif isinstance(value, list):
+                        for item in value:
+                            if isinstance(item, dict):
+                                # Recursively flatten each dictionary in the list
+                                _flatten(item)
+                    # Mark the key for removal
+                    keys_to_remove.append(key)
+                elif isinstance(value, dict):
+                    # Recursively flatten nested dicts
+                    _flatten(value)
+                elif isinstance(value, list):
+                    # Recursively flatten items inside lists
+                    for item in value:
+                        if isinstance(item, dict):
+                            _flatten(item)
+            # Remove keys after iteration to avoid modifying dict while iterating
+            for key in keys_to_remove:
+                del d[key]
+
+    # Make a copy of the dict to avoid modifying the original
+    result = d.copy()
+    _flatten(result)
+    return result
+
+
 def get_id(doc):
     try:
         if "myVariantInfo" in doc and "myVariantInfoId" in doc["myVariantInfo"]:
@@ -124,6 +162,7 @@ def load_data(data_folder):
             new_doc["civic"].pop("myVariantInfo")
         # print("### new_doc")
         # print(new_doc)
+        new_doc = flatten_dict(new_doc)
         yield dict_sweep(unlist(new_doc), ['', 'null', 'N/A', None, [], {}])
 
         # change doid into its formal representation, which should be sth like DOID:1
