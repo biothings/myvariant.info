@@ -1,11 +1,11 @@
-import requests
-import json
-import time
-import glob
-import os
-import logging
-from utils.hgvs import get_hgvs_from_vcf
-from biothings.utils.dataload import unlist, dict_sweep, to_int
+# import requests
+# import json
+# import time
+# import glob
+# import os
+# import logging
+# from utils.hgvs import get_hgvs_from_vcf
+# from biothings.utils.dataload import unlist, dict_sweep, to_int
 
 
 def merge_dicts(d1, d2):
@@ -23,30 +23,51 @@ def merge_dicts(d1, d2):
     return merged
 
 
-def remove_nodes_and_edges(data):
-    if isinstance(data, dict):
-        # If the current data is a dictionary, iterate through its keys
-        new_data = {}
-        for key, value in data.items():
-            if key in ['node', 'nodes', 'edge', 'edges']:
-                # If the key is 'nodes' or 'edges', recursively process the value
-                if isinstance(value, list):
-                    # If 'edges' is a list, take each element (each 'nodes') and process
-                    for item in value:
-                        new_data.update(remove_nodes_and_edges(item.get(key, item)))
-                else:
-                    # If 'nodes' is a dictionary, just update with its content
-                    new_data.update(remove_nodes_and_edges(value))
-            else:
-                # Process the value recursively for other keys
-                new_data[key] = remove_nodes_and_edges(value)
-        return new_data
-    elif isinstance(data, list):
-        # If it's a list, apply the function recursively to each element
-        return [remove_nodes_and_edges(item) for item in data]
-    else:
-        # If it's neither a dict nor a list, return the value
-        return data
+# def remove_nodes_and_edges(data):
+#     if isinstance(data, dict):
+#         # If the current data is a dictionary, iterate through its keys
+#         new_data = {}
+#         for key, value in data.items():
+#             if key in ['node', 'nodes', 'edge', 'edges']:
+#                 # If the key is 'nodes' or 'edges', recursively process the value
+#                 if isinstance(value, list):
+#                     # If 'edges' is a list, take each element (each 'nodes') and process
+#                     for item in value:
+#                         new_data.update(remove_nodes_and_edges(item.get(key, item)))
+#                 else:
+#                     # If 'nodes' is a dictionary, just update with its content
+#                     new_data.update(remove_nodes_and_edges(value))
+#             else:
+#                 # Process the value recursively for other keys
+#                 new_data[key] = remove_nodes_and_edges(value)
+#         return new_data
+#     elif isinstance(data, list):
+#         # If it's a list, apply the function recursively to each element
+#         return [remove_nodes_and_edges(item) for item in data]
+#     else:
+#         # If it's neither a dict nor a list, return the value
+#         return data
+
+
+
+def remove_nodes_and_edges(obj):
+    if not obj or type(obj) in [str, bool, int, float]:
+        return obj
+
+    if isinstance(obj, list):
+        return [remove_nodes_and_edges(item) for item in obj]
+
+    if 'edges' in obj:
+        return [remove_nodes_and_edges(edge['node']) for edge in obj['edges']]
+
+    # if 'nodes' in obj:
+    #     return [remove_nodes_and_edges(node) for node in obj['nodes']]
+
+    return {
+        key: remove_nodes_and_edges(value)
+        for key, value in obj.items()
+        if key != 'node'
+    }
 
 
 def get_id(doc):
