@@ -23,33 +23,6 @@ def merge_dicts(d1, d2):
     return merged
 
 
-# def remove_nodes_and_edges(data):
-#     if isinstance(data, dict):
-#         # If the current data is a dictionary, iterate through its keys
-#         new_data = {}
-#         for key, value in data.items():
-#             if key in ['node', 'nodes', 'edge', 'edges']:
-#                 # If the key is 'nodes' or 'edges', recursively process the value
-#                 if isinstance(value, list):
-#                     # If 'edges' is a list, take each element (each 'nodes') and process
-#                     for item in value:
-#                         new_data.update(remove_nodes_and_edges(item.get(key, item)))
-#                 else:
-#                     # If 'nodes' is a dictionary, just update with its content
-#                     new_data.update(remove_nodes_and_edges(value))
-#             else:
-#                 # Process the value recursively for other keys
-#                 new_data[key] = remove_nodes_and_edges(value)
-#         return new_data
-#     elif isinstance(data, list):
-#         # If it's a list, apply the function recursively to each element
-#         return [remove_nodes_and_edges(item) for item in data]
-#     else:
-#         # If it's neither a dict nor a list, return the value
-#         return data
-
-
-
 def remove_nodes_and_edges(obj):
     if not obj or type(obj) in [str, bool, int, float]:
         return obj
@@ -59,9 +32,6 @@ def remove_nodes_and_edges(obj):
 
     if 'edges' in obj:
         return [remove_nodes_and_edges(edge['node']) for edge in obj['edges']]
-
-    # if 'nodes' in obj:
-    #     return [remove_nodes_and_edges(node) for node in obj['nodes']]
 
     return {
         key: remove_nodes_and_edges(value)
@@ -113,71 +83,13 @@ def load_data(data_folder):
 
         new_doc = {}
         new_doc["_id"] = get_id(doc=doc)
-
-        # if set(['error', 'status']) != set(doc.keys()):
-        #     print("### doc")
-        #     print(doc)
-        #     [chrom, pos, ref, alt] = [doc['coordinates'][x] for x in ['chromosome', 'start', 'referenceBases', 'variantBases']]
-        #     variant_id = doc.pop("id")
-        #     new_doc = {}
-        #     doc['variant_id'] = variant_id
-        #     if chrom and ref and alt:
-        #         no_case1 += 1
-        #         try:
-        #             new_doc['_id'] = get_hgvs_from_vcf(chrom, pos, ref, alt)
-        #         except ValueError:
-        #             logging.warning("id has ref,alt, but coudn't be converted to hgvs id: {}".format(variant_id))
-        #             continue
-        #     # handle cases of deletions where only ref info is provided
-        #     elif chrom and ref and not alt:
-        #         no_case2 += 1
-        #         start = int(pos)
-        #         end = int(pos) + len(ref) - 1
-        #         if start == end:
-        #             new_doc['_id'] = 'chr{0}:g.{1}del'.format(chrom, start)
-        #         else:
-        #             new_doc['_id'] = 'chr{0}:g.{1}_{2}del'.format(chrom, start, end)
-        #     # handle cases of insertions where only alt info is provided
-        #     elif chrom and alt and not ref:
-        #         no_case3 += 1
-        #         new_doc['_id'] = 'chr{0}:g.{1}_{2}ins{3}'.format(chrom, start, end, alt)
-        #     # handle cases where no ref or alt info provided,
-        #     # in this case, use CIVIC internal ID as the primary id for MyVariant.info, e.g. CIVIC_VARIANT:1
-        #     else:
-        #         no_case4 += 1
-        #         new_doc['_id'] = 'CIVIC_VARIANT:' + str(variant_id)
-        #     # for _evidence in doc['evidence_items']:
-        #     # print(doc)
-
-        # for _molecularProfiles in doc['molecularProfiles']['nodes']:
-        #     # print(_molecularProfiles)
-        #     for _evidence in _molecularProfiles['evidenceItems']['edges']:
-        #         # print(_evidence['node'])
-        #         if 'disease' in _evidence['node'] and 'doid' in (_evidence['node']['disease'] or {}) and _evidence['node']['disease']['doid']:
-        #             _evidence['node']['disease']['doid'] = 'DOID:' + _evidence['node']['disease']['doid']
-        #         if 'source' in _evidence['node'] and 'citationId' in _evidence['node']['source']:
-        #             if _evidence['node']['source']['sourceType'].lower() == "pubmed":
-        #                 _evidence['node']['source']['pubmed'] = to_int(_evidence['node']['source']['citationId'])
-        #                 _evidence['node']['source'].pop('sourceType')
-        #                 _evidence['node']['source'].pop('citationId')
-        #             elif _evidence['node']['source']['sourceType'].lower() == "asco":
-        #                 _evidence['node']['source']['asco'] = to_int(_evidence['node']['source']['citationId'])
-        #                 _evidence['node']['source'].pop('sourceType')
-        #                 _evidence['node']['source'].pop('citationId')
-        #             else:
-        #                 raise ValueError("The value of source_type is not one of PubMed or ASCO, it's {}, need to restructure parser".format(_evidence['node']['source']['sourceType']))
         new_doc["civic"] = doc
         if "myVariantInfo" in new_doc["civic"]:
             new_doc["civic"].pop("myVariantInfo")
-        # print("### new_doc")
-        # print(new_doc)
         new_doc = remove_nodes_and_edges(new_doc)
         new_doc["civic"]["molecularProfiles"] = new_doc["civic"]["molecularProfiles"]["nodes"]
         yield dict_sweep(unlist(new_doc), ['', 'null', 'N/A', None, [], {}])
 
-        # change doid into its formal representation, which should be sth like DOID:1
-        # else:
-        #     continue
     logging.info("number of ids with ref, alt, chrom: {}".format(no_case1))
     logging.info("number of ids with chrom, ref but no alt: {}".format(no_case2))
     logging.info("number of ids with chrom, alt but no ref: {}".format(no_case3))
