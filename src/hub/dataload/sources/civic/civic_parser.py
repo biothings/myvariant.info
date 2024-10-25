@@ -31,40 +31,40 @@ def remove_nodes_and_edges(data):
 
 
 # number of civic ids from MyVariantInfo
-no_case1 = 0
+civic_no_case1 = 0
 # number of civic ids from CivicDB.org
-no_case2 = 0
+civic_no_case2 = 0
 # number of civic ids not found
-no_case3 = 0
+civic_no_case3 = 0
 # number of civic ids created by exception
-no_case4 = 0
+civic_no_case4 = 0
 
 
 def get_id(doc):
-    global no_case1
-    global no_case2
-    global no_case3
-    global no_case4
+    global civic_no_case1
+    global civic_no_case2
+    global civic_no_case3
+    global civic_no_case4
     try:
         if "myVariantInfo" in doc and "myVariantInfoId" in doc["myVariantInfo"]:
             _id = doc["myVariantInfo"]["myVariantInfoId"]
-            no_case1 = no_case1 + 1
+            civic_no_case1 = civic_no_case1 + 1
             return _id
         elif "hgvsDescriptions" in doc:
             hgvs_description = doc["hgvsDescriptions"]
             hgvs_nc_item = hgvs_description[0].split(":")
             nc_id = hgvs_nc_item[0].replace("NC_", "").split(".")[0].lstrip('0')
             _id = nc_id + hgvs_nc_item[1]
-            no_case2 = no_case2 + 1
+            civic_no_case2 = civic_no_case2 + 1
             return _id
         else:
             _id = 'CIVIC_VARIANT:' + str(doc["id"])
-            no_case3 = no_case3 + 1
+            civic_no_case3 = civic_no_case3 + 1
             return _id
     except Exception as e:
         logging.error(e)
         _id = 'CIVIC_VARIANT:' + str(doc["id"])
-        no_case4 = no_case4 + 1
+        civic_no_case4 = civic_no_case4 + 1
         return _id
 
 
@@ -86,7 +86,7 @@ def load_data(data_folder):
         # new_doc["civic"]["molecularProfiles"] = new_doc["civic"]["molecularProfiles"]["nodes"]
         yield dict_sweep(unlist(new_doc), ['', 'null', 'N/A', None, [], {}])
 
-    logging.info("number of civic ids from MyVariantInfo: {}".format(no_case1))
-    logging.info("number of civic ids from CivicDB.org: {}".format(no_case2))
-    logging.info("number of civic ids not found: {}".format(no_case3))
-    logging.info("number of civic ids created by exception: {}".format(no_case4))
+    logging.info("number of civic ids from MyVariantInfo: {}".format(civic_no_case1))
+    logging.info("number of civic ids from CivicDB.org: {}".format(civic_no_case2))
+    logging.info("number of civic ids not found: {}".format(civic_no_case3))
+    logging.info("number of civic ids created by exception: {}".format(civic_no_case4))
