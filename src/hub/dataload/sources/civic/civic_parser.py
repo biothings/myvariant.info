@@ -20,60 +20,57 @@ def merge_dicts(d1, d2):
     return merged
 
 
-def remove_nodes_and_edges(obj):
-    if not obj or type(obj) in [str, bool, int, float]:
-        return obj
+def remove_nodes_and_edges(data):
+    if "civic" in data and "molecularProfiles" in data["civic"]:
+        molecular_profiles = data["civic"]["molecularProfiles"]["nodes"]
+        for profile in molecular_profiles:
+            if "evidenceItems" in profile and "edges" in profile["evidenceItems"]:
+                profile["evidenceItems"] = [edge["node"] for edge in profile["evidenceItems"]["edges"]]
+        data["civic"]["molecularProfiles"] = molecular_profiles
+    return data
 
-    if isinstance(obj, list):
-        return [remove_nodes_and_edges(item) for item in obj]
 
-    if 'edges' in obj:
-        return [remove_nodes_and_edges(edge['node']) for edge in obj['edges']]
-
-    if 'nodes' in obj:
-        return [remove_nodes_and_edges(node) for node in obj['nodes']]
-    return {
-        key: remove_nodes_and_edges(value)
-        for key, value in obj.items()
-        if key != 'node'
-    }
+# number of civic ids from MyVariantInfo
+no_case1 = 0
+# number of civic ids from CivicDB.org
+no_case2 = 0
+# number of civic ids not found
+no_case3 = 0
+# number of civic ids created by exception
+no_case4 = 0
 
 
 def get_id(doc):
+    global no_case1
+    global no_case2
+    global no_case3
+    global no_case4
     try:
         if "myVariantInfo" in doc and "myVariantInfoId" in doc["myVariantInfo"]:
             _id = doc["myVariantInfo"]["myVariantInfoId"]
+            no_case1 = no_case1 + 1
             return _id
         elif "hgvsDescriptions" in doc:
             hgvs_description = doc["hgvsDescriptions"]
             hgvs_nc_item = hgvs_description[0].split(":")
             nc_id = hgvs_nc_item[0].replace("NC_", "").split(".")[0].lstrip('0')
             _id = nc_id + hgvs_nc_item[1]
+            no_case2 = no_case2 + 1
             return _id
         else:
             _id = 'CIVIC_VARIANT:' + str(doc["id"])
+            no_case3 = no_case3 + 1
             return _id
     except Exception as e:
         logging.error(e)
         _id = 'CIVIC_VARIANT:' + str(doc["id"])
+        no_case4 = no_case4 + 1
         return _id
 
 
 def load_data(data_folder):
-    # number of civic ids with ref, alt, chrom
-    no_case1 = 0
-    # number of civic ids with chrom, ref, but no alt
-    no_case2 = 0
-    # number of civic ids with chrom, alt, but no ref
-    no_case3 = 0
-    # number of civic ids with no alt and ref
-    no_case4 = 0
-    # for infile in glob.glob(os.path.join(data_folder,"variant_*.json")):
-    # print(glob.glob(os.path.join(data_folder,"variant_*.json")))
     for infile in glob.glob(os.path.join(data_folder,"variant_*.json")):
-        # logging.info(infile)
         variant_data = json.load(open(infile))
-
         doc = {}
         doc = merge_dicts(doc, variant_data["ContributorAvatars"]["data"])
         doc = merge_dicts(doc, variant_data["GeneVariant"]["data"]["variant"])
@@ -86,10 +83,10 @@ def load_data(data_folder):
         if "myVariantInfo" in new_doc["civic"]:
             new_doc["civic"].pop("myVariantInfo")
         new_doc = remove_nodes_and_edges(new_doc)
-        new_doc["civic"]["molecularProfiles"] = new_doc["civic"]["molecularProfiles"]["nodes"]
+        # new_doc["civic"]["molecularProfiles"] = new_doc["civic"]["molecularProfiles"]["nodes"]
         yield dict_sweep(unlist(new_doc), ['', 'null', 'N/A', None, [], {}])
 
-    logging.info("number of ids with ref, alt, chrom: {}".format(no_case1))
-    logging.info("number of ids with chrom, ref but no alt: {}".format(no_case2))
-    logging.info("number of ids with chrom, alt but no ref: {}".format(no_case3))
-    logging.info("number of ids with no ref and alt: {}".format(no_case4))
+    logging.info("number of civic ids from MyVariantInfo: {}".format(no_case1))
+    logging.info("number of civic ids from CivicDB.org: {}".format(no_case2))
+    logging.info("number of civic ids not found: {}".format(no_case3))
+    logging.info("number of civic ids created by exception: {}".format(no_case4))
