@@ -83,7 +83,6 @@ def load_data(data_folder):
         if "myVariantInfo" in new_doc["civic"]:
             new_doc["civic"].pop("myVariantInfo")
         new_doc = remove_nodes_and_edges(new_doc)
-        # new_doc["civic"]["molecularProfiles"] = new_doc["civic"]["molecularProfiles"]["nodes"]
         yield dict_sweep(unlist(new_doc), ['', 'null', 'N/A', None, [], {}])
 
     logging.info("number of civic ids from MyVariantInfo: {}".format(civic_no_case1))
