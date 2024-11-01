@@ -59,7 +59,7 @@ jobs:
       - name: Run pytest
         run: |
           source .venv/bin/activate
-          python -m pytest src/tests/data biothings_client.py/tests/variant.py -s -vv
+          python -m pytest src/tests/data biothings_client.py/tests/test_variant.py -s -vv
 
       # ### For debugging purposes in case of github action failure
       # ### Reference:https://github.com/mxschmitt/action-tmate
