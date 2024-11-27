@@ -1,39 +1,67 @@
-import os, sys, time, datetime
-import bs4
+import os
+import json
+import logging
+import datetime
 
 from config import DATA_ARCHIVE_ROOT
 from biothings.hub.dataload.dumper import HTTPDumper
-from biothings.utils.common import unzipall
+
+from hub.dataload.sources.civic.graphql_dump import GraphqlDump
 
 
 class CivicDumper(HTTPDumper):
 
     SRC_NAME = "civic"
+    API_URL = "https://civicdb.org/api/graphql"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
-    API_PAGE = 'https://civicdb.org/api/variants/'
     SCHEDULE = "0 22 1 * *"
-    IGNORE_HTTP_CODE = [404] # some variants are 
-    MAX_PARALLEL_DUMP = 1
-    SLEEP_BETWEEN_DOWNLOAD = 1.0
+    MAX_PARALLEL_DUMP = 5
+    SLEEP_BETWEEN_DOWNLOAD = 0.1
 
     def set_release(self):
         self.release = datetime.date.today().strftime("%Y-%m-%d")
 
-    def create_todump_list(self, force=False):
-        self.set_release() # so we can generate new_data_folder
-        # first check total number of variants. It's not continuous, so it's not
-        # because total_count = 2088 that the last variant is 2088, some have been deleted
-        # or at least give 404. Any 404 adds to the end...
-        ids = []
+    def create_todump_list(self, force=False, **kwargs):
+
         self.logger.info("Find all available variant IDS")
-        total_pages = self.client.get(self.API_PAGE + "?count=100").json()["_meta"]["total_pages"]
-        for p in range(1,total_pages+1):
-            self.logger.debug("Analyzing page %s/%s" % (p,total_pages))
-            doc = self.client.get(self.API_PAGE + "?count=100&page=%s" % p).json()
-            for rec in doc["records"]:
-                ids.append(rec["id"])
-        self.logger.info("Now generate download URLs")
-        for i in ids:
-            remote_file = self.API_PAGE + str(i)
-            local_file = os.path.join(self.new_data_folder,"variant_%s.json" % i)
-            self.to_dump.append({"remote":remote_file,"local":local_file})
+        ids = GraphqlDump().get_variants_list(api_url=self.API_URL)
+
+        self.logger.info("Now download files")
+        for variant_id in ids:
+            logging.info("### variant_id")
+            logging.info(variant_id)
+
+            if (
+                force
+                or not self.src_doc
+                or not self.release
+                or (
+                    self.src_doc
+                    and self.src_doc.get("download", {}).get("release") < self.release
+                )
+            ):
+                data_url = variant_id
+                file_name = f"variant_{str(variant_id)}.json"
+                self.set_release()
+                data_folder = os.path.join(self.SRC_ROOT_FOLDER, self.release)
+                local = os.path.join(data_folder, file_name)
+                logging.info(local)
+                self.to_dump.append({"remote": data_url, "local": local})
+
+    def download(self, remoteurl, localfile, headers={}):
+        self.prepare_local_folders(localfile)
+        variant_id = remoteurl
+
+        self.logger.info(f"Downloading data for variant id: {variant_id}")
+        variant_data = GraphqlDump().dump_variant(variant_id=variant_id, api_url=self.API_URL)
+
+        with open(localfile, "w") as f:
+            json.dump(variant_data, f)
+
+        return variant_data
+
+
+def __init__(self, *args, **kwargs):
+    super(CivicDumper, self).__init__(*args, **kwargs)
+    self.logger.info("Starting dump.")
+    self.dump()

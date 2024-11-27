@@ -21,9 +21,4 @@ class CGIDumper(LastModifiedHTTPDumper):
 
     VERIFY_CERT = False
     # URL is always the same, but headers change
-    SRC_URLS = ["https://www.cancergenomeinterpreter.org/data/cgi_biomarkers_latest.zip"]
-
-    def post_dump(self, *args, **kwargs):
-        self.logger.info("Unzipping files in '%s'" % self.new_data_folder) 
-        unzipall(self.new_data_folder)
-
+    SRC_URLS = ["https://www.cancergenomeinterpreter.org/data/biomarkers/cgi_biomarkers_latest.tsv"]
