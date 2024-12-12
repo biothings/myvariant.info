@@ -17,7 +17,7 @@
 
 biothings[hub] @ git+https://github.com/biothings/biothings.api.git@1.0.x
 
-bitarray==0.8.1     # used in utils.validate module
+bitarray==3.0.0     # used in utils.validate module
 generateDS>=2.29.24 # used in hub.dataload.sources.clinvar.clinvar_dump
 PyVCF3>=1.0.3        # used in various VCF parsers
 pysam>=0.8.1        # used in hub.dataload.sources.cadd.cadd_parser
