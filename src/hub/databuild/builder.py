@@ -8,7 +8,7 @@ from biothings.utils.common import iter_n
 from biothings.utils.mongo import id_feeder, get_target_db, Database, Collection
 from pymongo import UpdateOne
 from biothings.hub.databuild.builder import DataBuilder
-from biothings.hub.databuild.backend import ShardedTargetDocMongoBackend
+from biothings.hub.databuild.backend import TargetDocMongoBackend
 import config
 
 
@@ -127,7 +127,7 @@ class MyVariantShardedDataBuilder(MyVariantDataBuilder):
     """
 
     def __init__(self, build_name, source_backend, target_backend, *args, **kwargs):
-        shared_tgt_backend = partial(ShardedTargetDocMongoBackend,
+        shared_tgt_backend = partial(TargetDocMongoBackend,
                                      target_db=partial(get_target_db))
         super().__init__(build_name=build_name,
                          source_backend=source_backend,
