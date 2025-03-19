@@ -2,6 +2,8 @@ from pprint import pformat
 
 from biothings.tests.web import BiothingsDataTest
 
+import pytest
+
 
 class TestMyvariant(BiothingsDataTest):
     prefix = "v1"
@@ -63,8 +65,10 @@ class TestMyvariant(BiothingsDataTest):
         assert "wellderly" in res
         assert "clinvar" in res
 
+    @pytest.mark.heavy
     def test_320_index_count_hg19(self):
         self.check_index_count("hg19")
 
+    @pytest.mark.heavy
     def test_321_index_count_hg38(self):
         self.check_index_count("hg38")

@@ -1,0 +1,5 @@
+[tool.pytest.ini_options]
+addopts = "-m 'not heavy'"
+markers = [
+    "heavy: marks tests that are heavy and should not run by default"
+]
