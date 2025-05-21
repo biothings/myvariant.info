@@ -1,8 +1,8 @@
 # Use this instead to test the latest fixes on 0.12.x branch before official release
 # biothings@git+https://github.com/biothings/biothings.api@0.1.x#egg=biothings[web_extra]
 
-biothings@git+https://github.com/biothings/biothings.api@4fb3f268aa5b8c05dd6220be925b9ad533546839#egg=biothings[web_extra]
 # biothings[web_extra]==0.12.5
+biothings@git+https://github.com/biothings/biothings.api@4a66f72e32d65859297205bdfc5fb67bceeccc59#egg=biothings[web_extra]
 
 # for sentry monitoring
 raven
