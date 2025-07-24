@@ -121,13 +121,12 @@ class TestMyvariant(BiothingsDataTest):
         for _g in res:
             assert set(_g) == set(["_id", "query", "dbsnp", "_version"])
 
-    @pytest.mark.skip(reason="Slow Test")
+    @pytest.mark.heavy
     def test_044_annotation_post(self):
         """
         Test a large variant post
         """
-        # populate VARIANT_POST_LIST with ids
-        VARIANT_POST_LIST = []
+        from variant_list import VARIANT_POST_LIST
         res = self.request(
             "variant", method="POST", data={"ids": VARIANT_POST_LIST}
         ).json()

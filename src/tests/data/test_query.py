@@ -23,13 +23,12 @@ class TestMyvariant(BiothingsDataTest):
     def test_102_query_exists_(self):
         self.query(q="_exists_:gnomad_genome.hom", fields="gnomad_genome.hom")
 
-    @pytest.mark.xfail(reason="dbnsfp mapping is not updated")
     def test_110_query_exists_(self):
-        self.query(q="_exists_:dbnsfp.hgvsp&fields=dbnsfp.hgvsp")
-        self.query(q="_exists_:dbnsfp.hgvsc&fields=dbnsfp.hgvsc")
-        self.query(q="_exists_:dbnsfp.clinvar.clinvar_id&fields=dbnsfp.clinvar")
-        self.query(q="_exists_:dbnsfp.clinvar.omim&fields=dbnsfp.clinvar")
-        self.query(q="_exists_:dbnsfp.clinvar.medgen&fields=dbnsfp.clinvar")
+        self.query(q="_exists_:dbnsfp.hgvsp", fields="dbnsfp.hgvsp")
+        self.query(q="_exists_:dbnsfp.hgvsc", fields="dbnsfp.hgvsc")
+        self.query(q="_exists_:dbnsfp.clinvar.clinvar_id", fields="dbnsfp.clinvar")
+        self.query(q="_exists_:dbnsfp.clinvar.omim", fields="dbnsfp.clinvar")
+        self.query(q="_exists_:dbnsfp.clinvar.medgen", fields="dbnsfp.clinvar")
 
     def test_121_query(self):
         self.query(q="rs58991260")
@@ -49,7 +48,7 @@ class TestMyvariant(BiothingsDataTest):
     def test_126_query(self):
         self.query(q="dbsnp.vartype:snv")
 
-    @pytest.mark.skip(reason="Slow Test")
+    @pytest.mark.heavy
     def test_127_query(self):
         self.query(q="_exists_:dbnsfp")
 
@@ -64,11 +63,6 @@ class TestMyvariant(BiothingsDataTest):
             q="_exists_:wellderly AND cadd.polyphen.cat:possibly_damaging",
             fields="wellderly,cadd.polyphen",
         )
-
-    @pytest.mark.xfail(reason="feature removed in biothings 0.7.0")
-    def test_131_query_jsonld(self):
-        con = self.request("query?q=rs58991260&callback=mycallback").content
-        assert con.startswith("mycallback(".encode("utf-8"))
 
     def test_141_query_invalid(self):
         # testing non-ascii character
