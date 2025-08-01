@@ -271,7 +271,7 @@ try:
     'source_link_position': 'footer',
     }
 except ImportError:
-    print 'Warning: "sphinx_bootstrap_theme" is not installed, fall back to default theme.'
+    print('Warning: "sphinx_bootstrap_theme" is not installed, fall back to default theme.')
     pass
 
 try:
@@ -280,13 +280,13 @@ try:
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
     html_theme_options = {}
 except ImportError:
-    print 'Warning: "sphinx_rtd_theme" is not installed, fall back to default theme.'
+    print('Warning: "sphinx_rtd_theme" is not installed, fall back to default theme.')
     pass
 
 def setup(app):
-    print 'Entered Setup'
-    app.add_javascript('myvariant_doc.js')
-    app.add_javascript('jquery.dataTables.min.js')
-    app.add_stylesheet('myvariant_doc.css')
-    app.add_stylesheet('jquery.dataTables.min.css')
-    print 'Exited Setup'
+    print('Entered Setup')
+    app.add_js_file('myvariant_doc.js')
+    app.add_js_file('jquery.dataTables.min.js')
+    app.add_css_file('myvariant_doc.css')
+    app.add_css_file('jquery.dataTables.min.css')
+    print('Exited Setup')
