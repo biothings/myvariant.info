@@ -14,7 +14,7 @@ class ClingenUploader(uploader.ParallelizedSourceUploader):
             "url": "https://www.clinicalgenome.org",
             "license_url": "https://www.clinicalgenome.org/about/terms-of-use",
             "license_url_short": "http://bit.ly/2kAtyoH",
-            "licence": "CC0 1.0 Universal",
+            "license": "CC0 1.0 Universal",
         }
     }
 
