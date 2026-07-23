@@ -42,9 +42,9 @@ COLUMN_TAG.REF_ALLELE = "ref"
 COLUMN_TAG.ALT_ALLELE = "alt"
 COLUMN_TAG.UNIPROT_ACC = "uniprot_acc"
 COLUMN_TAG.UNIPROT_ENTRY = "uniprot_entry"
-COLUMN_TAG.HGVS_CODING = "hgvsc"  # for "HGVSc_snpEff" and "HGVSc_VEP" (HGVSc_ANNOVAR removed in 5.3.1a)
+COLUMN_TAG.HGVS_CODING = "hgvsc"  # for "HGVSc_snpEff" and "HGVSc_VEP" (HGVSc_ANNOVAR present through dbNSFP 4.9a, retired by dbNSFP 5.0)
 COLUMN_TAG.HGVS_PROTEIN = "hgvsp"  # for "HGVSp_snpEff" and "HGVSp_VEP"
-# GTEx, eQTLGen, and Geuvadis removed from 5.3.1a data file entirely
+# GTEx, eQTLGen, and Geuvadis eQTL columns retired by dbNSFP 5.0 (no longer in the variant file)
 
 
 def _check_length(lst: list):
@@ -222,8 +222,8 @@ COLUMNS = [
     Column("hg19_pos(1-based)", dest="hg19", transform=make_zero_based, tag=COLUMN_TAG.HG19_POS),
     # Column("hg18_chr"),  # Not Used
     Column("hg18_pos(1-based)", dest="hg18", transform=make_zero_based),
-    # Column("hs1_chr"),  # Not Used; new in 5.3.1a (CHM13 telomere-to-telomere assembly)
-    # Column("hs1_pos(1-based)", dest="hs1", transform=make_zero_based),  # new in 5.3.1a; hs1 support not yet implemented
+    # Column("hs1_chr"),  # Not Used, same rationale as hg18_chr above (chrom label doesn't vary by build)
+    Column("hs1_pos(1-based)", dest="hs1", transform=make_zero_based),  # hs1/T2T-CHM13 v2.0 coordinates, added in dbNSFP 5.3.1; stored on both hg19 and hg38 docs like hg18
     Column("aapos", dest="aa.pos", transform=split_int),
     Column("genename", transform=split_str),
     Column("Ensembl_geneid", transform=split_str),
@@ -231,7 +231,7 @@ COLUMNS = [
     Column("Ensembl_proteinid", transform=split_str),
     Column("Uniprot_acc", tag=COLUMN_TAG.UNIPROT_ACC),  # special column, see prune_uniprot()
     Column("Uniprot_entry", tag=COLUMN_TAG.UNIPROT_ENTRY),  # special column, see prune_uniprot()
-    # HGVSc_ANNOVAR and HGVSp_ANNOVAR removed in 5.3.1a; only snpEff and VEP sources remain
+    # HGVSc_ANNOVAR and HGVSp_ANNOVAR retired by dbNSFP 5.0; only snpEff and VEP sources remain
     Column("HGVSc_snpEff", tag=COLUMN_TAG.HGVS_CODING),  # special column, see prune_hgvsc_hgvsp()
     Column("HGVSp_snpEff", tag=COLUMN_TAG.HGVS_PROTEIN),  # ditto
     Column("HGVSc_VEP", tag=COLUMN_TAG.HGVS_CODING),  # ditto
@@ -240,7 +240,7 @@ COLUMNS = [
     Column("GENCODE_basic", dest="gencode_basic", transform=split_str),
     Column("TSL", transform=split_int),
     Column("VEP_canonical", dest="vep_canonical", transform=split_str),
-    Column("MANE", transform=split_str),  # new in 5.3.1a
+    Column("MANE", transform=split_str),  # added in dbNSFP 5.0
     Column("cds_strand", dest="cds_strand", transform=split_str),
     Column("refcodon", dest="aa.refcodon", transform=split_str),
     Column("codonpos", dest="aa.codonpos", transform=split_int),
@@ -250,7 +250,7 @@ COLUMNS = [
     Column("Denisova", transform=split_genotype),
     Column("VindijiaNeandertal", dest="vindijia_neandertal", transform=split_genotype),
     Column("ChagyrskayaNeandertal", dest="chagyrskaya_neandertal", transform=split_genotype),
-    # Note: clinvar and Interpro_domain moved to earlier column positions in 5.3.1a; no code impact (DictReader is order-independent)
+    # Note: clinvar and Interpro_domain appear at different column positions than in dbNSFP 4.9a; no code impact (DictReader is order-independent)
     Column("clinvar_id", dest="clinvar.clinvar_id", transform=split_clinvar),
     Column("clinvar_clnsig", transform=split_clinvar),
     Column("clinvar_trait", transform=split_clinvar),
@@ -273,21 +273,21 @@ COLUMNS = [
     Column("Polyphen2_HVAR_score", transform=split_float),
     Column("Polyphen2_HVAR_rankscore", transform=split_float),
     Column("Polyphen2_HVAR_pred", transform=split_str),
-    # LRT removed in 5.3.1a
+    # LRT retired by dbNSFP 5.0
     Column("MutationTaster_score", transform=split_float),
-    Column("MutationTaster_rankscore", dest="mutationtaster.rankscore", transform=split_float),  # renamed from MutationTaster_converted_rankscore in 5.3.1a
+    Column("MutationTaster_rankscore", dest="mutationtaster.rankscore", transform=split_float),  # renamed from MutationTaster_converted_rankscore when dbNSFP 5.0 adopted MutationTaster2021
     Column("MutationTaster_pred", transform=split_str),
     Column("MutationTaster_model", transform=split_str),
-    Column("MutationTaster_trees_benign", dest="mutationtaster.trees_benign", transform=split_int),  # new in 5.3.1a
-    Column("MutationTaster_trees_deleterious", dest="mutationtaster.trees_deleterious", transform=split_int),  # new in 5.3.1a
-    # MutationTaster_AAE removed in 5.3.1a
+    Column("MutationTaster_trees_benign", dest="mutationtaster.trees_benign", transform=split_int),  # added in dbNSFP 5.0 (MutationTaster2021 random-forest tree counts)
+    Column("MutationTaster_trees_deleterious", dest="mutationtaster.trees_deleterious", transform=split_int),  # ditto
+    # MutationTaster_AAE retired by dbNSFP 5.0 (tied to the pre-2021 MutationTaster model)
     Column("MutationAssessor_score", transform=split_float),
     Column("MutationAssessor_rankscore", transform=split_float),
     Column("MutationAssessor_pred", transform=split_str),
     Column("PROVEAN_score", transform=split_float),
     Column("PROVEAN_converted_rankscore", dest="provean.converted_rankscore", transform=split_float),
     Column("PROVEAN_pred", transform=split_str),
-    # FATHMM removed in 5.3.1a
+    # FATHMM retired by dbNSFP 5.0
     Column("VEST4_score", transform=split_float),
     Column("VEST4_rankscore", transform=split_float),
     Column("MetaSVM_score", transform=split_float),
@@ -305,21 +305,21 @@ COLUMNS = [
     Column("M-CAP_pred", transform=split_str),
     Column("REVEL_score", transform=split_float),
     Column("REVEL_rankscore", transform=split_float),
-    # MutPred (v1) removed in 5.3.1a; replaced by MutPred2
-    Column("MutPred2_score", dest="mutpred2.score", transform=split_float),  # new in 5.3.1a
-    Column("MutPred2_rankscore", dest="mutpred2.rankscore", transform=split_float),  # new in 5.3.1a
-    Column("MutPred2_pred", dest="mutpred2.pred", transform=split_str),  # new in 5.3.1a
-    Column("MutPred2_top5_mechanisms", dest="mutpred2.mechanisms", transform=parse_mutpred_top5features),  # new in 5.3.1a
+    # MutPred (v1) replaced by MutPred2 in dbNSFP 5.2
+    Column("MutPred2_score", dest="mutpred2.score", transform=split_float),  # added in dbNSFP 5.2
+    Column("MutPred2_rankscore", dest="mutpred2.rankscore", transform=split_float),  # added in dbNSFP 5.2
+    Column("MutPred2_pred", dest="mutpred2.pred", transform=split_str),  # added in dbNSFP 5.2
+    Column("MutPred2_top5_mechanisms", dest="mutpred2.mechanisms", transform=parse_mutpred_top5features),  # added in dbNSFP 5.2
     Column("MVP_score", transform=split_float),
     Column("MVP_rankscore", transform=split_float),
     Column("gMVP_score", transform=split_float),
     Column("gMVP_rankscore", transform=split_float),
-    Column("MisFit_D_score", dest="misfit.d.score", transform=split_float),  # new in 5.3.1a
-    Column("MisFit_D_rankscore", dest="misfit.d.rankscore", transform=split_float),  # new in 5.3.1a
-    Column("MisFit_D_pred_lenient", dest="misfit.d.pred_lenient", transform=split_str),  # new in 5.3.1a
-    Column("MisFit_D_pred_stringent", dest="misfit.d.pred_stringent", transform=split_str),  # new in 5.3.1a
-    Column("MisFit_S_score", dest="misfit.s.score", transform=split_float),  # new in 5.3.1a
-    Column("MisFit_S_rankscore", dest="misfit.s.rankscore", transform=split_float),  # new in 5.3.1a
+    Column("MisFit_D_score", dest="misfit.d.score", transform=split_float),  # added in dbNSFP 5.3
+    Column("MisFit_D_rankscore", dest="misfit.d.rankscore", transform=split_float),  # added in dbNSFP 5.3
+    Column("MisFit_D_pred_lenient", dest="misfit.d.pred_lenient", transform=split_str),  # added in dbNSFP 5.3
+    Column("MisFit_D_pred_stringent", dest="misfit.d.pred_stringent", transform=split_str),  # added in dbNSFP 5.3
+    Column("MisFit_S_score", dest="misfit.s.score", transform=split_float),  # added in dbNSFP 5.3
+    Column("MisFit_S_rankscore", dest="misfit.s.rankscore", transform=split_float),  # added in dbNSFP 5.3
     Column("MPC_score", transform=split_float),
     Column("MPC_rankscore", transform=split_float),
     Column("PrimateAI_score", transform=split_float),
@@ -349,9 +349,9 @@ COLUMNS = [
     Column("VARITY_ER_LOO_score", dest="varity.er_loo.score", transform=split_float),
     Column("VARITY_ER_LOO_rankscore", dest="varity.er_loo.rankscore", transform=split_float),
     Column("ESM1b_score", dest="esm1b.score", transform=split_float),
-    Column("ESM1b_converted_rankscore", dest="esm1b.converted_rankscore", transform=split_float),  # renamed from ESM1b_rankscore in 5.3.1a
+    Column("ESM1b_converted_rankscore", dest="esm1b.converted_rankscore", transform=split_float),  # renamed from ESM1b_rankscore when dbNSFP 5.2 updated ESM1b scoring
     Column("ESM1b_pred", dest="esm1b.pred", transform=split_str),
-    # EVE removed in 5.3.1a
+    # EVE retired by dbNSFP 5.0
     Column("AlphaMissense_score", dest="alphamissense.score", transform=split_float),
     Column("AlphaMissense_rankscore", dest="alphamissense.rankscore", transform=split_float),
     Column("AlphaMissense_pred", dest="alphamissense.pred", transform=split_str),
@@ -375,7 +375,7 @@ COLUMNS = [
     Column("CADD_phred", transform=split_float, assembly="hg38"),
     Column("DANN_score", transform=split_float),
     Column("DANN_rankscore", transform=split_float),
-    # fathmm-MKL removed in 5.3.1a
+    # fathmm-MKL retired by dbNSFP 5.0
     Column("fathmm-XF_coding_score", dest="fathmm-xf.coding_score", transform=split_float),
     Column("fathmm-XF_coding_rankscore", dest="fathmm-xf.coding_rankscore", transform=split_float),
     Column("fathmm-XF_coding_pred", dest="fathmm-xf.coding_pred", transform=split_str),
@@ -385,14 +385,14 @@ COLUMNS = [
     Column("Eigen-PC-raw_coding", dest="eigen-pc.raw_coding", transform=split_float),
     Column("Eigen-PC-raw_coding_rankscore", dest="eigen-pc.raw_coding_rankscore", transform=split_float),
     Column("Eigen-PC-phred_coding", dest="eigen-pc.phred_coding", transform=split_float),
-    # GenoCanyon removed in 5.3.1a
-    # fitCons (integrated, GM12878, H1-hESC, HUVEC) removed in 5.3.1a
-    # LINSIGHT removed in 5.3.1a
+    # GenoCanyon retired by dbNSFP 5.0
+    # fitCons (integrated, GM12878, H1-hESC, HUVEC) retired by dbNSFP 5.0
+    # LINSIGHT retired by dbNSFP 5.0
     Column("GERP++_NR", transform=split_float),
     Column("GERP++_RS", transform=split_float),
     Column("GERP++_RS_rankscore", dest="gerp++.rs_rankscore", transform=split_float),
-    Column("GERP_92_mammals", dest="gerp.92_mammals.score", transform=split_float),  # renamed from GERP_91_mammals in 5.3.1a
-    Column("GERP_92_mammals_rankscore", dest="gerp.92_mammals.rankscore", transform=split_float),  # renamed in 5.3.1a
+    Column("GERP_92_mammals", dest="gerp.92_mammals.score", transform=split_float),  # added as GERP_91_mammals in dbNSFP 4.8; renamed to GERP_92_mammals in dbNSFP 5.3
+    Column("GERP_92_mammals_rankscore", dest="gerp.92_mammals.rankscore", transform=split_float),  # ditto
     Column("phyloP100way_vertebrate", dest="phylop.100way_vertebrate.score", transform=split_float),
     Column("phyloP100way_vertebrate_rankscore", dest="phylop.100way_vertebrate.rankscore", transform=split_float),
     Column("phyloP470way_mammalian", dest="phylop.470way_mammalian.score", transform=split_float),
@@ -405,7 +405,7 @@ COLUMNS = [
     Column("phastCons470way_mammalian_rankscore", dest="phastcons.470way_mammalian.rankscore", transform=split_float),
     Column("phastCons17way_primate", dest="phastcons.17way_primate.score", transform=split_float),
     Column("phastCons17way_primate_rankscore", dest="phastcons.17way_primate.rankscore", transform=split_float),
-    # SiPhy removed in 5.3.1a (not in conservation score list: bStatistic, phyloP100way_vertebrate, phyloP470way_mammalian,
+    # SiPhy retired by dbNSFP 5.0 (not in conservation score list: bStatistic, phyloP100way_vertebrate, phyloP470way_mammalian,
     #   phyloP17way_primate, phastCons100way_vertebrate, phastCons470way_mammalian, phastCons17way_primate, GERP++, GERP_92)
     Column("bStatistic", dest="bstatistic.score", transform=split_float),
     Column("bStatistic_converted_rankscore", dest="bstatistic.converted_rankscore", transform=split_float),
@@ -421,9 +421,11 @@ COLUMNS = [
     Column("1000Gp3_EAS_AF", dest="1000gp3.eas.af", transform=float),
     Column("1000Gp3_SAS_AC", dest="1000gp3.sas.ac", transform=int),
     Column("1000Gp3_SAS_AF", dest="1000gp3.sas.af", transform=float),
-    # TWINSUK, ALSPAC, UK10K, ESP6500, ExAC, ExAC_nonTCGA, ExAC_nonpsych removed from 5.3.1a
-    # TOPMed freeze8 (3 cols), All of Us (28 cols), RegeneronME (84 cols), gnomAD2.1.1 (109 cols),
-    # gnomAD4.1 joint (45 cols) are in the file but not parsed here (counted in VALID_COLUMN_NO only)
+    # TWINSUK, ALSPAC, UK10K, ESP6500, ExAC, ExAC_nonTCGA, ExAC_nonpsych retired by dbNSFP 5.0
+    # TOPMed freeze8 (3 cols, added 5.0), gnomAD2.1.1 exomes controls/non_neuro/non_cancer (109 cols, added 5.0),
+    # gnomAD4.1 joint (45 cols, updated to v4.1 in 5.0), All of Us (28 cols, added 5.1), and RegeneronME (84 cols,
+    # added 5.1) are in the file but not parsed here (counted in VALID_COLUMN_NO only), consistent with gnomAD
+    # never being expanded into individual columns in earlier versions either (e.g. 4.8a)
     Column("ALFA_European_AC", dest="alfa.european.ac", transform=int),
     Column("ALFA_European_AN", dest="alfa.european.an", transform=int),
     Column("ALFA_European_AF", dest="alfa.european.af", transform=float),
@@ -460,11 +462,11 @@ COLUMNS = [
     Column("ALFA_Total_AC", dest="alfa.total.ac", transform=int),
     Column("ALFA_Total_AN", dest="alfa.total.an", transform=int),
     Column("ALFA_Total_AF", dest="alfa.total.af", transform=float),
-    # dbNSFP-computed POPMAX across all population databases (new in 5.3.1a)
+    # dbNSFP-computed POPMAX across all population databases (added in dbNSFP 5.1)
     Column("dbNSFP_POPMAX_AF", dest="dbnsfp_popmax.af", transform=float),
     Column("dbNSFP_POPMAX_AC", dest="dbnsfp_popmax.ac", transform=int),
     Column("dbNSFP_POPMAX_POP", dest="dbnsfp_popmax.pop"),
-    # GTEx, eQTLGen, and Geuvadis columns removed from 5.3.1a
+    # GTEx, eQTLGen, and Geuvadis eQTL columns retired by dbNSFP 5.0
 ]
 
 HG19_COLUMNS = [c for c in COLUMNS if c.is_hg19()]
@@ -531,7 +533,7 @@ def prune_hgvsc_hgvsp(raw_doc: dict, hgvsc_columns: list[Column], hgvsp_columns:
     """
     Split "HGVSc_snpEff" and "HGVSc_VEP" values into "hgvsc" field;
     split "HGVSp_snpEff" and "HGVSp_VEP" values into "hgvsp" field.
-    (HGVSc_ANNOVAR and HGVSp_ANNOVAR were removed in 5.3.1a)
+    (HGVSc_ANNOVAR and HGVSp_ANNOVAR were present through dbNSFP 4.9a, retired by dbNSFP 5.0)
     """
     coding_values = [raw_doc[c.dest] for c in hgvsc_columns if c.dest in raw_doc]
     protein_values = [raw_doc[c.dest] for c in hgvsp_columns if c.dest in raw_doc]
