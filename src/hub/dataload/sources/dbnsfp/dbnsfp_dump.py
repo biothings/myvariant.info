@@ -1,5 +1,6 @@
 import hashlib
 import os
+import time
 import zipfile
 
 import requests
@@ -40,6 +41,76 @@ class DBNSFPDumper(HTTPDumper):
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
 
     SCHEDULE = "0 9 1 * *"  # 9AM every 1st day of month; no-ops until DBNSFP_RELEASE/DBNSFP_DOWNLOAD_URL are updated
+
+    # The full academic archive is ~45GiB; connections to it are prone to breaking
+    # mid-transfer (seen in practice: ChunkedEncodingError/IncompleteRead partway
+    # through). The source (Cloudflare-fronted) advertises "Accept-Ranges: bytes",
+    # so on failure we resume from the last byte written instead of restarting.
+    # dbNSFP's own download instructions suggest "curl --http1.1 -C -" for this;
+    # "-C -" (resume from the local file's size) is what this override does, and
+    # "--http1.1" is moot here since plain requests/urllib3 has no HTTP/2 support
+    # to begin with (confirmed: a real request to the source negotiates HTTP/1.1).
+    MAX_DOWNLOAD_ATTEMPTS = 5
+    RETRY_WAIT_SECONDS = 15
+
+    def download(self, remoteurl, localfile, headers=None):
+        """
+        Like HTTPDumper.download(), but retries on a broken connection by
+        resuming from the last successfully-written byte (HTTP Range), instead
+        of restarting the whole ~45GiB transfer from scratch.
+        """
+        self.prepare_local_folders(localfile)
+        base_headers = dict(headers or {})
+
+        last_exception = None
+        for attempt in range(1, self.MAX_DOWNLOAD_ATTEMPTS + 1):
+            resume_from = os.path.getsize(localfile) if os.path.exists(localfile) else 0
+            attempt_headers = dict(base_headers)
+            mode = "wb"
+            if resume_from:
+                attempt_headers["Range"] = f"bytes={resume_from}-"
+                mode = "ab"
+
+            try:
+                res = self.client.get(remoteurl, stream=True, headers=attempt_headers, timeout=(30, 120))
+
+                if resume_from and res.status_code == 416:
+                    # Range not satisfiable: the file already on disk is already complete.
+                    self.logger.info(f"{localfile} is already fully downloaded ({resume_from} bytes); skipping.")
+                    return res
+                if resume_from and res.status_code == 200:
+                    # Server ignored our Range request; restart clean rather than risk corrupting the file.
+                    self.logger.warning(f"Server ignored Range request for {remoteurl}; restarting download from scratch.")
+                    mode = "wb"
+                elif res.status_code not in (200, 206):
+                    if res.status_code in self.__class__.IGNORE_HTTP_CODE:
+                        self.logger.info("Remote URL %s gave http code %s, ignored" % (remoteurl, res.status_code))
+                        return res
+                    raise DumperException(
+                        "Error while downloading '%s' (status: %s, reason: %s)" % (remoteurl, res.status_code, res.reason)
+                    )
+
+                self.logger.debug(f"Downloading '{remoteurl}' as '{localfile}' (attempt {attempt}, resuming from byte {resume_from})")
+                with open(localfile, mode) as fout:
+                    for chunk in res.iter_content(chunk_size=512 * 1024):
+                        if chunk:
+                            fout.write(chunk)
+                return res
+            except (requests.exceptions.ChunkedEncodingError, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+                last_exception = e
+                downloaded = os.path.getsize(localfile) if os.path.exists(localfile) else 0
+                if attempt < self.MAX_DOWNLOAD_ATTEMPTS:
+                    self.logger.warning(
+                        f"Download of {remoteurl} broke after {downloaded} bytes on attempt {attempt}/"
+                        f"{self.MAX_DOWNLOAD_ATTEMPTS} ({e}); will resume from there in {self.RETRY_WAIT_SECONDS}s."
+                    )
+                    time.sleep(self.RETRY_WAIT_SECONDS)
+                else:
+                    self.logger.error(f"Download of {remoteurl} failed after {self.MAX_DOWNLOAD_ATTEMPTS} attempts ({e}).")
+
+        raise DumperException(
+            f"Failed to download {remoteurl} after {self.MAX_DOWNLOAD_ATTEMPTS} attempts."
+        ) from last_exception
 
     def create_todump_list(self, force=False, **kwargs):
         if not DBNSFP_RELEASE or not DBNSFP_DOWNLOAD_URL:
