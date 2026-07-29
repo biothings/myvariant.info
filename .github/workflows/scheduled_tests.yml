@@ -52,6 +52,9 @@ jobs:
 
           pip install .venv/lib/python${{ matrix.python-version }}/site-packages/biothings/tests/slack_test_notification
 
+          # dbnsfp parser tests import src/utils/dotfield.py, which requires msgspec
+          pip install -r src/hub/dataload/sources/dbnsfp/requirements.txt
+
       - name: Force weekly run to bypass the version check
         if: github.event.schedule == '0 14 * * 1'
         run: echo "BYPASS_VERSION_CHECK=True" >> $GITHUB_ENV
