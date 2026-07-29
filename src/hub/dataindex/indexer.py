@@ -9,15 +9,15 @@ from utils.stats import ESMappingMetaStatsService, BuildDocMetaStatsService
 from elasticsearch import JSONSerializer, SerializationError, Elasticsearch
 from elasticsearch.compat import string_types
 
-import orjson
+import msgspec
 
 
 class MyVariantJSONSerializer(JSONSerializer):
     """
-    MyVariantJSONSerializer is an extension to JSONSerializer. Its `loads` and `dumps` code structures are logically the same 
-    with JSONSerializer, except that `orjson` is used as the underlying serializer instead of `json` or `simplejson`.
+    MyVariantJSONSerializer is an extension to JSONSerializer. Its `loads` and `dumps` code structures are logically the same
+    with JSONSerializer, except that `msgspec` is used as the underlying serializer instead of `json` or `simplejson`.
 
-    `orjson` is used to encode infinity values `float("inf")` or `float("-inf")` into `None`, instead of into "Infinity" or 
+    `msgspec` is used to encode infinity values `float("inf")` or `float("-inf")` into `None`, instead of into "Infinity" or
     "-Infinity" strings.
     ElasticSearch's underlying `JsonParser` module cannot convert "Infinity" or "-Infinity" strings back into infinity values
 
@@ -27,7 +27,7 @@ class MyVariantJSONSerializer(JSONSerializer):
     def loads(self, s):
         try:
             # return json.loads(s)
-            return orjson.loads(s)
+            return msgspec.json.decode(s)
         except (ValueError, TypeError) as e:
             raise SerializationError(s, e)
 
@@ -40,20 +40,20 @@ class MyVariantJSONSerializer(JSONSerializer):
             """
             `json.dumps()` behaviors:
 
-            ensure_ascii: If true (the default), the output is guaranteed to have all incoming non-ASCII characters escaped. 
+            ensure_ascii: If true (the default), the output is guaranteed to have all incoming non-ASCII characters escaped.
                           If false, these characters will be output as-is.
             separators: an (item_separator, key_separator) tuple, specifying the separators in the output.
             """
             # return json.dumps(data, default=self.default, ensure_ascii=False, separators=(",", ":"))
 
             """
-            `orjson.dumps()` will escape all incoming non-ASCII characters and output the encoded byte-strings.
+            `msgspec.json.encode()` will escape all incoming non-ASCII characters and output the encoded byte-strings.
             We decode the output byte-strings into string, and as a result, those escaped characters are un-escaped.
             In Python 3, the default encoding is "utf-8" (see https://docs.python.org/3/library/stdtypes.html#bytes.decode).
 
-            `orjson.dumps()` will output compact JSON representation, effectively the same behavior with json.dumps(separators=(",", ":"))
+            `msgspec.json.encode()` will output compact JSON representation, effectively the same behavior with json.dumps(separators=(",", ":"))
             """
-            return orjson.dumps(data, default=self.default).decode()
+            return msgspec.json.encode(data, enc_hook=self.default).decode()
         except (ValueError, TypeError) as e:
             raise SerializationError(data, e)
 

@@ -1,84 +1,136 @@
+import hashlib
 import os
-import re
-import requests
-from urllib.parse import urlparse, parse_qs
-from bs4 import BeautifulSoup
+import time
 import zipfile
-import xml.etree.ElementTree as ET
+
+import requests
 
 from config import DATA_ARCHIVE_ROOT
 from biothings.hub.dataload.dumper import HTTPDumper, DumperException
 from biothings.utils.common import unzipall
 
+try:
+    from config import DBNSFP_RELEASE, DBNSFP_DOWNLOAD_URL
+except ImportError:
+    DBNSFP_RELEASE = None
+    DBNSFP_DOWNLOAD_URL = None
+
 
 class DBNSFPDumper(HTTPDumper):
     """
-    Mixed dumper (use FTP and HTTP) to dump dbNSFP:
-    - FTP: to get the latest version
-    - HTTP: to actually get the data (because their FTP server is sooo slow)
+    Dumper for dbNSFP.
+
+    dbNSFP moved to a registration-gated download model starting with the 5.x
+    series (see https://www.dbnsfp.org/download): a human must submit an
+    institutional email via a Google Form to get an access code, then submit
+    a second Google Form (email + access code) to receive a release-specific
+    download link by email. There is no API and no predictable URL pattern
+    for this, so - unlike the old S3-bucket-listing + Box-link-scraping flow
+    this dumper used through 4.9a (dbnsfp.s3.amazonaws.com no longer exists;
+    the scraped page, sites.google.com/site/jpopgen/dbNSFP, is now explicitly
+    the "legacy" 1.x-4.x site and has no 5.x releases) - the release version
+    and download URL can no longer be auto-discovered.
+
+    They must be set in config.py (gitignored, not committed - the URL is
+    tied to a specific request) as DBNSFP_RELEASE and DBNSFP_DOWNLOAD_URL,
+    refreshed by hand each time a new dbNSFP release is obtained via the two
+    forms above.
     """
 
     SRC_NAME = "dbnsfp"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
 
-    SCHEDULE = "0 9 1 * *"  # 9AM every 1st day of month
+    SCHEDULE = "0 9 1 * *"  # 9AM every 1st day of month; no-ops until DBNSFP_RELEASE/DBNSFP_DOWNLOAD_URL are updated
 
-    # Look for filenames ending with "a" (for Academic), not "c" (for Commercial).
-    #   Also, sometimes there's a "v", sometimes not...
-    FILENAME_PATTERN = re.compile("dbNSFPv?(\d+\..*\d+a)\.zip")
-    # Check if a release is a beta release.
-    # Tricky there, usually releases are like 4.0a, 4.0b1a, 4.0b2a.
-    #   If sorted, 4.0b2a will be the "newest", but it's a beta (b2) and 4.0a is actually the newest there
-    BETA_RELEASE_PATTERN = re.compile("(\d+\.\d+)\w\d(\w)")
+    # The full academic archive is ~45GiB; connections to it are prone to breaking
+    # mid-transfer (seen in practice: ChunkedEncodingError/IncompleteRead partway
+    # through). The source (Cloudflare-fronted) advertises "Accept-Ranges: bytes",
+    # so on failure we resume from the last byte written instead of restarting.
+    # dbNSFP's own download instructions suggest "curl --http1.1 -C -" for this;
+    # "-C -" (resume from the local file's size) is what this override does, and
+    # "--http1.1" is moot here since plain requests/urllib3 has no HTTP/2 support
+    # to begin with (confirmed: a real request to the source negotiates HTTP/1.1).
+    MAX_DOWNLOAD_ATTEMPTS = 5
+    RETRY_WAIT_SECONDS = 15
 
-    def get_newest_info(self):
-        # Fetch the response from the endpoint
-        response = requests.get("https://dbnsfp.s3.amazonaws.com/")
-        response_content = response.content
+    def download(self, remoteurl, localfile, headers=None):
+        """
+        Like HTTPDumper.download(), but retries on a broken connection by
+        resuming from the last successfully-written byte (HTTP Range), instead
+        of restarting the whole ~45GiB transfer from scratch.
+        """
+        self.prepare_local_folders(localfile)
+        base_headers = dict(headers or {})
 
-        # Parse the XML response
-        root = ET.fromstring(response_content)
+        last_exception = None
+        for attempt in range(1, self.MAX_DOWNLOAD_ATTEMPTS + 1):
+            resume_from = os.path.getsize(localfile) if os.path.exists(localfile) else 0
+            attempt_headers = dict(base_headers)
+            mode = "wb"
+            if resume_from:
+                attempt_headers["Range"] = f"bytes={resume_from}-"
+                mode = "ab"
 
-        # Namespace for the XML
-        namespace = {'ns': 'http://s3.amazonaws.com/doc/2006-03-01/'}
+            try:
+                res = self.client.get(remoteurl, stream=True, headers=attempt_headers, timeout=(30, 120))
 
-        # Look for filenames ending with "a" (for Academic), not "c" (for Commercial).
-        #   Also, sometimes there's a "v", sometimes not...
-        FILENAME_PATTERN = re.compile("dbNSFPv?(\d+\..*\d+a)\.zip")
-        # Check if a release is a beta release.
-        # Tricky there, usually releases are like 4.0a, 4.0b1a, 4.0b2a.
-        #   If sorted, 4.0b2a will be the "newest", but it's a beta (b2) and 4.0a is actually the newest there
-        BETA_RELEASE_PATTERN = re.compile("(\d+\.\d+)\w\d(\w)")
+                if resume_from and res.status_code == 416:
+                    # Range not satisfiable: the file already on disk is already complete.
+                    self.logger.info(f"{localfile} is already fully downloaded ({resume_from} bytes); skipping.")
+                    return res
+                if resume_from and res.status_code == 200:
+                    # Server ignored our Range request; restart clean rather than risk corrupting the file.
+                    self.logger.warning(f"Server ignored Range request for {remoteurl}; restarting download from scratch.")
+                    mode = "wb"
+                elif res.status_code not in (200, 206):
+                    if res.status_code in self.__class__.IGNORE_HTTP_CODE:
+                        self.logger.info("Remote URL %s gave http code %s, ignored" % (remoteurl, res.status_code))
+                        return res
+                    raise DumperException(
+                        "Error while downloading '%s' (status: %s, reason: %s)" % (remoteurl, res.status_code, res.reason)
+                    )
 
-        release_map = dict()  # a dict of <release_num, file_name>
+                self.logger.debug(f"Downloading '{remoteurl}' as '{localfile}' (attempt {attempt}, resuming from byte {resume_from})")
+                with open(localfile, mode) as fout:
+                    for chunk in res.iter_content(chunk_size=512 * 1024):
+                        if chunk:
+                            fout.write(chunk)
+                return res
+            except (requests.exceptions.ChunkedEncodingError, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+                last_exception = e
+                downloaded = os.path.getsize(localfile) if os.path.exists(localfile) else 0
+                if attempt < self.MAX_DOWNLOAD_ATTEMPTS:
+                    self.logger.warning(
+                        f"Download of {remoteurl} broke after {downloaded} bytes on attempt {attempt}/"
+                        f"{self.MAX_DOWNLOAD_ATTEMPTS} ({e}); will resume from there in {self.RETRY_WAIT_SECONDS}s."
+                    )
+                    time.sleep(self.RETRY_WAIT_SECONDS)
+                else:
+                    self.logger.error(f"Download of {remoteurl} failed after {self.MAX_DOWNLOAD_ATTEMPTS} attempts ({e}).")
 
-        # Iterate through each Contents element in the XML
-        for contents in root.findall('ns:Contents', namespace):
-            key = contents.find('ns:Key', namespace).text
+        raise DumperException(
+            f"Failed to download {remoteurl} after {self.MAX_DOWNLOAD_ATTEMPTS} attempts."
+        ) from last_exception
 
-            filename_match = self.FILENAME_PATTERN.match(key)
-            if filename_match:
-                release = filename_match.groups()[0]
-                release_map[release] = key
+    def create_todump_list(self, force=False, **kwargs):
+        if not DBNSFP_RELEASE or not DBNSFP_DOWNLOAD_URL:
+            raise DumperException(
+                "DBNSFP_RELEASE and DBNSFP_DOWNLOAD_URL must be set in config.py. dbNSFP now requires a manual "
+                "request for a release-specific download link: register at https://www.dbnsfp.org/download, then "
+                "submit the 'Request download' form; there is no way to auto-discover them."
+            )
+        self.release = DBNSFP_RELEASE
 
-                # get the last item in the list, which is the latest version
-                newest_release = sorted(release_map.keys())[-1]
+        filename = os.path.basename(DBNSFP_DOWNLOAD_URL)
+        new_localfile = os.path.join(self.new_data_folder, filename)
+        try:
+            current_localfile = os.path.join(self.current_data_folder, filename)
+        except TypeError:
+            # current data folder doesn't even exist
+            current_localfile = new_localfile
 
-                beta_release_match = self.BETA_RELEASE_PATTERN.match(newest_release)
-                if beta_release_match:
-                    # If the newest release is a beta release, infer its stable release
-                    stable_release = "".join(beta_release_match.groups())
-
-                    # If the inferred stable release is available, use it instead of the beta release
-                    if stable_release in release_map:
-                        self.logger.info(f"Stable release {stable_release} detected; beta release {newest_release} discarded.")
-                        newest_release = stable_release
-                    # Otherwise just use the beta release
-                    # else:
-                    #     pass
-
-                self.release = newest_release
-                self.newest_file = release_map[newest_release]
+        if force or not os.path.exists(current_localfile) or self.new_release_available():
+            self.to_dump.append({"remote": DBNSFP_DOWNLOAD_URL, "local": new_localfile})
 
     def new_release_available(self):
         current_release = self.src_doc.get("download", {}).get("release")
@@ -89,99 +141,36 @@ class DBNSFPDumper(HTTPDumper):
             self.logger.debug(f"No new release available over current release {current_release}.")
             return False
 
-    @classmethod
-    def get_box_url(cls, filename):
-        """
-        Given a filename, find its Box download link from parsing the index page.
-
-        dbNSFP main page provides 3 types of downloads for each release, in the following order:
-        1. Amazon AWS (somehow cannot access)
-        2. Box (direct link, or wrapped in www.google.com/url?q=<Box_URL>)
-        3. Google Drive (a download page, not direct link)
-
-        However only the Amazon AWS download URL will contain the filename. E.g. "dbNSFP4.3a.zip" and
-        "https://www.google.com/url?q=https%3A%2F%2Fdbnsfp.s3.amazonaws.com%2FdbNSFP4.3a.zip&amp;sa=D&amp;sntz=1&amp;usg=AOvVaw2jxs6oSlLKGuD0pfWzazXd".
-
-        The algorithm here is:
-        1. Find the Amazon AWS download URL containing the filename.
-        2. Find the first Box download URL right after the above Amazon AWS URL.
-
-        Note: The above algorithm may fail once the HTML structure of the main page changed.
-        """
-
-        amazon_anchor_text = "Amazon"
-        box_anchor_text = "Box"
-        # google_drive_anchor_text = "googledrive"
-        # to find anchor elements containing text "Amazon", or "Box"
-        anchor_text_pattern = re.compile(f"^{amazon_anchor_text}|{box_anchor_text}$")
-
-        html_response = requests.get("https://sites.google.com/site/jpopgen/dbNSFP")
-        html_text = html_response.text
-        soup = BeautifulSoup(html_text, "html.parser")
-        anchors = soup.find_all("a", href=True, text=anchor_text_pattern)
-
-        amazon_anchor_index = None
-        for index, anchor in enumerate(anchors):
-            if filename in anchor["href"] and anchor.text == amazon_anchor_text:
-                amazon_anchor_index = index
-
-        if amazon_anchor_index is None:
-            raise DumperException(f"Cannot find an {amazon_anchor_text} anchor element containing filename {filename}.")
-
-        box_anchor = None
-        for anchor in anchors[amazon_anchor_index:]:
-            if anchor.text == box_anchor_text:
-                box_anchor = anchor
-                break
-
-        if box_anchor is None:
-            raise DumperException(f"Cannot find a {box_anchor_text} anchor element after the {amazon_anchor_text} anchor of "
-                                  f"{anchors[amazon_anchor_index]['href']}.")
-
-        box_url = box_anchor["href"]
-
-        # The Box download URL might be a "www.google.com/url" URL wrapping the true Box URL. E.g.
-        # "https://www.google.com/url?q=https%3A%2F%2Fusf.box.com%2Fshared%2Fstatic%2Fq1kufbnww5dy3fs2t1yp5ay0w93eufq7"
-        box_url_parse_result = urlparse(box_url)
-        if box_url_parse_result.netloc == "www.google.com":
-            qs_result = parse_qs(box_url_parse_result.query)
-            q = qs_result.get("q", None)
-            if q is None:
-                raise DumperException(f"Cannot find q in the query string of {box_url} for {filename}.")
-            return q[0]  # The wrapped Box URL should be the only element in "q"
-        elif box_url_parse_result.netloc.endswith("box.com"):  # direct Box.com download link
-            return box_url
-        else:
-            raise DumperException(f"Cannot recognized the Box download URL {box_url} for {filename}.")
-
-    def create_todump_list(self, force=False, **kwargs):
-        self.get_newest_info()
-
-        new_localfile = os.path.join(self.new_data_folder, os.path.basename(self.newest_file))
-        try:
-            current_localfile = os.path.join(self.current_data_folder, os.path.basename(self.newest_file))
-        except TypeError:
-            # current data folder doesn't even exist
-            current_localfile = new_localfile
-
-        if force or not os.path.exists(current_localfile) or self.new_release_available():
-            remote = self.get_box_url(self.newest_file)
-            self.to_dump.append({"remote": remote, "local": new_localfile})
-
     def post_download(self, remote, local):
         """
         Run some sanity checks after downloading
         """
 
         """
-        Check #1: The filename of the downloaded archive must contain the release tag.
+        Check #1: MD5 checksum, if the source publishes a "<file>.md5" next to the download URL.
+        """
+        md5_url = remote + ".md5"
+        try:
+            md5_response = requests.get(md5_url, timeout=30)
+            md5_response.raise_for_status()
+        except requests.RequestException as e:
+            self.logger.warning(f"Could not fetch {md5_url} to verify checksum, skipping: {e}")
+        else:
+            expected_md5 = md5_response.text.split()[0].strip()
+            with open(local, "rb") as f:
+                actual_md5 = hashlib.md5(f.read()).hexdigest()
+            if expected_md5 != actual_md5:
+                raise DumperException(f"MD5 mismatch for {os.path.basename(local)}: expected {expected_md5}, got {actual_md5}.")
+
+        """
+        Check #2: The filename of the downloaded archive must contain the release tag.
         """
         filename = os.path.basename(local)
         if self.release not in filename:
             raise DumperException(f"Weird, filename is wrong ({filename}); should contain release tag {self.release}.")
 
         """
-        Check #2: The downloaded archive must contain a README whole filename must contain the release tag.
+        Check #3: The downloaded archive must contain a README whole filename must contain the release tag.
         """
         zf = zipfile.ZipFile(local)
         readme = None
@@ -195,7 +184,7 @@ class DBNSFPDumper(HTTPDumper):
             raise DumperException(f"Version in readme filename ({readme.filename}) doesn't match release tag {self.release}.")
 
         """
-        Check #3: Must be a academic release. 
+        Check #4: Must be a academic release.
         """
         assert self.release.endswith("a"), f"Release {self.release} isn't academic version (how possible?)"
 
