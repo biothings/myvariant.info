@@ -1,5 +1,4 @@
-import logging
-import requests
+from hub.dataload.sources.civic.graphql_client import post_graphql
 
 
 class GraphqlContributorAvatars():
@@ -43,12 +42,8 @@ class GraphqlContributorAvatars():
         return query
 
     def fetch(self, api_url: str, variant_id: int):
-        try:
-            response = requests.post(
-                api_url,
-                json=self.gql(variant_id=variant_id)
-            )
-            return response.json()
-        except Exception as e:
-            logging.error(f"Error in {self.OPERATION_NAME}: {e}")
-            raise
+        return post_graphql(
+            api_url=api_url,
+            payload=self.gql(variant_id=variant_id),
+            operation_name=self.OPERATION_NAME,
+        )
