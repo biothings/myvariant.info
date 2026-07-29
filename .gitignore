@@ -13,6 +13,7 @@ docs/doc_html
 src/www/static/docs
 *checkpoint.ipynb
 src/config_prod.py
+src/hub/dataload/sources/civic/config.py
 src/run/*.pickle
 src/run/done/*.pickle
 src/.idea/
