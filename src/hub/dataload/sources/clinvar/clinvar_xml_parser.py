@@ -455,9 +455,14 @@ def clinvar_doc_feeder(input_file, hg19: bool):
         try:
             # Parse each `<ClinVarSet>` block into a `clinvarlib.PublicSetType` object
             public_set_obj = clinvarlib.parseString(clinvar_set_block, silence=1)
-        except:
+        except Exception as e:
             logging.debug(clinvar_set_block)
-            raise
+            # Some lxml exceptions (e.g. XMLSyntaxError) carry an unpicklable
+            # 'error_log' (lxml.etree._ListErrorLog) attribute. Since this
+            # generator runs in a worker process, letting that exception
+            # propagate as-is breaks pickling it back to the hub process and
+            # masks the real error. Re-raise as a plain, picklable exception.
+            raise RuntimeError("Failed to parse ClinVarSet block: %s" % e) from None
 
         # Convert each `clinvarlib.PublicSetType` object into a json document
         for doc in _map_public_set_to_json(public_set_obj, hg19):
