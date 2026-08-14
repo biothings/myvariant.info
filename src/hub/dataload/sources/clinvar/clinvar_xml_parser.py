@@ -6,13 +6,13 @@ Two major parsing functions in this script are:
 
 `clinvar_doc_feeder()` is responsible for the following jobs:
 
-    1. Receive a ClinVarFullRelease_*.xml.gz file, and split the xml file into `<ClinVarSet>...</ClinVarSet>` blocks
+    1. Receive a ClinVarRCVRelease_*.xml.gz file, and split the xml file into `<ClinVarSet>...</ClinVarSet>` blocks
     2. Parse each `<ClinVarSet>...</ClinVarSet>` block into an `PublicSetType` object, which is defined in the
         dynamically imported `clinvarlib`
     3. Convert each `PublicSetType` object into a clinvar document
 
 Note that The `PublicSetType` class is defined to map the block structure of `<ClinVarSet>`, which can be inspected
-through its XSD, https://ftp.ncbi.nlm.nih.gov/pub/clinvar/clinvar_public.xsd.
+through its XSD, https://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/RCV/ClinVar_RCV.xsd.
 
 `merge_rcv_accession()` is responsible for only one job:
 
@@ -31,7 +31,7 @@ biothings.config_for_app(config)
 
 from biothings.utils.dataload import unlist, dict_sweep, value_convert_to_number, rec_handler
 
-GLOB_PATTERN = "ClinVarFullRelease_*.xml.gz"
+GLOB_PATTERN = "ClinVarRCVRelease_*.xml.gz"
 clinvarlib = None
 
 
@@ -288,6 +288,58 @@ def _map_measure_to_json(measure_obj, hg19=True):
         return one_snp_json
 
 
+def _extract_classification(classifications):
+    """
+    Extract (clinical_significance, review_status, last_evaluated) out of a
+    `clinvarlib.ClassificationType` object (the `<Classifications>` block of a
+    `<ReferenceClinVarAssertion>`).
+
+    Since ClinVar's 2025-08-07 XML format update, the single `<ClinicalSignificance>`
+    element was replaced by `<Classifications>`, which bundles separate, mutually
+    exclusive sub-elements: `GermlineClassification`, `OncogenicityClassification`,
+    `SomaticClinicalImpact` (a list, unlike the other two) and `NoClassification`.
+    We prefer `GermlineClassification` since it matches the semantics of the old
+    `ClinicalSignificance` element, falling back to the other classification types
+    only when germline classification isn't available.
+    """
+    if classifications is None:
+        return None, None, None
+
+    germline = classifications.GermlineClassification
+    if germline is not None:
+        description = germline.Description
+        return (
+            description.valueOf_ if description is not None else None,
+            germline.ReviewStatus,
+            description.DateLastEvaluated if description is not None else None,
+        )
+
+    oncogenicity = classifications.OncogenicityClassification
+    if oncogenicity is not None:
+        description = oncogenicity.Description
+        return (
+            description.valueOf_ if description is not None else None,
+            oncogenicity.ReviewStatus,
+            description.DateLastEvaluated if description is not None else None,
+        )
+
+    somatic = classifications.SomaticClinicalImpact
+    if somatic is not None and somatic.Description:
+        description = somatic.Description[0]
+        return description.valueOf_, somatic.ReviewStatus, description.DateLastEvaluated
+
+    no_classification = classifications.NoClassification
+    if no_classification is not None:
+        description = no_classification.Description
+        return (
+            description.valueOf_ if description is not None else None,
+            no_classification.ReviewStatus,
+            None,
+        )
+
+    return None, None, None
+
+
 def _map_public_set_to_json(public_set_obj, hg19: bool):
     """
     Convert a `clinvarlib.PublicSetType` object into a json document.
@@ -304,23 +356,11 @@ def _map_public_set_to_json(public_set_obj, hg19: bool):
           </ReferenceClinVarAssertion>
         </ClinVarSet>
     """
-    try:
-        clinical_significance = public_set_obj.ReferenceClinVarAssertion.ClinicalSignificance.Description
-    except:
-        clinical_significance = None
+    clinical_significance, review_status, last_evaluated = _extract_classification(
+        public_set_obj.ReferenceClinVarAssertion.Classifications)
 
     rcv_accession = public_set_obj.ReferenceClinVarAssertion.ClinVarAccession.Acc
 
-    try:
-        review_status = public_set_obj.ReferenceClinVarAssertion.ClinicalSignificance.ReviewStatus
-    except:
-        review_status = None
-
-    try:
-        last_evaluated = public_set_obj.ReferenceClinVarAssertion.ClinicalSignificance.DateLastEvaluated
-    except:
-        last_evaluated = None
-    
     number_submitters = len(public_set_obj.ClinVarAssertion)
 
     # some items in clinvar_xml doesn't have origin information
@@ -421,7 +461,7 @@ def clinvar_doc_feeder(input_file, hg19: bool):
     """
 
     """
-    A ClinVarFullRelease_*.xml.gz file has the following structure:
+    A ClinVarRCVRelease_*.xml.gz file has the following structure:
     
         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <ReleaseSet Dated="2021-06-26" ...>

@@ -17,14 +17,14 @@ class ClinvarDumper(FTPDumper):
     SRC_NAME = "clinvar"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     FTP_HOST = 'ftp.ncbi.nlm.nih.gov'
-    CWD_DIR = '/pub/clinvar/xml/RCV_xml_old_format'
+    CWD_DIR = '/pub/clinvar/xml/RCV_release'
 
     SCHEDULE = "0 9 * * *"
 
     def get_newest_info(self):
         releases = self.client.nlst()
         # get rid of readme files
-        releases = [x for x in releases if x.startswith('ClinVarFullRelease') and x.endswith('gz')]
+        releases = [x for x in releases if x.startswith('ClinVarRCVRelease') and x.endswith('gz')]
         # sort items based on date
         releases = sorted(releases)
         # get the last item in the list, which is the latest version
@@ -52,9 +52,9 @@ class ClinvarDumper(FTPDumper):
             # register new release (will be stored in backend)
             self.to_dump.append({"remote": self.newest_file, "local": new_localfile})
             # schema
-            xsd = "clinvar_public.xsd"
+            xsd = "ClinVar_RCV.xsd"
             localxsdfile = os.path.join(self.new_data_folder, xsd)
-            self.to_dump.append({"remote": "../../xsd_public/RCV_xsd_old_format/%s" % xsd, "local": localxsdfile})
+            self.to_dump.append({"remote": "../../xsd_public/RCV/%s" % xsd, "local": localxsdfile})
 
     def post_dump(self, *args, **kwargs):
         generate_clinvar_lib(self.new_data_folder)
@@ -66,12 +66,12 @@ def generate_clinvar_lib(data_folder):
     try:
         os.chdir(data_folder)
         logging.info("Generate XM parser")
-        # ret = os.system('''generateDS.py -f -o "clinvar_tmp.py" -s "clinvarsubs.py" clinvar_public.xsd''')
+        # ret = os.system('''generateDS.py -f -o "clinvar_tmp.py" -s "clinvarsubs.py" ClinVar_RCV.xsd''')
         cmd = shutil.which('generateDS.py')
         if not cmd:
             raise OSError('"generateDS.py" is not found in the PATH!')
         # logging.info("CMD: %s; PATH: %s", cmd, os.environ.get("PATH"))
-        cmd += " -f -o clinvar_tmp.py -s clinvarsubs.py clinvar_public.xsd"
+        cmd += " -f -o clinvar_tmp.py -s clinvarsubs.py ClinVar_RCV.xsd"
         # logging.info("CMD: %s", cmd)
         ret = subprocess.call(cmd, shell=True)
         if ret != 0:
