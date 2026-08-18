@@ -31,24 +31,6 @@ class DBSNPDumper(FTPDumper):
 
     SCHEDULE = "0 9 * * *"
 
-    def __getstate__(self):
-        # Every file dispatch pickles this whole instance to ship self.download()
-        # to a worker process (job_manager.defer_to_process). self.src_dump is a
-        # live pymongo Collection (biothings sets it in BaseDumper for recording
-        # dump status) whose underlying client can pick up a threading.Lock once
-        # anything in the hub touches Mongo concurrently with this dump -- and
-        # locks can never be pickled. download() doesn't use src_dump (or client,
-        # which is already cleared between attempts), so drop both here instead of
-        # having unrelated hub activity intermittently break dispatching this
-        # dumper's download jobs.
-        state = self.__dict__.copy()
-        state["src_dump"] = None
-        state["client"] = None
-        return state
-
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-
     def set_release(self):
         try:
             self.client.cwd(self.__class__.VERSIONS_DIR)
@@ -67,8 +49,8 @@ class DBSNPDumper(FTPDumper):
         try:
             self.client.retrbinary("RETR %s" % self.__class__.CHECKSUMS_FILE, buf.write)
         except Exception as e:
-            self.logger.warning("Couldn't fetch '%s', downloads won't be checksum-verified: %s" %
-                                 (self.__class__.CHECKSUMS_FILE, e))
+            logging.warning("Couldn't fetch '%s', downloads won't be checksum-verified: %s" %
+                             (self.__class__.CHECKSUMS_FILE, e))
             return {}
         expected_md5s = {}
         for line in buf.getvalue().decode().splitlines():
@@ -138,6 +120,18 @@ class DBSNPDumper(FTPDumper):
                 self.release_client()
 
     def post_download(self, remotefile, localfile):
+        # NOTE: deliberately uses the plain module-level `logging` here, not
+        # `self.logger`. self.logger/self.src_dump are lazy properties backed by
+        # self._state (see biothings' BaseDumper); do_dump() calls self.unprepare()
+        # exactly once, before the whole per-file dispatch loop, to null out
+        # self._state so `self` can be pickled to ship download() to a worker
+        # process. post_download() runs in the main process, interleaved with
+        # later dispatches in that same loop -- merely *reading* self.logger here
+        # would lazily reconnect it (BaseDumper.logger's getter calls
+        # self.prepare(), which also reconnects self.src_dump, a live pymongo
+        # connection holding a threading.Lock that can never be pickled), breaking
+        # pickling for every dispatch that follows. Using the plain logger avoids
+        # touching that property entirely.
         expected_md5 = getattr(self, "_expected_md5s", {}).get(remotefile)
         if not expected_md5:
             # CHECKSUMS couldn't be fetched, or has no entry for this file
@@ -152,5 +146,5 @@ class DBSNPDumper(FTPDumper):
             raise ValueError(
                 "Checksum mismatch for '%s': expected %s, got %s (file removed, will retry on next run)" %
                 (remotefile, expected_md5, actual_md5))
-        self.logger.info("Checksum verified for '%s'" % remotefile)
+        logging.info("Checksum verified for '%s'" % remotefile)
 
