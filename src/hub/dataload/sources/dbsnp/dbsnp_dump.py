@@ -24,9 +24,10 @@ class DBSNPDumper(FTPDumper):
     # these files are 1-38GB each and can take hours to download; NCBI's FTP server
     # can go quiet for several minutes at a time during such long transfers, and the
     # 10-minute default is aggressive enough to kill an otherwise-healthy download.
-    # Since retrbinary() has no resume support, any timeout means restarting that
-    # file from scratch, so it's worth tolerating longer stalls here.
     FTP_TIMEOUT = 30 * 60.0
+    # even 30 minutes isn't always enough on a bad link, so on top of that, resume
+    # (rather than restart from scratch) up to this many times per file.
+    MAX_DOWNLOAD_ATTEMPTS = 8
 
     SCHEDULE = "0 9 * * *"
 
@@ -74,6 +75,49 @@ class DBSNPDumper(FTPDumper):
                 current_localfile = new_localfile
             if force or not os.path.exists(current_localfile) or self.remote_is_better(filename, current_localfile):
                 self.to_dump.append({"remote":filename, "local":new_localfile})
+
+    def download(self, remotefile, localfile):
+        self.prepare_local_folders(localfile)
+        block_size = self._get_optimal_buffer_size()
+        last_exc = None
+        try:
+            for attempt in range(1, self.__class__.MAX_DOWNLOAD_ATTEMPTS + 1):
+                if self.need_prepare():
+                    self.prepare_client()
+                offset = os.path.getsize(localfile) if os.path.exists(localfile) else 0
+                mode = "ab" if offset else "wb"
+                self.logger.debug("Downloading '%s' as '%s' (attempt %d/%d, resuming from byte %d)" %
+                                   (remotefile, localfile, attempt, self.__class__.MAX_DOWNLOAD_ATTEMPTS, offset))
+                try:
+                    with open(localfile, mode) as out_f:
+                        # retrbinary()'s "rest" arg sends a REST command so the transfer
+                        # picks up where the previous attempt left off, instead of
+                        # restarting this multi-GB file from byte 0 on every timeout.
+                        self.client.retrbinary(cmd="RETR %s" % remotefile, callback=out_f.write,
+                                                blocksize=block_size, rest=str(offset) if offset else None)
+                    # set the mtime to match remote ftp server
+                    response = self.client.sendcmd("MDTM " + remotefile)
+                    code, lastmodified = response.split()
+                    lastmodified = time.mktime(datetime.strptime(lastmodified, "%Y%m%d%H%M%S").timetuple())
+                    os.utime(localfile, (lastmodified, lastmodified))
+                    return code
+                except Exception as e:
+                    last_exc = e
+                    new_size = os.path.getsize(localfile) if os.path.exists(localfile) else 0
+                    self.logger.warning(
+                        "Attempt %d/%d downloading '%s' failed at byte %d, will resume: %s" %
+                        (attempt, self.__class__.MAX_DOWNLOAD_ATTEMPTS, remotefile, new_size, e))
+                    # connection is likely broken, force a fresh one on the next attempt
+                    if self.client:
+                        self.release_client()
+                    if attempt < self.__class__.MAX_DOWNLOAD_ATTEMPTS:
+                        time.sleep(min(60, 5 * attempt))
+            self.logger.error("Giving up on '%s' after %d attempts: %s" %
+                               (remotefile, self.__class__.MAX_DOWNLOAD_ATTEMPTS, last_exc))
+            raise last_exc
+        finally:
+            if self.client:
+                self.release_client()
 
     def post_download(self, remotefile, localfile):
         expected_md5 = getattr(self, "_expected_md5s", {}).get(remotefile)
