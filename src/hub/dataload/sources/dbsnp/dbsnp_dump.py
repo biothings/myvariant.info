@@ -31,6 +31,24 @@ class DBSNPDumper(FTPDumper):
 
     SCHEDULE = "0 9 * * *"
 
+    def __getstate__(self):
+        # Every file dispatch pickles this whole instance to ship self.download()
+        # to a worker process (job_manager.defer_to_process). self.src_dump is a
+        # live pymongo Collection (biothings sets it in BaseDumper for recording
+        # dump status) whose underlying client can pick up a threading.Lock once
+        # anything in the hub touches Mongo concurrently with this dump -- and
+        # locks can never be pickled. download() doesn't use src_dump (or client,
+        # which is already cleared between attempts), so drop both here instead of
+        # having unrelated hub activity intermittently break dispatching this
+        # dumper's download jobs.
+        state = self.__dict__.copy()
+        state["src_dump"] = None
+        state["client"] = None
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
     def set_release(self):
         try:
             self.client.cwd(self.__class__.VERSIONS_DIR)
