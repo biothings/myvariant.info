@@ -2,21 +2,23 @@
 Parses the two UniProtKB variant files (see uniprot_dump.py for how they're
 fetched) into 'uniprot' myvariant.info documents:
 
-  - humsavar.txt: manually curated missense variants. This drives which
-    variants end up in this source -- every output document corresponds to
-    exactly one humsavar.txt record.
   - homo_sapiens_variation.txt.gz: bulk protein-altering variant index (59M+
-    rows, mostly dbSNP/ClinVar-sourced). humsavar.txt has no genomic
-    coordinate of its own (only a dbSNP id), so this file is used purely to
-    look up that coordinate and to enrich the record with whatever
-    'source_db_id' / 'clinical_significance' / 'phenotype_disease' /
-    'phenotype_disease_source' values UniProt reports at that genomic
-    position -- not just the one dbSNP id humsavar happens to reference, but
-    every source (rs, RCV, or anything else) sharing that same coordinate.
+    rows, mostly dbSNP/ClinVar-sourced). This is the base: every unique
+    genomic coordinate found here becomes one output document, populated
+    with whatever 'source_db_id' / 'clinical_significance' /
+    'phenotype_disease' / 'phenotype_disease_source' values UniProt reports
+    at that position (every source sharing the coordinate -- rs, RCV, or
+    anything else -- not just one).
+  - humsavar.txt: manually curated missense variants, ~85K records. It has
+    no genomic coordinate of its own (only a dbSNP id), so its fields are
+    attached to a document only when one of that document's source_db_id
+    values matches a dbSNP id in humsavar.txt. Most documents (the vast
+    majority of the ~15M unique coordinates in the variation file have no
+    curated humsavar record) won't have a 'humsavar' field at all.
 
-humsavar.txt records with no dbSNP id, or whose dbSNP id can't be found in
-homo_sapiens_variation.txt.gz, are skipped: without a genomic coordinate there
-is no way to build the 'chrN:g.posREF>ALT' _id myvariant.info requires.
+Rows whose 'Chromosome Coordinate' isn't a recognized GRCh38 chromosome
+accession are skipped: without a genomic coordinate there is no way to build
+the 'chrN:g.posREF>ALT' _id myvariant.info requires.
 """
 import glob
 import gzip
@@ -130,103 +132,103 @@ def parse_variation(lines):
             yield row
 
 
-def build_variation_index(iter_rows_factory, needed_dbsnp_ids):
+def build_variation_aggregate(rows):
     """
-    Two-pass scan over the (huge) variation file, via `iter_rows_factory`: a
-    zero-arg callable returning a fresh iterator of parsed variation rows
-    (as produced by parse_variation()) each time it's called, since this
-    needs to scan the rows twice without holding all of them in memory.
+    Single pass over ALL homo_sapiens_variation.txt(.gz) rows (as produced by
+    parse_variation()), aggregating every row by its genomic coordinate --
+    this file is the base of this source, so every coordinate found here
+    ends up as an output document, not just a pre-selected subset.
 
-    Pass 1 finds the genomic coordinate for each dbSNP id in
-    `needed_dbsnp_ids`. Pass 2 collects every row sharing one of those
-    coordinates -- regardless of that row's own source_db_id -- so a
-    variant's enrichment fields reflect everything UniProt reports at that
-    genomic position, not just the one dbSNP id that happened to link it to
-    humsavar.
-
-    Returns (dbsnp_to_coordinate, coordinate_info):
-      - dbsnp_to_coordinate: {dbsnp_id: coordinate}
-      - coordinate_info: {coordinate: {"source_db_id": set(), "clinical_significance": set(),
-                                        "phenotype_disease": set(), "phenotype_disease_source": set()}}
+    Returns {coordinate: {"source_db_id": set(), "clinical_significance": set(),
+                           "phenotype_disease": set(), "phenotype_disease_source": set()}}
     """
-    remaining = set(needed_dbsnp_ids)
-    dbsnp_to_coordinate = {}
-    for row in iter_rows_factory():
-        if not remaining:
-            break
-        if row["source_db_id"] in remaining:
-            dbsnp_to_coordinate[row["source_db_id"]] = row["coordinate"]
-            remaining.discard(row["source_db_id"])
-
-    relevant_coordinates = set(dbsnp_to_coordinate.values())
     coordinate_info = {}
-    for row in iter_rows_factory():
+    for row in rows:
         coordinate = row["coordinate"]
-        if coordinate not in relevant_coordinates:
-            continue
-        info = coordinate_info.setdefault(coordinate, {
-            "source_db_id": set(),
-            "clinical_significance": set(),
-            "phenotype_disease": set(),
-            "phenotype_disease_source": set(),
-        })
+        info = coordinate_info.get(coordinate)
+        if info is None:
+            info = {
+                "source_db_id": set(),
+                "clinical_significance": set(),
+                "phenotype_disease": set(),
+                "phenotype_disease_source": set(),
+            }
+            coordinate_info[coordinate] = info
         info["source_db_id"].add(row["source_db_id"])
         for key in ("clinical_significance", "phenotype_disease", "phenotype_disease_source"):
             value = row[key]
             if value and value != "-":
                 info[key].add(value)
+    return coordinate_info
 
-    return dbsnp_to_coordinate, coordinate_info
 
-
-def build_docs(humsavar_rows, dbsnp_to_coordinate, coordinate_info):
+def build_humsavar_index(humsavar_rows):
     """
-    Yield one 'uniprot' document per humsavar row that could be resolved to a
-    genomic coordinate. Rows with no dbSNP id, or whose dbSNP id has no match
-    in the variation file, are skipped.
+    {dbsnp_id: [humsavar_record, ...]} -- a dbSNP id can be shared by more
+    than one humsavar record (real case: ABCA1's VAR_009147 and VAR_062487
+    both cite rs137854496, an un-cleaned-up UniProt curation duplicate), so
+    each dbSNP id maps to a list rather than a single record.
     """
+    index = {}
     for row in humsavar_rows:
         if not row["dbsnp_id"]:
             continue
-        coordinate = dbsnp_to_coordinate.get(row["dbsnp_id"])
-        if not coordinate:
-            continue
-        _id = nc_coordinate_to_hgvs_id(coordinate)
-        if not _id:
-            continue
-
-        humsavar = {
+        record = {
             "swiss_prot_ac": row["swiss_prot_ac"],
             "ftid": row["ftid"],
             "type_of_variant": row["type_of_variant"],
         }
         if row["disease_name"]:
-            humsavar["disease_name"] = row["disease_name"]
+            record["disease_name"] = row["disease_name"]
+        index.setdefault(row["dbsnp_id"], []).append(record)
+    return index
 
-        doc = {"_id": _id, "uniprot": {"humsavar": humsavar}}
-        info = coordinate_info.get(coordinate, {})
+
+def build_docs(coordinate_info, humsavar_index):
+    """
+    Yield one 'uniprot' document per genomic coordinate in coordinate_info
+    (i.e. per unique coordinate found in homo_sapiens_variation.txt.gz).
+    'humsavar' is attached only when one of the coordinate's source_db_id
+    values matches a dbSNP id in humsavar_index -- most documents won't have
+    one, since humsavar.txt (~85K records) is a small subset of all the
+    coordinates in the base file (~15M).
+    """
+    for coordinate, info in coordinate_info.items():
+        _id = nc_coordinate_to_hgvs_id(coordinate)
+        if not _id:
+            continue
+
+        doc = {"_id": _id, "uniprot": {}}
         for key in ("source_db_id", "clinical_significance", "phenotype_disease", "phenotype_disease_source"):
             values = info.get(key)
             if values:
                 doc["uniprot"][key] = sorted(values)
+
+        humsavar_by_ftid = {}
+        for source_id in info["source_db_id"]:
+            for record in humsavar_index.get(source_id, []):
+                humsavar_by_ftid[record["ftid"]] = record
+        if humsavar_by_ftid:
+            records = list(humsavar_by_ftid.values())
+            doc["uniprot"]["humsavar"] = records[0] if len(records) == 1 else records
 
         yield unlist(doc)
 
 
 def merge_docs(docs):
     """
-    build_docs() yields one document per humsavar row, but more than one
-    humsavar row can resolve to the same genomic coordinate -- e.g. dbSNP ids
-    that were later merged/deprecated in favor of a canonical rsID, with
-    UniProt's curated record still listing the older one. Storage does a
-    plain insert (not an upsert), so two documents with the same _id crash
+    Two distinct raw 'Chromosome Coordinate' strings can normalize to the
+    same _id (e.g. differing only by RefSeq patch version), so build_docs()
+    can still yield more than one document for the same _id even though it
+    iterates coordinate_info's already-unique keys. Storage does a plain
+    insert (not an upsert), so two documents with the same _id would crash
     the whole batch with a MongoDB duplicate key error.
 
     Groups by _id and merges each group into a single document: when more
-    than one distinct humsavar record maps to the same _id, 'humsavar'
-    becomes a list of records (mirroring how ClinVar's parser handles the
-    analogous "more than one record per genomic position" case for its 'rcv'
-    field) and the enrichment fields are unioned across all colliding rows.
+    than one distinct humsavar record ends up attached to the same _id,
+    'humsavar' becomes a list of records (as build_docs() already does for
+    multiple matches within one coordinate) and the enrichment fields are
+    unioned across all colliding rows.
     """
     grouped = {}
     for doc in docs:
@@ -237,7 +239,20 @@ def merge_docs(docs):
             yield group[0]
             continue
 
-        merged = {"_id": _id, "uniprot": {"humsavar": [d["uniprot"]["humsavar"] for d in group]}}
+        merged = {"_id": _id, "uniprot": {}}
+
+        humsavar_by_ftid = {}
+        for d in group:
+            humsavar = d["uniprot"].get("humsavar")
+            if humsavar is None:
+                continue
+            records = humsavar if isinstance(humsavar, list) else [humsavar]
+            for record in records:
+                humsavar_by_ftid[record["ftid"]] = record
+        if humsavar_by_ftid:
+            records = list(humsavar_by_ftid.values())
+            merged["uniprot"]["humsavar"] = records[0] if len(records) == 1 else records
+
         for key in ("source_db_id", "clinical_significance", "phenotype_disease", "phenotype_disease_source"):
             values = set()
             for d in group:
@@ -261,24 +276,19 @@ def load_data(data_folder, logger=None):
 
     with open(humsavar_file, encoding="utf-8", errors="replace") as f:
         humsavar_rows = list(parse_humsavar(f))
-    needed_dbsnp_ids = {row["dbsnp_id"] for row in humsavar_rows if row["dbsnp_id"]}
-    logger.info("Parsed %d humsavar.txt records (%d with a dbSNP id to resolve)" %
-                (len(humsavar_rows), len(needed_dbsnp_ids)))
+    humsavar_index = build_humsavar_index(humsavar_rows)
+    logger.info("Parsed %d humsavar.txt records (%d distinct dbSNP ids)" %
+                (len(humsavar_rows), len(humsavar_index)))
 
-    def _iter_variation_file():
-        f = gzip.open(variation_file, "rt", encoding="utf-8", errors="replace")
-        try:
-            yield from parse_variation(f)
-        finally:
-            f.close()
+    with gzip.open(variation_file, "rt", encoding="utf-8", errors="replace") as f:
+        coordinate_info = build_variation_aggregate(parse_variation(f))
+    logger.info("Aggregated %d unique genomic coordinates from '%s'" %
+                (len(coordinate_info), VARIATION_FILE_GLOB))
 
-    dbsnp_to_coordinate, coordinate_info = build_variation_index(_iter_variation_file, needed_dbsnp_ids)
-    logger.info("Resolved %d/%d dbSNP ids to a genomic coordinate in '%s'" %
-                (len(dbsnp_to_coordinate), len(needed_dbsnp_ids), VARIATION_FILE_GLOB))
-
-    raw_docs = list(build_docs(humsavar_rows, dbsnp_to_coordinate, coordinate_info))
-    logger.info("Built %d uniprot documents (%d humsavar records skipped: no dbSNP id or unresolved)" %
-                (len(raw_docs), len(humsavar_rows) - len(raw_docs)))
+    raw_docs = list(build_docs(coordinate_info, humsavar_index))
+    with_humsavar = sum(1 for d in raw_docs if "humsavar" in d["uniprot"])
+    logger.info("Built %d uniprot documents (%d with a humsavar match)" %
+                (len(raw_docs), with_humsavar))
 
     docs = list(merge_docs(raw_docs))
     if len(docs) != len(raw_docs):
