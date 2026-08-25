@@ -352,6 +352,81 @@ class TestBuildDocs(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+# merge_docs
+# ---------------------------------------------------------------------------
+
+class TestMergeDocs(unittest.TestCase):
+    """
+    Regression test for a real production crash: two distinct humsavar.txt
+    records for ABCA1 (VAR_009147 p.Trp590Ser and VAR_062487 p.Trp590Leu) both
+    reference the same dbSNP id, rs137854496 -- a UniProt curation duplicate
+    that was never cleaned up. Both resolve to the same genomic coordinate
+    (chr9:g.104831048C>G), so build_docs() yields two documents with the same
+    _id. Storage does a plain insert (not upsert), so without merging this
+    crashes the whole batch with a MongoDB E11000 duplicate key error.
+    """
+
+    def setUp(self):
+        self.doc_a = {
+            "_id": "chr9:g.104831048C>G",
+            "uniprot": {
+                "humsavar": {"swiss_prot_ac": "O95477", "ftid": "VAR_009147",
+                             "type_of_variant": "LP/P",
+                             "disease_name": "Tangier disease (TGD) [MIM:205400]"},
+                "source_db_id": "rs137854496",
+            },
+        }
+        self.doc_b = {
+            "_id": "chr9:g.104831048C>G",
+            "uniprot": {
+                "humsavar": {"swiss_prot_ac": "O95477", "ftid": "VAR_062487",
+                             "type_of_variant": "LP/P",
+                             "disease_name": "Tangier disease (TGD) [MIM:205400]"},
+                "source_db_id": ["RCV000010098", "RCV001509362", "rs137854496"],
+                "clinical_significance": "Variant of uncertain significance, Likely pathogenic, Pathogenic",
+                "phenotype_disease": ["Tangier disease (TGD)", "Tangier disease (tgd)"],
+                "phenotype_disease_source": "MIM:205400, 31751110, RCV000010098",
+            },
+        }
+
+    def test_non_colliding_docs_pass_through_unchanged(self):
+        other = {"_id": "chr1:g.1A>G", "uniprot": {"humsavar": {"ftid": "VAR_1"}}}
+        docs = list(up.merge_docs([self.doc_a, other]))
+        self.assertEqual(len(docs), 2)
+        self.assertIn(other, docs)
+
+    def test_colliding_docs_produce_a_single_document(self):
+        docs = list(up.merge_docs([self.doc_a, self.doc_b]))
+        self.assertEqual(len(docs), 1, "must not crash storage with two docs sharing an _id")
+        self.assertEqual(docs[0]["_id"], "chr9:g.104831048C>G")
+
+    def test_humsavar_becomes_a_list_of_both_records(self):
+        merged = next(iter(up.merge_docs([self.doc_a, self.doc_b])))
+        humsavar = merged["uniprot"]["humsavar"]
+        self.assertIsInstance(humsavar, list)
+        self.assertEqual({h["ftid"] for h in humsavar}, {"VAR_009147", "VAR_062487"})
+
+    def test_source_db_id_unioned_across_scalar_and_list_values(self):
+        """doc_a has a scalar source_db_id, doc_b has a list -- both must merge cleanly."""
+        merged = next(iter(up.merge_docs([self.doc_a, self.doc_b])))
+        self.assertEqual(sorted(merged["uniprot"]["source_db_id"]),
+                          ["RCV000010098", "RCV001509362", "rs137854496"])
+
+    def test_enrichment_fields_from_either_doc_are_preserved(self):
+        merged = next(iter(up.merge_docs([self.doc_a, self.doc_b])))
+        self.assertEqual(merged["uniprot"]["clinical_significance"],
+                          "Variant of uncertain significance, Likely pathogenic, Pathogenic")
+        self.assertEqual(sorted(merged["uniprot"]["phenotype_disease"]),
+                          ["Tangier disease (TGD)", "Tangier disease (tgd)"])
+
+    def test_single_doc_group_is_not_wrapped_in_extra_list(self):
+        """The overwhelmingly common case (no collision) must keep humsavar as a plain dict."""
+        docs = list(up.merge_docs([self.doc_a]))
+        self.assertEqual(len(docs), 1)
+        self.assertIsInstance(docs[0]["uniprot"]["humsavar"], dict)
+
+
+# ---------------------------------------------------------------------------
 # load_data (integration)
 # ---------------------------------------------------------------------------
 
@@ -371,6 +446,12 @@ class TestLoadDataIntegration(unittest.TestCase):
             f.write("A1BG        P04217     VAR_018370  p.His395Arg    LB/B     rs2241788      -\n")
             # unresolvable row: no dbSNP id at all
             f.write("AARS1       P49588     VAR_073293  p.Thr608Met    US       -              -\n")
+            # regression case: two distinct humsavar records sharing one dbSNP id
+            # (real production case: ABCA1 VAR_009147/VAR_062487 both rs137854496)
+            f.write("ABCA1       O95477     VAR_009147  p.Trp590Ser    LP/P     rs137854496    "
+                    "Tangier disease (TGD) [MIM:205400]\n")
+            f.write("ABCA1       O95477     VAR_062487  p.Trp590Leu    LP/P     rs137854496    "
+                    "Tangier disease (TGD) [MIM:205400]\n")
 
         variation_path = os.path.join(self.tmpdir, "homo_sapiens_variation.txt.gz")
         with gzip.open(variation_path, "wt") as f:
@@ -380,6 +461,8 @@ class TestLoadDataIntegration(unittest.TestCase):
             # a second source at that same position, to exercise aggregation end-to-end
             f.write(_variation_row("RCV000012345", "NC_000019.10:g.58864491G>A",
                                     clinsig="Benign", gene="A1BG", aa="p.His52Arg"))
+            f.write(_variation_row("rs137854496", "NC_000009.12:g.104831048C>G",
+                                    clinsig="Pathogenic", gene="ABCA1", ac="O95477", aa="p.Trp590Ser"))
 
     def tearDown(self):
         import shutil
@@ -387,13 +470,33 @@ class TestLoadDataIntegration(unittest.TestCase):
 
     def test_end_to_end(self):
         docs = up.load_data(self.tmpdir)
-        self.assertEqual(len(docs), 1)
-        doc = docs[0]
-        self.assertEqual(doc["_id"], "chr19:g.58864491G>A")
+        # 2 resolvable groups: the A1BG row, and the merged ABCA1 pair (the 2
+        # unresolvable/no-dbSNP-id rows are skipped, not 4 separate documents)
+        self.assertEqual(len(docs), 2)
+        by_id = {d["_id"]: d for d in docs}
+
+        doc = by_id["chr19:g.58864491G>A"]
         self.assertEqual(sorted(doc["uniprot"]["source_db_id"]),
                           ["RCV000012345", "rs893184"])
         self.assertEqual(doc["uniprot"]["clinical_significance"], "Benign")
         self.assertEqual(doc["uniprot"]["humsavar"]["swiss_prot_ac"], "P04217")
+
+    def test_end_to_end_merges_duplicate_dbsnp_id_across_humsavar_records(self):
+        """
+        Regression test for the production crash: without merge_docs(), this
+        scenario yields two raw documents with _id 'chr9:g.104831048C>G' and
+        crashes storage.process()'s plain insert_many() with E11000. Here it
+        must produce exactly one merged document instead.
+        """
+        docs = up.load_data(self.tmpdir)
+        by_id = {d["_id"]: d for d in docs}
+        self.assertIn("chr9:g.104831048C>G", by_id)
+        merged = by_id["chr9:g.104831048C>G"]
+        humsavar = merged["uniprot"]["humsavar"]
+        self.assertIsInstance(humsavar, list)
+        self.assertEqual({h["ftid"] for h in humsavar}, {"VAR_009147", "VAR_062487"})
+        self.assertEqual(merged["uniprot"]["source_db_id"], "rs137854496")
+        self.assertEqual(merged["uniprot"]["clinical_significance"], "Pathogenic")
 
     def test_missing_variation_file_raises(self):
         import tempfile

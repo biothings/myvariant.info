@@ -213,6 +213,43 @@ def build_docs(humsavar_rows, dbsnp_to_coordinate, coordinate_info):
         yield unlist(doc)
 
 
+def merge_docs(docs):
+    """
+    build_docs() yields one document per humsavar row, but more than one
+    humsavar row can resolve to the same genomic coordinate -- e.g. dbSNP ids
+    that were later merged/deprecated in favor of a canonical rsID, with
+    UniProt's curated record still listing the older one. Storage does a
+    plain insert (not an upsert), so two documents with the same _id crash
+    the whole batch with a MongoDB duplicate key error.
+
+    Groups by _id and merges each group into a single document: when more
+    than one distinct humsavar record maps to the same _id, 'humsavar'
+    becomes a list of records (mirroring how ClinVar's parser handles the
+    analogous "more than one record per genomic position" case for its 'rcv'
+    field) and the enrichment fields are unioned across all colliding rows.
+    """
+    grouped = {}
+    for doc in docs:
+        grouped.setdefault(doc["_id"], []).append(doc)
+
+    for _id, group in grouped.items():
+        if len(group) == 1:
+            yield group[0]
+            continue
+
+        merged = {"_id": _id, "uniprot": {"humsavar": [d["uniprot"]["humsavar"] for d in group]}}
+        for key in ("source_db_id", "clinical_significance", "phenotype_disease", "phenotype_disease_source"):
+            values = set()
+            for d in group:
+                value = d["uniprot"].get(key)
+                if value is None:
+                    continue
+                values.update(value) if isinstance(value, list) else values.add(value)
+            if values:
+                merged["uniprot"][key] = sorted(values)
+        yield unlist(merged)
+
+
 def load_data(data_folder, logger=None):
     logger = logger or logging.getLogger(__name__)
 
@@ -239,7 +276,12 @@ def load_data(data_folder, logger=None):
     logger.info("Resolved %d/%d dbSNP ids to a genomic coordinate in '%s'" %
                 (len(dbsnp_to_coordinate), len(needed_dbsnp_ids), VARIATION_FILE_GLOB))
 
-    docs = list(build_docs(humsavar_rows, dbsnp_to_coordinate, coordinate_info))
+    raw_docs = list(build_docs(humsavar_rows, dbsnp_to_coordinate, coordinate_info))
     logger.info("Built %d uniprot documents (%d humsavar records skipped: no dbSNP id or unresolved)" %
-                (len(docs), len(humsavar_rows) - len(docs)))
+                (len(raw_docs), len(humsavar_rows) - len(raw_docs)))
+
+    docs = list(merge_docs(raw_docs))
+    if len(docs) != len(raw_docs):
+        logger.info("Merged %d colliding documents sharing an _id down to %d" %
+                    (len(raw_docs), len(docs)))
     return docs
