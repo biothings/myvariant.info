@@ -1,7 +1,7 @@
-import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
+from hub.dataload.sources.uniprot import uniprot_parser
 
-class UniprotUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
+class UniprotUploader(SnpeffPostUpdateUploader):
 
     name = "uniprot"
     __metadata__ = {
@@ -14,6 +14,10 @@ class UniprotUploader(uploader.DummySourceUploader,SnpeffPostUpdateUploader):
             "license_url_short": "http://bit.ly/2RMp2Wa"
         }
     }
+
+    def load_data(self, data_folder):
+        self.logger.info("Load data from folder '%s'" % data_folder)
+        return uniprot_parser.load_data(data_folder, logger=self.logger)
 
     @classmethod
     def get_mapping(klass):
