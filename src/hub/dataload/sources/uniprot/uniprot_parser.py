@@ -2,8 +2,16 @@
 Loads humsavar.txt and homo_sapiens_variation.txt.gz as-is into 'uniprot'
 documents: one document per line in either file, verbatim. There is no
 deduplication, no merging of rows, and no correlation between the two files
--- each line becomes its own independent document with no computed _id
-(MongoDB assigns one automatically on insert).
+-- each line becomes its own independent document, identified by a random id
+(not a computed/genomic one).
+
+Every document needs an explicit "_id" here, even though its value carries
+no meaning: this project's MyVariantBasicStorage (see
+hub/dataload/storage.py) always looks at doc["_id"] before insert, to check
+whether it's a genomic HGVS id long enough to need shortening. Leaving "_id"
+unset (to let MongoDB assign one on insert) makes that lookup raise
+AssertionError for every document, since it runs before the insert ever
+happens.
 
 Column names already used elsewhere in this mapping are reused
 (source_db_id, clinical_significance, phenotype_disease,
@@ -14,6 +22,7 @@ own header (see _HUMSAVAR_FIELDS / _VARIATION_FIELDS below).
 import glob
 import gzip
 import os
+import uuid
 
 HUMSAVAR_FILE = "humsavar.txt"
 VARIATION_FILE_GLOB = "homo_sapiens_variation.txt.gz"
@@ -55,7 +64,7 @@ def parse_humsavar(lines):
             continue
         if len(values) == 6:
             values.append("-")
-        yield {"uniprot": dict(zip(_HUMSAVAR_FIELDS, values))}
+        yield {"_id": uuid.uuid4().hex, "uniprot": dict(zip(_HUMSAVAR_FIELDS, values))}
 
 
 def parse_variation(lines):
@@ -74,7 +83,7 @@ def parse_variation(lines):
         values = line.split("\t")
         if len(values) < len(_VARIATION_FIELDS):
             continue
-        yield {"uniprot": dict(zip(_VARIATION_FIELDS, values))}
+        yield {"_id": uuid.uuid4().hex, "uniprot": dict(zip(_VARIATION_FIELDS, values))}
 
 
 def load_data(data_folder, logger=None):
