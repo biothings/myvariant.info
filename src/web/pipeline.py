@@ -1,7 +1,7 @@
 import re
 from typing import Dict, Optional
 
-from elasticsearch_dsl import Search
+from elasticsearch.dsl import Search
 from biothings.web.query import ESQueryBuilder, AsyncESQueryBackend
 
 
