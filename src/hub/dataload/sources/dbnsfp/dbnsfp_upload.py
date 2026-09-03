@@ -1,10 +1,10 @@
 import os
 import glob
 
-from .dbnsfp_mapping_48a_v1 import mapping as mapping_v1
-from .dbnsfp_parser_48a_v1 import load_file as load_file_v1
-from .dbnsfp_mapping_48a_v2 import mapping as mapping_v2
-from .dbnsfp_parser_48a_v2 import load_file as load_file_v2
+from .dbnsfp_mapping_54a_v1 import mapping as mapping_v1
+from .dbnsfp_parser_54a_v1 import load_file as load_file_v1
+from .dbnsfp_mapping_54a_v2 import mapping as mapping_v2
+from .dbnsfp_parser_54a_v2 import load_file as load_file_v2
 
 import biothings.hub.dataload.uploader as uploader
 from hub.dataload.uploader import SnpeffPostUpdateUploader
@@ -12,9 +12,10 @@ from hub.dataload.storage import MyVariantIgnoreDuplicatedStorage
 
 
 SRC_META = {
-    "url": "https://sites.google.com/site/jpopgen/dbNSFP",
-    "license_url": "https://sites.google.com/site/jpopgen/dbNSFP",
-    "license_url_short": "http://bit.ly/2VLnQBz"
+    # sites.google.com/site/jpopgen/dbNSFP is the pre-5.x legacy site (tops out at 4.9a);
+    # dbnsfp.org is current as of 5.x. See dbnsfp_dump.py / README.md for the download flow.
+    "url": "https://www.dbnsfp.org",
+    "license_url": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
 }
 
 

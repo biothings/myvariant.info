@@ -7,8 +7,10 @@ release zip) into `dbnsfp` documents for both the `hg19` and `hg38` assemblies.
 The `dbNSFP_gene` file is never parsed - only the variant-level scores/annotations
 are indexed.
 
-There are two parser flavors per dbNSFP version, e.g. `dbnsfp_parser_531a_v1.py` /
-`dbnsfp_parser_531a_v2.py`:
+There are two parser flavors per dbNSFP version, e.g. `dbnsfp_parser_54a_v1.py` /
+`dbnsfp_parser_54a_v2.py`. `dbnsfp_upload.py` currently registers 54a (the
+newest version implemented here) - other version-suffixed parser/mapping files
+in this directory are kept for reference but are not wired into any uploader.
 
 - **v1**: per-transcript annotations (REVEL, SIFT, etc.) are flattened onto the
   document; when a variant has multiple transcript rows, only the first row's
@@ -31,8 +33,8 @@ series, getting the data requires a **manual, human-gated request**:
    and access code. This emails back release-specific download links, e.g.:
 
    ```text
-   https://dist.genos.us/academic/<token>/dbNSFP5.3.1a.zip
-   https://dist.genos.us/academic/<token>/dbNSFP5.3.1a.zip.md5
+   https://dist.genos.us/academic/<token>/dbNSFP5.4a.zip
+   https://dist.genos.us/academic/<token>/dbNSFP5.4a.zip.md5
    ```
 
    (There are also separate BGZF-format links for VEP/SnpSift and a
@@ -75,7 +77,7 @@ and the release is the academic ("a") branch.
   first row's. This is the root cause of
   [issue #179](https://github.com/biothings/myvariant.info/issues/179) and is
   unresolved in v1 by design - v2 exists specifically to fix it. See
-  `src/tests/data/test_dbnsfp_parser.py` and `test_dbnsfp_parser_531a.py`.
+  `src/tests/data/test_dbnsfp_parser.py` and `test_dbnsfp_parser_54a.py`.
 - **hs1 (T2T-CHM13 v2.0) coordinates are captured but not queryable as their own
   assembly.** `hs1_pos(1-based)` is stored as an auxiliary `hs1: {start, end}`
   field on both the hg19 and hg38 documents (mirroring how `hg18_pos(1-based)`
