@@ -24,7 +24,23 @@ class UniprotUploader(SnpeffPostUpdateUploader):
         mapping = {
             "uniprot": {
                 "properties": {
+                    "gene_name": {
+                        "type": "text",
+                        "analyzer": "string_lowercase"
+                    },
+                    "swiss_prot_ac": {
+                        "type": "text",
+                        "analyzer": "string_lowercase"
+                    },
+                    "aa_change": {
+                        "type": "text",
+                        "analyzer": "string_lowercase"
+                    },
                     "source_db_id": {
+                        "type": "text",
+                        "analyzer": "string_lowercase"
+                    },
+                    "consequence_type": {
                         "type": "text",
                         "analyzer": "string_lowercase"
                     },
@@ -38,14 +54,42 @@ class UniprotUploader(SnpeffPostUpdateUploader):
                         "type": "text",
                         "analyzer": "string_lowercase"
                     },
+                    "cytogenetic_band": {
+                        "type": "text",
+                        "analyzer": "string_lowercase"
+                    },
+                    "ensembl_gene_id": {
+                        "type": "text",
+                        "analyzer": "string_lowercase"
+                    },
+                    "ensembl_transcript_id": {
+                        "type": "text",
+                        "analyzer": "string_lowercase"
+                    },
+                    "ensembl_translation_id": {
+                        "type": "text",
+                        "analyzer": "string_lowercase"
+                    },
+                    "evidence": {
+                        "type": "text",
+                        "analyzer": "string_lowercase"
+                    },
                     "humsavar": {
                         "properties": {
+                            "gene_name": {
+                                "type": "text",
+                                "analyzer": "string_lowercase"
+                            },
                             "swiss_prot_ac": {
                                 "type": "text",
                                 "analyzer": "string_lowercase"
                             },
                             "ftid": {
                                 "copy_to" : ["all"],
+                                "type": "text",
+                                "analyzer": "string_lowercase"
+                            },
+                            "aa_change": {
                                 "type": "text",
                                 "analyzer": "string_lowercase"
                             },
@@ -62,4 +106,3 @@ class UniprotUploader(SnpeffPostUpdateUploader):
             }
         }
         return mapping
-
