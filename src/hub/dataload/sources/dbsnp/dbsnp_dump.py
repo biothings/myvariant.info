@@ -1,3 +1,5 @@
+import hashlib
+import io
 import os
 import os.path
 import sys, re
@@ -17,7 +19,15 @@ class DBSNPDumper(FTPDumper):
     CWD_DIR = '/snp/latest_release/JSON'
     VERSIONS_DIR = '/snp/archive'
     FILE_RE = 'refsnp-chr*.json.bz2'
+    CHECKSUMS_FILE = 'CHECKSUMS'
     MAX_PARALLEL_DUMP = 1   # reduced from 10 to 1 to prevent download timeout
+    # these files are 1-38GB each and can take hours to download; NCBI's FTP server
+    # can go quiet for several minutes at a time during such long transfers, and the
+    # 10-minute default is aggressive enough to kill an otherwise-healthy download.
+    FTP_TIMEOUT = 30 * 60.0
+    # even 30 minutes isn't always enough on a bad link, so on top of that, resume
+    # (rather than restart from scratch) up to this many times per file.
+    MAX_DOWNLOAD_ATTEMPTS = 8
 
     SCHEDULE = "0 9 * * *"
 
@@ -30,9 +40,30 @@ class DBSNPDumper(FTPDumper):
         finally:
             self.client.cwd(self.__class__.CWD_DIR)
 
+    def _fetch_checksums(self):
+        """Fetch and parse the remote CHECKSUMS file (md5sum-style lines:
+        '<md5>  <filename>') so each download can be verified in post_download().
+        Returns {} (skipping verification) if it can't be fetched, rather than
+        failing the whole dump over a 1.7KB file."""
+        buf = io.BytesIO()
+        try:
+            self.client.retrbinary("RETR %s" % self.__class__.CHECKSUMS_FILE, buf.write)
+        except Exception as e:
+            logging.warning("Couldn't fetch '%s', downloads won't be checksum-verified: %s" %
+                             (self.__class__.CHECKSUMS_FILE, e))
+            return {}
+        expected_md5s = {}
+        for line in buf.getvalue().decode().splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            md5sum, filename = line.split(None, 1)
+            expected_md5s[filename] = md5sum
+        return expected_md5s
 
     def create_todump_list(self, force=False):
         self.set_release()
+        self._expected_md5s = self._fetch_checksums()
         filenames = [fn for fn in self.client.nlst(self.__class__.FILE_RE)]
         assert len(filenames) == 25, "Expected 25 files, got %s" % len(filenames)
         for filename in filenames:
@@ -44,4 +75,76 @@ class DBSNPDumper(FTPDumper):
                 current_localfile = new_localfile
             if force or not os.path.exists(current_localfile) or self.remote_is_better(filename, current_localfile):
                 self.to_dump.append({"remote":filename, "local":new_localfile})
+
+    def download(self, remotefile, localfile):
+        self.prepare_local_folders(localfile)
+        block_size = self._get_optimal_buffer_size()
+        last_exc = None
+        try:
+            for attempt in range(1, self.__class__.MAX_DOWNLOAD_ATTEMPTS + 1):
+                if self.need_prepare():
+                    self.prepare_client()
+                offset = os.path.getsize(localfile) if os.path.exists(localfile) else 0
+                mode = "ab" if offset else "wb"
+                self.logger.debug("Downloading '%s' as '%s' (attempt %d/%d, resuming from byte %d)" %
+                                   (remotefile, localfile, attempt, self.__class__.MAX_DOWNLOAD_ATTEMPTS, offset))
+                try:
+                    with open(localfile, mode) as out_f:
+                        # retrbinary()'s "rest" arg sends a REST command so the transfer
+                        # picks up where the previous attempt left off, instead of
+                        # restarting this multi-GB file from byte 0 on every timeout.
+                        self.client.retrbinary(cmd="RETR %s" % remotefile, callback=out_f.write,
+                                                blocksize=block_size, rest=str(offset) if offset else None)
+                    # set the mtime to match remote ftp server
+                    response = self.client.sendcmd("MDTM " + remotefile)
+                    code, lastmodified = response.split()
+                    lastmodified = time.mktime(datetime.strptime(lastmodified, "%Y%m%d%H%M%S").timetuple())
+                    os.utime(localfile, (lastmodified, lastmodified))
+                    return code
+                except Exception as e:
+                    last_exc = e
+                    new_size = os.path.getsize(localfile) if os.path.exists(localfile) else 0
+                    self.logger.warning(
+                        "Attempt %d/%d downloading '%s' failed at byte %d, will resume: %s" %
+                        (attempt, self.__class__.MAX_DOWNLOAD_ATTEMPTS, remotefile, new_size, e))
+                    # connection is likely broken, force a fresh one on the next attempt
+                    if self.client:
+                        self.release_client()
+                    if attempt < self.__class__.MAX_DOWNLOAD_ATTEMPTS:
+                        time.sleep(min(60, 5 * attempt))
+            self.logger.error("Giving up on '%s' after %d attempts: %s" %
+                               (remotefile, self.__class__.MAX_DOWNLOAD_ATTEMPTS, last_exc))
+            raise last_exc
+        finally:
+            if self.client:
+                self.release_client()
+
+    def post_download(self, remotefile, localfile):
+        # NOTE: deliberately uses the plain module-level `logging` here, not
+        # `self.logger`. self.logger/self.src_dump are lazy properties backed by
+        # self._state (see biothings' BaseDumper); do_dump() calls self.unprepare()
+        # exactly once, before the whole per-file dispatch loop, to null out
+        # self._state so `self` can be pickled to ship download() to a worker
+        # process. post_download() runs in the main process, interleaved with
+        # later dispatches in that same loop -- merely *reading* self.logger here
+        # would lazily reconnect it (BaseDumper.logger's getter calls
+        # self.prepare(), which also reconnects self.src_dump, a live pymongo
+        # connection holding a threading.Lock that can never be pickled), breaking
+        # pickling for every dispatch that follows. Using the plain logger avoids
+        # touching that property entirely.
+        expected_md5 = getattr(self, "_expected_md5s", {}).get(remotefile)
+        if not expected_md5:
+            # CHECKSUMS couldn't be fetched, or has no entry for this file
+            return
+        actual_md5 = hashlib.md5()
+        with open(localfile, "rb") as f:
+            for chunk in iter(lambda: f.read(64 * 1024 * 1024), b""):
+                actual_md5.update(chunk)
+        actual_md5 = actual_md5.hexdigest()
+        if actual_md5 != expected_md5:
+            os.remove(localfile)
+            raise ValueError(
+                "Checksum mismatch for '%s': expected %s, got %s (file removed, will retry on next run)" %
+                (remotefile, expected_md5, actual_md5))
+        logging.info("Checksum verified for '%s'" % remotefile)
 

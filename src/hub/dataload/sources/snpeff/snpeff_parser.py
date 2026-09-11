@@ -6,6 +6,7 @@ import subprocess
 from biothings import config
 from biothings.utils.common import loadobj
 from biothings.utils.dataload import unlist, dict_sweep
+from config import MAX_REF_ALT_LEN
 from utils.hgvs import prune_redundant_seq
 from utils.validate import bit_to_nuc
 
@@ -85,6 +86,12 @@ class VCFConstruct(object):
             end = int(hgvs[1])
         else:
             end = int(hgvs[2])
+        if end - pos > MAX_REF_ALT_LEN:
+            # Some ClinVar records (e.g. large TTN deletions) span tens of kb. Building
+            # and sending such a huge REF allele crashes the snpEff subprocess instead of
+            # just failing to annotate, so skip these before doing the expensive lookup.
+            self.logger.warning("Skipping deletion HGVS %s: interval too large (%d bp) for snpEff annotation" % (repr(hgvs), end - pos))
+            return None
         chr_bit = self._chr_data[str(chrom)]
         ref = ''
         for i in range(pos, end+1):
@@ -126,6 +133,11 @@ class VCFConstruct(object):
         chrom = hgvs[0]
         pos = int(hgvs[1])
         end = int(hgvs[2])
+        if end - pos > MAX_REF_ALT_LEN:
+            # Same rationale as del_vcf_constructor: don't hand snpEff a REF allele
+            # spanning tens of kb, it crashes the subprocess instead of just skipping it.
+            self.logger.warning("Skipping delins HGVS %s: interval too large (%d bp) for snpEff annotation" % (repr(hgvs), end - pos))
+            return None
         chr_bit = self._chr_data[str(chrom)]
         ref = ''
         for i in range(pos, end+1):
