@@ -15,7 +15,7 @@
 #       require their own modules to run. Check their
 #       __METADATA__ setting for required modules.
 
-biothings[hub] @ git+https://github.com/biothings/biothings.api.git@1.0.x
+biothings[hub] @ git+https://github.com/biothings/biothings.api.git@1.1.x
 
 bitarray==3.0.0     # used in utils.validate module
 generateDS>=2.29.24 # used in hub.dataload.sources.clinvar.clinvar_dump
