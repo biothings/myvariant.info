@@ -234,19 +234,32 @@ class TestBuildVariationAggregate(unittest.TestCase):
         })
 
     def test_aggregates_all_source_db_ids_sharing_a_coordinate(self):
+        """build_variation_aggregate() intentionally returns lists, not
+        deduplicated sets (see its docstring: sets cost far more memory per
+        field at ~15M-coordinate scale) -- dedup happens later, in
+        build_docs(), one coordinate at a time."""
         coordinate_info = up.build_variation_aggregate(self.rows)
         info = coordinate_info["NC_000017.11:g.30178149A>G"]
-        self.assertEqual(info["source_db_id"], {"rs143842750", "RCV004292335", "RCV004545615"})
+        self.assertIsInstance(info["source_db_id"], list)
+        self.assertEqual(set(info["source_db_id"]), {"rs143842750", "RCV004292335", "RCV004545615"})
 
     def test_aggregates_new_fields_across_rows_sharing_a_coordinate(self):
         """Two different Ensembl transcripts at the same coordinate must both
         be collected, not just the first one seen."""
         coordinate_info = up.build_variation_aggregate(self.rows)
         info = coordinate_info["NC_000017.11:g.30178149A>G"]
-        self.assertEqual(info["ensembl_transcript_id"], {"ENST00000612959", "ENST00000999999"})
-        self.assertEqual(info["gene_name"], {"NSRP1"})
-        self.assertEqual(info["cytogenetic_band"], {"17q11.2"})
-        self.assertEqual(info["evidence"], {"TOPMed,gnomAD"})
+        self.assertEqual(set(info["ensembl_transcript_id"]), {"ENST00000612959", "ENST00000999999"})
+        self.assertEqual(set(info["gene_name"]), {"NSRP1"})
+        self.assertEqual(set(info["cytogenetic_band"]), {"17q11.2"})
+
+    def test_evidence_is_split_on_comma_into_individual_sources(self):
+        """A row's evidence can itself be a comma-separated list (e.g.
+        "TOPMed,gnomAD"); each source must become its own value rather than
+        one opaque blob, so it dedupes correctly against other rows at the
+        same coordinate that cite only one of those sources individually."""
+        coordinate_info = up.build_variation_aggregate(self.rows)
+        info = coordinate_info["NC_000017.11:g.30178149A>G"]
+        self.assertEqual(set(info["evidence"]), {"TOPMed", "gnomAD"})
 
     def test_placeholder_dash_values_are_excluded(self):
         coordinate_info = up.build_variation_aggregate(self.rows)

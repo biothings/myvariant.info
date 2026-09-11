@@ -171,26 +171,39 @@ def build_variation_aggregate(rows):
     """
     Single pass over ALL homo_sapiens_variation.txt(.gz) rows (as produced by
     parse_variation()), aggregating every row by its genomic coordinate --
-    every coordinate found here ends up as an output document. Every column
-    is aggregated as a set (source_db_id unconditionally; the rest skip '-'
-    placeholder values), since multiple rows -- e.g. different Ensembl
-    transcripts -- can share the same coordinate with different values.
+    every coordinate found here ends up as an output document.
 
-    Returns {coordinate: {field: set(), ...}} with one set per field in
-    _ALL_VARIATION_FIELDS.
+    Returns {coordinate: {field: [values...], ...}} -- plain lists, not sets:
+    an empty set costs ~216 bytes vs ~56 for an empty list, and with 13
+    fields x ~15.4M coordinates that difference alone is ~30GB (measured),
+    enough by itself to exhaust memory on a 32GB machine before any actual
+    string data is even counted. Values are deliberately left un-deduplicated
+    here (source_db_id unconditionally appended; the rest skip '-' placeholder
+    values) -- build_docs() dedupes/sorts each field once per coordinate,
+    transiently, while producing the final output, rather than maintaining a
+    live deduplicated set per field for all ~15.4M coordinates at once.
     """
     coordinate_info = {}
     for row in rows:
         coordinate = row["coordinate"]
         info = coordinate_info.get(coordinate)
         if info is None:
-            info = {key: set() for key in _ALL_VARIATION_FIELDS}
+            info = {key: [] for key in _ALL_VARIATION_FIELDS}
             coordinate_info[coordinate] = info
-        info["source_db_id"].add(row["source_db_id"])
+        info["source_db_id"].append(row["source_db_id"])
         for key in _VARIATION_SET_FIELDS:
             value = row[key]
-            if value and value != "-":
-                info[key].add(value)
+            if not value or value == "-":
+                continue
+            if key == "evidence":
+                # A row's evidence can itself be a comma-separated list of
+                # sources (e.g. "UniProt,ClinVar,ClinGen,dbSNP,1000Genomes,
+                # ESP,ExAC,TOPMed,gnomAD"); split so each source is its own
+                # value instead of one opaque blob alongside other rows'
+                # single-source values for the same coordinate.
+                info[key].extend(v.strip() for v in value.split(",") if v.strip())
+            else:
+                info[key].append(value)
     return coordinate_info
 
 
@@ -238,11 +251,19 @@ def build_docs(coordinate_info, humsavar_rows):
     humsavar record must end up as a document somewhere. These get a random
     _id (a uuid4 hex string), since there's no genomic coordinate to derive
     a real one from.
+
+    NOTE: drains coordinate_info via popitem() as it goes (rather than
+    coordinate_info.items()), freeing each coordinate's memory as soon as
+    it's turned into a document instead of holding the full ~15M-entry
+    aggregate alive for the entire time the (also large) output is being
+    built up -- coordinate_info is empty by the time this generator is
+    fully consumed.
     """
     humsavar_index = build_humsavar_index(humsavar_rows)
     used_ftids = set()
 
-    for coordinate, info in coordinate_info.items():
+    while coordinate_info:
+        coordinate, info = coordinate_info.popitem()
         _id = nc_coordinate_to_hgvs_id(coordinate)
         if not _id:
             continue
@@ -251,7 +272,7 @@ def build_docs(coordinate_info, humsavar_rows):
         for key in _ALL_VARIATION_FIELDS:
             values = info.get(key)
             if values:
-                doc["uniprot"][key] = sorted(values)
+                doc["uniprot"][key] = sorted(set(values))
 
         matched = {}
         for source_id in info["source_db_id"]:
