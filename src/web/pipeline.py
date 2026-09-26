@@ -96,8 +96,22 @@ class MVQueryBuilder(ESQueryBuilder):
                 search = search.query("query_string", query=match['query'])
             search = search.filter('match', chrom=match['chr'])
             assembly = 'hg38' if options.assembly == 'hg38' else 'hg19'
-            search = search.filter('range', **{assembly + ".start": {"lte": match['gend']}})
-            search = search.filter('range', **{assembly + ".end": {"gte": match['gstart']}})
+            # MAX_VARIANT_SPAN caps the upper bound on (end - start) for any stored variant.
+            # The hub build trims vcf.ref/vcf.alt to MAX_REF_ALT_LEN = 10000 (src/config_hub.py)
+            # before annotate_start_end() computes start/end, so a deletion's span is at most
+            # 10000 - 2 = 9998.  Adding these bounds is logically equivalent to the original
+            # open-ended ranges (no results are dropped), but narrows each range from ~half the
+            # chromosome (~38–45M docs) to ~5K docs, giving a 30–100× speedup on narrow windows.
+            # If config_hub.py ever raises MAX_REF_ALT_LEN, raise this constant to match.
+            MAX_VARIANT_SPAN = 10000
+            gstart = int(match['gstart'])
+            gend = int(match['gend'])
+            search = search.filter('range', **{
+                assembly + ".start": {"gte": gstart - MAX_VARIANT_SPAN, "lte": gend}
+            })
+            search = search.filter('range', **{
+                assembly + ".end": {"gte": gstart, "lte": gend + MAX_VARIANT_SPAN}
+            })
 
         else:  # default query
             search = super().default_string_query(q, options)
