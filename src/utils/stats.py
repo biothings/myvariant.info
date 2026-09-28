@@ -76,11 +76,14 @@ class ESMappingMetaStatsService:
         The goal here is to update the "stats" field inside.
         """
 
+        from config import MAX_REF_ALT_LEN
+
         stats = dict()
         stats["total"] = self.client.count(index=self.index_name)["count"]
         for field in [assembly, "observed", "vcf"]:
             body = {"query": {"exists": {"field": field}}}
             stats[field] = self.client.count(index=self.index_name, body=body)["count"]
+        stats["max_variant_span"] = MAX_REF_ALT_LEN
 
         mapping = self.client.indices.get_mapping(index=self.index_name)
         meta = mapping[self.index_name]["mappings"]["_meta"]  # Get the current meta field from mapping
