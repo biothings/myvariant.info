@@ -42,6 +42,30 @@ class ESMappingMetaStatsService:
         if release < required_min_release:
             raise ESReleaseException(f"Required ES minimum release is {required_min_release}, found version {version} installed.")
 
+    def _compute_max_variant_span(self, assembly) -> int:
+        """
+        Return the maximum (end - start) across all documents that have the given assembly field.
+        This is measured from the actual index data rather than inferred from config constants.
+        Falls back to 10000 (MAX_REF_ALT_LEN default) if the aggregation returns no result.
+        """
+        body = {
+            "size": 0,
+            "query": {"exists": {"field": assembly}},
+            "aggs": {
+                "max_span": {
+                    "max": {
+                        "script": {
+                            "source": f"doc['{assembly}.end'].value - doc['{assembly}.start'].value",
+                            "lang": "painless",
+                        }
+                    }
+                }
+            },
+        }
+        result = self.client.search(index=self.index_name, body=body)
+        value = result["aggregations"]["max_span"]["value"]
+        return int(value) if value is not None else 10000
+
     def update_mapping_meta_stats(self, assembly):
         """
         Update the "stats" entry inside the "_meta" field of the index's mapping. Return the updated "meta._stats" field of the mapping.
@@ -81,6 +105,7 @@ class ESMappingMetaStatsService:
         for field in [assembly, "observed", "vcf"]:
             body = {"query": {"exists": {"field": field}}}
             stats[field] = self.client.count(index=self.index_name, body=body)["count"]
+        stats["max_variant_span"] = self._compute_max_variant_span(assembly)
 
         mapping = self.client.indices.get_mapping(index=self.index_name)
         meta = mapping[self.index_name]["mappings"]["_meta"]  # Get the current meta field from mapping
