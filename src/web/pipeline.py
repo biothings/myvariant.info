@@ -96,8 +96,22 @@ class MVQueryBuilder(ESQueryBuilder):
                 search = search.query("query_string", query=match['query'])
             search = search.filter('match', chrom=match['chr'])
             assembly = 'hg38' if options.assembly == 'hg38' else 'hg19'
-            search = search.filter('range', **{assembly + ".start": {"lte": match['gend']}})
-            search = search.filter('range', **{assembly + ".end": {"gte": match['gstart']}})
+            # MAX_VARIANT_SPAN is written into _meta.stats by the hub after each build
+            # Falls back to 10000 for older indices that predate this field.
+            MAX_VARIANT_SPAN = (
+                self.metadata
+                .get_metadata(assembly)
+                .get('stats', {})
+                .get('max_variant_span', 10000)
+            )
+            gstart = int(match['gstart'])
+            gend = int(match['gend'])
+            search = search.filter('range', **{
+                assembly + ".start": {"gte": gstart - MAX_VARIANT_SPAN, "lte": gend}
+            })
+            search = search.filter('range', **{
+                assembly + ".end": {"gte": gstart, "lte": gend + MAX_VARIANT_SPAN}
+            })
 
         else:  # default query
             search = super().default_string_query(q, options)
