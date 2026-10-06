@@ -166,6 +166,13 @@ class TestGenomicIntervalQuery(BiothingsWebAppTest):
     def test_standalone_interval_query_pos_hg38(self):
         self.query(data={'q': 'chrX:30718532', 'assembly': 'hg38'})
 
+    def test_interval_query_span_limit(self):
+        self.request(
+            'query',
+            data={'q': 'chr1:1-5000002'},
+            expect=400,
+        )
+
     def test_prequery(self):
         self.query(data={'q': 'cadd.chrom:9 AND chr8:7194707'}, hits=False)
         self.query(data={'q': 'cadd.chrom:8 AND chr8:7194707'})

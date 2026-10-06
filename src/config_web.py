@@ -70,6 +70,10 @@ STATUS_CHECK = {"id": "chr1:g.218631822G>A", "index": "myvariant_current_hg19"}
 # *****************************************************************************
 # User Input Control
 # *****************************************************************************
+
+# Maximum interval query span; larger windows return HTTP 400.
+MAX_INTERVAL_QUERY_SPAN = 1_000_000  # 1 Mb
+
 BIOLINK_MODEL_PREFIX_BIOTHINGS_VARIANT_MAPPING = {
     "DBSNP": {
         "type": "variant",
