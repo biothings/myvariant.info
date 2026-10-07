@@ -4,6 +4,11 @@ from typing import Dict, Optional
 from elasticsearch.dsl import Search
 from biothings.web.query import ESQueryBuilder, AsyncESQueryBackend
 
+try:
+    from config_web import MAX_INTERVAL_QUERY_SPAN
+except (ImportError, AttributeError):
+    MAX_INTERVAL_QUERY_SPAN = 1_000_000
+
 
 INTERVAL_PATTERN = re.compile(
     r"""
@@ -106,6 +111,12 @@ class MVQueryBuilder(ESQueryBuilder):
             )
             gstart = int(match['gstart'])
             gend = int(match['gend'])
+            max_span = MAX_INTERVAL_QUERY_SPAN
+            if gend - gstart > max_span:
+                raise ValueError(
+                    f"Interval query span ({gend - gstart:,} bp) exceeds the "
+                    f"{max_span:,} bp limit. Please narrow the region."
+                )
             search = search.filter('range', **{
                 assembly + ".start": {"gte": gstart - MAX_VARIANT_SPAN, "lte": gend}
             })
