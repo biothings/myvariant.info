@@ -2,7 +2,6 @@ import re
 from typing import Dict, Optional
 
 from elasticsearch.dsl import Search
-from biothings.web.query.builder import QueryException
 from biothings.web.query import ESQueryBuilder, AsyncESQueryBackend
 
 
@@ -109,7 +108,7 @@ class MVQueryBuilder(ESQueryBuilder):
             gend = int(match['gend'])
             max_span = getattr(self.web_settings, 'MAX_INTERVAL_QUERY_SPAN', 1_000_000)
             if gend - gstart > max_span:
-                raise QueryException(
+                raise ValueError(
                     f"Interval query span ({gend - gstart:,} bp) exceeds the "
                     f"{max_span:,} bp limit. Please narrow the region."
                 )
