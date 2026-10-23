@@ -1,7 +1,7 @@
 # Use this instead to test the latest fixes on 1.2.x branch before official release
 # biothings[web_extra]@git+https://github.com/biothings/biothings.api@1.2.x
 
-biothings[web_extra]==1.2.0
+biothings[web_extra]==1.2.2
 
 # for sentry monitoring
 raven
