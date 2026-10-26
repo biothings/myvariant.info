@@ -7,6 +7,7 @@ import pickle
 from biothings.utils.common import iter_n
 from biothings.utils.mongo import id_feeder, get_target_db, Database, Collection
 from pymongo import UpdateOne
+from pymongo.errors import AutoReconnect, CursorNotFound
 from biothings.hub.databuild.builder import DataBuilder
 from biothings.hub.databuild.backend import TargetDocMongoBackend
 import config
@@ -14,10 +15,35 @@ import config
 
 class MyVariantDataBuilder(DataBuilder):
     MAX_CHROM_EX = 100000  # if chrom discrepancies found, max # of examples we keep
+    MAX_MERGE_SOURCE_RETRIES = 3  # attempts per source on CursorNotFound/AutoReconnect
 
     def merge(self, sources=None, target_name=None, batch_size=50000, job_manager=None, **kwargs):
         # just override default batch_size, or it consumes too much mem
-        return super(MyVariantDataBuilder, self).merge(sources=sources, target_name=target_name, job_manager=job_manager, batch_size=batch_size, **kwargs)
+        task = super(MyVariantDataBuilder, self).merge(sources=sources, target_name=target_name, job_manager=job_manager, batch_size=batch_size, **kwargs)
+
+        def _on_merge_done(t):
+            if t.cancelled() or t.exception() is None:
+                return
+            exc = t.exception()
+            # base merge() only marks the build failed for metadata errors, not merge errors
+            self.logger.error("Unhandled merge failure, marking build as failed: %s", exc)
+            self.register_status("failed", job={"err": repr(exc)})
+
+        task.add_done_callback(_on_merge_done)
+        return task
+
+    async def merge_source(self, src_name, *args, **kwargs):
+        # upserts are idempotent, so re-running the whole source is safe
+        for attempt in range(1, self.MAX_MERGE_SOURCE_RETRIES + 1):
+            try:
+                return await super().merge_source(src_name, *args, **kwargs)
+            except (CursorNotFound, AutoReconnect) as e:
+                if attempt == self.MAX_MERGE_SOURCE_RETRIES:
+                    raise
+                self.logger.warning(
+                    "Transient error merging source '%s' (attempt %d/%d), retrying: %s",
+                    src_name, attempt, self.MAX_MERGE_SOURCE_RETRIES, e
+                )
 
     def validate_merge(self):
         # MyVariant merging either insert or updates. So we can't just count
