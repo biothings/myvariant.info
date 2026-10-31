@@ -19,6 +19,15 @@ SRC_META = {
 }
 
 
+def find_variant_files(data_folder, pattern):
+    # 4.x zips extract flat, 5.x zips extract into a dbNSFP<release>/ subfolder; "**" covers both
+    paths = glob.glob(os.path.join(data_folder, "**", pattern), recursive=True)
+    if not paths:
+        # an empty job list would otherwise end as a "successful" upload that loaded nothing
+        raise FileNotFoundError("no files matching '%s' under '%s'" % (pattern, data_folder))
+    return paths
+
+
 class DBNSFPBaseUploaderV1(uploader.ParallelizedSourceUploader, SnpeffPostUpdateUploader):
 
     storage_class = MyVariantIgnoreDuplicatedStorage
@@ -29,7 +38,7 @@ class DBNSFPBaseUploaderV1(uploader.ParallelizedSourceUploader, SnpeffPostUpdate
         return mapping_v1
 
     def jobs(self):
-        paths = glob.glob(os.path.join(self.data_folder, self.__class__.GLOB_PATTERN))
+        paths = find_variant_files(self.data_folder, self.__class__.GLOB_PATTERN)
         assembly = self.__class__.__metadata__["assembly"]
         return map(lambda path: (path, assembly), paths)
 
@@ -48,7 +57,7 @@ class DBNSFPBaseUploaderV2(uploader.ParallelizedSourceUploader, SnpeffPostUpdate
         return mapping_v2
 
     def jobs(self):
-        paths = glob.glob(os.path.join(self.data_folder, self.__class__.GLOB_PATTERN))
+        paths = find_variant_files(self.data_folder, self.__class__.GLOB_PATTERN)
         assembly = self.__class__.__metadata__["assembly"]
         return map(lambda path: (path, assembly), paths)
 
