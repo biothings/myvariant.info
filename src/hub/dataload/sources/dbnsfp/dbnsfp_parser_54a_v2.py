@@ -151,6 +151,22 @@ def compose(_split_func: Callable, _unlist_func: Callable):
     return _func
 
 
+def _int_from_float(value: str):
+    # dbNSFP 5.x writes some integer counts as floats, e.g. MutationTaster_trees_benign "196.0"
+    number = float(value)
+    if not number.is_integer():
+        raise ValueError(f"Expected an integer count, got '{value}'")
+    return int(number)
+
+
+def _int_or_float(value: str):
+    # allele counts are integers, except for RegeneronME populations whose counts are fractional (e.g. "2.421e-01")
+    try:
+        return int(value)
+    except ValueError:
+        return float(value)
+
+
 # Transforming functions for "protein" data sources
 # We don't compose with _check_length because it would be easier to apply "zip" on the split results if all values are lists
 split_str = split(";")
@@ -161,6 +177,7 @@ split_int = split_cast(";", int)
 split_str_drop_na = compose(split(";", drop_na=True), _check_length)
 split_float_drop_na = compose(split_cast(";", float, drop_na=True), _check_length)
 split_int_drop_na = compose(split_cast(";", int, drop_na=True), _check_length)
+split_int_or_float_drop_na = compose(split_cast(";", _int_or_float, drop_na=True), _check_length)
 
 # Transforming functions for specific data sources
 split_clinvar = compose(split(r"|", drop_na=True), _check_length)
@@ -493,8 +510,9 @@ COLUMNS = [
     Column("ALFA_Total_AF", dest="alfa.total.af", transform=float),
     # dbNSFP-computed POPMAX across all population databases (added in dbNSFP 5.1)
     Column("dbNSFP_POPMAX_AF", dest="dbnsfp_popmax.af", transform=float),
-    Column("dbNSFP_POPMAX_AC", dest="dbnsfp_popmax.ac", transform=int),
-    Column("dbNSFP_POPMAX_POP", dest="dbnsfp_popmax.pop"),
+    # ties between populations are listed ";"-separated in both AC and POP; AC is fractional for RegeneronME populations
+    Column("dbNSFP_POPMAX_AC", dest="dbnsfp_popmax.ac", transform=split_int_or_float_drop_na),
+    Column("dbNSFP_POPMAX_POP", dest="dbnsfp_popmax.pop", transform=split_str_drop_na),
     # GTEx, eQTLGen, and Geuvadis eQTL columns retired by dbNSFP 5.0
 ]
 
@@ -599,8 +617,8 @@ def prune_mutation_taster(raw_doc: dict, model_column: Column, pred_column: Colu
                 "model": model,
                 "pred": pred,
                 "score": float(score) if score is not None else None,
-                "trees_benign": int(trees_benign) if trees_benign is not None else None,
-                "trees_deleterious": int(trees_deleterious) if trees_deleterious is not None else None
+                "trees_benign": _int_from_float(trees_benign) if trees_benign is not None else None,
+                "trees_deleterious": _int_from_float(trees_deleterious) if trees_deleterious is not None else None
             }
             for (model, pred, score, trees_benign, trees_deleterious) in analysis_values
         ]

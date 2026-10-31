@@ -122,10 +122,28 @@ def split_cast(sep: str, astype: Callable, na_values: set = NA_VALUES):
     return _func
 
 
+def _int_from_float(value: str):
+    # dbNSFP 5.x writes some integer counts as floats, e.g. MutationTaster_trees_benign "196.0"
+    number = float(value)
+    if not number.is_integer():
+        raise ValueError(f"Expected an integer count, got '{value}'")
+    return int(number)
+
+
+def _int_or_float(value: str):
+    # allele counts are integers, except for RegeneronME populations whose counts are fractional (e.g. "2.421e-01")
+    try:
+        return int(value)
+    except ValueError:
+        return float(value)
+
+
 # transforming functions for common data sources
 split_str = split(";")
 split_float = split_cast(";", float)
 split_int = split_cast(";", int)
+split_int_from_float = split_cast(";", _int_from_float)
+split_int_or_float = split_cast(";", _int_or_float)
 
 # transforming functions for specific data sources
 split_clinvar = split(r"|")
@@ -279,8 +297,8 @@ COLUMNS = [
     Column("MutationTaster_rankscore", dest="mutationtaster.rankscore", transform=split_float),  # renamed from MutationTaster_converted_rankscore when dbNSFP 5.0 adopted MutationTaster2021
     Column("MutationTaster_pred", transform=split_str),
     Column("MutationTaster_model", transform=split_str),
-    Column("MutationTaster_trees_benign", dest="mutationtaster.trees_benign", transform=split_int),  # added in dbNSFP 5.0 (MutationTaster2021 random-forest tree counts)
-    Column("MutationTaster_trees_deleterious", dest="mutationtaster.trees_deleterious", transform=split_int),  # ditto
+    Column("MutationTaster_trees_benign", dest="mutationtaster.trees_benign", transform=split_int_from_float),  # added in dbNSFP 5.0 (MutationTaster2021 random-forest tree counts)
+    Column("MutationTaster_trees_deleterious", dest="mutationtaster.trees_deleterious", transform=split_int_from_float),  # ditto
     # MutationTaster_AAE retired by dbNSFP 5.0 (tied to the pre-2021 MutationTaster model)
     Column("MutationAssessor_score", transform=split_float),
     Column("MutationAssessor_rankscore", transform=split_float),
@@ -468,8 +486,9 @@ COLUMNS = [
     Column("ALFA_Total_AF", dest="alfa.total.af", transform=float),
     # dbNSFP-computed POPMAX across all population databases (added in dbNSFP 5.1)
     Column("dbNSFP_POPMAX_AF", dest="dbnsfp_popmax.af", transform=float),
-    Column("dbNSFP_POPMAX_AC", dest="dbnsfp_popmax.ac", transform=int),
-    Column("dbNSFP_POPMAX_POP", dest="dbnsfp_popmax.pop"),
+    # ties between populations are listed ";"-separated in both AC and POP; AC is fractional for RegeneronME populations
+    Column("dbNSFP_POPMAX_AC", dest="dbnsfp_popmax.ac", transform=split_int_or_float),
+    Column("dbNSFP_POPMAX_POP", dest="dbnsfp_popmax.pop", transform=split_str),
     # GTEx, eQTLGen, and Geuvadis eQTL columns retired by dbNSFP 5.0
 ]
 

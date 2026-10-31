@@ -664,7 +664,7 @@ mapping = {
             "dbnsfp_popmax": {  # new in dbNSFP 5.1
                 "properties": {
                     **allele_freq_field,
-                    **allele_count_field,
+                    "ac": {"type": "float"},  # fractional for RegeneronME populations
                     "pop": keyword_value_field
                 }
             }

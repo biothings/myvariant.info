@@ -219,6 +219,69 @@ class TestFieldsCarriedOverFrom531a(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+# Value formats seen in the real dbNSFP5.4a_variant.chr<#> files
+# (the tests above use hand-written values and never hit these)
+# ---------------------------------------------------------------------------
+
+class TestRealFileValueFormats(unittest.TestCase):
+
+    def test_trees_counts_are_written_as_floats(self):
+        """MutationTaster_trees_* are counts but the files write them as "196.0"."""
+        row = _base_row(V1)
+        row.update({"MutationTaster_trees_benign": "196.0", "MutationTaster_trees_deleterious": "4.0"})
+        mt = V1.construct_hg38_doc(row)["dbnsfp"]["mutationtaster"]
+        self.assertEqual((mt["trees_benign"], mt["trees_deleterious"]), (196, 4))
+        self.assertIsInstance(mt["trees_benign"], int)
+
+    def test_v2_trees_counts_are_written_as_floats(self):
+        row = _base_row(V2)
+        row.update({
+            "MutationTaster_score": "1", "MutationTaster_rankscore": "0.9",
+            "MutationTaster_pred": "D", "MutationTaster_model": "simple_aae",
+            "MutationTaster_trees_benign": "196.0", "MutationTaster_trees_deleterious": "4.0",
+        })
+        analysis = V2.construct_hg38_doc(row)["dbnsfp"]["mutationtaster"]["analysis"]
+        self.assertEqual((analysis["trees_benign"], analysis["trees_deleterious"]), (196, 4))
+        self.assertIsInstance(analysis["trees_benign"], int)
+
+    def test_non_integral_count_is_rejected(self):
+        with self.assertRaises(ValueError):
+            V1._int_from_float("196.5")
+        with self.assertRaises(ValueError):
+            V2._int_from_float("196.5")
+
+    def test_popmax_ties_are_listed_in_ac_and_pop(self):
+        """When populations tie for the maximum AF, AC and POP list every one, ";"-separated."""
+        for mod in (V1, V2):
+            row = _base_row(mod)
+            row.update({
+                "dbNSFP_POPMAX_AF": "0.000e+00", "dbNSFP_POPMAX_AC": "0;0;0",
+                "dbNSFP_POPMAX_POP": "ALFA_European;ALFA_African_Others;ALFA_East_Asian",
+            })
+            popmax = mod.construct_hg38_doc(row)["dbnsfp"]["dbnsfp_popmax"]
+            self.assertEqual(popmax["ac"], [0, 0, 0])
+            self.assertEqual(popmax["pop"], ["ALFA_European", "ALFA_African_Others", "ALFA_East_Asian"])
+
+    def test_popmax_ac_is_fractional_for_regeneronme(self):
+        for mod in (V1, V2):
+            row = _base_row(mod)
+            row.update({"dbNSFP_POPMAX_AF": "4.615e-06", "dbNSFP_POPMAX_AC": "2.421e-01", "dbNSFP_POPMAX_POP": "RegeneronME_SPA"})
+            popmax = mod.construct_hg38_doc(row)["dbnsfp"]["dbnsfp_popmax"]
+            self.assertEqual(popmax, {"af": 4.615e-06, "ac": 0.2421, "pop": "RegeneronME_SPA"})
+
+    def test_popmax_tied_regeneronme_counts(self):
+        for mod in (V1, V2):
+            row = _base_row(mod)
+            row.update({
+                "dbNSFP_POPMAX_AF": "9.572e-07", "dbNSFP_POPMAX_AC": "1.000e+00;7.863e-01",
+                "dbNSFP_POPMAX_POP": "RegeneronME_BI;RegeneronME_GBR",
+            })
+            popmax = mod.construct_hg38_doc(row)["dbnsfp"]["dbnsfp_popmax"]
+            self.assertEqual(popmax["ac"], [1.0, 0.7863])
+            self.assertEqual(popmax["pop"], ["RegeneronME_BI", "RegeneronME_GBR"])
+
+
+# ---------------------------------------------------------------------------
 # Multi-transcript merge regression (issue #179), re-run for 5.4a
 # ---------------------------------------------------------------------------
 
