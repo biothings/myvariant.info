@@ -71,9 +71,7 @@ def generate_clinvar_lib(data_folder):
         if not cmd:
             raise OSError('"generateDS.py" is not found in the PATH!')
         # logging.info("CMD: %s; PATH: %s", cmd, os.environ.get("PATH"))
-        cmd += " -f -o clinvar_tmp.py -s clinvarsubs.py ClinVar_RCV.xsd"
-        # logging.info("CMD: %s", cmd)
-        ret = subprocess.call(cmd, shell=True)
+        ret = subprocess.call([cmd, "-f", "-o", "clinvar_tmp.py", "-s", "clinvarsubs.py", "ClinVar_RCV.xsd"])
         if ret != 0:
             raise Exception("Unable to generate parser, return code: %s" % ret)
         try:
